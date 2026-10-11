@@ -14,7 +14,7 @@ declare(strict_types=1);
  *   php paparan/generate.php
  */
 
-$outFile = __DIR__ . "/Laravel-Security-Monitor-Bulwark.pptx";
+$outFile = __DIR__ . "/Pasak-Bulwark.pptx";
 
 const SLIDE_W = 12192000; // 13.333 in (16:9)
 const SLIDE_H = 6858000; // 7.5 in
@@ -408,9 +408,9 @@ $slides = [
             "Auto-discovery: `PasakServiceProvider` + Facade `Pasak`.",
             "Trait `HasSecurityRelations` pada model `User` host.",
             "Middleware teraliasing: `security.block`, `security.detect`, `security.admin`, `security.activity`.",
-            "Gate `manage-security-monitor` untuk otorisasi admin.",
+            "Gate `manage-pasak` untuk otorisasi admin.",
             "Model & nama tabel dinamis via config — tidak ada `User` atau tabel yang di-hardcode.",
-            "Zero-touch opsional: `SECURITY_AUTO_REGISTER_MIDDLEWARE=true`.",
+            "Zero-touch opsional: PASAK_AUTO_REGISTER_MIDDLEWARE=true.",
         ],
     ],
     [
@@ -427,12 +427,12 @@ $slides = [
         "kind" => "content",
         "title" => "CLI Artisan & Automation",
         "bullets" => [
-            "`security:install` — publikasi aset + hardening interaktif.",
-            "`security:scan-logs` — pindai log akses dan auto-block.",
-            "`security:baseline` — audit, buat, atau hapus baseline SHA-256.",
-            "`security:unblock-ip` — cabut blokir darurat.",
-            "`security:prune-logs` — bersihkan log kedaluwarsa (default 90 hari).",
-            "`security:purge-injected-data` — bersihkan residu payload pentest dari database.",
+            "`pasak:install` — publikasi aset + hardening interaktif.",
+            "`pasak:scan-logs` — pindai log akses dan auto-block.",
+            "`pasak:baseline` — audit, buat, atau hapus baseline SHA-256.",
+            "`pasak:unblock-ip` — cabut blokir darurat.",
+            "`pasak:prune-logs` — bersihkan log kedaluwarsa (default 90 hari).",
+            "`pasak:purge-injected-data` — bersihkan residu payload pentest dari database.",
             "Scheduler: prune log, heartbeat, dan pemindaian log harian.",
         ],
     ],
@@ -442,7 +442,7 @@ $slides = [
         "bullets" => [
             "Nginx: dual rate-limit zone, eksekusi PHP hanya lewat `/index.php`, sandbox storage, blokir ekstensi ganda.",
             "Apache/LiteSpeed: proteksi dotfile, blokir ekstensi ganda, kunci berkas backup/log, matikan directory indexing.",
-            "Publikasi template: `vendor:publish --tag=security-nginx` / `security-htaccess` / `security-all`.",
+            "Publikasi template: `vendor:publish --tag=pasak-nginx` / `pasak-htaccess` / `pasak-all`.",
         ],
     ],
     [
@@ -450,18 +450,18 @@ $slides = [
         "title" => "Instalasi Cepat",
         "bullets" => [
             "`composer require robyajo/pasak`",
-            "`php artisan security:install`",
+            "`php artisan pasak:install`",
             "`php artisan migrate`",
             "Tambahkan trait `HasSecurityRelations` ke model `User` dan daftarkan middleware.",
-            "Opsional: `SECURITY_AUTO_REGISTER_MIDDLEWARE=true`.",
-            "`php artisan security:baseline --create`",
+            "Opsional: `PASAK_AUTO_REGISTER_MIDDLEWARE=true`. ",
+            "`php artisan pasak:baseline --create`",
         ],
     ],
     [
         "kind" => "content",
         "title" => "Kualitas & Kompatibilitas",
         "bullets" => [
-            "70 tes / 302 assertion (Pest PHP + Orchestra Testbench) — semuanya lulus.",
+            "133 tes / 566 assertion (Pest PHP + Orchestra Testbench) — semuanya lulus.",
             "Matriks CI: Laravel 10–13 × PHP 8.2–8.5 (12 kombinasi, semuanya hijau).",
             "ReDoS-safe: setiap regex diuji terhadap payload 100KB+.",
             "Lisensi MIT, tanpa dependensi build frontend.",

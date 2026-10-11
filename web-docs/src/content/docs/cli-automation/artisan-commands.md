@@ -11,6 +11,8 @@ Paket menyertakan kumpulan perintah Artisan CLI untuk administrasi, otomasi pemi
 
 ## 1. `pasak:install`
 
+Wizard instalasi terpandu bilingual (Indonesia default / English via `--lang=en`): pilihan mode API-only (`--api-only`), pilihan dashboard (Blade murni / Livewire / React / keduanya / tidak ada), cek kelengkapan lingkungan, tawaran migrasi langsung, dan saran langkah berikutnya beserta tautan dokumentasi.
+
 Menginisialisasi paket, mempublikasikan konfigurasi, migrasi database, konfigurasi Nginx hardened WAF, serta menerapkan aturan **Apache `.htaccess` Hardened** di folder `public/`.
 
 ```bash
@@ -25,13 +27,20 @@ php artisan pasak:install [options]
 
 ### Mekanisme Penyematan Variabel `.env` & `.env.example`:
 
-- Installer secara otomatis memeriksa apakah blok konfigurasi `SECURITY_*` sudah ada di `.env` dan `.env.example`.
+- Installer secara otomatis memeriksa apakah blok konfigurasi `PASAK_*` sudah ada di `.env` dan `.env.example`.
 - Jika belum ada, installer menyematkan blok variabel lingkungan lengkap dengan komentar dokumentasi berbahasa Indonesia di akhir berkas.
 - Opsi `--without-env` dapat digunakan untuk melewati langkah ini jika Anda ingin mengonfigurasi variabel lingkungan secara manual.
 
 ### Opsi:
 
 - `--force`: Menimpa seluruh berkas konfigurasi, migrasi, `nginx.conf`, dan `public/.htaccess` dengan template bawaan.
+- `--lang=`: Bahasa wizard (`id` | `en`).
+- `--api-only`: Instalasi API-only — inti + keamanan saja, tanpa halaman/dashboard.
+- `--with-plain` / `--with-blade`: Dashboard Blade murni (semua aplikasi Laravel).
+- `--with-livewire` / `--with-dashboard`: Dashboard Livewire Starter Kit.
+- `--with-tsx` / `--with-react-dashboard`: Dashboard React/TSX Starter Kit.
+- `--with-both`: Blade murni + TSX.
+- `--stack=`: `blade`, `livewire`, `tsx`, `both`, atau `none`.
 - `--without-nginx`: Melewatkan publikasi berkas `nginx.conf`.
 - `--without-htaccess`: Melewatkan publikasi atau penambahan aturan pada `public/.htaccess`.
 - `--with-htaccess`: Memaksa pembaruan berkas `public/.htaccess` dengan aturan hardening keamanan.
@@ -164,3 +173,34 @@ php artisan pasak:purge-injected-data [options]
 - `--force`: Menghapus baris data tercemar yang ditemukan.
 - `--marker=*`: Marker teks spesifik yang dicari (dapat diulang, default: canary pentest umum).
 - `--model=*`: Membatasi pencarian pada model Eloquent tertentu.
+
+## 7. `pasak:upgrade`
+
+Memperbarui paket via Composer lalu menyinkronkan migrasi, rute kustom, dan tampilan dashboard **tanpa menimpa kustomisasi host** (sinkronisasi paksa mencadangkan dulu ke `*.backup-*`).
+
+```bash
+php artisan pasak:upgrade --check
+php artisan pasak:upgrade --force --no-composer --no-migrate
+```
+
+### Opsi:
+
+- `--check`: Hanya memeriksa versi terbaru tanpa mengubah apa pun.
+- `--force`: Jalankan penuh meskipun sudah versi terbaru.
+- `--no-composer`: Lewati `composer update` (sinkronisasi aset lokal saja).
+- `--no-migrate`: Lewati `php artisan migrate`.
+- `--sync-routes` / `--sync-views`: Timpa berkas rute/tampilan setelah mencadangkan.
+
+## 8. `pasak:uninstall`
+
+Mencopot seluruh jejak paket dari aplikasi host tanpa merusaknya: menghapus 7 tabel Pasak (+ record migrasinya), rute publikasi, middleware, trait User, variabel `PASAK_*`, mengembalikan `.htaccess` dari cadangan, menghapus berkas publikasi, dan menjalankan `composer remove`.
+
+```bash
+php artisan pasak:uninstall --force
+```
+
+### Opsi:
+
+- `--force`: Jalankan tanpa konfirmasi interaktif.
+- `--keep-tables`: Pertahankan tabel database.
+- `--keep-env`: Pertahankan variabel `.env`.

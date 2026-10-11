@@ -73,7 +73,7 @@ Perintah ini akan secara otomatis:
     - Jika berkas sudah ada: membuat cadangan otomatis `public/.htaccess.backup-YYYYMMDD_HHMMSS` dan menyisipkan blok hardening keamanan di bagian bawah berkas tanpa merusak aturan rewrite kustom Anda.
     - Jika sudah memiliki aturan hardening: mendeteksi dan mempertahankan berkas yang sudah terlindungi.
 5. **Menyematkan Variabel Lingkungan ke `.env` & `.env.example`**:
-    - Menambahkan blok konfigurasi lengkap (`SECURITY_*`) disertai dokumentasi penjelasan fungsi berbahasa Indonesia langsung di bagian bawah berkas `.env` dan `.env.example`.
+    - Menambahkan blok konfigurasi lengkap (`PASAK_*`) disertai dokumentasi penjelasan fungsi berbahasa Indonesia langsung di bagian bawah berkas `.env` dan `.env.example`.
     - Menggunakan deteksi cerdas agar tidak terjadi duplikasi jika variabel sudah pernah ditambahkan sebelumnya.
 6. **Menyematkan Trait `HasSecurityRelations` ke Model User**:
     - Secara otomatis mendeteksi model `User` (`app/Models/User.php`) dan menambahkan import `use Internal\Pasak\Concerns\HasSecurityRelations;` serta menyematkan trait `HasSecurityRelations`.
@@ -83,8 +83,8 @@ Perintah ini akan secara otomatis:
     - Idempotent: memeriksa keberadaan middleware terlebih dahulu sebelum mendaftarkan.
 8. **Menyiapkan Dukungan API & Berkas Rute Kustom (`routes/`)**:
     - Memeriksa apakah berkas `routes/api.php` sudah tersedia. Jika belum (pada Laravel 11+), otomatis menjalankan `php artisan install:api` agar dukungan API aktif.
-    - Menghasilkan berkas `routes/security-api.php` untuk endpoint headless REST API dan menyertakannya di `routes/api.php` (`require __DIR__.'/security-api.php';`).
-    - Menghasilkan berkas `routes/security.php` untuk rute web dashboard yang langsung me-render ke view dan menyertakannya di `routes/web.php` (`require __DIR__.'/security.php';`).
+    - Menghasilkan berkas `routes/pasak-api.php` untuk endpoint headless REST API dan menyertakannya di `routes/api.php` (`require __DIR__.'/pasak-api.php';`).
+    - Menghasilkan berkas `routes/pasak.php` untuk rute web dashboard yang langsung me-render ke view dan menyertakannya di `routes/web.php` (`require __DIR__.'/pasak.php';`).
     - Memberikan kebebasan penuh kepada developer untuk mengkustomisasi prefix URL, middleware, otorisasi, dan tampilan tanpa terkunci pada rute internal paket.
 
 ### Opsi Perintah:
@@ -92,13 +92,16 @@ Perintah ini akan secara otomatis:
 | Opsi                   | Fungsi                                                                                                                    |
 | :--------------------- | :------------------------------------------------------------------------------------------------------------------------ |
 | `--force`              | Menimpa seluruh berkas konfigurasi, migrasi, `nginx.conf`, dan `public/.htaccess` dengan template bawaan paket.           |
-| `--with-blade`         | Mempublikasikan tampilan dashboard monitoring Blade (Livewire Starter Kit — Pure Vanilla CSS).                            |
+| `--lang=...`           | Bahasa wizard instalasi (`id` default, `en`).                                                                             |
+| `--api-only`           | Instalasi API-only: inti + keamanan saja, tanpa halaman/dashboard.                                                        |
+| `--with-plain` / `--with-blade` | Mempublikasikan dashboard Blade murni — jalan di semua aplikasi Laravel, tanpa Livewire/Inertia.              |
+| `--with-livewire` / `--with-dashboard` | Mempublikasikan tampilan dashboard monitoring Livewire Starter Kit.                                          |
 | `--with-tsx`           | Mempublikasikan tampilan dashboard monitoring TSX (Inertia + React Starter Kit — Pure Vanilla CSS).                       |
-| `--with-both`          | Mempublikasikan kedua tampilan dashboard monitoring sekaligus (Blade & TSX).                                              |
-| `--stack=...`          | Menentukan stack dashboard yang ingin dipublikasikan (`blade`, `tsx`, `both`, `none`).                                    |
+| `--with-both`          | Mempublikasikan kedua tampilan dashboard monitoring sekaligus (Blade murni & TSX).                                        |
+| `--stack=...`          | Menentukan stack dashboard yang ingin dipublikasikan (`blade`, `livewire`, `tsx`, `both`, `none`).                                    |
 | `--without-user-trait` | Melewatkan penyematan otomatis trait `HasSecurityRelations` ke model User.                                                |
 | `--without-middleware` | Melewatkan pendaftaran otomatis middleware WAF di `bootstrap/app.php` / `Kernel.php`.                                     |
-| `--without-routes`     | Melewatkan pembuatan berkas rute `routes/security.php` dan `routes/security-api.php`.                                     |
+| `--without-routes`     | Melewatkan pembuatan berkas rute `routes/pasak.php` dan `routes/pasak-api.php`.                                     |
 | `--without-api`        | Melewatkan pemeriksaan dan instalasi rute API (`install:api`).                                                            |
 | `--without-nginx`      | Melewatkan publikasi berkas `nginx.conf` jika server Anda tidak menggunakan web server Nginx.                             |
 | `--without-htaccess`   | Melewatkan pembaruan berkas `public/.htaccess` jika Anda menggunakan Nginx murni dan tidak memerlukan Apache `.htaccess`. |
@@ -140,8 +143,8 @@ php artisan vendor:publish --tag=pasak-routes-api
 
 Berkas akan ditempatkan di:
 
-- `routes/security.php` (rute web dashboard yang langsung me-render view).
-- `routes/security-api.php` (rute headless REST API).
+- `routes/pasak.php` (rute web dashboard yang langsung me-render view).
+- `routes/pasak-api.php` (rute headless REST API).
 
 ### 4. Publikasikan Template Nginx WAF Hardened Saja
 
@@ -178,7 +181,7 @@ php artisan vendor:publish --tag=starterkit-tsx
 php artisan vendor:publish --tag=starterkit-all
 ```
 
-Perintah Blade menyalin enam halaman Livewire (single-file component) ke `resources/views/pages/pasak/`. Perintah TSX menyalin enam halaman Inertia/React ke `resources/js/pages/pasak/` beserta komponen pendukung di `resources/js/components/pasak/`. Keduanya juga menyertakan konfigurasi `dashboard` pada `config/pasak.php`. Dashboard diakses di prefix `/security` dan **wajib login** (lihat bagian [Dashboard Monitoring Starter Kit](#8-dashboard-monitoring-starter-kit-opsional)).
+Perintah Blade murni menyalin tujuh halaman Blade ke `resources/views/pages/pasak/` (tanpa ketergantungan apa pun). Perintah Livewire menyalin delapan single-file component (termasuk layout). Perintah TSX menyalin tujuh halaman Inertia/React ke `resources/js/pages/pasak/` beserta komponen pendukung di `resources/js/components/pasak/`. Keduanya juga menyertakan konfigurasi `dashboard` pada `config/pasak.php`. Dashboard diakses di prefix `/pasak` dan **wajib login** (lihat bagian [Dashboard Monitoring Starter Kit](#8-dashboard-monitoring-starter-kit-opsional)).
 
 ---
 
@@ -284,21 +287,29 @@ protected $middleware = [
 ];
 ```
 
-> **Tips Opsi Otomatis (Zero-Touch)**: Jika Anda mengatur `SECURITY_AUTO_REGISTER_MIDDLEWARE=true` di berkas `.env`, paket akan otomatis menyuntikkan `BlockIpAddress` dan `DetectSecurityThreats` ke Kernel HTTP aplikasi secara otomatis saat booting.
+> **Tips Opsi Otomatis (Zero-Touch)**: Jika Anda mengatur `PASAK_AUTO_REGISTER_MIDDLEWARE=true` di berkas `.env`, paket akan otomatis menyuntikkan `BlockIpAddress` dan `DetectSecurityThreats` ke Kernel HTTP aplikasi secara otomatis saat booting.
 
 ---
 
-## 8. Dashboard Monitoring Starter Kit (Opsional)
+## 8. Dashboard Monitoring (Opsional)
 
-Paket tetap 100% headless secara default. Bila aplikasi host menggunakan **starter kit resmi Laravel**, Anda dapat mengaktifkan panel monitoring siap pakai. Pilih salah satu stack.
+Paket tetap 100% headless secara default. Bila membutuhkan panel monitoring siap pakai, pilih salah satu stack.
 
-### A. Livewire Starter Kit (Flux UI)
+### A. Blade Murni (semua aplikasi Laravel, tanpa Livewire/Inertia)
+
+```bash
+php artisan vendor:publish --tag=plain-views
+```
+
+Halaman tersimpan di `resources/views/pages/pasak/` dan dirender controller bawaan paket.
+
+### B. Livewire Starter Kit (Flux UI)
 
 ```bash
 php artisan vendor:publish --tag=starterkit-livewire
 ```
 
-### B. React Starter Kit (Inertia + React + shadcn/ui)
+### C. React Starter Kit (Inertia + React + shadcn/ui)
 
 ```bash
 php artisan vendor:publish --tag=starterkit-react
@@ -314,14 +325,14 @@ npm run build
 ```bash
 # Aktifkan di .env
 #    PASAK_DASHBOARD_ENABLED=true
-#    PASAK_DASHBOARD_DRIVER=livewire   # atau "react"
+#    PASAK_DASHBOARD_DRIVER=blade      # blade | livewire | react
 #    PASAK_DASHBOARD_PREFIX=pasak
 
 # Bersihkan cache
 php artisan optimize:clear
 ```
 
-Panel tersedia di `/security` dan berisi enam modul: **Overview**, **Security Logs**, **Blocked IPs**, **Server Audit**, **User Sessions**, dan **Unblock Appeals**.
+Panel tersedia di `/pasak` dan berisi tujuh modul: **Overview**, **Security Logs**, **Blocked IPs**, **Server Audit**, **User Sessions**, **Unblock Appeals**, dan **Settings**.
 
 ### Keamanan & Kontrol Akses
 

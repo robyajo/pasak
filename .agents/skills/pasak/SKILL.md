@@ -23,9 +23,9 @@ metadata:
         - **Package Auto-Discovery**: `PasakServiceProvider` + `Pasak` Facade.
         - **Core Eloquent Model Trait**: `HasSecurityRelations` on host `User` model (similar to Spatie's `HasRoles`).
         - **Core Auth Events**: Automatically listens to `\Illuminate\Auth\Events\Failed` and `Login`.
-        - **Core HTTP Middleware**: Aliased as `'security.block'`, `'security.detect'`, `'security.admin'`, `'security.activity'`.
-        - **Core Gate**: `Gate::define('manage-security-monitor')`.
-        - **Core Artisan Commands**: 6 commands under `php artisan security:*`.
+        - **Core HTTP Middleware**: Aliased as `'pasak.block'`, `'pasak.detect'`, `'pasak.admin'`, `'pasak.activity'`.
+        - **Core Gate**: `Gate::define('manage-pasak')`.
+        - **Core Artisan Commands**: 8 commands under `php artisan pasak:*` (`install`, `scan-logs`, `baseline`, `unblock-ip`, `prune-logs`, `purge-injected-data`, `upgrade`, `uninstall`).
         - **Core Scheduler**: Auto-registered prune & heartbeat tasks.
         - **Validation Rules**: `SafeImageFile`, `SafeAssetPath`.
 
@@ -113,7 +113,7 @@ All endpoints use prefix `/api/security` (configurable in `config/security.php`)
 
 - `POST /api/security/trusted-ips/save-my-ip`: Save current IP as trusted.
 
-### Admin Protected (`auth` + `security.admin`)
+### Admin Protected (`auth` + `pasak.admin`)
 
 - **Logs**: `GET /logs`, `DELETE /logs/clear`, `DELETE /logs/{id}`.
 - **Blocked IPs**: `GET /blocked-ips`, `POST /blocked-ips`, `GET /blocked-ips/{id}`, `PATCH /blocked-ips/{id}/toggle`, `DELETE /blocked-ips/{id}`.
@@ -126,9 +126,9 @@ All endpoints use prefix `/api/security` (configurable in `config/security.php`)
 - `php artisan vendor:publish --tag=security-nginx`: Publishes `nginx.conf` template with dual-zone rate limiting, strict single-PHP execution (`/index.php` only), storage sandboxing (nosniff + CSP sandbox), and double-extension blocking.
 - `php artisan vendor:publish --tag=security-htaccess`: Publishes `public/.htaccess` template with Apache hardening (dotfile protection, double extension blocking, dump/log protection, directory indexing disabled).
 - `php artisan vendor:publish --tag=security-all`: Publishes config, migrations, `nginx.conf`, and `public/.htaccess` in a single command.
-- `php artisan vendor:publish --tag=starterkit-livewire`: Publishes the optional Livewire Starter Kit monitoring dashboard (six single-file Livewire pages under `resources/views/pages/security/`) plus the `dashboard` configuration block. The dashboard is disabled by default and, once enabled via `SECURITY_DASHBOARD_ENABLED=true` and `SECURITY_DASHBOARD_DRIVER=livewire`, is served under `/security` behind the `web` + `auth` + `security.admin` middleware.
-- `php artisan vendor:publish --tag=starterkit-react`: Publishes the optional Inertia + React Starter Kit monitoring dashboard (six Inertia pages under `resources/js/pages/security/` plus shared components under `resources/js/components/security/`) and the `dashboard` configuration block. Set `SECURITY_DASHBOARD_DRIVER=react` to serve the server-rendered Inertia pages (backed by `Internal\Pasak\Http\Controllers\Dashboard\*`) under `/security`, behind the same auth + admin middleware. Run `npm run build` after publishing.
-- `php artisan security:install`: Interactive one-stop command that publishes assets and auto-appends hardening rules to `public/.htaccess` with automatic backup. Add `--with-dashboard` (Livewire) or `--with-react-dashboard` (React) to also publish the dashboard.
+- `php artisan vendor:publish --tag=starterkit-livewire`: Publishes the optional Livewire Starter Kit monitoring dashboard (six single-file Livewire pages under `resources/views/pages/pasak/`) plus the `dashboard` configuration block. The dashboard is disabled by default and, once enabled via `PASAK_DASHBOARD_ENABLED=true` and `PASAK_DASHBOARD_DRIVER=blade`, is served under `/pasak` behind the `web` + `auth` + `pasak.admin` middleware.
+- `php artisan vendor:publish --tag=starterkit-react`: Publishes the optional Inertia + React Starter Kit monitoring dashboard (six Inertia pages under `resources/js/pages/pasak/` plus shared components under `resources/js/components/pasak/`) and the `dashboard` configuration block. Set `PASAK_DASHBOARD_DRIVER=react` to serve the server-rendered Inertia pages (backed by `Internal\Pasak\Http\Controllers\Dashboard\*`) under `/pasak`, behind the same auth + admin middleware. Run `npm run build` after publishing.
+- `php artisan pasak:install`: Interactive bilingual wizard (ID/EN, API-only mode, starterkit picker, readiness check, optional migrate) that publishes assets and auto-appends hardening rules to `public/.htaccess` with automatic backup. Add `--with-plain` (plain Blade, any app), `--with-livewire`, or `--with-react-dashboard` to also publish the dashboard. `--with-blade` is an alias of `--with-plain`.
 
 ---
 
@@ -136,12 +136,14 @@ All endpoints use prefix `/api/security` (configurable in `config/security.php`)
 
 | Command                                  | Purpose                                                                                             |
 | :--------------------------------------- | :-------------------------------------------------------------------------------------------------- |
-| `security:install`                       | Publish all package assets: config, migrations, and hardened `nginx.conf` with interactive options. |
-| `security:scan-logs`                     | Stream & parse Apache/Nginx access logs for zero-tolerance attacks; auto-block offending IPs.       |
-| `security:baseline`                      | Audit, create (`--create`), or destroy (`--destroy`) SHA-256 integrity baseline.                    |
-| `security:unblock-ip {ip}`               | Lift block on IP or device immediately (emergency escape hatch).                                    |
-| `security:prune-logs {--days=}`          | Remove logs older than retention period (default: 90 days).                                         |
-| `security:purge-injected-data {--force}` | Scan & clean residual pentest payloads from application database tables.                            |
+| `pasak:install`                       | Publish all package assets: config, migrations, and hardened `nginx.conf` with interactive options. |
+| `pasak:scan-logs`                     | Stream & parse Apache/Nginx access logs for zero-tolerance attacks; auto-block offending IPs.       |
+| `pasak:baseline`                      | Audit, create (`--create`), or destroy (`--destroy`) SHA-256 integrity baseline.                    |
+| `pasak:unblock-ip {ip}`               | Lift block on IP or device immediately (emergency escape hatch).                                    |
+| `pasak:prune-logs {--days=}`          | Remove logs older than retention period (default: 90 days).                                         |
+| `pasak:purge-injected-data {--force}` | Scan & clean residual pentest payloads from application database tables.                            |
+| `pasak:upgrade {--check,--force,--no-composer,--no-migrate,--sync-routes,--sync-views}` | Update via Composer without overwriting host customizations (auto-backup on forced sync). |
+| `pasak:uninstall {--force,--keep-tables,--keep-env}` | Remove all package traces from host apps (config, routes, middleware, trait, tables, files). |
 
 ---
 

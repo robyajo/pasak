@@ -2,6 +2,134 @@
 
 All notable changes to `robyajo/pasak` will be documented in this file.
 
+## [1.1.5] - 2026-10-11
+
+### Added
+
+- **Plain-Blade monitoring dashboard (no Livewire/Inertia required)**: new `stubs/blade/pages/pasak/` views (standalone layout + Overview, Logs, Blocked IPs, Server, Sessions, Appeals, Settings) published with `php artisan vendor:publish --tag=plain-views` or `php artisan pasak:install --with-plain` / `--with-blade`. Dashboard controllers now dual-render via `RespondsWithDashboard`: driver `blade` (new default) serves plain views, `react` serves Inertia, with graceful fallback when a stack is missing.
+- **Dashboard route file for plain Blade** (`routes/pasak-dashboard-blade.php`) covering all CRUD endpoints with the same `pasak.dashboard.*` names.
+- Installer wizard choice for plain Blade (auto-default when Livewire is absent), `--with-livewire` flag, and `--stack` values `blade` / `livewire`.
+
+### Changed
+
+- **BREAKING (minor, pre-1.2)**: `--with-blade` now means plain Blade (was Livewire alias); use `--with-livewire` / `--with-dashboard` for the single-file Livewire version. `--with-both` and `--stack=both` now pair plain Blade + TSX.
+- Dashboard `driver` default is now `blade`; `livewire` only serves the Livewire routes.
+- Fixed the `routes/pasak.php` stub fallback which rendered non-existent `pages.security.*` views; it now wires the dashboard controllers directly. Default dashboard prefix in stubs corrected to `pasak`.
+- `pasak:upgrade` blade sync follows the host stack (Livewire tag vs `plain-views`).
+
+### Verified
+
+- All 7 plain-Blade pages render HTTP 200 with working mutations on a real `laravel new` app; suite at **133 passed (566 assertions)**.
+
+## [1.1.4] - 2026-10-11
+
+### Fixed
+
+- **Dashboard styling gaps**: added 5 missing CSS classes to the Livewire layout (`sec-badge-warning`, `sec-card-body`, `sec-card-desc`, `sec-content`, `sec-label`) plus scope-selector styles; replaced emoji nav icons with inline SVGs on Blade and React.
+- **React dashboard**: `pasak-nav.tsx` no longer hardcodes `/security` (prefix derived at runtime); added missing `sec-header/title/subtitle`, `sec-alert*`, `sec-card-desc`, `sec-badge-warning` styles; fixed `ui.tsx` prop types (`id`, `onKeyDown`, `title`, `warning`) — `tsc --noEmit` and `vite build` pass.
+- **Dashboard controllers** rendered `Inertia::render('security/*')` while pages live at `js/pages/pasak/*` — corrected to `pasak/*`.
+- **`pasak:uninstall` left migration records behind**, so reinstalls reported "Nothing to migrate" with missing tables (dashboard 500s). Uninstall now deletes its migration rows; legacy `security_*` tables are also dropped.
+
+### Verified
+
+- Render-tested on real Livewire + React apps (login, all pages 200, block-IP mutation persisted).
+
+## [1.1.3] - 2026-10-11
+
+### Fixed
+
+- `PasakService::VERSION` was stale (`2.0.8`), making `pasak:upgrade` report a phantom version and silencing update notices. Synced to the release line; `push.sh` now rewrites the constant to the new tag on every push.
+- Installer/uninstaller normalize edited host files (single trailing newline, collapsed blank lines) so they stay Pint-clean; `laravel-test/` excluded from `pint.json`.
+- Install guide curl probe documented the localhost whitelist exclusion (`PASAK_IP_WHITELIST`).
+
+## [1.1.2] - 2026-10-11
+
+### Changed
+
+- Internal maintenance commit (no user-facing changes).
+
+## [1.1.1] - 2026-10-11
+
+### Added
+
+- **Interactive install wizard** (`php artisan pasak:install`): language choice (ID default / EN, `--lang`), API-only mode (`--api-only`: core + security, no pages or web dashboard routes), starterkit picker (Livewire / React / both / none, skipped for API-only), environment readiness check (PHP, Laravel, DB, `.env`), optional immediate `php artisan migrate`, and numbered next steps each with a docs link to `https://security-dev.pekanbaru.go.id/`.
+- New `--with-tsx`, `--with-both`, `--stack` handling unified with the wizard.
+
+## [1.1.0] - 2026-10-11
+
+### Fixed
+
+- Quoted Mermaid node labels containing `()` (`User::logins()`, `Gate::define(...)`) which broke diagram rendering in the docs portal and Starlight site.
+
+## [1.0.10] - 2026-10-11
+
+### Changed
+
+- Docs: last `security.activity` alias references renamed to `pasak.activity`.
+
+## [1.0.9] - 2026-10-11
+
+### Changed
+
+- Docs: stale middleware aliases, `manage-security-monitor` gate, and `security.*` route names updated to `pasak.*` across guides.
+
+## [1.0.8] - 2026-10-11
+
+### Fixed
+
+- **BREAKING (minor, pre-1.1)**: `pasak:upgrade` no longer force-overwrites customized host routes/views; `--sync-routes` / `--sync-views` back up to `*.backup-*` first.
+- Fixed installer writing `require security.php` (non-existent file, fatal on hosts) instead of `require pasak.php`, plus duplicate-require guard.
+- New `PasakLifecycleEdgeTest` (10 simulations): fresh/partial/legacy hosts, Laravel 10 Kernel style, combined-trait removal, upgrade backup behavior.
+
+## [1.0.7] - 2026-10-11
+
+### Added
+
+- **New `php artisan pasak:uninstall` command**: removes all package traces from host apps without breaking them — drops only Pasak tables, removes published routes/config/views/migrations, detaches middleware and the User trait, strips `PASAK_*` from `.env`, restores `.htaccess` from backup, and runs `composer remove`. Supports `--force`, `--keep-tables`, `--keep-env`.
+
+## [1.0.6] - 2026-10-11
+
+### Changed
+
+- Auto-generated web-docs files (`changelog.md`, `src/data/package.json`) are untracked + gitignored so `git pull` never conflicts with local build output.
+
+## [1.0.5] - 2026-10-11
+
+### Added
+
+- Root `finis.sh` wrapper forwarding to `web-docs/finis.sh` so docs build/deploy runs from the repo root without changing directories.
+
+## [1.0.4] - 2026-10-11
+
+### Changed
+
+- `push.sh` now regenerates `documents/index.html` and runs the web-docs build (`finis.sh --no-pull --no-deploy`) before every commit (`--no-docs-build` to skip).
+
+## [1.0.3] - 2026-10-11
+
+### Changed
+
+- Docs: web-docs site titles, SEO keywords, tracker defaults, and integration-guide examples renamed to Pasak.
+
+## [1.0.2] - 2026-10-11
+
+### Changed
+
+- `push.sh` version policy: patch numbers cap at `.10` then roll over to the next minor (`v1.0.10` → `v1.1.0`); major bumps are never automatic — only via explicit `-t vX.0.0`.
+
+## [1.0.1] - 2026-10-11
+
+### Changed
+
+- `push.sh` auto-tags every push with the recommended version (opt out with `--no-tag`); Dependabot config ignores major updates to protect the CI matrix.
+
+## [1.0.0] - 2026-10-11
+
+### Changed
+
+- **BREAKING — package renamed to `robyajo/pasak`**: namespace `Internal\SecurityMonitor` → `Internal\Pasak`; `SecurityMonitorService` → `PasakService`; `SecurityMonitorServiceProvider` → `PasakServiceProvider`; facade `SecurityMonitor` → `Pasak`. Backward-compatible class aliases ship in `src/compat.php`.
+- **BREAKING — `pasak` naming across the stack**: `config/security.php` → `config/pasak.php` with `PASAK_*` env vars (legacy `SECURITY_*` still work as fallback); Artisan `security:*` → `pasak:*`; middleware aliases `pasak.*`; gate `manage-pasak`; single consolidated migration `create_pasak_tables` with `pasak_logs` / `pasak_settings` tables (legacy tables auto-renamed with data preserved).
+
 ## [2.1.0] - 2026-10-09
 
 ### Added
