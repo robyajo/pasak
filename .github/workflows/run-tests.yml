@@ -1,0 +1,127 @@
+name: Run Tests
+
+on:
+    push:
+        branches:
+            - main
+            - master
+    pull_request:
+        branches:
+            - main
+            - master
+
+permissions:
+    contents: read
+
+jobs:
+    pest-tests:
+        runs-on: ubuntu-latest
+        strategy:
+            fail-fast: false
+            matrix:
+                # Explicit matrix covering every advertised combination:
+                # Laravel ^10.0 | ^11.0 | ^12.0 | ^13.0 on PHP ^8.2 | ^8.3 | ^8.4 | ^8.5.
+                include:
+                    - php: "8.2"
+                      laravel: "10.*"
+                      testbench: "8.*"
+                    - php: "8.3"
+                      laravel: "10.*"
+                      testbench: "8.*"
+                    - php: "8.2"
+                      laravel: "11.*"
+                      testbench: "9.*"
+                    - php: "8.3"
+                      laravel: "11.*"
+                      testbench: "9.*"
+                    - php: "8.4"
+                      laravel: "11.*"
+                      testbench: "9.*"
+                    - php: "8.2"
+                      laravel: "12.*"
+                      testbench: "10.*"
+                    - php: "8.3"
+                      laravel: "12.*"
+                      testbench: "10.*"
+                    - php: "8.4"
+                      laravel: "12.*"
+                      testbench: "10.*"
+                    - php: "8.5"
+                      laravel: "12.*"
+                      testbench: "10.*"
+                    - php: "8.3"
+                      laravel: "13.*"
+                      testbench: "11.*"
+                    - php: "8.4"
+                      laravel: "13.*"
+                      testbench: "11.*"
+                    - php: "8.5"
+                      laravel: "13.*"
+                      testbench: "11.*"
+
+        name: P${{ matrix.php }} - L${{ matrix.laravel }}
+
+        steps:
+            - name: Checkout Code
+              uses: actions/checkout@v7
+
+            - name: Setup PHP
+              uses: shivammathur/setup-php@v2
+              with:
+                  php-version: ${{ matrix.php }}
+                  extensions: mbstring, pdo, sqlite, pdo_sqlite, filter, openssl
+                  coverage: none
+
+            - name: Validate composer.json
+              run: composer validate --strict
+
+            - name: Install Dependencies
+              run: |
+                  composer config policy.advisories.block false
+                  composer require "laravel/framework:${{ matrix.laravel }}" "orchestra/testbench:${{ matrix.testbench }}" --no-interaction --no-update --dev
+                  composer update --prefer-stable --prefer-dist --no-interaction --no-audit
+
+            - name: Execute Pest Tests
+              run: ./vendor/bin/pest --ci
+
+    code-style:
+        name: Code Style (Pint)
+
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout Code
+              uses: actions/checkout@v7
+
+            - name: Setup PHP
+              uses: shivammathur/setup-php@v2
+              with:
+                  php-version: "8.3"
+                  coverage: none
+
+            - name: Install Dependencies
+              run: composer require --dev laravel/pint --no-interaction --no-audit
+
+            - name: Check Code Style
+              run: ./vendor/bin/pint --test
+
+    static-analysis:
+        name: Static Analysis (PHPStan)
+
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout Code
+              uses: actions/checkout@v7
+
+            - name: Setup PHP
+              uses: shivammathur/setup-php@v2
+              with:
+                  php-version: "8.3"
+                  coverage: none
+
+            - name: Install Dependencies
+              run: composer require --dev larastan/larastan --no-interaction --no-audit
+
+            - name: Run PHPStan
+              run: ./vendor/bin/phpstan analyse --no-progress

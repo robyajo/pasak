@@ -1,0 +1,160 @@
+---
+// Override SiteTitle: tambahkan badge versi paket di samping judul situs.
+// Pada desktop: Logo + "Laravel Security Monitor" + Versi Packagist.
+// Pada mobile: Logo + "Security Monitor" (tanpa kata "Laravel" agar proporsional dan tidak terpotong).
+import { logos } from "virtual:starlight/user-images";
+import config from "virtual:starlight/user-config";
+import pkg from "../data/package.json";
+
+const { siteTitleHref } = Astro.locals.starlightRoute;
+const version = pkg.packagist?.version ?? pkg.version;
+---
+
+<a href={siteTitleHref} class="site-title sl-flex">
+	{
+		config.logo && logos.dark && (
+			<>
+				<img
+					class:list={{ "light:sl-hidden print:hidden": !("src" in config.logo) }}
+					alt={config.logo.alt}
+					src={logos.dark.src}
+					width={logos.dark.width}
+					height={logos.dark.height}
+				/>
+				{!('src' in config.logo) && (
+					<img
+						class="dark:sl-hidden print:block"
+						alt={config.logo.alt}
+						src={logos.light?.src}
+						width={logos.light?.width}
+						height={logos.light?.height}
+					/>
+				)}
+			</>
+		)
+	}
+	<span class="site-title-text" translate="no">
+		<span class="title-brand">Laravel </span><span class="title-product">Security Monitor</span>
+	</span>
+</a>
+
+<a
+	class="pkg-version"
+	href={pkg.packagist.url}
+	target="_blank"
+	rel="noopener"
+	title={`Versi terbaru paket di Packagist: v${version}`}
+>
+	v{version}
+</a>
+
+<style>
+	:global(.title-wrapper) {
+		gap: 0.75rem;
+		align-items: center;
+	}
+
+	.site-title {
+		align-items: center;
+		gap: var(--sl-nav-gap, 0.75rem);
+		font-size: var(--sl-text-h4, 1.05rem);
+		font-family: var(--sl-font) !important;
+		font-weight: 700 !important;
+		letter-spacing: -0.02em !important;
+		color: var(--sl-color-white) !important;
+		text-decoration: none;
+		white-space: nowrap;
+		min-width: 0;
+		transition: opacity 0.15s ease;
+	}
+
+	.site-title:hover {
+		color: var(--sl-color-accent) !important;
+	}
+
+	.site-title img {
+		height: calc(var(--sl-nav-height, 3.5rem) - 2 * var(--sl-nav-pad-y, 0.75rem));
+		width: auto;
+		max-width: 100%;
+		object-fit: contain;
+		object-position: 0 50%;
+	}
+
+	.site-title-text {
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	.title-brand {
+		display: inline;
+	}
+
+	.title-product {
+		display: inline;
+	}
+
+	.pkg-version {
+		align-self: center;
+		flex: none;
+		display: inline-flex;
+		align-items: center;
+		margin-inline-start: 0.75rem;
+		padding: 0.15rem 0.6rem;
+		border: 1px solid var(--sl-color-gray-5);
+		border-radius: 999px;
+		font-family: var(--sl-font-mono);
+		font-size: var(--sl-text-xs);
+		font-weight: 600;
+		line-height: 1.4;
+		color: var(--sl-color-text-accent);
+		background-color: var(--sl-color-gray-6);
+		text-decoration: none;
+		white-space: nowrap;
+		transition: border-color 0.15s ease, background-color 0.15s ease;
+	}
+
+	.pkg-version:hover {
+		border-color: var(--sl-color-accent);
+		background-color: var(--sl-color-accent-low);
+	}
+
+	/* Tampilan Responsif Mobile: Tampilkan Icon + \"Security Monitor\" */
+	@media (max-width: 50rem) {
+		:global(.title-wrapper) {
+			gap: 0.5rem !important;
+			padding: 0 !important;
+			margin: 0 !important;
+		}
+
+		.site-title {
+			gap: 0.5rem !important;
+			padding: 0.2rem 0 !important;
+			font-size: 0.95rem !important;
+			font-weight: 700 !important;
+		}
+
+		.site-title img {
+			height: 1.85rem !important;
+			width: auto !important;
+			max-height: 100% !important;
+			display: block !important;
+			object-fit: contain !important;
+		}
+
+		/* Sembunyikan kata \"Laravel\" di mobile agar \"Security Monitor\" muat dengan rapi */
+		.title-brand {
+			display: none !important;
+		}
+
+		.title-product {
+			display: inline !important;
+			font-weight: 700 !important;
+			color: var(--sl-color-white) !important;
+		}
+
+		.pkg-version {
+			display: none !important;
+		}
+	}
+</style>

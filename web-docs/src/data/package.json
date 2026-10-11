@@ -1,0 +1,11 @@
+{
+  "name": "robyajo/laravel-security-monitor",
+  "version": "2.1.0",
+  "repository": "https://github.com/robyajo/laravel-security-monitor",
+  "packagist": {
+    "url": "https://packagist.org/packages/robyajo/laravel-security-monitor",
+    "version": "2.1.0",
+    "released": "2026-10-09"
+  },
+  "updatedAt": "2026-10-09"
+}

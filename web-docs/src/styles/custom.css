@@ -1,0 +1,727 @@
+/* ==========================================================================
+   Laravel Security Monitor (Bulwark) — Documentation Theme
+   Font Primer: Plus Jakarta Sans (UI & Editorial) & JetBrains Mono (Code)
+   Responsif Mobile: Header hanya menampilkan Logo saja
+   Aset Ikon: Selaras & Berstandar Keamanan Siber
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. PALET WARNA & VARIABEL TEMA
+   -------------------------------------------------------------------------- */
+:root {
+	/* Tema Gelap (Dark Mode - Default) */
+	--sl-color-white: #f8fafc;       /* slate-50 (judul tajam & berwibawa) */
+	--sl-color-gray-1: #f1f5f9;      /* slate-100 */
+	--sl-color-gray-2: #cbd5e1;      /* slate-300 (paragraf kontras tinggi & nyaman dibaca) */
+	--sl-color-gray-3: #94a3b8;      /* slate-400 (keterangan sekunder) */
+	--sl-color-gray-4: #64748b;      /* slate-500 (border netral) */
+	--sl-color-gray-5: #1e293b;      /* slate-800 (garis pembatas halus) */
+	--sl-color-gray-6: #0f172a;      /* slate-900 (latar kartu & surface) */
+	--sl-color-black: #0b0f19;       /* slate-950 (kanvas dasar) */
+
+	/* Aksen Keamanan Utama: Sky Blue & Indigo Glow */
+	--sl-color-accent-low: rgba(14, 165, 233, 0.12);
+	--sl-color-accent: #38bdf8;
+	--sl-color-accent-high: #bae6fd;
+
+	--sl-color-text: var(--sl-color-gray-2);
+	--sl-color-text-accent: var(--sl-color-accent);
+	--sl-color-bg: var(--sl-color-black);
+	--sl-color-bg-nav: rgba(11, 15, 25, 0.92);
+	--sl-color-bg-sidebar: #0e1424;
+	--sl-color-bg-inline-code: rgba(255, 255, 255, 0.08);
+	--sl-color-hairline: var(--sl-color-gray-5);
+
+	/* Status Alerts / Callout */
+	--sl-color-blue: #38bdf8;
+	--sl-color-blue-low: rgba(56, 189, 248, 0.1);
+	--sl-color-blue-high: #bae6fd;
+
+	--sl-color-green: #34d399;
+	--sl-color-green-low: rgba(52, 211, 153, 0.1);
+	--sl-color-green-high: #a7f3d0;
+
+	--sl-color-orange: #fbbf24;
+	--sl-color-orange-low: rgba(251, 191, 36, 0.1);
+	--sl-color-orange-high: #fde68a;
+
+	--sl-color-red: #f87171;
+	--sl-color-red-low: rgba(248, 113, 113, 0.1);
+	--sl-color-red-high: #fecaca;
+
+	/* Tipografi Plus Jakarta Sans & JetBrains Mono */
+	--sl-font: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+	--sl-font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', monospace;
+	--sl-font-system: var(--sl-font);
+
+	--sl-content-width: 52rem;
+	--sl-line-height: 1.75;
+	--sl-line-height-headings: 1.25;
+
+	--sl-text-xs: 0.75rem;
+	--sl-text-sm: 0.875rem;
+	--sl-text-base: 1rem;
+	--sl-text-md: 1.0625rem;
+	--sl-text-lg: 1.125rem;
+	--sl-text-xl: 1.25rem;
+	--sl-text-2xl: 1.5rem;
+	--sl-text-3xl: 1.875rem;
+	--sl-text-4xl: 2.25rem;
+	--sl-text-5xl: 2.75rem;
+}
+
+:root[data-theme='light'] {
+	/* Tema Terang (Light Mode - Bersih & Tajam) */
+	--sl-color-white: #0f172a;       /* slate-900 (judul hitam pekat terbaca) */
+	--sl-color-gray-1: #1e293b;      /* slate-800 */
+	--sl-color-gray-2: #334155;      /* slate-700 (paragraf kontras tinggi) */
+	--sl-color-gray-3: #475569;      /* slate-600 */
+	--sl-color-gray-4: #64748b;      /* slate-500 */
+	--sl-color-gray-5: #e2e8f0;      /* slate-200 */
+	--sl-color-gray-6: #f8fafc;      /* slate-50 */
+	--sl-color-gray-7: #f1f5f9;      /* slate-100 */
+	--sl-color-black: #ffffff;
+
+	--sl-color-accent-low: #e0f2fe;
+	--sl-color-accent: #0284c7;
+	--sl-color-accent-high: #0369a1;
+
+	--sl-color-text: var(--sl-color-gray-2);
+	--sl-color-text-accent: var(--sl-color-accent);
+	--sl-color-bg: #ffffff;
+	--sl-color-bg-nav: rgba(255, 255, 255, 0.94);
+	--sl-color-bg-sidebar: #f8fafc;
+	--sl-color-bg-inline-code: rgba(2, 132, 199, 0.08);
+	--sl-color-hairline: #e2e8f0;
+
+	--sl-color-blue: #0284c7;
+	--sl-color-blue-low: #f0f9ff;
+	--sl-color-blue-high: #075985;
+
+	--sl-color-green: #059669;
+	--sl-color-green-low: #f0fdf4;
+	--sl-color-green-high: #065f46;
+
+	--sl-color-orange: #d97706;
+	--sl-color-orange-low: #fffbeb;
+	--sl-color-orange-high: #92400e;
+
+	--sl-color-red: #e11d48;
+	--sl-color-red-low: #fff1f2;
+	--sl-color-red-high: #9f1239;
+}
+
+/* --------------------------------------------------------------------------
+   2. FONT RENDERING & PENGATURAN GLOBAL
+   -------------------------------------------------------------------------- */
+html {
+	font-family: var(--sl-font);
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	text-rendering: optimizeLegibility;
+	font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+}
+
+body {
+	font-family: var(--sl-font);
+	font-size: var(--sl-text-base);
+	line-height: var(--sl-line-height);
+	color: var(--sl-color-text);
+	letter-spacing: -0.01em;
+}
+
+button, input, select, textarea {
+	font-family: var(--sl-font);
+}
+
+*, *::before, *::after {
+	animation-duration: 0s !important;
+}
+
+a, button, input, select, .card, .sl-link-card, .pkg-version, summary {
+	transition: color 0.12s ease, background-color 0.12s ease, border-color 0.12s ease, opacity 0.12s ease !important;
+	transform: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	*, *::before, *::after {
+		transition-duration: 0.01ms !important;
+		scroll-behavior: auto !important;
+	}
+}
+
+/* --------------------------------------------------------------------------
+   3. HEADER & NAVIGASI
+   -------------------------------------------------------------------------- */
+header.header {
+	backdrop-filter: blur(12px);
+	-webkit-backdrop-filter: blur(12px);
+	border-bottom: 1px solid var(--sl-color-hairline);
+}
+
+.title-wrapper {
+	gap: 0.85rem !important;
+	align-items: center !important;
+}
+
+.site-title {
+	font-family: var(--sl-font) !important;
+	font-size: 1.05rem !important;
+	font-weight: 700 !important;
+	letter-spacing: -0.02em !important;
+	color: var(--sl-color-white) !important;
+	gap: 0.75rem !important;
+	align-items: center !important;
+}
+
+.site-title:hover {
+	color: var(--sl-color-accent) !important;
+}
+
+/* Badge versi di header desktop */
+.pkg-version {
+	margin-inline-start: 0.85rem !important;
+	align-self: center;
+	flex: none;
+	display: inline-flex;
+	align-items: center;
+	padding: 0.15rem 0.6rem;
+	border: 1px solid var(--sl-color-gray-5);
+	border-radius: 999px;
+	font-family: var(--sl-font-mono) !important;
+	font-size: var(--sl-text-xs);
+	font-weight: 600;
+	line-height: 1.4;
+	color: var(--sl-color-text-accent);
+	background-color: var(--sl-color-gray-6);
+	text-decoration: none;
+	white-space: nowrap;
+}
+
+.pkg-version:hover {
+	border-color: var(--sl-color-accent);
+	background-color: var(--sl-color-accent-low);
+}
+
+/* --------------------------------------------------------------------------
+   RESPONSIF MOBILE: HEADER MENAMPILKAN LOGO & "SECURITY MONITOR"
+   -------------------------------------------------------------------------- */
+@media (max-width: 50rem) {
+	/* Sembunyikan kata "Laravel" di mobile, tampilkan "Security Monitor" bersama icon */
+	.site-title .title-brand {
+		display: none !important;
+	}
+
+	.site-title .title-product {
+		display: inline !important;
+		font-weight: 700 !important;
+		font-size: 0.95rem !important;
+		color: var(--sl-color-white) !important;
+		letter-spacing: -0.02em !important;
+	}
+
+	.pkg-version {
+		display: none !important;
+	}
+
+	.title-wrapper {
+		gap: 0.5rem !important;
+		padding: 0 !important;
+		margin: 0 !important;
+	}
+
+	.site-title {
+		gap: 0.5rem !important;
+		padding: 0.2rem 0 !important;
+	}
+
+	.site-title img {
+		height: 1.85rem !important;
+		width: auto !important;
+		max-height: 100% !important;
+		display: block !important;
+		object-fit: contain !important;
+	}
+}
+
+/* --------------------------------------------------------------------------
+   4. TIPOGRAFI & KENYAMANAN MEMBACA DOKUMENTASI (PLUS JAKARTA SANS)
+   -------------------------------------------------------------------------- */
+.sl-markdown-content {
+	font-family: var(--sl-font);
+	font-size: 1.0125rem;
+	line-height: var(--sl-line-height);
+	color: var(--sl-color-text);
+	letter-spacing: -0.01em;
+}
+
+.sl-markdown-content h1 {
+	font-family: var(--sl-font) !important;
+	font-size: clamp(1.95rem, 3.8vw, 2.5rem) !important;
+	font-weight: 800 !important;
+	letter-spacing: -0.035em !important;
+	line-height: 1.2 !important;
+	color: var(--sl-color-white) !important;
+	margin-top: 1rem !important;
+	margin-bottom: 1.25rem !important;
+}
+
+.sl-markdown-content h2 {
+	font-family: var(--sl-font) !important;
+	font-size: clamp(1.4rem, 2.6vw, 1.7rem) !important;
+	font-weight: 700 !important;
+	letter-spacing: -0.025em !important;
+	line-height: 1.28 !important;
+	color: var(--sl-color-white) !important;
+	margin-top: 2.75rem !important;
+	margin-bottom: 0.85rem !important;
+	padding-bottom: 0.5rem !important;
+	border-bottom: 1px solid var(--sl-color-gray-5) !important;
+}
+
+.sl-markdown-content h3 {
+	font-family: var(--sl-font) !important;
+	font-size: clamp(1.15rem, 2vw, 1.35rem) !important;
+	font-weight: 650 !important;
+	letter-spacing: -0.02em !important;
+	line-height: 1.35 !important;
+	color: var(--sl-color-white) !important;
+	margin-top: 2.25rem !important;
+	margin-bottom: 0.65rem !important;
+}
+
+.sl-markdown-content h4 {
+	font-family: var(--sl-font) !important;
+	font-size: 1.05rem !important;
+	font-weight: 600 !important;
+	letter-spacing: -0.015em !important;
+	line-height: 1.4 !important;
+	color: var(--sl-color-white) !important;
+	margin-top: 1.75rem !important;
+	margin-bottom: 0.5rem !important;
+}
+
+.sl-markdown-content p {
+	margin-top: 1.15rem;
+	margin-bottom: 1.15rem;
+	line-height: 1.75;
+}
+
+.sl-markdown-content strong,
+.sl-markdown-content b {
+	font-weight: 700;
+	color: var(--sl-color-white);
+}
+
+.sl-markdown-content ul,
+.sl-markdown-content ol {
+	padding-inline-start: 1.4rem;
+	margin-top: 0.85rem;
+	margin-bottom: 1.15rem;
+}
+
+.sl-markdown-content li {
+	margin-top: 0.35rem;
+	margin-bottom: 0.35rem;
+	line-height: 1.7;
+}
+
+.sl-markdown-content li::marker {
+	color: var(--sl-color-accent);
+}
+
+.sl-markdown-content a:not(:where(.not-content *)) {
+	color: var(--sl-color-text-accent);
+	text-decoration: underline;
+	text-decoration-thickness: 1px;
+	text-underline-offset: 3px;
+	font-weight: 500;
+}
+
+.sl-markdown-content a:not(:where(.not-content *)):hover {
+	color: var(--sl-color-white);
+	text-decoration-thickness: 2px;
+}
+
+.sl-markdown-content code:not(:where(.not-content *)) {
+	font-family: var(--sl-font-mono) !important;
+	border-radius: 0.375rem;
+	padding: 0.15rem 0.45rem;
+	font-size: 0.875em;
+	font-weight: 500;
+	letter-spacing: -0.005em;
+	border: 1px solid var(--sl-color-gray-5);
+	background-color: var(--sl-color-bg-inline-code);
+	color: var(--sl-color-accent-high);
+}
+
+:root[data-theme='light'] .sl-markdown-content code:not(:where(.not-content *)) {
+	color: var(--sl-color-accent-high);
+	border-color: rgba(2, 132, 199, 0.2);
+}
+
+.sl-markdown-content blockquote:not(:where(.not-content *)) {
+	border-inline-start: 3px solid var(--sl-color-accent);
+	background-color: var(--sl-color-accent-low);
+	padding: 0.75rem 1.25rem;
+	border-radius: 0 0.5rem 0.5rem 0;
+	margin: 1.25rem 0;
+	color: var(--sl-color-gray-1);
+}
+
+.sl-markdown-content hr:not(:where(.not-content *)) {
+	border: 0;
+	border-top: 1px solid var(--sl-color-gray-5);
+	margin: 2.25rem 0;
+}
+
+/* --------------------------------------------------------------------------
+   5. KARTU FITUR BERSIH & SERAGAM (CARD & CARDGRID)
+   -------------------------------------------------------------------------- */
+.card-grid {
+	gap: 1.25rem !important;
+}
+
+.card {
+	border: 1px solid var(--sl-color-gray-5) !important;
+	background-color: var(--sl-color-gray-6) !important;
+	border-radius: 0.75rem !important;
+	padding: 1.25rem 1.5rem !important;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
+}
+
+.card:hover {
+	border-color: var(--sl-color-accent) !important;
+}
+
+.card .title {
+	font-family: var(--sl-font) !important;
+	font-size: 1.125rem !important;
+	font-weight: 700 !important;
+	letter-spacing: -0.02em !important;
+	color: var(--sl-color-white) !important;
+	gap: 0.75rem !important;
+	align-items: center !important;
+}
+
+.card .icon {
+	border: 1px solid var(--sl-color-accent-low) !important;
+	background-color: var(--sl-color-accent-low) !important;
+	color: var(--sl-color-text-accent) !important;
+	border-radius: 0.5rem !important;
+	padding: 0.35rem !important;
+}
+
+.card .body {
+	font-family: var(--sl-font) !important;
+	color: var(--sl-color-gray-3) !important;
+	font-size: 0.925rem !important;
+	line-height: 1.62 !important;
+	letter-spacing: -0.005em !important;
+	margin-top: 0.5rem !important;
+}
+
+/* Kartu tautan navigasi */
+.sl-link-card {
+	border: 1px solid var(--sl-color-gray-5) !important;
+	background-color: var(--sl-color-gray-6) !important;
+	border-radius: 0.75rem !important;
+	padding: 1.25rem 1.5rem !important;
+}
+
+.sl-link-card:hover {
+	border-color: var(--sl-color-accent) !important;
+	background-color: var(--sl-color-accent-low) !important;
+}
+
+.sl-link-card .title {
+	font-family: var(--sl-font) !important;
+	font-size: 1.05rem !important;
+	font-weight: 700 !important;
+	letter-spacing: -0.02em !important;
+	color: var(--sl-color-white) !important;
+}
+
+.sl-link-card .description {
+	font-family: var(--sl-font) !important;
+	color: var(--sl-color-gray-3) !important;
+	font-size: 0.875rem !important;
+	line-height: 1.55 !important;
+}
+
+/* --------------------------------------------------------------------------
+   6. ASIDES / KOTAK PERINGATAN KEAMANAN (CALLOUT)
+   -------------------------------------------------------------------------- */
+.starlight-aside {
+	border-radius: 0.625rem !important;
+	border-inline-start-width: 4px !important;
+	padding: 1rem 1.25rem !important;
+	margin: 1.5rem 0 !important;
+}
+
+.starlight-aside__title {
+	font-family: var(--sl-font) !important;
+	font-size: 0.95rem !important;
+	font-weight: 700 !important;
+	letter-spacing: -0.015em !important;
+	display: flex !important;
+	align-items: center !important;
+	gap: 0.5rem !important;
+}
+
+.starlight-aside__content {
+	font-family: var(--sl-font) !important;
+	font-size: 0.9375rem !important;
+	line-height: 1.65 !important;
+	color: var(--sl-color-gray-2) !important;
+	letter-spacing: -0.005em !important;
+}
+
+.starlight-aside--note {
+	background-color: var(--sl-color-blue-low) !important;
+	border-inline-start-color: var(--sl-color-blue) !important;
+}
+.starlight-aside--note .starlight-aside__title {
+	color: var(--sl-color-blue) !important;
+}
+
+.starlight-aside--tip {
+	background-color: var(--sl-color-green-low) !important;
+	border-inline-start-color: var(--sl-color-green) !important;
+}
+.starlight-aside--tip .starlight-aside__title {
+	color: var(--sl-color-green) !important;
+}
+
+.starlight-aside--caution {
+	background-color: var(--sl-color-orange-low) !important;
+	border-inline-start-color: var(--sl-color-orange) !important;
+}
+.starlight-aside--caution .starlight-aside__title {
+	color: var(--sl-color-orange) !important;
+}
+
+.starlight-aside--danger {
+	background-color: var(--sl-color-red-low) !important;
+	border-inline-start-color: var(--sl-color-red) !important;
+}
+.starlight-aside--danger .starlight-aside__title {
+	color: var(--sl-color-red) !important;
+}
+
+/* --------------------------------------------------------------------------
+   7. TABEL RESPONSIF & MUDAH DIBACA DI PONSEL
+   -------------------------------------------------------------------------- */
+.sl-markdown-content table {
+	display: block !important;
+	width: 100% !important;
+	overflow-x: auto !important;
+	-webkit-overflow-scrolling: touch !important;
+	border-collapse: separate !important;
+	border-spacing: 0 !important;
+	margin: 1.5rem 0 !important;
+	border: 1px solid var(--sl-color-gray-5) !important;
+	border-radius: 0.5rem !important;
+	font-family: var(--sl-font) !important;
+	font-size: 0.875rem !important;
+	letter-spacing: -0.01em !important;
+}
+
+.sl-markdown-content th {
+	background-color: var(--sl-color-gray-6) !important;
+	padding: 0.75rem 1rem !important;
+	font-weight: 700 !important;
+	font-size: 0.8125rem !important;
+	text-transform: uppercase !important;
+	letter-spacing: 0.05em !important;
+	color: var(--sl-color-white) !important;
+	border-bottom: 1px solid var(--sl-color-gray-5) !important;
+	white-space: nowrap !important;
+}
+
+.sl-markdown-content td {
+	padding: 0.75rem 1rem !important;
+	border-bottom: 1px solid var(--sl-color-gray-5) !important;
+	vertical-align: top !important;
+	color: var(--sl-color-gray-2) !important;
+	line-height: 1.6 !important;
+}
+
+.sl-markdown-content tr:last-child td {
+	border-bottom: none !important;
+}
+
+.sl-markdown-content tr:nth-child(even) td {
+	background-color: rgba(125, 125, 125, 0.03) !important;
+}
+
+/* --------------------------------------------------------------------------
+   8. DIAGRAM MERMAID RESPONSIF
+   -------------------------------------------------------------------------- */
+.mermaid {
+	display: flex;
+	justify-content: center;
+	margin: 1.5rem 0;
+	padding: 1.25rem;
+	border: 1px solid var(--sl-color-gray-5);
+	border-radius: 0.75rem;
+	background: var(--sl-color-gray-6);
+	overflow-x: auto;
+	-webkit-overflow-scrolling: touch;
+}
+
+.mermaid svg {
+	max-width: 100%;
+	height: auto;
+}
+
+/* --------------------------------------------------------------------------
+   9. BLOK KODE (EXPRESSIVE CODE & JETBRAINS MONO)
+   -------------------------------------------------------------------------- */
+.expressive-code {
+	margin: 1.25rem 0 !important;
+	border-radius: 0.625rem !important;
+	border: 1px solid var(--sl-color-gray-5) !important;
+	overflow: hidden !important;
+}
+
+.expressive-code pre {
+	font-family: var(--sl-font-mono) !important;
+	padding: 1rem 1.25rem !important;
+	font-size: 0.875rem !important;
+	line-height: 1.65 !important;
+	letter-spacing: 0 !important;
+}
+
+/* --------------------------------------------------------------------------
+   10. HERO HALAMAN DEPAN (BERSIH & RESPONSIF)
+   -------------------------------------------------------------------------- */
+.hero {
+	padding: 3rem 0 2rem 0 !important;
+	gap: 2rem !important;
+}
+
+@media (min-width: 50rem) {
+	.hero {
+		grid-template-columns: 7fr 5fr !important;
+		text-align: start !important;
+	}
+	.hero .stack {
+		text-align: start !important;
+	}
+	.hero .copy {
+		align-items: flex-start !important;
+	}
+	.hero .actions {
+		justify-content: flex-start !important;
+	}
+}
+
+.hero h1 {
+	font-family: var(--sl-font) !important;
+	font-size: clamp(2.15rem, 4.5vw, 2.9rem) !important;
+	font-weight: 800 !important;
+	letter-spacing: -0.035em !important;
+	line-height: 1.15 !important;
+	color: var(--sl-color-white) !important;
+}
+
+.hero .tagline {
+	font-family: var(--sl-font) !important;
+	font-size: clamp(1.025rem, 1.5vw, 1.18rem) !important;
+	font-weight: 400 !important;
+	letter-spacing: -0.01em !important;
+	color: var(--sl-color-gray-3) !important;
+	line-height: 1.65 !important;
+	max-width: 48ch !important;
+}
+
+.hero .actions {
+	gap: 0.75rem !important;
+	flex-wrap: wrap !important;
+	margin-top: 0.5rem !important;
+}
+
+.hero .actions a {
+	font-family: var(--sl-font) !important;
+	border-radius: 0.5rem !important;
+	font-weight: 600 !important;
+	letter-spacing: -0.01em !important;
+	padding: 0.75rem 1.5rem !important;
+	font-size: 0.95rem !important;
+}
+
+/* Meta Bar Informasi Paket pada Halaman Depan */
+.hero-meta-bar {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 0.625rem;
+	margin: 1.5rem 0 2rem 0;
+	padding: 0.625rem 1rem;
+	border: 1px solid var(--sl-color-gray-5);
+	border-radius: 0.5rem;
+	background-color: var(--sl-color-gray-6);
+	font-family: var(--sl-font) !important;
+	font-size: 0.86rem;
+	font-weight: 500;
+	letter-spacing: -0.01em;
+	color: var(--sl-color-gray-2);
+}
+
+.hero-meta-bar a {
+	color: var(--sl-color-text-accent);
+	text-decoration: none;
+	font-weight: 500;
+}
+
+.hero-meta-bar a:hover {
+	text-decoration: underline;
+}
+
+/* --------------------------------------------------------------------------
+   11. SIDEBAR & TABLE OF CONTENTS
+   -------------------------------------------------------------------------- */
+.sidebar-content {
+	font-family: var(--sl-font) !important;
+	font-size: 0.875rem !important;
+	letter-spacing: -0.01em !important;
+}
+
+.sidebar-content summary {
+	font-family: var(--sl-font) !important;
+	font-weight: 700 !important;
+	letter-spacing: -0.015em !important;
+	color: var(--sl-color-white) !important;
+}
+
+.sidebar-content a {
+	font-family: var(--sl-font) !important;
+	font-weight: 450 !important;
+	letter-spacing: -0.008em !important;
+}
+
+.sidebar-content a[aria-current="page"] {
+	background-color: var(--sl-color-accent-low) !important;
+	color: var(--sl-color-text-accent) !important;
+	font-weight: 650 !important;
+	border-radius: 0.375rem !important;
+}
+
+starlight-toc summary {
+	font-family: var(--sl-font) !important;
+	font-weight: 650 !important;
+	letter-spacing: -0.01em !important;
+}
+
+starlight-toc a {
+	font-family: var(--sl-font) !important;
+	font-size: 0.84rem !important;
+	font-weight: 450 !important;
+	line-height: 1.55 !important;
+	letter-spacing: -0.005em !important;
+}
+
+starlight-toc a[aria-current="true"] {
+	font-weight: 650 !important;
+}

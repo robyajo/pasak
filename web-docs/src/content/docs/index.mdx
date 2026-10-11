@@ -1,0 +1,189 @@
+---
+title: Laravel Security Monitor
+description: Dokumentasi resmi robyajo/laravel-security-monitor (Bulwark) — WAF mandiri, karantina perangkat, proteksi login bertingkat, pemindai webshell, dan REST API headless untuk Laravel 10–13. Keamanan Siber & Informasi Pemerintah Kota Pekanbaru (security-dev.pekanbaru.go.id).
+template: splash
+hero:
+    title: Laravel Security Monitor
+    tagline: WAF mandiri, karantina perangkat, proteksi login bertingkat, dan pemindai integritas server — 100% murni PHP untuk Laravel 10 sampai 13 di lingkungan Pemerintah Kota Pekanbaru.
+    image:
+        alt: Logo Bulwark
+        file: ../../assets/logo.svg
+    actions:
+        - text: Mulai Cepat
+          link: getting-started/installation/
+          variant: primary
+        - text: Pelajari Arsitektur
+          link: core-architecture/threat-detection-engine/
+---
+
+import {
+    Card,
+    CardGrid,
+    LinkCard,
+    Steps,
+    Tabs,
+    TabItem,
+} from "@astrojs/starlight/components";
+import pkg from "../../data/package.json";
+
+Paket **`robyajo/laravel-security-monitor`** (Bulwark) adalah Web Application Firewall
+(WAF) mandiri untuk Laravel yang mengikuti standar paket Spatie: **100% murni PHP**,
+tanpa dependensi NPM/Node, dan tanpa memaksakan satu jenis frontend.
+
+<div class="hero-meta-bar">
+    <span>
+        📦 <strong>v{pkg.packagist.version}</strong>
+    </span>
+    <span>·</span>
+    <a href={pkg.packagist.url} target="_blank" rel="noopener">
+        Packagist
+    </a>
+    <span>·</span>
+    <a href="changelog/">Changelog</a>
+    <span>·</span>
+    <a href={pkg.repository} target="_blank" rel="noopener">
+        GitHub
+    </a>
+    <span>·</span>
+    <span>🛡️ 100% Pure PHP</span>
+    <span>·</span>
+    <span>📍 Kota Pekanbaru</span>
+</div>
+
+## Fitur Utama
+
+<CardGrid>
+    <Card title="Zero-Tolerance WAF" icon="padlock">
+        Blokir instan pada request pertama untuk signature berbahaya: null byte,
+        double extension, path traversal, webshell, dan SSTI.
+    </Card>
+    <Card title="Karantina Perangkat" icon="laptop">
+        Isolasi penyerang pada IP publik bersama (NAT) tanpa memblokir seluruh
+        kantor.
+    </Card>
+    <Card title="Login Bertingkat" icon="clock">
+        Lockout eksponensial 1 menit, 5 menit, 15 menit, 1 jam, sampai 24 jam
+        untuk melawan brute force dan credential stuffing.
+    </Card>
+    <Card title="Dashboard Vanilla CSS" icon="analytics">
+        Starter kit monitoring responsif untuk Blade (Livewire) & React
+        (Inertia) dengan Pure Vanilla CSS tanpa dependensi UI eksternal.
+    </Card>
+    <Card title="Pemindai Webshell" icon="magnifier">
+        Baseline SHA-256 berkas inti dan deteksi berkas mencurigakan di server.
+    </Card>
+    <Card title="REST API Headless" icon="server">
+        Endpoint JSON murni, siap dikonsumsi React, Vue, Livewire, atau aplikasi
+        mobile.
+    </Card>
+</CardGrid>
+
+## Mulai dalam 3 Langkah
+
+<Steps>
+
+1. Pasang paket melalui Composer.
+
+    ```bash
+    composer require robyajo/laravel-security-monitor
+    ```
+
+2. Publikasikan konfigurasi, migrasi, dashboard, dan template web server sekaligus.
+
+    ```bash
+    php artisan security:install
+    ```
+
+3. Jalankan migrasi database.
+
+    ```bash
+    php artisan migrate
+    ```
+
+</Steps>
+
+Perintah `security:install` secara otomatis menyuntikkan trait `HasSecurityRelations` pada model `User`
+dan mendaftarkan middleware WAF ke bootstrap aplikasi host Anda (`bootstrap/app.php` atau `Kernel.php`).
+Detail lengkapnya ada di [Panduan Instalasi](getting-started/installation/).
+
+## Alur Arsitektur
+
+```mermaid
+flowchart TD
+    Client(["HTTP Request"]) --> Nginx["Nginx / Apache Hardened WAF"]
+    Nginx -->|Lolos| PHP["Laravel Front Controller"]
+
+    subgraph LSM ["Laravel Security Monitor"]
+        PHP --> BlockMW["Middleware: BlockIpAddress"]
+        BlockMW -->|IP / Device Terblokir| Ret403["HTTP 403: Akses Ditolak"]
+        BlockMW -->|Lolos| ThreatMW["Middleware: DetectSecurityThreats"]
+        ThreatMW --> Inspect["Inspeksi Payload<br/>path, query, body, input,<br/>filename, user_agent"]
+        Inspect -->|Zero-Tolerance Match| InstBlock["Blokir Instan 30 Hari<br/>Percobaan ke-1"]
+        Inspect -->|Ancaman high/critical| Log["Catat ke SecurityLog"]
+        Log --> Window{"Kejadian >= 3 dalam 10 Menit?"}
+        Window -->|YA| AutoBlock["Auto-Block 24 Jam"]
+        Window -->|TIDAK| Allow["Izinkan Request Lewat"]
+        Inspect -->|Aman| App["Controller Aplikasi Host"]
+    end
+
+    InstBlock --> Ret403
+    AutoBlock --> Ret403
+    Ret403 --> Appeal["Form Tiket Banding"]
+    Appeal --> Admin["Admin Review & Unblock API"]
+```
+
+## Jelajahi Dokumentasi
+
+<CardGrid>
+    <LinkCard title="Memulai" href="getting-started/introduction/">
+        Latar belakang, instalasi, dan seluruh variabel konfigurasi.
+    </LinkCard>
+    <LinkCard
+        title="Arsitektur Inti"
+        href="core-architecture/threat-detection-engine/"
+    >
+        Mesin deteksi, karantina perangkat, dan resolusi reverse proxy.
+    </LinkCard>
+    <LinkCard
+        title="Modul Keamanan"
+        href="security-modules/stepped-login-throttling/"
+    >
+        Login lockout, pemindai webshell, dan tiket banding.
+    </LinkCard>
+    <LinkCard title="Referensi REST API" href="api-reference/api-overview/">
+        Konvensi, endpoint publik, pengguna, dan administrator.
+    </LinkCard>
+    <LinkCard title="CLI & Otomasi" href="cli-automation/artisan-commands/">
+        Perintah Artisan dan tugas terjadwal.
+    </LinkCard>
+    <LinkCard
+        title="Hardening Web Server"
+        href="webserver-hardening/nginx-hardened-waf/"
+    >
+        Konfigurasi Nginx, Apache, dan checklist produksi.
+    </LinkCard>
+    <LinkCard title="Changelog" href="changelog/">
+        Riwayat lengkap perubahan dan rilis paket.
+    </LinkCard>
+    <LinkCard
+        title={`Packagist v${pkg.packagist.version}`}
+        href={pkg.packagist.url}
+    >
+        Halaman paket resmi di Packagist.
+    </LinkCard>
+</CardGrid>
+
+## Kompatibilitas
+
+<Tabs>
+    <TabItem label="PHP">`^8.2`, `^8.3`, `^8.4`, `^8.5`</TabItem>
+    <TabItem label="Laravel">`^10.0`, `^11.0`, `^12.0`, `^13.0`</TabItem>
+    <TabItem label="Ekstensi">
+        `pdo`, `mbstring`, `json`, `filter`, `openssl` — tanpa `gd` atau
+        `imagick`.
+    </TabItem>
+</Tabs>
+
+> ℹ️ Dokumentasi ini juga tersedia sebagai portal HTML statis di folder
+> `documents/` pada repositori paket. Situs Astro ini adalah versi utama yang
+> lebih cepat, dapat dicari, dan siap dideploy.

@@ -1,0 +1,9 @@
+/vendor
+composer.lock
+.phpunit.result.cache
+.pest
+.env
+*.log
+
+# Situs dokumentasi (repo terpisah: robyajo/web-laravel-security)
+/web

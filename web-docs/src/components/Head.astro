@@ -1,0 +1,249 @@
+---
+import pkg from '../data/package.json';
+
+// Override komponen Head Starlight: pertahankan seluruh tag <head> bawaan,
+// lalu suntikkan font Plus Jakarta Sans, favicons, metadata SEO lengkap
+// (Open Graph, Twitter Cards, Schema.org JSON-LD, breadcrumbs, dan robots crawl directives),
+// serta skrip Mermaid.
+const { head, entry } = Astro.locals.starlightRoute;
+const title = entry.data.title;
+const description = entry.data.description || 'Dokumentasi resmi robyajo/laravel-security-monitor (Bulwark) — Enterprise Headless Web Application Firewall untuk Laravel.';
+const pathname = Astro.url.pathname;
+const siteOrigin = Astro.site ? Astro.site.origin : (Astro.url.origin || 'https://docs.example.com');
+const canonicalUrl = new URL(pathname, siteOrigin).href;
+const ogImageUrl = new URL('/og-image.png', siteOrigin).href;
+const isHome = pathname === '/' || pathname === '';
+
+// Structured Data Breadcrumbs (Schema.org)
+const breadcrumbItems = [
+  {
+    '@type': 'ListItem',
+    position: 1,
+    name: 'Beranda',
+    item: siteOrigin + '/',
+  },
+];
+
+const segments = pathname.split('/').filter(Boolean);
+if (segments.length > 0 && !isHome) {
+  let accumulatedPath = siteOrigin;
+  segments.forEach((seg, idx) => {
+    accumulatedPath += `/${seg}`;
+    const isLast = idx === segments.length - 1;
+    const readableName = isLast
+      ? title
+      : seg.replace(/-/g, ' ').replace(/\b\w/g, (char) => char.toUpperCase());
+
+    breadcrumbItems.push({
+      '@type': 'ListItem',
+      position: idx + 2,
+      name: readableName,
+      item: accumulatedPath + (isLast ? '' : '/'),
+    });
+  });
+}
+
+// Daftar Kata Kunci Lengkap untuk SEO (Termasuk Kota Pekanbaru & Cybersecurity)
+const allKeywords = [
+  // Entitas Kota Pekanbaru & Pemerintah (Kominfo)
+  'pekanbaru',
+  'kota pekanbaru',
+  'pemko pekanbaru',
+  'pemerintah kota pekanbaru',
+  'kominfo pekanbaru',
+  'diskominfo pekanbaru',
+  'dinas komunikasi informatika statistik dan persandian kota pekanbaru',
+  'security-dev.pekanbaru.go.id',
+  'keamanan siber pekanbaru',
+  'keamanan informasi pekanbaru',
+  'csirt pekanbaru',
+  'pekanbaru go id',
+  'aplikasi pekanbaru go id',
+  'portal keamanan pekanbaru',
+
+  // Brand & Identitas Paket
+  'laravel security monitor',
+  'bulwark waf',
+  'bulwark laravel',
+  'robyajo/laravel-security-monitor',
+  'robyajo',
+  'roby karti s',
+
+  // Fitur Keamanan WAF Laravel
+  'laravel web application firewall',
+  'laravel waf',
+  'waf laravel',
+  'laravel firewall',
+  'keamanan laravel',
+  'web security laravel',
+  'laravel threat detection',
+  'deteksi ancaman laravel',
+  'zero tolerance waf',
+  'instant block laravel',
+  'auto block ip laravel',
+  'device quarantine laravel',
+  'karantina perangkat',
+  'stepped login throttling',
+  'login lockout laravel',
+  'brute force protection laravel',
+  'proteksi brute force',
+  'credential stuffing protection',
+  'webshell scanner php',
+  'pemindai webshell laravel',
+  'server security audit laravel',
+  'audit keamanan server',
+  'file integrity baseline sha256',
+  'access log streaming laravel',
+  'reverse proxy ip spoofing laravel',
+  'real client ip resolution',
+  'cloudflare connecting ip laravel',
+  'appeal ticket unblock',
+  'tiket banding ip terblokir',
+  'active session tracking laravel',
+  'session invalidation laravel',
+
+  // Standar & Arsitektur Paket
+  'spatie standard laravel package',
+  'pure php waf',
+  'zero npm laravel security',
+  'headless security api laravel',
+  'laravel rest api security',
+  'laravel 10 security',
+  'laravel 11 security',
+  'laravel 12 security',
+  'laravel 13 security',
+  'php 8.2 security',
+  'php 8.3 security',
+  'php 8.4 security',
+  'mitigasi ddos laravel',
+  'proteksi sql injection laravel',
+  'proteksi xss laravel',
+  'proteksi ssti laravel',
+  'path traversal prevention'
+].join(', ');
+
+const websiteSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: 'Laravel Security Monitor',
+  alternateName: ['Bulwark', 'robyajo/laravel-security-monitor', 'Security Pekanbaru', 'Laravel Security Pekanbaru', 'Diskominfo Pekanbaru Security'],
+  url: siteOrigin + '/',
+  description: 'Dokumentasi resmi robyajo/laravel-security-monitor (Bulwark) — Enterprise Headless Web Application Firewall & Audit Library untuk Laravel. Layanan Keamanan Sistem Informasi & Siber Kota Pekanbaru (security-dev.pekanbaru.go.id).',
+  inLanguage: 'id-ID',
+  keywords: allKeywords,
+};
+
+const softwareSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'SoftwareApplication',
+  name: 'Laravel Security Monitor (Bulwark)',
+  applicationCategory: 'SecurityApplication',
+  operatingSystem: 'PHP ^8.2 | ^8.3 | ^8.4, Laravel ^10 | ^11 | ^12 | ^13',
+  softwareVersion: pkg?.packagist?.version || '2.0.10',
+  license: 'https://opensource.org/licenses/MIT',
+  url: 'https://github.com/robyajo/laravel-security-monitor',
+  downloadUrl: 'https://packagist.org/packages/robyajo/laravel-security-monitor',
+  keywords: allKeywords,
+  author: {
+    '@type': 'Person',
+    name: 'Roby Karti S.',
+    url: 'https://github.com/robyajo',
+  },
+  offers: {
+    '@type': 'Offer',
+    price: '0',
+    priceCurrency: 'USD',
+  },
+};
+
+const articleSchema = !isHome ? {
+  '@context': 'https://schema.org',
+  '@type': 'TechArticle',
+  headline: title,
+  description: description,
+  url: canonicalUrl,
+  inLanguage: 'id-ID',
+  keywords: allKeywords,
+  author: {
+    '@type': 'Person',
+    name: 'Roby Karti S.',
+    url: 'https://github.com/robyajo',
+  },
+  publisher: {
+    '@type': 'Organization',
+    name: 'Laravel Security Monitor',
+    url: siteOrigin + '/',
+    logo: {
+      '@type': 'ImageObject',
+      url: new URL('/favicon.svg', siteOrigin).href,
+    },
+  },
+} : null;
+
+const breadcrumbSchema = breadcrumbItems.length > 1 ? {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: breadcrumbItems,
+} : null;
+---
+
+{head.map(({ tag: Tag, attrs, content }) => <Tag {...attrs} set:html={content} />)}
+
+<!-- Tipografi Google Fonts: Plus Jakarta Sans & JetBrains Mono -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300..800;1,300..800&family=JetBrains+Mono:ital,wght@0,400..700;1,400..700&display=swap"
+  rel="stylesheet"
+/>
+
+<!-- Ikon & Web App Manifest Lengkap -->
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+<link rel="shortcut icon" href="/favicon.ico" />
+<link rel="manifest" href="/site.webmanifest" />
+
+<!-- Open Graph & Social Preview -->
+<meta property="og:image" content={ogImageUrl} />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:type" content="image/png" />
+<meta property="og:image:alt" content="Laravel Security Monitor (Bulwark) — Enterprise Headless WAF" />
+<meta property="og:locale" content="id_ID" />
+<meta name="twitter:image" content={ogImageUrl} />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content={title} />
+<meta name="twitter:description" content={description} />
+
+<!-- Search Engine Verification -->
+<meta name="google-site-verification" content="0JqR3rz8B1BGb2jLQy78PSUGlldUXwXPsWTouL_Z4mA" />
+
+<!-- General SEO & Search Engine Crawling Directives -->
+<meta name="keywords" content={allKeywords} />
+<meta name="author" content="Roby Karti S." />
+<meta name="theme-color" content="#0f172a" />
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+
+<!-- Geo & Local SEO Tags (Kota Pekanbaru, Riau, Indonesia) -->
+<meta name="geo.region" content="ID-RI" />
+<meta name="geo.placename" content="Pekanbaru" />
+<meta name="geo.position" content="0.5071;101.4478" />
+<meta name="ICBM" content="0.5071, 101.4478" />
+<meta name="coverage" content="Indonesia, Kota Pekanbaru, Riau" />
+<meta name="distribution" content="Global" />
+
+<!-- Structured Data (Schema.org JSON-LD) -->
+<script type="application/ld+json" set:html={JSON.stringify(websiteSchema)} />
+<script type="application/ld+json" set:html={JSON.stringify(softwareSchema)} />
+{articleSchema && <script type="application/ld+json" set:html={JSON.stringify(articleSchema)} />}
+{breadcrumbSchema && <script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} />}
+
+<script>
+	import { initMermaid } from '../scripts/mermaid';
+	import { initVisitorTracker } from '../scripts/tracker';
+
+	initMermaid();
+	initVisitorTracker();
+</script>

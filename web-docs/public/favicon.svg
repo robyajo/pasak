@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" role="img" aria-label="Laravel Security Monitor">
+  <defs>
+    <linearGradient id="shield" x1="6" y1="4" x2="58" y2="60" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#38bdf8" />
+      <stop offset="1" stop-color="#6366f1" />
+    </linearGradient>
+  </defs>
+  <path d="M32 4.5 54 12.6v17.1c0 13.9-9.2 24.6-22 30.3-12.8-5.7-22-16.4-22-30.3V12.6L32 4.5Z" fill="url(#shield)" />
+  <path d="M32 4.5 54 12.6v17.1c0 13.9-9.2 24.6-22 30.3-12.8-5.7-22-16.4-22-30.3V12.6L32 4.5Z" fill="#000" fill-opacity="0.08" />
+  <path d="m22.5 32.4 6.6 6.6 12.8-13.4" stroke="#ffffff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+</svg>

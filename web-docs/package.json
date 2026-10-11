@@ -1,0 +1,28 @@
+{
+  "name": "web",
+  "type": "module",
+  "version": "0.0.1",
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro",
+    "sync:docs": "node scripts/sync-docs.mjs",
+    "sync:package": "node scripts/sync-package.mjs",
+    "sync:favicons": "node scripts/sync-favicons.mjs",
+    "generate:favicons": "node scripts/sync-favicons.mjs",
+    "generate:og": "node scripts/generate-og.mjs",
+    "deploy": "./finis.sh"
+  },
+  "dependencies": {
+    "@astrojs/sitemap": "^3.7.4",
+    "@astrojs/starlight": "^0.42.5",
+    "astro": "^7.2.10",
+    "mermaid": "^12.0.0",
+    "sharp": "^0.35.3"
+  },
+  "allowScripts": {
+    "esbuild": true
+  }
+}

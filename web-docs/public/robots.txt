@@ -1,0 +1,9 @@
+# =====================================================================
+# Robots.txt — Laravel Security Monitor Official Documentation
+# =====================================================================
+
+User-agent: *
+Allow: /
+
+# Directives for search engine optimization
+Sitemap: https://security-dev.pekanbaru.go.id/sitemap-index.xml
