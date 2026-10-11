@@ -3,12 +3,30 @@
 namespace Internal\Pasak\Console\Commands;
 
 use Illuminate\Console\Command;
+use Illuminate\Foundation\Application;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 
 class SecurityInstallCommand extends Command
 {
+    protected string $wizardLang = 'id';
+
+    protected const DOCS_BASE = 'https://security-dev.pekanbaru.go.id';
+
+    protected function t(string $id, string $en): string
+    {
+        return $this->wizardLang === 'en' ? $en : $id;
+    }
+
+    protected function docs(string $path = ''): string
+    {
+        return rtrim(self::DOCS_BASE, '/').($path !== '' ? '/'.ltrim($path, '/') : '');
+    }
+
     protected $signature = 'pasak:install
                             {--force : Timpa berkas konfigurasi, migrasi, nginx, htaccess, dan halaman blokir yang sudah ada}
+                            {--lang= : Bahasa wizard instalasi (id|en)}
+                            {--api-only : Instalasi API-only (inti + keamanan, tanpa halaman/dashboard)}
                             {--without-nginx : Jangan publikasikan berkas nginx.conf}
                             {--without-apache : Jangan publikasikan berkas apache2.conf}
                             {--without-htaccess : Jangan perbarui berkas public/.htaccess}
@@ -30,9 +48,6 @@ class SecurityInstallCommand extends Command
 
     public function handle(): int
     {
-        $this->info('Memulai instalasi Pasak (Bulwark)...');
-        $this->newLine();
-
         $force = (bool) $this->option('force');
         $withoutNginx = (bool) $this->option('without-nginx');
         $withoutApache = (bool) $this->option('without-apache');
@@ -47,6 +62,73 @@ class SecurityInstallCommand extends Command
         $withReactDashboard = (bool) ($this->option('with-react-dashboard') || $this->option('with-tsx'));
         $withBoth = (bool) $this->option('with-both');
         $stack = $this->option('stack');
+        $apiOnly = (bool) $this->option('api-only');
+
+        $interactive = ! app()->runningUnitTests() && $this->input->isInteractive();
+
+        // 0. Bahasa wizard instalasi (default: Indonesia).
+        $langOption = strtolower((string) ($this->option('lang') ?? ''));
+        if (in_array($langOption, ['id', 'en'], true)) {
+            $this->wizardLang = $langOption;
+        } elseif ($interactive && ! $this->option('no-interaction')) {
+            $langChoice = $this->choice(
+                'Pilih bahasa instalasi / Choose installation language',
+                ['id' => 'Indonesia (default)', 'en' => 'English'],
+                'id'
+            );
+            $this->wizardLang = $langChoice === 'en' ? 'en' : 'id';
+        }
+
+        $this->info($this->t('Memulai instalasi Pasak (Bulwark)...', 'Starting Pasak (Bulwark) installation...'));
+        $this->newLine();
+
+        // 1. Mode API-only: inti + keamanan saja, tanpa halaman/dashboard.
+        $dashboardFlagsGiven = $withDashboard || $withReactDashboard || $withBoth || $stack;
+        if (! $apiOnly && ! $dashboardFlagsGiven && $interactive) {
+            $apiOnly = $this->confirm(
+                $this->t(
+                    'Apakah ini instalasi API-only? (hanya inti + keamanan, TANPA halaman/dashboard)',
+                    'Is this an API-only installation? (core + security only, NO pages/dashboard)'
+                ),
+                false
+            );
+        }
+
+        if ($apiOnly) {
+            $withDashboard = false;
+            $withReactDashboard = false;
+            $withBoth = false;
+            $this->comment($this->t(
+                'Mode API-only: halaman dashboard dilewati, yang dipasang hanya inti + keamanan.',
+                'API-only mode: dashboard pages skipped, only core + security will be installed.'
+            ));
+        }
+
+        // 2. Pilihan starterkit (hanya bila BUKAN api-only dan belum ditentukan via opsi).
+        if (! $apiOnly && ! $dashboardFlagsGiven && $interactive) {
+            $choice = $this->choice(
+                $this->t(
+                    'Pasang dashboard monitoring starterkit apa?',
+                    'Which starterkit monitoring dashboard to install?'
+                ),
+                [
+                    'livewire' => 'Livewire / Blade (Flux UI Starter Kit)',
+                    'react' => 'React / TSX (Inertia + shadcn Starter Kit)',
+                    'both' => $this->t('Keduanya (Blade & TSX)', 'Both (Blade & TSX)'),
+                    'none' => $this->t('Tidak ada (Headless REST API saja)', 'None (Headless REST API only)'),
+                ],
+                'livewire'
+            );
+
+            if ($choice === 'livewire') {
+                $withDashboard = true;
+            } elseif ($choice === 'react') {
+                $withReactDashboard = true;
+            } elseif ($choice === 'both') {
+                $withDashboard = true;
+                $withReactDashboard = true;
+            }
+        }
 
         if ($stack) {
             match (strtolower((string) $stack)) {
@@ -63,28 +145,10 @@ class SecurityInstallCommand extends Command
             $withReactDashboard = true;
         }
 
-        // Jika dijalankan interaktif di terminal (bukan test suite) dan opsi dashboard belum dipilih
-        if (! app()->runningUnitTests() && ! $withDashboard && ! $withReactDashboard && ! $withoutViews && $this->input->isInteractive()) {
-            $choice = $this->choice(
-                'Sediakan tampilan dashboard monitoring di prefix /pasak (wajib login)?',
-                [
-                    'blade' => 'Blade (Livewire / Flux UI Starter Kit)',
-                    'tsx' => 'TSX (Inertia + React / shadcn Starter Kit)',
-                    'both' => 'Keduanya (Blade & TSX)',
-                    'none' => 'Lewati (Headless REST API saja)',
-                ],
-                'blade'
-            );
+        // 3. Cek kelengkapan lingkungan sebelum memasang apa pun.
+        $this->runReadinessCheck();
 
-            if ($choice === 'blade') {
-                $withDashboard = true;
-            } elseif ($choice === 'tsx') {
-                $withReactDashboard = true;
-            } elseif ($choice === 'both') {
-                $withDashboard = true;
-                $withReactDashboard = true;
-            }
-        }
+        $migrated = false;
 
         // 1. Publish Config
         $this->comment('Mempublikasikan berkas konfigurasi...');
@@ -182,9 +246,11 @@ class SecurityInstallCommand extends Command
         // 10. Ensure API support & publish customizable route files (routes/pasak.php & routes/pasak-api.php)
         if (! $withoutRoutes) {
             $this->comment(
-                'Menyiapkan rute mandiri (routes/pasak.php & routes/pasak-api.php)...',
+                $apiOnly
+                    ? 'Menyiapkan rute mandiri API-only (routes/pasak-api.php)...'
+                    : 'Menyiapkan rute mandiri (routes/pasak.php & routes/pasak-api.php)...',
             );
-            $this->publishSecurityRoutes($force, $withoutApi);
+            $this->publishSecurityRoutes($force, $withoutApi, $apiOnly);
         }
 
         // 11. Append / Update Environment Variables with rich comments to .env & .env.example
@@ -196,86 +262,118 @@ class SecurityInstallCommand extends Command
         }
 
         $this->newLine();
-        $this->info('Instalasi aset berhasil diselesaikan!');
+        $this->info($this->t('Instalasi aset berhasil diselesaikan!', 'Asset installation completed!'));
         $this->newLine();
 
+        // 4. Tawarkan menjalankan migrasi database sekarang.
+        if ($interactive && ! $migrated) {
+            $migrated = $this->confirm(
+                $this->t(
+                    'Jalankan migrasi database sekarang? (php artisan migrate)',
+                    'Run database migrations now? (php artisan migrate)'
+                ),
+                true
+            );
+
+            if ($migrated) {
+                $this->call('migrate', ['--force' => true]);
+            }
+        }
+
         $dashboardPrefix = '/'.ltrim((string) config('pasak.dashboard.prefix', 'pasak'), '/');
+        $doc = fn (string $path): string => '📖 '.$this->docs($path);
         $steps = [];
-        $steps[] = ['Jalankan migrasi database:', 'php artisan migrate'];
+        $steps[] = $migrated
+            ? [$this->t('Migrasi database: sudah dijalankan otomatis.', 'Database migrations: already executed automatically.'), $doc('getting-started/installation')]
+            : [$this->t('Jalankan migrasi database:', 'Run database migrations:'), 'php artisan migrate', $doc('getting-started/installation')];
         if (! $withoutUserTrait) {
-            $steps[] = ['Model User: Trait HasSecurityRelations berhasil disematkan secara otomatis.'];
+            $steps[] = [$this->t('Model User: Trait HasSecurityRelations berhasil disematkan secara otomatis.', 'User model: HasSecurityRelations trait injected automatically.'), $doc('getting-started/installation')];
         } else {
             $steps[] = [
-                'Tambahkan trait HasSecurityRelations ke model User:',
+                $this->t('Tambahkan trait HasSecurityRelations ke model User:', 'Add the HasSecurityRelations trait to your User model:'),
                 'use Internal\Pasak\Concerns\HasSecurityRelations;',
+                $doc('getting-started/installation'),
             ];
         }
         if (! $withoutMiddleware) {
-            $steps[] = ['Middleware WAF: BlockIpAddress & DetectSecurityThreats berhasil didaftarkan otomatis.'];
+            $steps[] = [$this->t('Middleware WAF: BlockIpAddress & DetectSecurityThreats berhasil didaftarkan otomatis.', 'WAF middleware: BlockIpAddress & DetectSecurityThreats registered automatically.'), $doc('core-architecture/threat-detection-engine')];
         } else {
             $steps[] = [
-                'Daftarkan middleware proteksi WAF di bootstrap/app.php (Laravel 11+) atau app/Http/Kernel.php (Laravel 10):',
+                $this->t('Daftarkan middleware proteksi WAF di bootstrap/app.php (Laravel 11+) atau app/Http/Kernel.php (Laravel 10):', 'Register the WAF protection middleware in bootstrap/app.php (Laravel 11+) or app/Http/Kernel.php (Laravel 10):'),
                 '\Internal\Pasak\Http\Middleware\BlockIpAddress::class',
                 '\Internal\Pasak\Http\Middleware\DetectSecurityThreats::class',
+                $doc('getting-started/installation'),
             ];
         }
         if (! $withoutRoutes) {
-            $steps[] = ['Rute kustom: berkas routes/pasak.php (web) dan routes/pasak-api.php (API) siap dikustomisasi.'];
+            $steps[] = [$apiOnly
+                ? $this->t('Rute kustom API: berkas routes/pasak-api.php siap dikustomisasi.', 'Custom API routes: routes/pasak-api.php is ready to customize.')
+                : $this->t('Rute kustom: berkas routes/pasak.php (web) dan routes/pasak-api.php (API) siap dikustomisasi.', 'Custom routes: routes/pasak.php (web) and routes/pasak-api.php (API) are ready to customize.'),
+                $doc('api-reference/api-overview')];
         }
         $steps[] = [
-            'Sesuaikan variabel PASAK_* di berkas .env, minimal:',
+            $this->t('Sesuaikan variabel PASAK_* di berkas .env, minimal:', 'Adjust the PASAK_* variables in your .env file, at minimum:'),
             'PASAK_IP_WHITELIST=127.0.0.1,::1,<ip-kantor-anda>   # agar IP internal tidak pernah diblokir',
             'PASAK_SUPPORT_EMAIL=security@domain-anda.test          # tampil di halaman blokir 403',
+            $doc('getting-started/configuration'),
         ];
         $steps[] = [
-            'Aktifkan scheduler Laravel agar pembersihan log & heartbeat berjalan (sekali saja):',
+            $this->t('Aktifkan scheduler Laravel agar pembersihan log & heartbeat berjalan (sekali saja):', 'Enable the Laravel scheduler so log pruning & heartbeat run (one time):'),
             '* * * * * cd /path-ke-proyek && php artisan schedule:run >> /dev/null 2>&1',
+            $doc('cli-automation/scheduled-tasks'),
         ];
         $steps[] = [
-            'Buat baseline integritas berkas (deteksi backdoor):',
+            $this->t('Buat baseline integritas berkas (deteksi backdoor):', 'Create the file integrity baseline (backdoor detection):'),
             'php artisan pasak:baseline --create',
+            $doc('security-modules/server-security-and-webshells'),
         ];
         $steps[] = [
-            'Uji cepat: buka satu URL normal (harus 200) lalu simulasi probe aman (harus 403 + tercatat):',
+            $this->t('Uji cepat: buka satu URL normal (harus 200) lalu simulasi probe aman (harus 403 + tercatat):', 'Quick test: open a normal URL (expect 200) then simulate a safe probe (expect 403 + logged):'),
             'curl -I https://domain-anda.test/                                  # 200',
             "curl -I 'https://domain-anda.test/?q=%7B%7B7*7%7D%7D'               # 403",
+            $doc('core-architecture/threat-detection-engine'),
         ];
         if (! $withoutNginx) {
-            $steps[] = ['Web server Nginx: periksa dan sesuaikan nginx.conf di root proyek, lalu reload nginx.'];
+            $steps[] = [$this->t('Web server Nginx: periksa dan sesuaikan nginx.conf di root proyek, lalu reload nginx.', 'Nginx web server: review and adjust nginx.conf at the project root, then reload nginx.'), $doc('webserver-hardening/nginx-hardened-waf')];
         }
         if (! $withoutApache) {
-            $steps[] = ['Web server Apache2: periksa dan sesuaikan apache2.conf di root proyek, lalu reload apache2.'];
+            $steps[] = [$this->t('Web server Apache2: periksa dan sesuaikan apache2.conf di root proyek, lalu reload apache2.', 'Apache2 web server: review and adjust apache2.conf at the project root, then reload apache2.'), $doc('webserver-hardening/apache-htaccess-hardening')];
         }
         if (! $withoutHtaccess) {
-            $steps[] = ['Apache / cPanel: public/.htaccess telah diperkuat terhadap upload webshell, double extension, dotfile, dan file backup.'];
+            $steps[] = [$this->t('Apache / cPanel: public/.htaccess telah diperkuat terhadap upload webshell, double extension, dotfile, dan file backup.', 'Apache / cPanel: public/.htaccess has been hardened against webshell uploads, double extensions, dotfiles, and backup files.'), $doc('webserver-hardening/apache-htaccess-hardening')];
         }
         if (! $withoutViews) {
-            $steps[] = ['Halaman blokir: sesuaikan resources/views/errors/blocked.blade.php dengan branding aplikasi Anda.'];
+            $steps[] = [$this->t('Halaman blokir: sesuaikan resources/views/errors/blocked.blade.php dengan branding aplikasi Anda.', 'Blocked page: customize resources/views/errors/blocked.blade.php with your app branding.'), $doc('integration-guides/frontend-blade-livewire')];
         }
         if ($withDashboard && $withReactDashboard) {
             $steps[] = [
-                "Dashboard Blade & TSX: siap diakses pada prefix {$dashboardPrefix} (wajib login).",
-                'Ganti driver aktif di .env (PASAK_DASHBOARD_DRIVER=livewire atau react).',
+                $this->t("Dashboard Blade & TSX: siap diakses pada prefix {$dashboardPrefix} (wajib login).", "Blade & TSX dashboard: ready at the {$dashboardPrefix} prefix (login required)."),
+                $this->t('Ganti driver aktif di .env (PASAK_DASHBOARD_DRIVER=livewire atau react).', 'Switch the active driver in .env (PASAK_DASHBOARD_DRIVER=livewire or react).'),
+                $doc('integration-guides/frontend-blade-livewire'),
             ];
         } elseif ($withDashboard) {
-            $steps[] = ["Dashboard Blade: siap diakses pada prefix {$dashboardPrefix} (wajib login)."];
+            $steps[] = [$this->t("Dashboard Blade: siap diakses pada prefix {$dashboardPrefix} (wajib login).", "Blade dashboard: ready at the {$dashboardPrefix} prefix (login required)."), $doc('integration-guides/frontend-blade-livewire')];
         } elseif ($withReactDashboard) {
             $steps[] = [
-                "Dashboard TSX: siap diakses pada prefix {$dashboardPrefix} (wajib login).",
-                'Jalankan npm run build untuk memproses aset TSX pada Vite.',
+                $this->t("Dashboard TSX: siap diakses pada prefix {$dashboardPrefix} (wajib login).", "TSX dashboard: ready at the {$dashboardPrefix} prefix (login required)."),
+                $this->t('Jalankan npm run build untuk memproses aset TSX pada Vite.', 'Run npm run build to process the TSX assets with Vite.'),
+                $doc('integration-guides/frontend-react-inertia'),
             ];
+        } elseif (! $apiOnly) {
+            $steps[] = [$this->t('Dashboard monitoring (opsional): sediakan kapan saja dengan php artisan pasak:install --with-blade atau --with-tsx.', 'Monitoring dashboard (optional): provide anytime with php artisan pasak:install --with-blade or --with-tsx.'), $doc('integration-guides/frontend-blade-livewire')];
         } else {
-            $steps[] = ['Dashboard monitoring (opsional): sediakan kapan saja dengan php artisan pasak:install --with-blade atau --with-tsx.'];
+            $steps[] = [$this->t('Mode API-only: kelola semuanya via headless REST API di /api/pasak/*.', 'API-only mode: manage everything via the headless REST API at /api/pasak/*.'), $doc('api-reference/api-overview')];
         }
         if (config('pasak.access_log.auto_scan_enabled', false) === false) {
             $steps[] = [
-                'Opsional: pindai access log web server untuk serangan yang tak sampai ke PHP:',
+                $this->t('Opsional: pindai access log web server untuk serangan yang tak sampai ke PHP:', 'Optional: scan the web server access log for attacks that never reach PHP:'),
                 'php artisan pasak:scan-logs --since="24 hours ago"',
+                $doc('security-modules/access-log-streaming'),
             ];
         }
 
         $this->line(
-            '<fg=cyan>Langkah selanjutnya untuk mengaktifkan proteksi & dashboard:</>',
+            $this->t('<fg=cyan>Langkah selanjutnya agar tidak pusing — ikuti berurutan:</>', '<fg=cyan>Next steps so nothing gets confusing — follow in order:</>'),
         );
         foreach ($steps as $index => $lines) {
             $number = $index + 1;
@@ -286,6 +384,40 @@ class SecurityInstallCommand extends Command
         }
 
         return self::SUCCESS;
+    }
+
+    /**
+     * Cek kelengkapan lingkungan (langkah 3): PHP, Laravel, database, .env.
+     * Hanya memberi peringatan — tidak pernah menghentikan instalasi.
+     */
+    protected function runReadinessCheck(): void
+    {
+        $this->comment($this->t(
+            'Memeriksa kelengkapan lingkungan...',
+            'Checking environment readiness...'
+        ));
+
+        $checks = [];
+
+        $checks[] = [version_compare(PHP_VERSION, '8.2.0', '>='), 'PHP '.PHP_VERSION.' (>= 8.2)'];
+        $checks[] = [class_exists(Application::class), 'Framework Laravel ('.Application::VERSION.')'];
+
+        try {
+            DB::connection()->getPdo();
+            $checks[] = [true, $this->t('Koneksi database', 'Database connection')];
+        } catch (\Throwable) {
+            $checks[] = [false, $this->t('Koneksi database (periksa DB_* di .env)', 'Database connection (check DB_* in .env)')];
+        }
+
+        $checks[] = [File::exists(base_path('.env')), $this->t('Berkas .env', '.env file')];
+        $checks[] = [is_writable(base_path('composer.json')), $this->t('composer.json dapat ditulis', 'composer.json is writable')];
+
+        foreach ($checks as [$ok, $label]) {
+            $this->line($ok ? "  ✓ {$label}" : "  ✗ {$label}");
+        }
+
+        $this->line('  📖 '.$this->docs('getting-started/installation'));
+        $this->newLine();
     }
 
     /**
@@ -674,7 +806,7 @@ PHP
     /**
      * Publikasikan berkas rute pasak.php dan pasak-api.php ke direktori routes/ host application.
      */
-    protected function publishSecurityRoutes(bool $force, bool $withoutApi = false): void
+    protected function publishSecurityRoutes(bool $force, bool $withoutApi = false, bool $apiOnly = false): void
     {
         if (! $withoutApi) {
             $this->ensureApiRoutesInstalled();
@@ -701,29 +833,31 @@ PHP
             }
         }
 
-        // 2. Publikasikan routes/pasak.php
-        $webStubPath = __DIR__.'/../../../stubs/routes/pasak.php.stub';
-        if (! File::exists($webStubPath)) {
-            $webStubPath = dirname(__DIR__, 2).'/stubs/routes/pasak.php.stub';
-        }
-        $targetWebPath = base_path('routes/pasak.php');
-
-        if (File::exists($webStubPath)) {
-            if (! File::exists($targetWebPath) || $force) {
-                File::copy($webStubPath, $targetWebPath);
-                $this->info('  ✓ Berkas routes/pasak.php berhasil dibuat (render view langsung).');
-            } else {
-                $this->line('  ✓ Berkas routes/pasak.php sudah ada.');
+        // 2. Publikasikan routes/pasak.php (dilewati pada mode API-only).
+        if (! $apiOnly) {
+            $webStubPath = __DIR__.'/../../../stubs/routes/pasak.php.stub';
+            if (! File::exists($webStubPath)) {
+                $webStubPath = dirname(__DIR__, 2).'/stubs/routes/pasak.php.stub';
             }
-        }
+            $targetWebPath = base_path('routes/pasak.php');
 
-        // 3. Sertakan routes/pasak.php di routes/web.php jika belum ada
-        $webRouteFile = base_path('routes/web.php');
-        if (File::exists($webRouteFile)) {
-            $webContent = File::get($webRouteFile);
-            if (! str_contains($webContent, 'security.php')) {
-                File::append($webRouteFile, "\nrequire __DIR__.'/pasak.php';\n");
-                $this->info('  ✓ Berkas routes/web.php menyertakan routes/pasak.php.');
+            if (File::exists($webStubPath)) {
+                if (! File::exists($targetWebPath) || $force) {
+                    File::copy($webStubPath, $targetWebPath);
+                    $this->info('  ✓ Berkas routes/pasak.php berhasil dibuat (render view langsung).');
+                } else {
+                    $this->line('  ✓ Berkas routes/pasak.php sudah ada.');
+                }
+            }
+
+            // 3. Sertakan routes/pasak.php di routes/web.php jika belum ada
+            $webRouteFile = base_path('routes/web.php');
+            if (File::exists($webRouteFile)) {
+                $webContent = File::get($webRouteFile);
+                if (! str_contains($webContent, 'pasak.php')) {
+                    File::append($webRouteFile, "\nrequire __DIR__.'/pasak.php';\n");
+                    $this->info('  ✓ Berkas routes/web.php menyertakan routes/pasak.php.');
+                }
             }
         }
 
@@ -731,7 +865,7 @@ PHP
         $apiRouteFile = base_path('routes/api.php');
         if (File::exists($apiRouteFile)) {
             $apiContent = File::get($apiRouteFile);
-            if (! str_contains($apiContent, 'security-api.php')) {
+            if (! str_contains($apiContent, 'pasak-api.php')) {
                 File::append($apiRouteFile, "\nrequire __DIR__.'/pasak-api.php';\n");
                 $this->info('  ✓ Berkas routes/api.php menyertakan routes/pasak-api.php.');
             }
