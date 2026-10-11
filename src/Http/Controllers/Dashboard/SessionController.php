@@ -2,6 +2,7 @@
 
 namespace Internal\Pasak\Http\Controllers\Dashboard;
 
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
@@ -18,7 +19,9 @@ use Internal\Pasak\Services\UserLoginService;
  */
 class SessionController extends Controller
 {
-    public function index(Request $request): Response
+    use RespondsWithDashboard;
+
+    public function index(Request $request): View|Response
     {
         $query = UserLogin::query()->with('user')->latest('id');
 
@@ -37,21 +40,25 @@ class SessionController extends Controller
             });
         }
 
-        return Inertia::render('pasak/sessions', [
-            'logins' => $query->paginate(20)->withQueryString(),
-            'trustedIps' => TrustedIp::query()->with('user')->latest('id')->get(),
-            'onlineCount' => UserLogin::query()->active(5)->count(),
-            'filters' => [
-                'search' => $search,
-            ],
-            'urls' => [
-                'index' => route('pasak.dashboard.sessions'),
-                'loginDestroy' => route('pasak.dashboard.user-sessions.destroy', ['id' => '__ID__']),
-                'sessionDestroy' => route('pasak.dashboard.sessions.destroy', ['sessionId' => '__SESSION__']),
-                'trustedDestroy' => route('pasak.dashboard.trusted-ips.destroy', ['id' => '__ID__']),
-                'storeMyIp' => route('pasak.dashboard.trusted-ips.store-my-ip'),
-            ],
-        ]);
+        return $this->dashboardResponse(
+            'pages.pasak.sessions',
+            'pasak/sessions',
+            [
+                'logins' => $query->paginate(20)->withQueryString(),
+                'trustedIps' => TrustedIp::query()->with('user')->latest('id')->get(),
+                'onlineCount' => UserLogin::query()->active(5)->count(),
+                'filters' => [
+                    'search' => $search,
+                ],
+                'urls' => [
+                    'index' => route('pasak.dashboard.sessions'),
+                    'loginDestroy' => route('pasak.dashboard.user-sessions.destroy', ['id' => '__ID__']),
+                    'sessionDestroy' => route('pasak.dashboard.sessions.destroy', ['sessionId' => '__SESSION__']),
+                    'trustedDestroy' => route('pasak.dashboard.trusted-ips.destroy', ['id' => '__ID__']),
+                    'storeMyIp' => route('pasak.dashboard.trusted-ips.store-my-ip'),
+                ],
+            ]
+        );
     }
 
     public function destroyLogin(int $id): RedirectResponse

@@ -261,6 +261,14 @@ class PasakServiceProvider extends ServiceProvider
         );
         $this->publishes(
             [
+                __DIR__.'/../stubs/blade/pages/pasak' => resource_path(
+                    'views/pages/pasak',
+                ),
+            ],
+            'plain-views',
+        );
+        $this->publishes(
+            [
                 __DIR__.'/../stubs/livewire/pages/pasak' => resource_path(
                     'views/pages/pasak',
                 ),
@@ -402,15 +410,27 @@ class PasakServiceProvider extends ServiceProvider
             return;
         }
 
-        $driver = (string) config('pasak.dashboard.driver', 'livewire');
+        $driver = strtolower((string) config('pasak.dashboard.driver', 'blade'));
 
-        if (in_array(strtolower($driver), ['livewire', 'blade', 'all', 'both'], true)) {
+        if (in_array($driver, ['livewire', 'all', 'both'], true)) {
             $this->registerLivewireDashboardRoutes();
         }
 
-        if (in_array(strtolower($driver), ['react', 'tsx', 'all', 'both'], true)) {
+        if (in_array($driver, ['blade', 'plain', 'all', 'both'], true)) {
+            $this->registerBladeDashboardRoutes();
+        }
+
+        if (in_array($driver, ['react', 'tsx', 'all', 'both'], true)) {
             $this->registerReactDashboardRoutes();
         }
+    }
+
+    /**
+     * Register the plain-Blade dashboard routes (no Livewire/Inertia needed).
+     */
+    protected function registerBladeDashboardRoutes(): void
+    {
+        $this->loadRoutesFrom(__DIR__.'/../routes/pasak-dashboard-blade.php');
     }
 
     /**

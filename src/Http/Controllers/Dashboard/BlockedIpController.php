@@ -2,6 +2,7 @@
 
 namespace Internal\Pasak\Http\Controllers\Dashboard;
 
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
@@ -16,7 +17,9 @@ use Internal\Pasak\Services\PasakService;
  */
 class BlockedIpController extends Controller
 {
-    public function index(Request $request): Response
+    use RespondsWithDashboard;
+
+    public function index(Request $request): View|Response
     {
         $query = BlockedIp::query()->latest('id');
 
@@ -40,25 +43,29 @@ class BlockedIpController extends Controller
             $query->whereNull('expires_at')->where('is_active', true);
         }
 
-        return Inertia::render('pasak/blocked-ips', [
-            'blocks' => $query->paginate(25)->withQueryString(),
-            'stats' => [
-                'total' => BlockedIp::query()->count(),
-                'active' => BlockedIp::query()->active()->count(),
-                'permanent' => BlockedIp::query()->whereNull('expires_at')->where('is_active', true)->count(),
-                'hits' => (int) BlockedIp::query()->sum('hit_count'),
-            ],
-            'filters' => [
-                'search' => $search,
-                'status' => $status,
-            ],
-            'urls' => [
-                'index' => route('pasak.dashboard.blocked-ips'),
-                'store' => route('pasak.dashboard.blocked-ips.store'),
-                'toggle' => route('pasak.dashboard.blocked-ips.toggle', ['id' => '__ID__']),
-                'destroy' => route('pasak.dashboard.blocked-ips.destroy', ['id' => '__ID__']),
-            ],
-        ]);
+        return $this->dashboardResponse(
+            'pages.pasak.blocked-ips',
+            'pasak/blocked-ips',
+            [
+                'blocks' => $query->paginate(25)->withQueryString(),
+                'stats' => [
+                    'total' => BlockedIp::query()->count(),
+                    'active' => BlockedIp::query()->active()->count(),
+                    'permanent' => BlockedIp::query()->whereNull('expires_at')->where('is_active', true)->count(),
+                    'hits' => (int) BlockedIp::query()->sum('hit_count'),
+                ],
+                'filters' => [
+                    'search' => $search,
+                    'status' => $status,
+                ],
+                'urls' => [
+                    'index' => route('pasak.dashboard.blocked-ips'),
+                    'store' => route('pasak.dashboard.blocked-ips.store'),
+                    'toggle' => route('pasak.dashboard.blocked-ips.toggle', ['id' => '__ID__']),
+                    'destroy' => route('pasak.dashboard.blocked-ips.destroy', ['id' => '__ID__']),
+                ],
+            ]
+        );
     }
 
     public function store(Request $request, PasakService $security): RedirectResponse

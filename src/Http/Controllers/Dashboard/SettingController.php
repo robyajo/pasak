@@ -2,6 +2,7 @@
 
 namespace Internal\Pasak\Http\Controllers\Dashboard;
 
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
@@ -12,6 +13,8 @@ use Internal\Pasak\Services\VersionCheckService;
 
 class SettingController extends Controller
 {
+    use RespondsWithDashboard;
+
     public function __construct(
         protected PasakService $securityService,
     ) {}
@@ -19,16 +22,20 @@ class SettingController extends Controller
     /**
      * Render the settings page on Inertia + React dashboard.
      */
-    public function index(VersionCheckService $versionChecker): Response
+    public function index(VersionCheckService $versionChecker): View|Response
     {
-        return Inertia::render('pasak/settings', [
-            'settings' => $this->securityService->getSettings(),
-            'version' => [
-                'current' => $versionChecker->getCurrentVersion(),
-                'latest' => $versionChecker->getLatestVersion(),
-                'update_available' => $versionChecker->isUpdateAvailable(),
-            ],
-        ]);
+        return $this->dashboardResponse(
+            'pages.pasak.settings',
+            'pasak/settings',
+            [
+                'settings' => $this->securityService->getSettings(),
+                'version' => [
+                    'current' => $versionChecker->getCurrentVersion(),
+                    'latest' => $versionChecker->getLatestVersion(),
+                    'update_available' => $versionChecker->isUpdateAvailable(),
+                ],
+            ]
+        );
     }
 
     /**

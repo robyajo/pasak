@@ -9,6 +9,8 @@ test('install command registers wizard options', function () {
     expect($definition->hasOption('lang'))->toBeTrue()
         ->and($definition->hasOption('api-only'))->toBeTrue()
         ->and($definition->hasOption('with-blade'))->toBeTrue()
+        ->and($definition->hasOption('with-plain'))->toBeTrue()
+        ->and($definition->hasOption('with-livewire'))->toBeTrue()
         ->and($definition->hasOption('with-tsx'))->toBeTrue()
         ->and($definition->hasOption('with-both'))->toBeTrue()
         ->and($definition->hasOption('stack'))->toBeTrue();

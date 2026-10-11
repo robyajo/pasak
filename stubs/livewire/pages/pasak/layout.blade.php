@@ -602,6 +602,65 @@
             gap: 10px;
         }
 
+
+        /* Scope Selector (Settings) */
+        .sec-scope-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+        }
+        .sec-scope-box {
+            cursor: pointer;
+            border: 2px solid var(--sec-border);
+            border-radius: var(--sec-radius);
+            padding: 18px;
+            background: var(--sec-card);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            transition: all 0.2s ease-in-out;
+        }
+        .sec-scope-box:hover {
+            border-color: var(--sec-border-light);
+            background: var(--sec-card-hover);
+        }
+        .sec-scope-box.active-primary {
+            border-color: var(--sec-primary);
+            background: rgba(59, 130, 246, 0.08);
+        }
+        .sec-scope-box.active-warning {
+            border-color: var(--sec-warning);
+            background: rgba(245, 158, 11, 0.08);
+        }
+        .sec-scope-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .sec-scope-title-wrap {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .sec-scope-title {
+            font-weight: 700;
+            font-size: 15px;
+            color: var(--sec-text);
+        }
+        .sec-scope-desc {
+            font-size: 13px;
+            color: var(--sec-text-muted);
+            line-height: 1.5;
+            margin: 0;
+        }
+        .sec-param-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--sec-border);
+        }
+
         /* Responsive Breakpoints */
         @media (max-width: 900px) {
             .sec-container {

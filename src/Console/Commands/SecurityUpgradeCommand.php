@@ -6,6 +6,7 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\File;
 use Internal\Pasak\Services\VersionCheckService;
+use Livewire\Livewire;
 use Symfony\Component\Process\Process;
 use Throwable;
 
@@ -139,8 +140,11 @@ class SecurityUpgradeCommand extends Command
             if ($this->option('sync-views')) {
                 $this->backupHostFiles([resource_path('views/pages/pasak')]);
             }
+            // Livewire single-file vs Blade murni: samakan dengan stack host.
             $this->call('vendor:publish', [
-                '--tag' => 'pasak-dashboard-blade-views',
+                '--tag' => class_exists(Livewire::class)
+                    ? 'pasak-dashboard-blade-views'
+                    : 'plain-views',
                 '--force' => (bool) $this->option('sync-views'),
             ]);
             $this->info('  ✓ Tampilan dashboard Blade/Livewire telah disinkronkan.');

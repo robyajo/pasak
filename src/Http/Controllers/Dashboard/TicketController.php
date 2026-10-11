@@ -2,6 +2,7 @@
 
 namespace Internal\Pasak\Http\Controllers\Dashboard;
 
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
@@ -15,7 +16,9 @@ use Internal\Pasak\Services\PasakService;
  */
 class TicketController extends Controller
 {
-    public function index(Request $request): Response
+    use RespondsWithDashboard;
+
+    public function index(Request $request): View|Response
     {
         $query = IpUnblockRequest::query()->latest('id');
 
@@ -35,23 +38,27 @@ class TicketController extends Controller
             });
         }
 
-        return Inertia::render('pasak/tickets', [
-            'tickets' => $query->paginate(20)->withQueryString(),
-            'stats' => [
-                'pending' => IpUnblockRequest::query()->pending()->count(),
-                'approved' => IpUnblockRequest::query()->approved()->count(),
-                'rejected' => IpUnblockRequest::query()->rejected()->count(),
-            ],
-            'filters' => [
-                'search' => $search,
-                'status' => $status,
-            ],
-            'urls' => [
-                'index' => route('pasak.dashboard.tickets'),
-                'respond' => route('pasak.dashboard.tickets.respond', ['id' => '__ID__']),
-                'destroy' => route('pasak.dashboard.tickets.destroy', ['id' => '__ID__']),
-            ],
-        ]);
+        return $this->dashboardResponse(
+            'pages.pasak.tickets',
+            'pasak/tickets',
+            [
+                'tickets' => $query->paginate(20)->withQueryString(),
+                'stats' => [
+                    'pending' => IpUnblockRequest::query()->pending()->count(),
+                    'approved' => IpUnblockRequest::query()->approved()->count(),
+                    'rejected' => IpUnblockRequest::query()->rejected()->count(),
+                ],
+                'filters' => [
+                    'search' => $search,
+                    'status' => $status,
+                ],
+                'urls' => [
+                    'index' => route('pasak.dashboard.tickets'),
+                    'respond' => route('pasak.dashboard.tickets.respond', ['id' => '__ID__']),
+                    'destroy' => route('pasak.dashboard.tickets.destroy', ['id' => '__ID__']),
+                ],
+            ]
+        );
     }
 
     public function respond(Request $request, int $id, PasakService $security): RedirectResponse

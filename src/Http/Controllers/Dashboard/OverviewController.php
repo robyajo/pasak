@@ -2,6 +2,7 @@
 
 namespace Internal\Pasak\Http\Controllers\Dashboard;
 
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Inertia\Inertia;
@@ -13,7 +14,9 @@ use Internal\Pasak\Services\PasakService;
  */
 class OverviewController extends Controller
 {
-    public function __invoke(Request $request, PasakService $security): Response
+    use RespondsWithDashboard;
+
+    public function __invoke(Request $request, PasakService $security): View|Response
     {
         $range = (string) $request->query('range', 'week');
 
@@ -21,17 +24,21 @@ class OverviewController extends Controller
             $range = 'week';
         }
 
-        return Inertia::render('pasak/overview', [
-            'range' => $range,
-            'stats' => $security->stats(),
-            'levels' => $security->levelBreakdown(),
-            'trend' => $security->attackTrend($range),
-            'attackers' => $security->topAttackers(5)
-                ->map(fn ($row): array => (array) $row)
-                ->all(),
-            'urls' => [
-                'self' => route('pasak.dashboard.overview'),
-            ],
-        ]);
+        return $this->dashboardResponse(
+            'pages.pasak.overview',
+            'pasak/overview',
+            [
+                'range' => $range,
+                'stats' => $security->stats(),
+                'levels' => $security->levelBreakdown(),
+                'trend' => $security->attackTrend($range),
+                'attackers' => $security->topAttackers(5)
+                    ->map(fn ($row): array => (array) $row)
+                    ->all(),
+                'urls' => [
+                    'self' => route('pasak.dashboard.overview'),
+                ],
+            ]
+        );
     }
 }

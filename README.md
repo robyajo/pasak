@@ -87,7 +87,7 @@ php artisan pasak:install
     > _Catatan Keamanan_: Jika `public/.htaccess` lama sudah ada, installer otomatis membuat cadangan `public/.htaccess.backup-YYYYMMDD_HHMMSS` dan menyisipkan aturan keamanan di bawah tanpa merusak rewrite rules aplikasi Anda.
 5. 🚫 **`resources/views/errors/blocked.blade.php`**: Halaman 403 default yang menampilkan alasan blokir, kode referensi, dan **formulir banding** yang terhubung langsung ke endpoint publik tiket banding. Dapat disesuaikan sesuai branding aplikasi Anda.
 6. ⚙️ **Penyematan Variabel ke `.env` & `.env.example`**: Installer secara otomatis menambahkan blok konfigurasi lengkap disertai **penjelasan fungsi berbahasa Indonesia** untuk setiap variabel (`PASAK_*`) langsung ke berkas `.env` dan `.env.example` aplikasi Anda.
-7. 📊 **(Opsional) Dashboard monitoring Starter Kit**: Tampilan monitoring Livewire (`resources/views/pages/pasak/`) atau React (`resources/js/pages/pasak/`), wajib login. Dipublikasikan bila Anda menambahkan opsi `--with-blade` / `--with-dashboard` atau `--with-tsx` / `--with-react-dashboard` (atau `--with-both` untuk keduanya).
+7. 📊 **(Opsional) Dashboard monitoring Starter Kit**: Tampilan monitoring Blade murni (`resources/views/pages/pasak/`, semua aplikasi Laravel), Livewire, atau React (`resources/js/pages/pasak/`), wajib login. Dipublikasikan bila Anda menambahkan opsi `--with-plain` / `--with-blade`, `--with-livewire` / `--with-dashboard`, atau `--with-tsx` / `--with-react-dashboard` (atau `--with-both` untuk Blade murni + TSX).
 
 #### Opsi Perintah `pasak:install`:
 
@@ -103,11 +103,13 @@ php artisan pasak:install
 | `--without-middleware`   | Melewatkan pendaftaran middleware WAF ke `bootstrap/app.php` / Kernel.                             |
 | `--without-routes`       | Melewatkan publikasi berkas `routes/pasak.php` dan `routes/pasak-api.php`.                          |
 | `--without-api`          | Melewatkan pemeriksaan/pemasangan rute API (`install:api`).                                        |
-| `--with-dashboard`       | Mempublikasikan tampilan dashboard monitoring Livewire / Blade (wajib login).                      |
-| `--with-blade`           | Alias dari `--with-dashboard`.                                                                     |
+| `--with-dashboard`       | Mempublikasikan tampilan dashboard monitoring Livewire Starter Kit (wajib login).                  |
+| `--with-livewire`        | Alias dari `--with-dashboard`.                                                                     |
+| `--with-plain`           | Mempublikasikan tampilan dashboard Blade murni, jalan di semua aplikasi Laravel (wajib login).     |
+| `--with-blade`           | Alias dari `--with-plain`.                                                                         |
 | `--with-react-dashboard` | Mempublikasikan tampilan dashboard monitoring React / TSX (wajib login).                           |
 | `--with-tsx`             | Alias dari `--with-react-dashboard`.                                                               |
-| `--with-both`            | Mempublikasikan kedua tampilan dashboard (Blade & TSX).                                            |
+| `--with-both`            | Mempublikasikan kedua tampilan dashboard (Blade murni & TSX).                                      |
 | `--stack=`               | Tentukan stack dashboard: `blade`, `tsx`, `both`, atau `none`.                                     |
 | `--with-htaccess`        | Memaksa pembaruan berkas `public/.htaccess`.                                                       |
 
@@ -153,7 +155,8 @@ php artisan migrate
 Paket ini menyediakan panel monitoring siap pakai untuk **starter kit resmi Laravel (Blade & React/TSX)** yang dapat dipublikasikan langsung ke dalam aplikasi host di prefix **`/pasak`**.
 
 Tersedia opsi instalasi fleksibel lewat `php artisan pasak:install`:
-- **Blade / Livewire**: `php artisan pasak:install --with-blade` (atau `--tag=starterkit-blade`)
+- **Blade murni (semua aplikasi)**: `php artisan pasak:install --with-plain` (atau `--tag=plain-views`)
+- **Livewire**: `php artisan pasak:install --with-livewire` (atau `--tag=starterkit-blade`)
 - **React / TSX**: `php artisan pasak:install --with-tsx` (atau `--tag=starterkit-tsx`)
 - **Keduanya**: `php artisan pasak:install --with-both` (atau `--tag=starterkit-all`)
 

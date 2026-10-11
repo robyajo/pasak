@@ -707,18 +707,23 @@ return [
     | Panel monitoring opsional yang dapat dipublikasikan ke dalam
     | aplikasi host melalui perintah:
     |
+    |     # Blade murni (semua aplikasi Laravel, tanpa Livewire/Inertia)
+    |     php artisan vendor:publish --tag=plain-views
+    |
     |     # Livewire Starter Kit (Flux UI)
     |     php artisan vendor:publish --tag=starterkit-livewire
     |
     |     # React Starter Kit (Inertia + React)
     |     php artisan vendor:publish --tag=starterkit-react
     |
-    | Publikasi tersebut menyalin berkas Blade (single-file Livewire component)
-    | ke resources/views/pages/security beserta konfigurasi ini. Seluruh halaman
-    | WAJIB melalui autentikasi (middleware "auth") dan secara default juga
-    | dibatasi oleh Gate "manage-security-monitor" (middleware "security.admin").
+    | Publikasi tersebut menyalin berkas tampilan ke
+    | resources/views/pages/pasak (Blade) beserta konfigurasi ini.
+    | Seluruh halaman WAJIB melalui autentikasi (middleware "auth")
+    | dan secara default juga dibatasi oleh Gate "manage-pasak"
+    | (middleware "pasak.admin").
     |
-    | "driver" menentukan stack tampilan yang diaktifkan: "livewire" atau "react".
+    | "driver" menentukan stack tampilan yang diaktifkan:
+    | "blade" (bawaan, Blade murni), "livewire", atau "react".
     |
     | Dashboard dinonaktifkan secara default agar paket tetap 100% headless
     | sampai pengguna secara sengaja mengaktifkannya.
@@ -726,7 +731,7 @@ return [
     */
     'dashboard' => [
         'enabled' => (bool) env('PASAK_DASHBOARD_ENABLED', env('SECURITY_DASHBOARD_ENABLED', false)),
-        'driver' => env('PASAK_DASHBOARD_DRIVER', env('SECURITY_DASHBOARD_DRIVER', 'livewire')),
+        'driver' => env('PASAK_DASHBOARD_DRIVER', env('SECURITY_DASHBOARD_DRIVER', 'blade')),
         'prefix' => env('PASAK_DASHBOARD_PREFIX', env('SECURITY_DASHBOARD_PREFIX', 'pasak')),
         'middleware' => ['web', 'auth'],
         'admin_middleware' => env('PASAK_DASHBOARD_ADMIN_ONLY', env('SECURITY_DASHBOARD_ADMIN_ONLY', false))

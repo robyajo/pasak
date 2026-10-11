@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-$prefix = config('pasak.dashboard.prefix', 'security');
+$prefix = config('pasak.dashboard.prefix', 'pasak');
 $middleware = array_filter((array) config('pasak.dashboard.middleware', ['web', 'auth']));
 $adminMiddleware = array_filter((array) config('pasak.dashboard.admin_middleware', []));
 

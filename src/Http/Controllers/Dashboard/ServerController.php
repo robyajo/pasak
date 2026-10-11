@@ -2,6 +2,7 @@
 
 namespace Internal\Pasak\Http\Controllers\Dashboard;
 
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
@@ -15,41 +16,47 @@ use Internal\Pasak\Services\ServerSecurityService;
  */
 class ServerController extends Controller
 {
+    use RespondsWithDashboard;
+
     public function index(
         Request $request,
         ServerSecurityService $server,
-    ): Response {
+    ): View|Response {
         $force = $request->boolean('refresh');
 
         if ($force) {
             $server->forget();
         }
 
-        return Inertia::render('pasak/server', [
-            'report' => $server->scan($force),
-            'environment' => $server->environmentInfo(),
-            'baseline' => $server->baselineSummary(),
-            'integrity' => $server->integrityReport(),
-            'suspicious' => $server->suspiciousFiles($force),
-            'lockouts' => $server->activeLockouts(),
-            'urls' => [
-                'index' => route('pasak.dashboard.server'),
-                'refresh' => route('pasak.dashboard.server', [
-                    'refresh' => 1,
-                ]),
-                'baseline' => route('pasak.dashboard.server.baseline'),
-                'baselineDestroy' => route(
-                    'pasak.dashboard.server.baseline.destroy',
-                ),
-                'suspiciousDestroy' => route(
-                    'pasak.dashboard.server.suspicious-files.destroy',
-                ),
-                'lockoutDestroy' => route(
-                    'pasak.dashboard.lockouts.destroy',
-                    ['id' => '__ID__'],
-                ),
-            ],
-        ]);
+        return $this->dashboardResponse(
+            'pages.pasak.server',
+            'pasak/server',
+            [
+                'report' => $server->scan($force),
+                'environment' => $server->environmentInfo(),
+                'baseline' => $server->baselineSummary(),
+                'integrity' => $server->integrityReport(),
+                'suspicious' => $server->suspiciousFiles($force),
+                'lockouts' => $server->activeLockouts(),
+                'urls' => [
+                    'index' => route('pasak.dashboard.server'),
+                    'refresh' => route('pasak.dashboard.server', [
+                        'refresh' => 1,
+                    ]),
+                    'baseline' => route('pasak.dashboard.server.baseline'),
+                    'baselineDestroy' => route(
+                        'pasak.dashboard.server.baseline.destroy',
+                    ),
+                    'suspiciousDestroy' => route(
+                        'pasak.dashboard.server.suspicious-files.destroy',
+                    ),
+                    'lockoutDestroy' => route(
+                        'pasak.dashboard.lockouts.destroy',
+                        ['id' => '__ID__'],
+                    ),
+                ],
+            ]
+        );
     }
 
     public function createBaseline(

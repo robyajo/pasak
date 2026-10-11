@@ -2,6 +2,7 @@
 
 namespace Internal\Pasak\Http\Controllers\Dashboard;
 
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
@@ -14,7 +15,9 @@ use Internal\Pasak\Models\SecurityLog;
  */
 class LogController extends Controller
 {
-    public function index(Request $request): Response
+    use RespondsWithDashboard;
+
+    public function index(Request $request): View|Response
     {
         $query = SecurityLog::query()->latest('id');
 
@@ -40,26 +43,30 @@ class LogController extends Controller
             $query->where('event_type', $eventType);
         }
 
-        return Inertia::render('pasak/logs', [
-            'logs' => $query->paginate(25)->withQueryString(),
-            'levels' => SecurityLog::LEVELS,
-            'eventTypes' => SecurityLog::query()
-                ->select('event_type')
-                ->distinct()
-                ->orderBy('event_type')
-                ->pluck('event_type')
-                ->all(),
-            'filters' => [
-                'search' => $search,
-                'level' => $level,
-                'event_type' => $eventType,
-            ],
-            'urls' => [
-                'index' => route('pasak.dashboard.logs'),
-                'clear' => route('pasak.dashboard.logs.clear'),
-                'destroy' => route('pasak.dashboard.logs.destroy', ['id' => '__ID__']),
-            ],
-        ]);
+        return $this->dashboardResponse(
+            'pages.pasak.logs',
+            'pasak/logs',
+            [
+                'logs' => $query->paginate(25)->withQueryString(),
+                'levels' => SecurityLog::LEVELS,
+                'eventTypes' => SecurityLog::query()
+                    ->select('event_type')
+                    ->distinct()
+                    ->orderBy('event_type')
+                    ->pluck('event_type')
+                    ->all(),
+                'filters' => [
+                    'search' => $search,
+                    'level' => $level,
+                    'event_type' => $eventType,
+                ],
+                'urls' => [
+                    'index' => route('pasak.dashboard.logs'),
+                    'clear' => route('pasak.dashboard.logs.clear'),
+                    'destroy' => route('pasak.dashboard.logs.destroy', ['id' => '__ID__']),
+                ],
+            ]
+        );
     }
 
     public function clear(): RedirectResponse

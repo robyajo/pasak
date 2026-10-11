@@ -23,7 +23,7 @@ test(
         expect(config('pasak.dashboard.enabled'))
             ->toBeFalse()
             ->and(config('pasak.dashboard.driver'))
-            ->toBe('livewire')
+            ->toBe('blade')
             ->and(config('pasak.dashboard.prefix'))
             ->toBe('pasak')
             ->and(config('pasak.dashboard.middleware'))
@@ -274,6 +274,9 @@ test(
         ])->assertSuccessful();
 
         expect(File::exists($bladeDir.'/overview.blade.php'))->toBeTrue();
+
+        // --with-blade memasang Blade murni (tanpa ketergantungan Livewire).
+        expect(File::get($bladeDir.'/overview.blade.php'))->not->toContain('extends Component');
 
         $this->artisan('pasak:install', [
             '--force' => true,
