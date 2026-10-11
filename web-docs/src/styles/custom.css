@@ -1148,3 +1148,71 @@ starlight-toc a[aria-current="true"] {
 ::-webkit-scrollbar-thumb:hover {
     background: var(--sl-color-gray-4);
 }
+
+/* --------------------------------------------------------------------------
+   14. INPUT FORM PENCARIAN PAGEFIND (PENYELARASAN IKON & JARAK LEGA TEKS)
+   -------------------------------------------------------------------------- */
+#starlight__search .pagefind-ui__form {
+    position: relative !important;
+    width: 100% !important;
+    display: block !important;
+}
+
+#starlight__search .pagefind-ui__form::before {
+    content: "" !important;
+    position: absolute !important;
+    top: 1.625rem !important;
+    transform: translateY(-50%) !important;
+    left: 1.25rem !important;
+    width: 1.2rem !important;
+    height: 1.2rem !important;
+    z-index: 5 !important;
+    pointer-events: none !important;
+    opacity: 0.85 !important;
+    background-color: #0f172a !important;
+}
+
+:root[data-theme="dark"] #starlight__search .pagefind-ui__form::before {
+    background-color: #cbd5e1 !important;
+}
+
+#starlight__search .pagefind-ui__search-input {
+    font-family: var(--sl-font) !important;
+    font-size: 1rem !important;
+    font-weight: 600 !important;
+    color: #0f172a !important;
+    border: 2px solid var(--sl-color-hairline) !important;
+    box-shadow: 3px 3px 0px var(--pk-shadow) !important;
+    border-radius: 0.5rem !important;
+    background: #ffffff !important;
+    height: 3.25rem !important;
+    line-height: 3.25rem !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    padding-left: 3.75rem !important; /* Jarak lega 60px: 20px posisi/lebar icon + 20px spasi bersih */
+    padding-right: 3.25rem !important;
+    width: calc(100% - var(--sl-search-cancel-space, 0px)) !important;
+    box-sizing: border-box !important;
+}
+
+:root[data-theme="dark"] #starlight__search .pagefind-ui__search-input {
+    color: var(--sl-color-white) !important;
+    background: var(--sl-color-black) !important;
+}
+
+#starlight__search .pagefind-ui__search-clear {
+    position: absolute !important;
+    top: 1.625rem !important;
+    transform: translateY(-50%) !important;
+    right: 0.85rem !important;
+    height: 1.85rem !important;
+    width: 1.85rem !important;
+    padding: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background: transparent !important;
+    border: 0 !important;
+    z-index: 5 !important;
+    cursor: pointer !important;
+}
