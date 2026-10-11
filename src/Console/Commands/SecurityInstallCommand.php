@@ -308,6 +308,11 @@ class SecurityInstallCommand extends Command
         }
 
         $dashboardPrefix = '/'.ltrim((string) config('pasak.dashboard.prefix', 'pasak'), '/');
+        $dashboardBase = rtrim((string) config('app.url', 'http://localhost:8000'), '/').$dashboardPrefix;
+        $dashboardUrls = array_map(
+            fn (string $page): string => $page === '' ? $dashboardBase : $dashboardBase.'/'.$page,
+            ['', 'logs', 'blocked-ips', 'server', 'sessions', 'tickets', 'settings']
+        );
         $doc = fn (string $path): string => '📖 '.$this->docs($path);
         $steps = [];
         $steps[] = $migrated
@@ -373,25 +378,32 @@ class SecurityInstallCommand extends Command
             $steps[] = [$this->t('Halaman blokir: sesuaikan resources/views/errors/blocked.blade.php dengan branding aplikasi Anda.', 'Blocked page: customize resources/views/errors/blocked.blade.php with your app branding.'), $doc('integration-guides/frontend-blade-livewire')];
         }
         if ($withDashboard && $withReactDashboard) {
-            $steps[] = [
+            $steps[] = array_merge([
                 $this->t("Dashboard Blade & TSX: siap diakses pada prefix {$dashboardPrefix} (wajib login).", "Blade & TSX dashboard: ready at the {$dashboardPrefix} prefix (login required)."),
                 $this->t('Ganti driver aktif di .env (PASAK_DASHBOARD_DRIVER=livewire atau react).', 'Switch the active driver in .env (PASAK_DASHBOARD_DRIVER=livewire or react).'),
-                $doc('integration-guides/frontend-blade-livewire'),
-            ];
+            ], $dashboardUrls, [$doc('integration-guides/frontend-blade-livewire')]);
         } elseif ($withPlainDashboard && $withReactDashboard) {
-            $steps[] = [
+            $steps[] = array_merge([
                 $this->t("Dashboard Blade murni & TSX: siap diakses pada prefix {$dashboardPrefix} (wajib login).", "Plain Blade & TSX dashboard: ready at the {$dashboardPrefix} prefix (login required)."),
                 $this->t('Ganti driver aktif di .env (PASAK_DASHBOARD_DRIVER=blade atau react).', 'Switch the active driver in .env (PASAK_DASHBOARD_DRIVER=blade or react).'),
-                $doc('integration-guides/frontend-blade-livewire'),
-            ];
+            ], $dashboardUrls, [$doc('integration-guides/frontend-blade-livewire')]);
         } elseif ($withPlainDashboard) {
-            $steps[] = [$this->t("Dashboard Blade murni: siap diakses pada prefix {$dashboardPrefix} (wajib login, tanpa Livewire).", "Plain Blade dashboard: ready at the {$dashboardPrefix} prefix (login required, no Livewire needed)."), $doc('integration-guides/frontend-blade-livewire')];
+            $steps[] = array_merge(
+                [$this->t("Dashboard Blade murni: siap diakses pada prefix {$dashboardPrefix} (wajib login, tanpa Livewire).", "Plain Blade dashboard: ready at the {$dashboardPrefix} prefix (login required, no Livewire needed).")],
+                $dashboardUrls,
+                [$doc('integration-guides/frontend-blade-livewire')]
+            );
         } elseif ($withReactDashboard) {
-            $steps[] = [
+            $steps[] = array_merge([
                 $this->t("Dashboard TSX: siap diakses pada prefix {$dashboardPrefix} (wajib login).", "TSX dashboard: ready at the {$dashboardPrefix} prefix (login required)."),
                 $this->t('Jalankan npm run build untuk memproses aset TSX pada Vite.', 'Run npm run build to process the TSX assets with Vite.'),
-                $doc('integration-guides/frontend-react-inertia'),
-            ];
+            ], $dashboardUrls, [$doc('integration-guides/frontend-react-inertia')]);
+        } elseif ($withDashboard) {
+            $steps[] = array_merge(
+                [$this->t("Dashboard Livewire: siap diakses pada prefix {$dashboardPrefix} (wajib login).", "Livewire dashboard: ready at the {$dashboardPrefix} prefix (login required).")],
+                $dashboardUrls,
+                [$doc('integration-guides/frontend-blade-livewire')]
+            );
         } elseif (! $apiOnly) {
             $steps[] = [$this->t('Dashboard monitoring (opsional): sediakan kapan saja dengan php artisan pasak:install --with-blade atau --with-tsx.', 'Monitoring dashboard (optional): provide anytime with php artisan pasak:install --with-blade or --with-tsx.'), $doc('integration-guides/frontend-blade-livewire')];
         } else {

@@ -36,6 +36,34 @@ test('install with api-only publishes api routes but no web pages', function () 
     }
 });
 
+test('install prints dashboard access urls after install', function () {
+    $webRouteFile = base_path('routes/pasak.php');
+    $apiRouteFile = base_path('routes/pasak-api.php');
+    @unlink($webRouteFile);
+    @unlink($apiRouteFile);
+
+    try {
+        $command = $this->artisan('pasak:install', [
+            '--force' => true,
+            '--with-plain' => true,
+            '--without-nginx' => true,
+            '--without-htaccess' => true,
+            '--without-env' => true,
+        ]);
+
+        $command->expectsOutputToContain('/pasak/logs');
+
+        foreach (['/pasak/blocked-ips', '/pasak/server', '/pasak/sessions', '/pasak/tickets', '/pasak/settings'] as $path) {
+            $command->expectsOutputToContain($path);
+        }
+
+        $command->assertSuccessful();
+    } finally {
+        @unlink($webRouteFile);
+        @unlink($apiRouteFile);
+    }
+});
+
 test('install does not duplicate route require lines on re-run', function () {
     $apiRoutesFile = base_path('routes/api.php');
     $hadApiRoutes = File::exists($apiRoutesFile);
