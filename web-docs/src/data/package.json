@@ -1,11 +1,11 @@
 {
   "name": "robyajo/pasak",
-  "version": "2.1.0",
+  "version": "1.0.3",
   "repository": "https://github.com/robyajo/pasak",
   "packagist": {
     "url": "https://packagist.org/packages/robyajo/pasak",
-    "version": "2.1.0",
-    "released": "2026-10-09"
+    "version": "1.0.3",
+    "released": "2026-10-11"
   },
-  "updatedAt": "2026-10-09"
+  "updatedAt": "2026-10-11"
 }

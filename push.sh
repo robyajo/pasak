@@ -182,6 +182,7 @@ show_help() {
     echo -e "                        Tanpa opsi ini, versi rekomendasi dipakai otomatis"
     echo -e "                        sehingga setiap push selalu menaikkan versi"
     echo -e "  --no-tag              Lewatkan pembuatan tag rilis"
+    echo -e "  --no-docs-build       Lewatkan build dokumentasi web (finis.sh)"
     echo -e "  -b, --branch <name>   Nama branch target (default: branch aktif)"
     echo -e "  -r, --remote <name>   Nama remote git (default: origin)"
     echo -e "  -h, --help            Tampilkan bantuan ini"
@@ -201,6 +202,7 @@ show_help() {
 COMMIT_MSG=""
 TAG_NAME=""
 NO_TAG=0
+NO_DOCS_BUILD=0
 REMOTE_NAME="origin"
 TARGET_BRANCH=""
 
@@ -216,6 +218,10 @@ while [[ $# -gt 0 ]]; do
             ;;
         --no-tag)
             NO_TAG=1
+            shift
+            ;;
+        --no-docs-build)
+            NO_DOCS_BUILD=1
             shift
             ;;
         -b|--branch)
@@ -260,6 +266,31 @@ echo ""
 
 # 0. Pengecekan Versi (WAJIB, selalu dijalankan)
 report_versions
+
+# 0b. Sinkronisasi Dokumentasi (WAJIB sebelum commit agar ikut ter-commit)
+echo -e "${BOLD}${CYAN}----------------------------------------------------------------------${NC}"
+echo -e "${BOLD}  📚 Sinkronisasi Dokumentasi${NC}"
+echo -e "${BOLD}${CYAN}----------------------------------------------------------------------${NC}"
+if command -v php >/dev/null 2>&1 && [ -f "documents/generate.php" ]; then
+    print_info "Regenerasi portal documents/index.html..."
+    php documents/generate.php > /dev/null 2>&1 \
+        && print_success "documents/index.html mutakhir." \
+        || print_warning "Gagal regenerasi documents/index.html; dilanjutkan tanpa itu."
+else
+    print_warning "PHP / documents/generate.php tidak tersedia; portal docs dilewati."
+fi
+if [ "$NO_DOCS_BUILD" -eq 1 ]; then
+    print_info "Melewatkan build dokumentasi web (--no-docs-build)."
+elif [ -f "web-docs/finis.sh" ]; then
+    # --no-pull: hindari git pull (baru saja akan push); --no-deploy: hanya build dist/.
+    print_info "Menjalankan build dokumentasi web (web-docs/finis.sh --no-pull --no-deploy)..."
+    bash web-docs/finis.sh --no-pull --no-deploy > /dev/null 2>&1 \
+        && print_success "Build dokumentasi web selesai." \
+        || print_warning "Build dokumentasi web gagal; push tetap dilanjutkan."
+else
+    print_warning "web-docs/finis.sh tidak ditemukan; build docs web dilewati."
+fi
+echo ""
 
 # 1. Periksa Status Perubahan File
 STATUS_OUTPUT=$(git status --porcelain)
