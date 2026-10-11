@@ -1,0 +1,1274 @@
+---
+import EditLink from "virtual:starlight/components/EditLink";
+import LastUpdated from "virtual:starlight/components/LastUpdated";
+import Pagination from "virtual:starlight/components/Pagination";
+import pkg from "../data/package.json";
+import { Image } from "astro:assets";
+import logo from "../assets/logo.svg";
+
+// Periksa apakah halaman saat ini adalah halaman beranda (/)
+const { entry } = Astro.locals.starlightRoute;
+const pathname = Astro.url.pathname;
+const isHome =
+    entry?.data?.template === "splash" || pathname === "/" || pathname === "";
+
+const year = new Date().getFullYear();
+const version = pkg?.packagist?.version ?? pkg?.version ?? "1.2.3";
+const installCmd = "composer require robyajo/pasak";
+
+const navColumns = [
+    {
+        heading: "Panduan Memulai",
+        links: [
+            {
+                label: "Pengenalan Pasak Security",
+                href: "/getting-started/introduction/",
+                badge: "Dasar",
+            },
+            {
+                label: "Instalasi & Migrasi Database",
+                href: "/getting-started/installation/",
+            },
+            {
+                label: "Konfigurasi Lengkap (.env)",
+                href: "/getting-started/configuration/",
+            },
+            {
+                label: "Checklist Produksi Siap Pakai",
+                href: "/webserver-hardening/production-checklist/",
+                badge: "Penting",
+            },
+        ],
+    },
+    {
+        heading: "Arsitektur & Mesin",
+        links: [
+            {
+                label: "Mesin Deteksi Ancaman WAF",
+                href: "/core-architecture/threat-detection-engine/",
+            },
+            {
+                label: "Karantina Perangkat (NAT Friendly)",
+                href: "/core-architecture/device-quarantine/",
+            },
+            {
+                label: "Resolusi Real IP Reverse Proxy",
+                href: "/core-architecture/reverse-proxy-resolution/",
+            },
+            {
+                label: "Model Database & Relasi Eloquent",
+                href: "/core-architecture/models-and-database/",
+            },
+        ],
+    },
+    {
+        heading: "Modul Pertahanan",
+        links: [
+            {
+                label: "Stepped Login Throttling",
+                href: "/security-modules/stepped-login-throttling/",
+            },
+            {
+                label: "Pemindai Webshell & SHA-256",
+                href: "/security-modules/server-security-and-webshells/",
+            },
+            {
+                label: "Sistem Tiket Banding IP",
+                href: "/security-modules/appeal-tickets-system/",
+            },
+            {
+                label: "Pemantau Log Akses & Streaming",
+                href: "/security-modules/access-log-streaming/",
+            },
+            {
+                label: "Pelacakan Sesi & Aktivitas",
+                href: "/security-modules/session-and-activity-tracking/",
+            },
+        ],
+    },
+    {
+        heading: "Ekosistem & Integrasi",
+        links: [
+            {
+                label: "REST API Headless (Admin & Publik)",
+                href: "/api-reference/api-overview/",
+            },
+            {
+                label: "Perintah Artisan & Penjadwalan",
+                href: "/cli-automation/artisan-commands/",
+            },
+            {
+                label: "Hardening Nginx & Apache",
+                href: "/webserver-hardening/nginx-hardened-waf/",
+            },
+            {
+                label: "Integrasi Blade & React Inertia",
+                href: "/integration-guides/frontend-blade-livewire/",
+            },
+            {
+                label: "Pertanyaan Umum (FAQ)",
+                href: "/faq/",
+            },
+            {
+                label: "Catatan Rilis (Changelog)",
+                href: "/changelog/",
+            },
+        ],
+    },
+];
+
+const highlights = [
+    {
+        icon: "shield-check",
+        title: "Zero-Tolerance WAF",
+        desc: "Blokir instan 30 hari untuk signature berbahaya seperti null byte, traversal, & webshell.",
+    },
+    {
+        icon: "device",
+        title: "Karantina Perangkat",
+        desc: "Isolasi perangkat penyerang secara presisi tanpa memblokir seluruh kantor di IP NAT bersama.",
+    },
+    {
+        icon: "clock",
+        title: "Login Bertingkat",
+        desc: "Lockout eksponensial 1 menit hingga 24 jam untuk menumpas brute force & credential stuffing.",
+    },
+    {
+        icon: "file-code",
+        title: "Audit Integritas File",
+        desc: "Baseline SHA-256 berkas inti framework dan pemindai webshell otomatis berkala.",
+    },
+];
+---
+
+<footer class="sl-flex pk-footer-wrapper">
+    {/* Halaman Dokumentasi: Footer bersih & fokus (hanya metadata artikel, pagination, dan 1 baris copyright minimal) */}
+    {!isHome ? (
+        <>
+            <div class="meta sl-flex">
+                <EditLink />
+                <LastUpdated />
+            </div>
+            <Pagination />
+            <div class="pk-doc-footer">
+                <p>
+                    &copy; {year} <strong>Pasak (Bulwark)</strong> &bull;
+                    Lisensi Open-Source MIT &bull; Keamanan Siber &amp; Sandi
+                    Diskominfo Kota Pekanbaru
+                </p>
+            </div>
+        </>
+    ) : (
+        /* Halaman Beranda (/): Tampilan footer lengkap, kaya informasi & direktori tautan SEO */
+        <div
+            class="pk-footer"
+            role="contentinfo"
+            aria-label="Footer Pasak Security"
+        >
+            <div class="pk-footer-glow" aria-hidden="true"></div>
+
+            {/* Brand & Action Header */}
+            <div class="pk-footer-top">
+                <div class="pk-footer-brand">
+                    <div class="pk-footer-brand-title">
+                        <a
+                            href="/"
+                            class="pk-footer-logo-link"
+                            aria-label="Beranda Pasak"
+                        >
+                            <Image
+                                src={logo}
+                                alt="Logo Pasak"
+                                width={34}
+                                height={34}
+                                class="pk-footer-logo"
+                            />
+                        </a>
+                        <div class="pk-footer-title-text">
+                            <span class="pk-brand-name">Pasak</span>
+                            <span class="pk-brand-tag">Bulwark WAF</span>
+                        </div>
+                    </div>
+
+                    <p class="pk-footer-desc">
+                        Web Application Firewall mandiri dan modul audit
+                        keamanan <strong>100% Native PHP</strong> untuk
+                        ekosistem <strong>Laravel 10 sampai 13</strong>.
+                        Dikembangkan untuk memperkuat postur ketahanan siber
+                        sistem informasi pemerintahan dan enterprise.
+                    </p>
+
+                    <div class="pk-footer-meta-pills">
+                        <a
+                            href={
+                                pkg?.packagist?.url ??
+                                "https://packagist.org/packages/robyajo/pasak"
+                            }
+                            target="_blank"
+                            rel="noopener"
+                            class="pk-pill pk-pill-version"
+                            title="Versi paket rilis terbaru di Packagist"
+                        >
+                            <span
+                                class="pk-pulse-dot"
+                                aria-hidden="true"
+                            ></span>
+                            <span>v{version}</span>
+                            <span class="pk-pill-sub">Rilis Stabil</span>
+                        </a>
+
+                        <span class="pk-pill pk-pill-neutral">
+                            <svg
+                                width="13"
+                                height="13"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                aria-hidden="true"
+                            >
+                                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                            </svg>
+                            <span>Pure PHP (Zero NPM)</span>
+                        </span>
+
+                        <span class="pk-pill pk-pill-neutral">
+                            <svg
+                                width="13"
+                                height="13"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                aria-hidden="true"
+                            >
+                                <rect
+                                    x="2"
+                                    y="3"
+                                    width="20"
+                                    height="14"
+                                    rx="2"
+                                    ry="2"
+                                />
+                                <line x1="8" y1="21" x2="16" y2="21" />
+                                <line x1="12" y1="17" x2="12" y2="21" />
+                            </svg>
+                            <span>Laravel 10 – 13</span>
+                        </span>
+                    </div>
+                </div>
+
+                <div class="pk-footer-actions">
+                    <div class="pk-install-box">
+                        <span class="pk-install-label">
+                            Pasang Cepat via Composer:
+                        </span>
+                        <button
+                            type="button"
+                            class="pk-copy-btn"
+                            data-copy={installCmd}
+                            aria-label="Salin perintah composer require robyajo/pasak"
+                            title="Klik untuk menyalin perintah instalasi"
+                        >
+                            <span class="pk-copy-prompt">$</span>
+                            <code class="pk-copy-code">{installCmd}</code>
+                            <span class="pk-copy-icon" aria-hidden="true">
+                                <svg
+                                    width="15"
+                                    height="15"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                >
+                                    <rect
+                                        x="9"
+                                        y="9"
+                                        width="13"
+                                        height="13"
+                                        rx="2"
+                                        ry="2"
+                                    ></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg>
+                            </span>
+                            <span class="pk-copy-feedback" aria-live="polite">
+                                Tersalin!
+                            </span>
+                        </button>
+                    </div>
+
+                    <div class="pk-social-links">
+                        <a
+                            href={
+                                pkg?.repository ??
+                                "https://github.com/robyajo/pasak"
+                            }
+                            target="_blank"
+                            rel="noopener"
+                            class="pk-social-btn"
+                            aria-label="Repositori GitHub robyajo/pasak"
+                            title="Lihat Source Code di GitHub"
+                        >
+                            <svg
+                                width="16"
+                                height="16"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                aria-hidden="true"
+                            >
+                                <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4" />
+                                <path d="M9 18c-4.51 2-5-2-7-2" />
+                            </svg>
+                            <span>GitHub</span>
+                        </a>
+
+                        <a
+                            href={
+                                pkg?.packagist?.url ??
+                                "https://packagist.org/packages/robyajo/pasak"
+                            }
+                            target="_blank"
+                            rel="noopener"
+                            class="pk-social-btn"
+                            aria-label="Paket Resmi di Packagist"
+                            title="Unduh Paket di Packagist"
+                        >
+                            <svg
+                                width="16"
+                                height="16"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                aria-hidden="true"
+                            >
+                                <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+                                <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+                            </svg>
+                            <span>Packagist</span>
+                        </a>
+
+                        <a
+                            href="https://security-dev.pekanbaru.go.id"
+                            target="_blank"
+                            rel="noopener"
+                            class="pk-social-btn pk-social-btn-csirt"
+                            aria-label="Portal Keamanan Siber Pekanbaru"
+                            title="Portal Resmi Keamanan Siber Pemerintah Kota Pekanbaru"
+                        >
+                            <svg
+                                width="16"
+                                height="16"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                aria-hidden="true"
+                            >
+                                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                                <circle cx="12" cy="11" r="3" />
+                            </svg>
+                            <span>Pekanbaru CSIRT</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            {/* 4 Pilar Keamanan Pasak */}
+            <div class="pk-footer-highlights">
+                {highlights.map((h) => (
+                    <div class="pk-highlight-card">
+                        <div class="pk-highlight-icon" aria-hidden="true">
+                            {h.icon === "shield-check" && (
+                                <svg
+                                    width="16"
+                                    height="16"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                >
+                                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                                    <polyline points="9 12 11 14 15 10" />
+                                </svg>
+                            )}
+                            {h.icon === "device" && (
+                                <svg
+                                    width="16"
+                                    height="16"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                >
+                                    <rect
+                                        x="2"
+                                        y="3"
+                                        width="20"
+                                        height="14"
+                                        rx="2"
+                                        ry="2"
+                                    />
+                                    <line x1="8" y1="21" x2="16" y2="21" />
+                                </svg>
+                            )}
+                            {h.icon === "clock" && (
+                                <svg
+                                    width="16"
+                                    height="16"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                >
+                                    <circle cx="12" cy="12" r="10" />
+                                    <polyline points="12 6 12 12 16 14" />
+                                </svg>
+                            )}
+                            {h.icon === "file-code" && (
+                                <svg
+                                    width="16"
+                                    height="16"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                >
+                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                                    <polyline points="14 2 14 8 20 8" />
+                                    <polyline points="10 13 8 15 10 17" />
+                                    <polyline points="14 13 16 15 14 17" />
+                                </svg>
+                            )}
+                        </div>
+                        <div class="pk-highlight-text">
+                            <p class="pk-highlight-title">{h.title}</p>
+                            <p class="pk-highlight-desc">{h.desc}</p>
+                        </div>
+                    </div>
+                ))}
+            </div>
+
+            {/* Direktori Tautan Navigasi (4 Kolom Terstruktur & Responsif) */}
+            <div class="pk-footer-nav-grid">
+                {navColumns.map((col) => (
+                    <nav class="pk-footer-col" aria-label={col.heading}>
+                        <p class="pk-footer-heading">
+                            <span
+                                class="pk-heading-indicator"
+                                aria-hidden="true"
+                            ></span>
+                            {col.heading}
+                        </p>
+                        <ul class="pk-footer-links">
+                            {col.links.map((link) => (
+                                <li>
+                                    <a href={link.href} class="pk-footer-link">
+                                        <span>{link.label}</span>
+                                        {link.badge && (
+                                            <span class="pk-link-badge">
+                                                {link.badge}
+                                            </span>
+                                        )}
+                                    </a>
+                                </li>
+                            ))}
+                        </ul>
+                    </nav>
+                ))}
+            </div>
+
+            {/* Bottom Bar: Copyright, Lisensi, & Akreditasi Pemko Pekanbaru */}
+            <div class="pk-footer-bottom">
+                <div class="pk-bottom-left">
+                    <p class="pk-bottom-copy">
+                        &copy; {year} <strong>Pasak (Bulwark)</strong> &mdash;
+                        Berlisensi Open-Source MIT.
+                    </p>
+                    <p class="pk-bottom-author">
+                        Arsitektur &amp; Pengembangan oleh{" "}
+                        <strong>Roby Karti S.</strong> untuk Ekosistem Keamanan
+                        Laravel.
+                    </p>
+                </div>
+
+                <div class="pk-bottom-right">
+                    <a
+                        href="https://security-dev.pekanbaru.go.id"
+                        target="_blank"
+                        rel="noopener"
+                        class="pk-pekanbaru-badge"
+                        title="Kunjungi Portal Keamanan Siber & Diskominfo Kota Pekanbaru"
+                    >
+                        <span class="pk-seal-icon" aria-hidden="true">
+                            <svg
+                                width="15"
+                                height="15"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                            >
+                                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                                <polyline points="9 12 11 14 15 10" />
+                            </svg>
+                        </span>
+                        <span class="pk-pekanbaru-text">
+                            <span class="pk-pekanbaru-gov">
+                                Pemerintah Kota Pekanbaru
+                            </span>
+                            <span class="pk-pekanbaru-dept">
+                                Diskominfo &bull; Bidang Statistik &amp;
+                                Persandian
+                            </span>
+                        </span>
+                        <span class="pk-ext-arrow" aria-hidden="true">
+                            &nearr;
+                        </span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    )}
+</footer>
+
+<script>
+    // Penanganan interaktif salin perintah Composer (hanya aktif bila tombol salin ada)
+    const setupCopyButtons = () => {
+        const copyBtns =
+            document.querySelectorAll<HTMLButtonElement>(".pk-copy-btn");
+        if (!copyBtns.length) return;
+
+        copyBtns.forEach((btn) => {
+            btn.addEventListener("click", async () => {
+                const text = btn.getAttribute("data-copy");
+                if (!text) return;
+
+                try {
+                    await navigator.clipboard.writeText(text);
+                    btn.classList.add("is-copied");
+                    setTimeout(() => {
+                        btn.classList.remove("is-copied");
+                    }, 2200);
+                } catch {
+                    const textarea = document.createElement("textarea");
+                    textarea.value = text;
+                    textarea.style.position = "fixed";
+                    textarea.style.opacity = "0";
+                    document.body.appendChild(textarea);
+                    textarea.select();
+                    try {
+                        document.execCommand("copy");
+                        btn.classList.add("is-copied");
+                        setTimeout(
+                            () => btn.classList.remove("is-copied"),
+                            2200,
+                        );
+                    } finally {
+                        document.body.removeChild(textarea);
+                    }
+                }
+            });
+        });
+    };
+
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", setupCopyButtons);
+    } else {
+        setupCopyButtons();
+    }
+</script>
+
+<style>
+    /* ==========================================================================
+       CONTAINER & DOKUMENTASI MINIMAL FOOTER
+       ========================================================================== */
+    .pk-footer-wrapper {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+        margin-top: 2rem;
+    }
+
+    .pk-doc-footer {
+        margin-top: 2rem;
+        padding-top: 1.25rem;
+        border-top: 1px solid var(--sl-color-hairline);
+        text-align: center;
+        font-size: 0.8rem;
+        line-height: 1.5;
+        color: var(--sl-color-gray-4);
+    }
+
+    .pk-doc-footer p {
+        margin: 0;
+    }
+
+    .pk-doc-footer strong {
+        color: var(--sl-color-gray-3);
+        font-weight: 600;
+    }
+
+    /* ==========================================================================
+       HOMEPAGE RICH FOOTER
+       ========================================================================== */
+    .pk-footer {
+        position: relative;
+        overflow: hidden;
+        margin-top: 1.5rem;
+        padding: 2.25rem 2rem 1.75rem;
+        border-radius: 1.5rem;
+        border: 1px solid var(--sl-color-hairline);
+        background: linear-gradient(
+            180deg,
+            rgba(15, 23, 42, 0.7) 0%,
+            rgba(11, 15, 25, 0.95) 100%
+        );
+        box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.35);
+        font-family: var(--sl-font);
+        font-size: var(--sl-text-sm);
+        color: var(--sl-color-gray-2);
+    }
+
+    :global(:root[data-theme="light"]) .pk-footer {
+        background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+        box-shadow: 0 10px 30px -5px rgba(15, 23, 42, 0.05);
+        border-color: #e2e8f0;
+    }
+
+    .pk-footer-glow {
+        pointer-events: none;
+        position: absolute;
+        top: -6rem;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 38rem;
+        height: 12rem;
+        max-width: 100%;
+        border-radius: 9999px;
+        background: radial-gradient(
+            circle,
+            rgba(56, 189, 248, 0.18) 0%,
+            rgba(99, 102, 241, 0.08) 50%,
+            transparent 80%
+        );
+        filter: blur(48px);
+    }
+
+    :global(:root[data-theme="light"]) .pk-footer-glow {
+        background: radial-gradient(
+            circle,
+            rgba(2, 132, 199, 0.1) 0%,
+            transparent 70%
+        );
+    }
+
+    /* ==========================================================================
+       TOP ROW: BRAND & ACTIONS
+       ========================================================================== */
+    .pk-footer-top {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
+        padding-bottom: 2rem;
+        border-bottom: 1px solid var(--sl-color-hairline);
+    }
+
+    @media (min-width: 58rem) {
+        .pk-footer-top {
+            flex-direction: row;
+            align-items: flex-start;
+            justify-content: space-between;
+        }
+    }
+
+    .pk-footer-brand {
+        max-width: 36rem;
+    }
+
+    .pk-footer-brand-title {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-bottom: 0.85rem;
+    }
+
+    .pk-footer-logo-link {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        transition: transform 0.15s ease;
+    }
+
+    .pk-footer-logo-link:hover {
+        transform: scale(1.05) !important;
+    }
+
+    .pk-footer-logo {
+        border-radius: 0.5rem;
+        filter: drop-shadow(0 2px 6px rgba(56, 189, 248, 0.3));
+    }
+
+    .pk-footer-title-text {
+        display: flex;
+        align-items: baseline;
+        gap: 0.5rem;
+    }
+
+    .pk-brand-name {
+        font-size: 1.35rem;
+        font-weight: 800;
+        letter-spacing: -0.03em;
+        color: var(--sl-color-white);
+    }
+
+    .pk-brand-tag {
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        padding: 0.15rem 0.5rem;
+        border-radius: 0.375rem;
+        background: var(--sl-color-accent-low);
+        color: var(--sl-color-text-accent);
+        border: 1px solid rgba(56, 189, 248, 0.25);
+    }
+
+    .pk-footer-desc {
+        margin: 0 0 1.25rem;
+        font-size: 0.9rem;
+        line-height: 1.65;
+        color: var(--sl-color-gray-2);
+        max-width: 34rem;
+    }
+
+    .pk-footer-desc strong {
+        color: var(--sl-color-white);
+        font-weight: 600;
+    }
+
+    .pk-footer-meta-pills {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .pk-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        padding: 0.3rem 0.7rem;
+        border-radius: 9999px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-decoration: none;
+        line-height: 1;
+        transition:
+            border-color 0.12s ease,
+            background-color 0.12s ease;
+    }
+
+    .pk-pill-version {
+        border: 1px solid rgba(52, 211, 153, 0.4);
+        background: rgba(52, 211, 153, 0.12);
+        color: #34d399;
+    }
+
+    :global(:root[data-theme="light"]) .pk-pill-version {
+        border-color: rgba(5, 150, 105, 0.35);
+        background: #ecfdf5;
+        color: #065f46;
+    }
+
+    .pk-pill-version:hover {
+        background: rgba(52, 211, 153, 0.2);
+        border-color: #34d399;
+    }
+
+    .pk-pill-sub {
+        font-weight: 400;
+        opacity: 0.85;
+    }
+
+    .pk-pulse-dot {
+        width: 0.45rem;
+        height: 0.45rem;
+        border-radius: 9999px;
+        background-color: #34d399;
+        box-shadow: 0 0 6px #34d399;
+    }
+
+    :global(:root[data-theme="light"]) .pk-pulse-dot {
+        background-color: #059669;
+        box-shadow: 0 0 4px #059669;
+    }
+
+    .pk-pill-neutral {
+        border: 1px solid var(--sl-color-hairline);
+        background: rgba(255, 255, 255, 0.03);
+        color: var(--sl-color-gray-3);
+    }
+
+    :global(:root[data-theme="light"]) .pk-pill-neutral {
+        background: #ffffff;
+        color: var(--sl-color-gray-2);
+        border-color: #e2e8f0;
+    }
+
+    /* Actions Column: Quick Install Box & Socials */
+    .pk-footer-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        min-width: 17rem;
+    }
+
+    .pk-install-box {
+        display: flex;
+        flex-direction: column;
+        gap: 0.45rem;
+    }
+
+    .pk-install-label {
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--sl-color-gray-3);
+    }
+
+    .pk-copy-btn {
+        position: relative;
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        padding: 0.65rem 0.9rem;
+        border-radius: 0.625rem;
+        border: 1px solid var(--sl-color-hairline);
+        background: rgba(15, 23, 42, 0.6);
+        color: var(--sl-color-white);
+        cursor: pointer;
+        font-family: var(--sl-font-mono);
+        text-align: left;
+        transition:
+            border-color 0.15s ease,
+            background-color 0.15s ease;
+    }
+
+    :global(:root[data-theme="light"]) .pk-copy-btn {
+        background: #ffffff;
+        border-color: #cbd5e1;
+        color: #0f172a;
+    }
+
+    .pk-copy-btn:hover {
+        border-color: var(--sl-color-accent);
+        background: rgba(56, 189, 248, 0.06);
+    }
+
+    .pk-copy-prompt {
+        color: var(--sl-color-accent);
+        font-weight: 700;
+        user-select: none;
+    }
+
+    .pk-copy-code {
+        font-size: 0.8125rem;
+        font-weight: 600;
+        letter-spacing: -0.01em;
+        color: inherit;
+        background: transparent !important;
+        border: none !important;
+        padding: 0 !important;
+        flex: 1;
+    }
+
+    .pk-copy-icon {
+        display: inline-flex;
+        color: var(--sl-color-gray-3);
+        flex-shrink: 0;
+        transition: color 0.12s ease;
+    }
+
+    .pk-copy-btn:hover .pk-copy-icon {
+        color: var(--sl-color-text-accent);
+    }
+
+    .pk-copy-feedback {
+        position: absolute;
+        right: 0.75rem;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 0.75rem;
+        font-family: var(--sl-font);
+        font-weight: 700;
+        color: #34d399;
+        background: rgba(15, 23, 42, 0.95);
+        padding: 0.2rem 0.5rem;
+        border-radius: 0.375rem;
+        border: 1px solid rgba(52, 211, 153, 0.4);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.15s ease;
+    }
+
+    :global(:root[data-theme="light"]) .pk-copy-feedback {
+        background: #ecfdf5;
+        color: #065f46;
+        border-color: rgba(5, 150, 105, 0.4);
+    }
+
+    .pk-copy-btn.is-copied .pk-copy-feedback {
+        opacity: 1;
+    }
+
+    .pk-copy-btn.is-copied .pk-copy-icon {
+        opacity: 0;
+    }
+
+    /* Social Pills */
+    .pk-social-links {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .pk-social-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45rem;
+        padding: 0.45rem 0.85rem;
+        border-radius: 0.5rem;
+        border: 1px solid var(--sl-color-hairline);
+        background: rgba(255, 255, 255, 0.02);
+        font-size: 0.8125rem;
+        font-weight: 600;
+        color: var(--sl-color-gray-2);
+        text-decoration: none;
+        transition:
+            border-color 0.12s ease,
+            color 0.12s ease,
+            background-color 0.12s ease;
+    }
+
+    :global(:root[data-theme="light"]) .pk-social-btn {
+        background: #ffffff;
+        border-color: #e2e8f0;
+        color: #334155;
+    }
+
+    .pk-social-btn:hover {
+        border-color: var(--sl-color-accent);
+        color: var(--sl-color-white);
+        background: var(--sl-color-accent-low);
+    }
+
+    .pk-social-btn-csirt {
+        border-color: rgba(56, 189, 248, 0.3);
+        color: var(--sl-color-text-accent);
+    }
+
+    .pk-social-btn-csirt:hover {
+        border-color: var(--sl-color-accent);
+        background: rgba(56, 189, 248, 0.12);
+    }
+
+    /* ==========================================================================
+       SECURITY PILLARS / HIGHLIGHTS
+       ========================================================================== */
+    .pk-footer-highlights {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 0.85rem;
+        margin-top: 1.75rem;
+        padding-bottom: 2rem;
+        border-bottom: 1px solid var(--sl-color-hairline);
+    }
+
+    @media (min-width: 36rem) {
+        .pk-footer-highlights {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @media (min-width: 60rem) {
+        .pk-footer-highlights {
+            grid-template-columns: repeat(4, 1fr);
+        }
+    }
+
+    .pk-highlight-card {
+        display: flex;
+        gap: 0.75rem;
+        align-items: flex-start;
+        padding: 0.85rem 1rem;
+        border-radius: 0.75rem;
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid var(--sl-color-hairline);
+    }
+
+    :global(:root[data-theme="light"]) .pk-highlight-card {
+        background: #ffffff;
+        border-color: #e2e8f0;
+    }
+
+    .pk-highlight-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 1.85rem;
+        height: 1.85rem;
+        border-radius: 0.5rem;
+        background: var(--sl-color-accent-low);
+        color: var(--sl-color-text-accent);
+        flex-shrink: 0;
+        margin-top: 0.1rem;
+    }
+
+    .pk-highlight-title {
+        margin: 0;
+        font-size: 0.8125rem;
+        font-weight: 700;
+        color: var(--sl-color-white);
+        letter-spacing: -0.01em;
+    }
+
+    .pk-highlight-desc {
+        margin: 0.2rem 0 0;
+        font-size: 0.75rem;
+        line-height: 1.45;
+        color: var(--sl-color-gray-3);
+    }
+
+    /* ==========================================================================
+       NAVIGATION DIRECTORY (4 BALANCED COLUMNS)
+       ========================================================================== */
+    .pk-footer-nav-grid {
+        position: relative;
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 2rem 1.5rem;
+        margin-top: 2rem;
+    }
+
+    @media (min-width: 34rem) {
+        .pk-footer-nav-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @media (min-width: 54rem) {
+        .pk-footer-nav-grid {
+            grid-template-columns: repeat(4, 1fr);
+        }
+    }
+
+    .pk-footer-col {
+        min-width: 0;
+    }
+
+    .pk-footer-heading {
+        display: flex;
+        align-items: center;
+        gap: 0.45rem;
+        margin: 0 0 1rem;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--sl-color-white);
+    }
+
+    .pk-heading-indicator {
+        display: inline-block;
+        width: 0.35rem;
+        height: 0.35rem;
+        border-radius: 9999px;
+        background-color: var(--sl-color-accent);
+    }
+
+    .pk-footer-links {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 0.55rem;
+    }
+
+    .pk-footer-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        color: var(--sl-color-gray-3);
+        text-decoration: none;
+        font-size: 0.84rem;
+        line-height: 1.45;
+        transition: color 0.12s ease;
+    }
+
+    .pk-footer-link:hover {
+        color: var(--sl-color-text-accent);
+    }
+
+    :global(:root[data-theme="light"]) .pk-footer-link {
+        color: #475569;
+    }
+
+    :global(:root[data-theme="light"]) .pk-footer-link:hover {
+        color: #0284c7;
+    }
+
+    .pk-link-badge {
+        font-size: 0.65rem;
+        font-weight: 700;
+        padding: 0.1rem 0.35rem;
+        border-radius: 0.25rem;
+        background: rgba(56, 189, 248, 0.12);
+        color: var(--sl-color-text-accent);
+        border: 1px solid rgba(56, 189, 248, 0.25);
+        line-height: 1;
+    }
+
+    /* ==========================================================================
+       BOTTOM ROW: COPYRIGHT & PEKANBARU ACCREDITATION
+       ========================================================================== */
+    .pk-footer-bottom {
+        position: relative;
+        margin-top: 2.25rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid var(--sl-color-hairline);
+        display: flex;
+        flex-direction: column;
+        gap: 1.25rem;
+        align-items: flex-start;
+    }
+
+    @media (min-width: 52rem) {
+        .pk-footer-bottom {
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-between;
+        }
+    }
+
+    .pk-bottom-left {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+
+    .pk-bottom-copy,
+    .pk-bottom-author {
+        margin: 0;
+        font-size: 0.8rem;
+        line-height: 1.5;
+        color: var(--sl-color-gray-3);
+    }
+
+    .pk-bottom-copy strong,
+    .pk-bottom-author strong {
+        color: var(--sl-color-gray-2);
+        font-weight: 600;
+    }
+
+    .pk-bottom-right {
+        flex-shrink: 0;
+    }
+
+    .pk-pekanbaru-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.65rem;
+        padding: 0.55rem 0.95rem;
+        border-radius: 0.75rem;
+        border: 1px solid var(--sl-color-hairline);
+        background: rgba(255, 255, 255, 0.02);
+        text-decoration: none;
+        transition:
+            border-color 0.15s ease,
+            background-color 0.15s ease;
+    }
+
+    :global(:root[data-theme="light"]) .pk-pekanbaru-badge {
+        background: #ffffff;
+        border-color: #e2e8f0;
+    }
+
+    .pk-pekanbaru-badge:hover {
+        border-color: var(--sl-color-accent);
+        background: var(--sl-color-accent-low);
+    }
+
+    .pk-seal-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 1.85rem;
+        height: 1.85rem;
+        border-radius: 9999px;
+        background: rgba(56, 189, 248, 0.12);
+        color: var(--sl-color-text-accent);
+        flex-shrink: 0;
+    }
+
+    .pk-pekanbaru-text {
+        display: flex;
+        flex-direction: column;
+        line-height: 1.3;
+    }
+
+    .pk-pekanbaru-gov {
+        font-size: 0.78rem;
+        font-weight: 700;
+        color: var(--sl-color-white);
+        letter-spacing: -0.01em;
+    }
+
+    .pk-pekanbaru-dept {
+        font-size: 0.7rem;
+        color: var(--sl-color-gray-3);
+    }
+
+    .pk-ext-arrow {
+        font-size: 0.85rem;
+        color: var(--sl-color-gray-3);
+        margin-left: 0.2rem;
+        transition:
+            transform 0.15s ease,
+            color 0.15s ease;
+    }
+
+    .pk-pekanbaru-badge:hover .pk-ext-arrow {
+        color: var(--sl-color-text-accent);
+        transform: translate(2px, -2px) !important;
+    }
+</style>

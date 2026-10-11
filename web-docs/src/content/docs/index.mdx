@@ -29,9 +29,21 @@ import {
 } from "@astrojs/starlight/components";
 import pkg from "../../data/package.json";
 
-Paket **`robyajo/pasak`** (Bulwark) adalah Web Application Firewall
-(WAF) mandiri untuk Laravel yang mengikuti standar paket Spatie: **100% murni PHP**,
-tanpa dependensi NPM/Node, dan tanpa memaksakan satu jenis frontend.
+Paket **`robyajo/pasak`** (Bulwark, dikenal juga sebagai **Pasak Security**) adalah solusi
+**Laravel security** berupa Web Application Firewall (WAF) mandiri untuk Laravel yang mengikuti
+standar paket Spatie: **100% murni PHP**, tanpa dependensi NPM/Node, dan tanpa memaksakan satu
+jenis frontend.
+
+## Perlindungan Laravel dari Serangan Siber
+
+Serangan terhadap **keamanan aplikasi** Laravel modern — SQL injection, XSS, SSTI, path traversal,
+unggahan webshell, brute force, dan credential stuffing — membutuhkan **perlindungan Laravel**
+berlapis, bukan sekadar validasi form. Cara mengatasi serangan tersebut adalah menggabungkan
+WAF di level HTTP, karantina IP/perangkat otomatis, penguncian login bertingkat, audit integritas
+server, dan pemantauan access log dalam satu paket. Arsitektur inilah yang dipakai Pasak, termasuk
+untuk **cara mengatasi serangan pada aplikasi pemerintah** yang menjadi target empuk serangan siber:
+setiap request mencurigakan dicatat, diblokir instan bila berbahaya, dan dapat diajukan banding
+melalui tiket resmi.
 
 <div class="hero-meta-bar">
     <span>
@@ -175,6 +187,14 @@ flowchart TD
         Halaman paket resmi di Packagist.
     </LinkCard>
 </CardGrid>
+
+<div class="pk-cta">
+    <p class="pk-cta-title">Amankan aplikasi Laravel Anda malam ini juga.</p>
+    <p class="pk-cta-sub">
+        Satu perintah Composer, satu wizard instalasi — WAF, karantina, dan
+        audit langsung aktif.
+    </p>
+</div>
 
 ## Kompatibilitas
 

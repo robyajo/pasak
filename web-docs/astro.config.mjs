@@ -55,6 +55,8 @@ export default defineConfig({
       components: {
         // Menyuntikkan skrip render Mermaid ke setiap halaman.
         Head: "./src/components/Head.astro",
+        // Footer kustom: navigasi bawaan + direktori tautan SEO.
+        Footer: "./src/components/Footer.astro",
         // Menambahkan badge versi paket di sebelah judul situs.
         SiteTitle: "./src/components/SiteTitle.astro",
       },
@@ -92,6 +94,8 @@ export default defineConfig({
           items: [{ autogenerate: { directory: "integration-guides" } }],
         },
         { label: "Changelog", slug: "changelog" },
+        { label: "Indeks Kata Kunci", slug: "keywords" },
+        { label: "FAQ", slug: "faq" },
         {
           label: "Packagist",
           link: "https://packagist.org/packages/robyajo/pasak",

@@ -43,3 +43,5 @@
   - https://security-dev.pekanbaru.go.id/integration-guides/frontend-blade-livewire/
   - https://security-dev.pekanbaru.go.id/integration-guides/custom-rules-and-whitelist/
 - Changelog: https://security-dev.pekanbaru.go.id/changelog/
+- Indeks kata kunci: https://security-dev.pekanbaru.go.id/keywords/
+- FAQ (Pasak Security, perlindungan Laravel, cara mengatasi serangan): https://security-dev.pekanbaru.go.id/faq/
