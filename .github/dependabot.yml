@@ -8,6 +8,13 @@ updates:
     open-pull-requests-limit: 5
     labels:
       - dependencies
+    # Abaikan major release (mis. Pest 4 -> 5) agar PR Dependabot
+    # tidak merusak matrix CI PHP 8.2 / Laravel 10. Major tetap
+    # diurus manual lewat composer update yang terverifikasi.
+    ignore:
+      - dependency-name: "*"
+        update-types:
+          - version-update:semver-major
 
   - package-ecosystem: github-actions
     directory: "/"
