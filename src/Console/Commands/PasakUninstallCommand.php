@@ -40,6 +40,13 @@ class PasakUninstallCommand extends Command
         $this->removePublishedFiles();
         $this->removeComposerPackage();
 
+        try {
+            $this->callSilent('optimize:clear');
+            $this->info('  ✓ Cache konfigurasi, rute, dan tampilan dibersihkan.');
+        } catch (\Throwable) {
+            // Abaikan bila tidak didukung environment tersebut.
+        }
+
         $this->newLine();
         $this->info('Pencopotan selesai. Aplikasi Anda kembali seperti sebelum Pasak dipasang.');
         $this->line('  Disarankan: <fg=yellow>php artisan config:clear && php artisan route:clear && composer dump-autoload</>');
@@ -163,7 +170,7 @@ class PasakUninstallCommand extends Command
 
             // Bersihkan blok append yang kini kosong: "->append([\n]);"
             $content = preg_replace(
-                "/->[a-zA-Z_]+->append\\(\\[\\s*\\]\\);\\n?/",
+                '/->[a-zA-Z_]+->append\\(\\[\\s*\\]\\);\\n?/',
                 '',
                 implode("\n", $filtered)
             );

@@ -108,15 +108,21 @@ class SecurityUpgradeCommand extends Command
         $this->info('  ✓ Berkas migrasi telah disinkronkan dan diterapkan.');
         $this->newLine();
 
-        // 3. Synchronize routes
+        // 3. Synchronize routes (tanpa menimpa kustomisasi host kecuali diminta).
         $this->comment('3/5. Menyinkronkan berkas rute kustom...');
         $hasWebRoutes = File::exists(base_path('routes/pasak.php'));
         $hasApiRoutes = File::exists(base_path('routes/pasak-api.php'));
 
         if ($hasWebRoutes || $hasApiRoutes || $this->option('sync-routes')) {
+            if ($this->option('sync-routes')) {
+                $this->backupHostFiles([
+                    base_path('routes/pasak.php'),
+                    base_path('routes/pasak-api.php'),
+                ]);
+            }
             $this->call('vendor:publish', [
                 '--tag' => 'pasak-routes',
-                '--force' => true,
+                '--force' => (bool) $this->option('sync-routes'),
             ]);
             $this->info('  ✓ Berkas routes/pasak.php dan routes/pasak-api.php telah disinkronkan.');
         } else {
@@ -124,23 +130,29 @@ class SecurityUpgradeCommand extends Command
         }
         $this->newLine();
 
-        // 4. Synchronize dashboard views
+        // 4. Synchronize dashboard views (tanpa menimpa kustomisasi host kecuali diminta).
         $this->comment('4/5. Menyinkronkan tampilan dashboard monitoring...');
         $hasBladeViews = File::isDirectory(resource_path('views/pages/pasak'));
         $hasReactViews = File::isDirectory(resource_path('js/pages/pasak'));
 
         if ($hasBladeViews || $this->option('sync-views')) {
+            if ($this->option('sync-views')) {
+                $this->backupHostFiles([resource_path('views/pages/pasak')]);
+            }
             $this->call('vendor:publish', [
                 '--tag' => 'pasak-dashboard-blade-views',
-                '--force' => true,
+                '--force' => (bool) $this->option('sync-views'),
             ]);
             $this->info('  ✓ Tampilan dashboard Blade/Livewire telah disinkronkan.');
         }
 
         if ($hasReactViews) {
+            if ($this->option('sync-views')) {
+                $this->backupHostFiles([resource_path('js/pages/pasak')]);
+            }
             $this->call('vendor:publish', [
                 '--tag' => 'pasak-dashboard-react-views',
-                '--force' => true,
+                '--force' => (bool) $this->option('sync-views'),
             ]);
             $this->info('  ✓ Tampilan dashboard React/Inertia telah disinkronkan.');
         }
@@ -148,7 +160,7 @@ class SecurityUpgradeCommand extends Command
         if (File::exists(resource_path('views/errors/blocked.blade.php'))) {
             $this->call('vendor:publish', [
                 '--tag' => 'pasak-views',
-                '--force' => true,
+                '--force' => (bool) $this->option('sync-views'),
             ]);
             $this->info('  ✓ Halaman error blokir (errors/blocked.blade.php) telah disinkronkan.');
         }
@@ -170,6 +182,34 @@ class SecurityUpgradeCommand extends Command
         $this->newLine();
 
         return 0;
+    }
+
+    /**
+     * Cadangkan berkas/direktori host sebelum ditimpa agar kustomisasi
+     * pengguna tidak pernah hilang diam-diam.
+     *
+     * @param  array<int, string>  $paths
+     */
+    protected function backupHostFiles(array $paths): void
+    {
+        foreach ($paths as $path) {
+            if (! File::exists($path)) {
+                continue;
+            }
+
+            $backup = $path.'.backup-'.date('Ymd_His');
+
+            try {
+                if (File::isDirectory($path)) {
+                    File::copyDirectory($path, $backup);
+                } else {
+                    File::copy($path, $backup);
+                }
+                $this->line("  ℹ Cadangan kustomisasi disimpan di: {$backup}");
+            } catch (Throwable $e) {
+                $this->warn('  ⚠ Gagal mencadangkan '.$path.': '.$e->getMessage());
+            }
+        }
     }
 
     /**
