@@ -13,6 +13,7 @@ const siteOrigin = Astro.site ? Astro.site.origin : (Astro.url.origin || 'https:
 const canonicalUrl = new URL(pathname, siteOrigin).href;
 const ogImageUrl = new URL('/og-image.png', siteOrigin).href;
 const isHome = pathname === '/' || pathname === '';
+const isNotFound = pathname === '/404' || pathname === '/404/';
 
 // Structured Data Breadcrumbs (Schema.org)
 const breadcrumbItems = [
@@ -156,7 +157,7 @@ const softwareSchema = {
   },
 };
 
-const articleSchema = !isHome ? {
+const articleSchema = !isHome && !isNotFound ? {
   '@context': 'https://schema.org',
   '@type': 'TechArticle',
   headline: title,
@@ -180,7 +181,7 @@ const articleSchema = !isHome ? {
   },
 } : null;
 
-const breadcrumbSchema = breadcrumbItems.length > 1 ? {
+const breadcrumbSchema = breadcrumbItems.length > 1 && !isNotFound ? {
   '@context': 'https://schema.org',
   '@type': 'BreadcrumbList',
   itemListElement: breadcrumbItems,
@@ -213,7 +214,7 @@ const breadcrumbSchema = breadcrumbItems.length > 1 ? {
 <meta property="og:image:alt" content="Pasak (Bulwark) — Enterprise Headless WAF" />
 <meta property="og:locale" content="id_ID" />
 <meta name="twitter:image" content={ogImageUrl} />
-<meta name="twitter:card" content="summary_large_image" />
+{/* twitter:card, twitter:title & twitter:description sudah diterbitkan Starlight bawaan. */}
 <meta name="twitter:title" content={title} />
 <meta name="twitter:description" content={description} />
 
@@ -224,7 +225,9 @@ const breadcrumbSchema = breadcrumbItems.length > 1 ? {
 <meta name="keywords" content={allKeywords} />
 <meta name="author" content="Roby Karti S." />
 <meta name="theme-color" content="#0f172a" />
-<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+{isNotFound
+  ? <meta name="robots" content="noindex, nofollow" />
+  : <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />}
 
 <!-- Geo & Local SEO Tags (Kota Pekanbaru, Riau, Indonesia) -->
 <meta name="geo.region" content="ID-RI" />

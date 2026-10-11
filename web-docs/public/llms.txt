@@ -1,0 +1,45 @@
+# Pasak (Bulwark) — Dokumentasi Resmi
+
+> WAF mandiri (self-hosted), mesin deteksi ancaman, dan pustaka audit keamanan
+> headless untuk Laravel (PHP ^8.2–^8.5, Laravel ^10–^13). 100% Pure PHP, tanpa NPM.
+> Paket: robyajo/pasak (MIT). Bahasa: Indonesia.
+
+- Situs: https://security-dev.pekanbaru.go.id/
+- GitHub: https://github.com/robyajo/pasak
+- Packagist: https://packagist.org/packages/robyajo/pasak
+- Instalasi: `composer require robyajo/pasak` lalu `php artisan pasak:install`
+
+## Panduan
+
+- Memulai:
+  - https://security-dev.pekanbaru.go.id/getting-started/introduction/
+  - https://security-dev.pekanbaru.go.id/getting-started/installation/
+  - https://security-dev.pekanbaru.go.id/getting-started/configuration/
+- Arsitektur inti:
+  - https://security-dev.pekanbaru.go.id/core-architecture/threat-detection-engine/
+  - https://security-dev.pekanbaru.go.id/core-architecture/device-quarantine/
+  - https://security-dev.pekanbaru.go.id/core-architecture/reverse-proxy-resolution/
+  - https://security-dev.pekanbaru.go.id/core-architecture/models-and-database/
+- Modul keamanan:
+  - https://security-dev.pekanbaru.go.id/security-modules/stepped-login-throttling/
+  - https://security-dev.pekanbaru.go.id/security-modules/server-security-and-webshells/
+  - https://security-dev.pekanbaru.go.id/security-modules/access-log-streaming/
+  - https://security-dev.pekanbaru.go.id/security-modules/appeal-tickets-system/
+  - https://security-dev.pekanbaru.go.id/security-modules/session-and-activity-tracking/
+- REST API:
+  - https://security-dev.pekanbaru.go.id/api-reference/api-overview/
+  - https://security-dev.pekanbaru.go.id/api-reference/public-endpoints/
+  - https://security-dev.pekanbaru.go.id/api-reference/user-endpoints/
+  - https://security-dev.pekanbaru.go.id/api-reference/admin-endpoints/
+- CLI & otomasi:
+  - https://security-dev.pekanbaru.go.id/cli-automation/artisan-commands/
+  - https://security-dev.pekanbaru.go.id/cli-automation/scheduled-tasks/
+- Hardening web server:
+  - https://security-dev.pekanbaru.go.id/webserver-hardening/nginx-hardened-waf/
+  - https://security-dev.pekanbaru.go.id/webserver-hardening/apache-htaccess-hardening/
+  - https://security-dev.pekanbaru.go.id/webserver-hardening/production-checklist/
+- Integrasi:
+  - https://security-dev.pekanbaru.go.id/integration-guides/frontend-react-inertia/
+  - https://security-dev.pekanbaru.go.id/integration-guides/frontend-blade-livewire/
+  - https://security-dev.pekanbaru.go.id/integration-guides/custom-rules-and-whitelist/
+- Changelog: https://security-dev.pekanbaru.go.id/changelog/
