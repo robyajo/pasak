@@ -1,5 +1,5 @@
 # =====================================================================
-# Robots.txt — Laravel Security Monitor Official Documentation
+# Robots.txt — Pasak Official Documentation
 # =====================================================================
 
 User-agent: *

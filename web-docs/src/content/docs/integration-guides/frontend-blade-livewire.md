@@ -112,7 +112,7 @@ PASAK_DASHBOARD_PREFIX=pasak
 
 Panel dapat diakses pada `/security`. Halaman-halaman tersebut merupakan **single-file Livewire component** (`pages::security.*`) sehingga otomatis memakai layout starter kit (`layouts::app`).
 
-> 🔒 **Wajib Login**: Rute dashboard memakai middleware `web` + `auth`, dan secara bawaan juga `security.admin` (Gate `manage-security-monitor`). Untuk mengizinkan semua pengguna yang sudah login (tanpa syarat admin), kosongkan `security.dashboard.admin_middleware` pada `config/pasak.php`.
+> 🔒 **Wajib Login**: Rute dashboard memakai middleware `web` + `auth`, dan secara bawaan juga `pasak.admin` (Gate `manage-pasak`). Untuk mengizinkan semua pengguna yang sudah login (tanpa syarat admin), kosongkan `pasak.dashboard.admin_middleware` pada `config/pasak.php`.
 
 ### Desain Sistem Pure Vanilla CSS (Zero External UI Dependencies)
 
@@ -127,15 +127,15 @@ Stubs Livewire dibangun menggunakan **Pure Vanilla CSS**:
 Untuk memunculkan tautan ke panel, tambahkan item berikut pada navigasi sidebar aplikasi Anda (misalnya di `resources/views/layouts/app/sidebar.blade.php`):
 
 ```blade
-<flux:sidebar.item icon="shield-check" :href="route('security.dashboard.overview')" :current="request()->routeIs('security.dashboard.*')" wire:navigate>
-    {{ __('Security Monitor') }}
+<flux:sidebar.item icon="shield-check" :href="route('pasak.dashboard.overview')" :current="request()->routeIs('pasak.dashboard.*')" wire:navigate>
+    {{ __('Pasak') }}
 </flux:sidebar.item>
 ```
 
 Atau jika menggunakan link HTML standar:
 
 ```blade
-<a href="{{ route('security.dashboard.overview') }}" wire:navigate class="nav-item">
-    Security Monitor
+<a href="{{ route('pasak.dashboard.overview') }}" wire:navigate class="nav-item">
+    Pasak
 </a>
 ```

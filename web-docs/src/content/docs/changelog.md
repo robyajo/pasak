@@ -228,7 +228,7 @@ All notable changes to `robyajo/pasak` will be documented in this file.
   Audit, User Sessions, Unblock Appeals) with
   `php artisan vendor:publish --tag=starterkit-livewire`. The dashboard is
   disabled by default and served under `/security` behind the
-  `web` + `auth` + `security.admin` middleware.
+  `web` + `auth` + `pasak.admin` middleware.
 - **React (Inertia) Starter Kit monitoring dashboard** (optional): publish six
   server-rendered Inertia + React pages and shared components with
   `php artisan vendor:publish --tag=starterkit-react`. Backed by the new

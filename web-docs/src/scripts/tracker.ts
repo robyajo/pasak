@@ -1,12 +1,12 @@
 /**
- * Pelacak kunjungan situs dokumentasi Laravel Security Monitor.
+ * Pelacak kunjungan situs dokumentasi Pasak.
  *
  * Mengirimkan telemetry pageview ke Superapp API:
  *   POST /api/master/visitors
  *
  * Konfigurasi (opsional via env web):
  *   PUBLIC_VISITOR_API_URL  = URL endpoint API (default: https://superapp-api.pekanbaru.go.id/api/master/visitors)
- *   PUBLIC_VISITOR_SITE_ID  = Identifier situs (default: laravel-security-monitor)
+ *   PUBLIC_VISITOR_SITE_ID  = Identifier situs (default: pasak)
  */
 
 interface VisitorPayload {
@@ -21,7 +21,7 @@ const DEFAULT_API_URL =
   'https://superapp-api.pekanbaru.go.id/api/master/visitors';
 
 const SITE_ID =
-  import.meta.env.PUBLIC_VISITOR_SITE_ID || 'laravel-security-monitor';
+  import.meta.env.PUBLIC_VISITOR_SITE_ID || 'pasak';
 
 let lastTrackedPath: string | null = null;
 let lastTrackedTime = 0;

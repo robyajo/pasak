@@ -1,7 +1,6 @@
 ---
 // Override SiteTitle: tambahkan badge versi paket di samping judul situs.
-// Pada desktop: Logo + "Pasak" + Versi Packagist.
-// Pada mobile: Logo + "Security Monitor" (tanpa kata "Laravel" agar proporsional dan tidak terpotong).
+// Desktop & mobile: Logo + "Pasak".
 import { logos } from "virtual:starlight/user-images";
 import config from "virtual:starlight/user-config";
 import pkg from "../data/package.json";
@@ -34,7 +33,7 @@ const version = pkg.packagist?.version ?? pkg.version;
 		)
 	}
 	<span class="site-title-text" translate="no">
-		<span class="title-brand">Laravel </span><span class="title-product">Security Monitor</span>
+		<span class="title-product">Pasak</span>
 	</span>
 </a>
 
@@ -119,7 +118,7 @@ const version = pkg.packagist?.version ?? pkg.version;
 		background-color: var(--sl-color-accent-low);
 	}
 
-	/* Tampilan Responsif Mobile: Tampilkan Icon + \"Security Monitor\" */
+	/* Tampilan Responsif Mobile: Tampilkan Icon + "Pasak" */
 	@media (max-width: 50rem) {
 		:global(.title-wrapper) {
 			gap: 0.5rem !important;
@@ -142,7 +141,7 @@ const version = pkg.packagist?.version ?? pkg.version;
 			object-fit: contain !important;
 		}
 
-		/* Sembunyikan kata \"Laravel\" di mobile agar \"Security Monitor\" muat dengan rapi */
+		/* Judul "Pasak" yang ringkas muat dengan rapi di layar sempit */
 		.title-brand {
 			display: none !important;
 		}

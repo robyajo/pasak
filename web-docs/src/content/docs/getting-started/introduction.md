@@ -44,8 +44,8 @@ graph TD
 
     Discovery --> Hook1[2. Core Eloquent: HasSecurityRelations Trait<br/>User::logins(), User::trustedIps()]
     Discovery --> Hook2[3. Core Auth Events: Event::listen<br/>Failed & Login Events Otomatis Diawasi]
-    Discovery --> Hook3[4. Core HTTP Kernel: Middleware Aliases<br/>security.block, security.detect, security.admin]
-    Discovery --> Hook4[5. Core Authorization: Gate<br/>Gate::define('manage-security-monitor')]
+    Discovery --> Hook3[4. Core HTTP Kernel: Middleware Aliases<br/>pasak.block, pasak.detect, pasak.admin]
+    Discovery --> Hook4[5. Core Authorization: Gate<br/>Gate::define('manage-pasak')]
     Discovery --> Hook5[6. Core Artisan CLI: Console Commands<br/>pasak:install, pasak:scan-logs, dll]
     Discovery --> Hook6[7. Core Scheduler: Schedule Runner<br/>Prune log harian & liveness heartbeat]
     Discovery --> Hook7[8. Core Validation: ValidationRule<br/>SafeImageFile, SafeAssetPath]
@@ -96,16 +96,16 @@ Tanpa perlu memodifikasi controller login aplikasi Anda, `PasakServiceProvider` 
 
 Paket mendaftarkan 4 alias middleware resmi:
 
-- `'security.block'` ➔ `BlockIpAddress`
-- `'security.detect'` ➔ `DetectSecurityThreats`
-- `'security.admin'` ➔ `EnsureSecurityAdmin`
-- `'security.activity'` ➔ `TrackUserActivity`
+- `'pasak.block'` ➔ `BlockIpAddress`
+- `'pasak.detect'` ➔ `DetectSecurityThreats`
+- `'pasak.admin'` ➔ `EnsureSecurityAdmin`
+- `'pasak.activity'` ➔ `TrackUserActivity`
 
 Pengembang dapat memasangnya di mana saja: sebagai middleware global, di grup `web`, grup `api`, atau pada rute individual.
 
 ### 5. Registrasi Gate Otorisasi Bawaan
 
-Paket mendefinisikan gate `'manage-security-monitor'` yang langsung terhubung ke sistem otorisasi standar Laravel (`@can`, `$user->can()`, `Gate::allows()`).
+Paket mendefinisikan gate `'manage-pasak'` yang langsung terhubung ke sistem otorisasi standar Laravel (`@can`, `$user->can()`, `Gate::allows()`).
 
 ### 6. Artisan Console Commands
 

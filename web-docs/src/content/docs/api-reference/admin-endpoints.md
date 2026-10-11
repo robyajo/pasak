@@ -1,11 +1,11 @@
 ---
 title: "Endpoint Administrator REST API"
-description: "Seluruh endpoint pada dokumen ini dilindungi oleh middleware ganda: auth (pengguna harus login) dan security.admin (EnsureSecurityAdmin)."
+description: "Seluruh endpoint pada dokumen ini dilindungi oleh middleware ganda: auth (pengguna harus login) dan pasak.admin (EnsureSecurityAdmin)."
 sidebar:
   order: 4
 ---
 
-Seluruh endpoint pada dokumen ini dilindungi oleh middleware ganda: **`auth`** (pengguna harus login) dan **`security.admin`** (`EnsureSecurityAdmin`).
+Seluruh endpoint pada dokumen ini dilindungi oleh middleware ganda: **`auth`** (pengguna harus login) dan **`pasak.admin`** (`EnsureSecurityAdmin`).
 
 ---
 

@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Laravel Security Monitor (Bulwark) — Documentation Theme
+   Pasak (Bulwark) — Documentation Theme
    Font Primer: Plus Jakarta Sans (UI & Editorial) & JetBrains Mono (Code)
    Responsif Mobile: Header hanya menampilkan Logo saja
    Aset Ikon: Selaras & Berstandar Keamanan Siber
@@ -204,10 +204,10 @@ header.header {
 }
 
 /* --------------------------------------------------------------------------
-   RESPONSIF MOBILE: HEADER MENAMPILKAN LOGO & "SECURITY MONITOR"
+   RESPONSIF MOBILE: HEADER MENAMPILKAN LOGO & "PASAK"
    -------------------------------------------------------------------------- */
 @media (max-width: 50rem) {
-	/* Sembunyikan kata "Laravel" di mobile, tampilkan "Security Monitor" bersama icon */
+	/* Judul ringkas "Pasak" bersama icon di mobile */
 	.site-title .title-brand {
 		display: none !important;
 	}
