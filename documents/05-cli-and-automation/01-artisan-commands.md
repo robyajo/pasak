@@ -4,12 +4,12 @@ Paket menyertakan kumpulan perintah Artisan CLI untuk administrasi, otomasi pemi
 
 ---
 
-## 1. `security:install`
+## 1. `pasak:install`
 
 Menginisialisasi paket, mempublikasikan konfigurasi, migrasi database, konfigurasi Nginx hardened WAF, serta menerapkan aturan **Apache `.htaccess` Hardened** di folder `public/`.
 
 ```bash
-php artisan security:install [options]
+php artisan pasak:install [options]
 ```
 
 ### Mekanisme Pembaruan `.htaccess`:
@@ -34,12 +34,12 @@ php artisan security:install [options]
 
 ---
 
-## 2. `security:scan-logs`
+## 2. `pasak:scan-logs`
 
 Memindai berkas log web server (Apache/Nginx) secara streaming, mendeteksi serangan yang ditolak di level web server, mengimpor ke tabel log keamanan, atau langsung memblokir IP penyerang zero-tolerance.
 
 ```bash
-php artisan security:scan-logs [options]
+php artisan pasak:scan-logs [options]
 ```
 
 ### Opsi:
@@ -60,20 +60,20 @@ php artisan security:scan-logs [options]
 
 ```bash
 # 1. Analisis cepat 24 jam terakhir tanpa ubah database
-php artisan security:scan-logs --since="24 hours ago" --samples
+php artisan pasak:scan-logs --since="24 hours ago" --samples
 
 # 2. Tangkap penyerang dan blokir langsung di database
-php artisan security:scan-logs --since="6 hours ago" --import --block
+php artisan pasak:scan-logs --since="6 hours ago" --import --block
 ```
 
 ---
 
-## 3. `security:baseline`
+## 3. `pasak:baseline`
 
 Membuat, mengaudit, atau menghapus baseline hash SHA-256 integritas berkas aplikasi.
 
 ```bash
-php artisan security:baseline [options]
+php artisan pasak:baseline [options]
 ```
 
 ### Opsi:
@@ -95,12 +95,12 @@ Status Audit:
 
 ---
 
-## 4. `security:unblock-ip`
+## 4. `pasak:unblock-ip`
 
 Membuka blokir alamat IP yang terkena karantina WAF. Berfungsi sebagai **Escape Hatch** darurat jika administrator tidak sengaja memblokir IP mereka sendiri.
 
 ```bash
-php artisan security:unblock-ip [ip] [options]
+php artisan pasak:unblock-ip [ip] [options]
 ```
 
 ### Argumen & Opsi:
@@ -113,23 +113,23 @@ php artisan security:unblock-ip [ip] [options]
 
 ```bash
 # Buka blokir satu IP
-php artisan security:unblock-ip 198.51.100.50
+php artisan pasak:unblock-ip 198.51.100.50
 
 # Lihat siapa saja yang sedang diblokir
-php artisan security:unblock-ip --list
+php artisan pasak:unblock-ip --list
 
 # Buka seluruh blokir saat insiden darurat
-php artisan security:unblock-ip --all
+php artisan pasak:unblock-ip --all
 ```
 
 ---
 
-## 5. `security:prune-logs`
+## 5. `pasak:prune-logs`
 
 Membersihkan riwayat log keamanan yang telah melewati batas retensi waktu.
 
 ```bash
-php artisan security:prune-logs [options]
+php artisan pasak:prune-logs [options]
 ```
 
 ### Opsi:
@@ -140,17 +140,17 @@ php artisan security:prune-logs [options]
 
 ```bash
 # Bersihkan log yang lebih tua dari 30 hari
-php artisan security:prune-logs --days=30
+php artisan pasak:prune-logs --days=30
 ```
 
 ---
 
-## 6. `security:purge-injected-data`
+## 6. `pasak:purge-injected-data`
 
 Mendeteksi dan menghapus residu payload pentest atau injeksi yang tersimpan di dalam tabel aplikasi (misal `{{7*7}}`, `.htaccess`, `../../../public/`).
 
 ```bash
-php artisan security:purge-injected-data [options]
+php artisan pasak:purge-injected-data [options]
 ```
 
 ### Opsi:

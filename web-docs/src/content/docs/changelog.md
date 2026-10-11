@@ -13,9 +13,9 @@ All notable changes to `robyajo/pasak` will be documented in this file.
 
 - **Hardened Apache 2 VirtualHost Configuration (`stubs/apache2.conf.stub`)**:
   - Menyediakan template VirtualHost Apache 2 hardened siap pakai untuk server Ubuntu / Debian / CentOS.
-  - Tag vendor publish baru: `php artisan vendor:publish --tag=security-apache` (menghasilkan berkas `apache2.conf` di root aplikasi host).
-  - Terintegrasi penuh ke dalam perintah instalasi `php artisan security:install` dan grup tag `--tag=security-all`.
-  - Opsi CLI baru: `--without-apache` pada `php artisan security:install` untuk melewati publikasi `apache2.conf`.
+  - Tag vendor publish baru: `php artisan vendor:publish --tag=pasak-apache` (menghasilkan berkas `apache2.conf` di root aplikasi host).
+  - Terintegrasi penuh ke dalam perintah instalasi `php artisan pasak:install` dan grup tag `--tag=pasak-all`.
+  - Opsi CLI baru: `--without-apache` pada `php artisan pasak:install` untuk melewati publikasi `apache2.conf`.
   - Fitur pengamanan VirtualHost mencakup:
     - Mitigasi Slowloris DoS via `mod_reqtimeout` (`header=15-30,MinRate=500 body=15,MinRate=500`).
     - Buffer request body (5MB) dan header buffer (`LimitRequestFieldSize 32768`) untuk mencegah DoS dan error token JWT/Cookie besar.
@@ -57,9 +57,9 @@ All notable changes to `robyajo/pasak` will be documented in this file.
   - Pemeriksaan dirancang sangat ringan, non-blocking (timeout 2 detik), dan di-cache selama 1 jam (`SECURITY_VERSION_CHECK_CACHE_TTL=3600`) sehingga tidak pernah memperlambat atau mengganggu startup server.
   - Dapat diaktifkan/dinonaktifkan melalui konfigurasi `security.version_check.enabled` atau variabel `.env`: `SECURITY_VERSION_CHECK_ENABLED=true`.
 
-- **Perintah Baru `php artisan security:upgrade`**:
+- **Perintah Baru `php artisan pasak:upgrade`**:
   - Perintah artisan terpadu untuk memeriksa, memperbarui, dan menyinkronkan seluruh komponen package:
-    - `php artisan security:upgrade`: Memperbarui package via Composer (`composer update robyajo/pasak`), menerapkan migrasi database terbaru (`php artisan migrate`), menyinkronkan rute kustom (`routes/security.php` & `routes/security-api.php`), menyinkronkan tampilan dashboard monitoring (Blade/Livewire & React/TSX), serta membersihkan cache framework.
+    - `php artisan pasak:upgrade`: Memperbarui package via Composer (`composer update robyajo/pasak`), menerapkan migrasi database terbaru (`php artisan migrate`), menyinkronkan rute kustom (`routes/security.php` & `routes/security-api.php`), menyinkronkan tampilan dashboard monitoring (Blade/Livewire & React/TSX), serta membersihkan cache framework.
     - Opsi `--check`: Hanya memeriksa status versi tanpa menjalankan proses pembaruan.
     - Opsi `--force`: Memaksa pembaruan dan sinkronisasi aset meskipun sudah di versi terbaru.
     - Opsi `--no-composer`: Melewati pembaruan Composer (hanya sinkronisasi aset lokal).
@@ -114,12 +114,12 @@ All notable changes to `robyajo/pasak` will be documented in this file.
 ### Added
 
 - **Automated API Setup & Customizable Route Files (`routes/security.php` & `routes/security-api.php`)**:
-  - Automatically checks and executes `php artisan install:api` during `security:install` if API routes are not yet initialized in Laravel 11/12/13 host applications.
+  - Automatically checks and executes `php artisan install:api` during `pasak:install` if API routes are not yet initialized in Laravel 11/12/13 host applications.
   - Generates `routes/security-api.php` for headless REST API endpoints and wires it into `routes/api.php` (`require __DIR__.'/security-api.php';`).
   - Generates `routes/security.php` for web dashboard routes and wires it into `routes/web.php` (`require __DIR__.'/security.php';`).
   - Web routes in `routes/security.php` render directly to views (`pages::security.*` / `resources/views/pages/security/*` for Livewire/Blade or Inertia controllers for React) so developers have full control to customize URL prefixes, middleware, layout wrappers, and custom pages.
   - Added `security-routes`, `security-routes-web`, and `security-routes-api` publication tags to `php artisan vendor:publish`.
-  - Added `--without-routes` and `--without-api` flags to `php artisan security:install`.
+  - Added `--without-routes` and `--without-api` flags to `php artisan pasak:install`.
   - Smart route loading in `PasakServiceProvider`: prioritized host route files if customized and prevents route duplication with host `routes/web.php` and `routes/api.php`.
 
 ## [2.0.4] - 2026-10-05
@@ -137,7 +137,7 @@ All notable changes to `robyajo/pasak` will be documented in this file.
 
 ### Added
 
-- **Automated Host Setup in `security:install`**:
+- **Automated Host Setup in `pasak:install`**:
   - Automatically detects and injects the `HasSecurityRelations` trait and import into `app/Models/User.php`.
   - Automatically registers WAF middlewares (`BlockIpAddress` and `DetectSecurityThreats`) in `bootstrap/app.php` (Laravel 11 & 12) or `app/Http/Kernel.php` (Laravel 10).
   - Both injections are idempotent and preserve existing code formatting and PHPDoc tags.
@@ -148,7 +148,7 @@ All notable changes to `robyajo/pasak` will be documented in this file.
 ### Added
 
 - **Blade & TSX Starter Kit Tags**:
-  - Added `--with-blade`, `--with-tsx`, and `--with-all` flags to `php artisan security:install` alongside interactive stack selection.
+  - Added `--with-blade`, `--with-tsx`, and `--with-all` flags to `php artisan pasak:install` alongside interactive stack selection.
   - Added `starterkit-blade`, `starterkit-tsx`, `starterkit-all`, `security-dashboard-blade`, `security-dashboard-tsx`, and `security-dashboard-all` publication tags.
   - Enforced authentication and login requirement across all `/security` monitoring routes.
 
@@ -235,7 +235,7 @@ All notable changes to `robyajo/pasak` will be documented in this file.
   `Internal\Pasak\Http\Controllers\Dashboard\*` controllers, so no
   separate API token is required. Enable with `SECURITY_DASHBOARD_DRIVER=react`.
 - `--with-dashboard` and `--with-react-dashboard` options on
-  `php artisan security:install`.
+  `php artisan pasak:install`.
 - `documents/generate.php`: regenerates the `documents/index.html` portal
   (Tailwind CSS Play CDN + marked.js + Mermaid.js) from the markdown chapters.
 
@@ -331,9 +331,9 @@ All notable changes to `robyajo/pasak` will be documented in this file.
 ### Added
 
 - Publishable default 403 page `resources/views/errors/blocked.blade.php`
-  (`vendor:publish --tag=security-views`), including a self-contained appeal
+  (`vendor:publish --tag=pasak-views`), including a self-contained appeal
   form wired to the public unblock-ticket endpoint. Integrated into
-  `security:install` with a new `--without-views` option.
+  `pasak:install` with a new `--without-views` option.
 - Laravel Pint configuration (`pint.json`), `composer format` / `composer lint`
   scripts, and a dedicated "Code Style" CI job.
 

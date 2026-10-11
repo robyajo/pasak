@@ -50,12 +50,12 @@ composer require robyajo/pasak:@dev
 
 ---
 
-## 3. Publikasi Aset Otomatis (`security:install`)
+## 3. Publikasi Aset Otomatis (`pasak:install`)
 
 Paket menyediakan perintah Artisan interaktif satu langkah untuk mempublikasikan seluruh berkas konfigurasi, migrasi, template Nginx, serta menerapkan aturan **Hardening Apache `.htaccess`**:
 
 ```bash
-php artisan security:install
+php artisan pasak:install
 ```
 
 Perintah ini akan secara otomatis:
@@ -109,7 +109,7 @@ Jika Anda ingin mempublikasikan aset secara bertahap atau terpisah:
 ### 1. Publikasikan Konfigurasi Saja
 
 ```bash
-php artisan vendor:publish --tag=security-config
+php artisan vendor:publish --tag=pasak-config
 ```
 
 Berkas akan ditempatkan di: `config/security.php`.
@@ -117,7 +117,7 @@ Berkas akan ditempatkan di: `config/security.php`.
 ### 2. Publikasikan Migrasi Saja
 
 ```bash
-php artisan vendor:publish --tag=security-migrations
+php artisan vendor:publish --tag=pasak-migrations
 ```
 
 Berkas migrasi akan disalin ke folder `database/migrations/`.
@@ -126,11 +126,11 @@ Berkas migrasi akan disalin ke folder `database/migrations/`.
 
 ```bash
 # Publikasikan rute web dan API sekaligus:
-php artisan vendor:publish --tag=security-routes
+php artisan vendor:publish --tag=pasak-routes
 
 # Atau publikasikan terpisah:
-php artisan vendor:publish --tag=security-routes-web
-php artisan vendor:publish --tag=security-routes-api
+php artisan vendor:publish --tag=pasak-routes-web
+php artisan vendor:publish --tag=pasak-routes-api
 ```
 
 Berkas akan ditempatkan di:
@@ -140,7 +140,7 @@ Berkas akan ditempatkan di:
 ### 4. Publikasikan Template Nginx WAF Hardened Saja
 
 ```bash
-php artisan vendor:publish --tag=security-nginx
+php artisan vendor:publish --tag=pasak-nginx
 ```
 
 Berkas akan ditempatkan di root proyek: `nginx.conf`.
@@ -148,7 +148,7 @@ Berkas akan ditempatkan di root proyek: `nginx.conf`.
 ### 4. Publikasikan Template Apache `.htaccess` Hardened Saja
 
 ```bash
-php artisan vendor:publish --tag=security-htaccess --force
+php artisan vendor:publish --tag=pasak-htaccess --force
 ```
 
 Berkas akan ditempatkan di: `public/.htaccess`.
@@ -156,7 +156,7 @@ Berkas akan ditempatkan di: `public/.htaccess`.
 ### 5. Publikasikan Seluruh Aset Sekaligus
 
 ```bash
-php artisan vendor:publish --tag=security-all --force
+php artisan vendor:publish --tag=pasak-all --force
 ```
 
 ### 6. Publikasikan Dashboard Monitoring Starter Kit

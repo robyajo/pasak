@@ -13,7 +13,7 @@ sidebar:
 
 Jika `SECURITY_SCHEDULE_ENABLED=true` (default), tugas berikut otomatis aktif:
 
-### A. Pembersihan Log Kedaluwarsa Harian (`security:prune-logs`)
+### A. Pembersihan Log Kedaluwarsa Harian (`pasak:prune-logs`)
 - **Jadwal**: Harian pada jam yang ditentukan oleh `SECURITY_PRUNE_SCHEDULE` (default: **02:30 pagi**).
 - **Aksi**: Menghapus entri `security_logs` yang lebih tua dari `SECURITY_LOG_RETENTION_DAYS` (default: 90 hari) agar ukuran database tidak membengkak seiring waktu.
 
@@ -27,7 +27,7 @@ Jika `SECURITY_SCHEDULE_ENABLED=true` (default), tugas berikut otomatis aktif:
 - **Aktivasi**: Aktif jika `SECURITY_ACCESS_LOG_AUTO_SCAN=true`.
 - **Aksi**: Menjalankan:
   ```bash
-  php artisan security:scan-logs --import --min-level=high --since="24 hours ago"
+  php artisan pasak:scan-logs --import --min-level=high --since="24 hours ago"
   ```
   Menyerap seluruh temuan ancaman dari log web server ke basis data audit keamanan.
 

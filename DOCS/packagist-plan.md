@@ -229,14 +229,14 @@ cd test-security-app
 composer require robyajo/pasak
 
 # 3. Jalankan instalasi aset
-php artisan security:install
+php artisan pasak:install
 
 # 4. Jalankan migrasi
 php artisan migrate
 
 # 5. Uji perintah Artisan
-php artisan security:baseline
-php artisan security:scan-logs --dry-run
+php artisan pasak:baseline
+php artisan pasak:scan-logs --dry-run
 ```
 
 ---

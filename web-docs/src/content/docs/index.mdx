@@ -91,7 +91,7 @@ tanpa dependensi NPM/Node, dan tanpa memaksakan satu jenis frontend.
 2. Publikasikan konfigurasi, migrasi, dashboard, dan template web server sekaligus.
 
     ```bash
-    php artisan security:install
+    php artisan pasak:install
     ```
 
 3. Jalankan migrasi database.
@@ -102,7 +102,7 @@ tanpa dependensi NPM/Node, dan tanpa memaksakan satu jenis frontend.
 
 </Steps>
 
-Perintah `security:install` secara otomatis menyuntikkan trait `HasSecurityRelations` pada model `User`
+Perintah `pasak:install` secara otomatis menyuntikkan trait `HasSecurityRelations` pada model `User`
 dan mendaftarkan middleware WAF ke bootstrap aplikasi host Anda (`bootstrap/app.php` atau `Kernel.php`).
 Detail lengkapnya ada di [Panduan Instalasi](getting-started/installation/).
 

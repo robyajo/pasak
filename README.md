@@ -70,12 +70,12 @@ composer require robyajo/pasak:^1.1
 > sekali. Flag `@dev` hanya diperlukan saat mengembangkan paket ini lewat
 > _path repository_ lokal.
 
-### 2. Publikasikan Aset Otomatis (`security:install`)
+### 2. Publikasikan Aset Otomatis (`pasak:install`)
 
 Gunakan perintah satu langkah untuk mempublikasikan dan menerapkan seluruh aset keamanan secara otomatis:
 
 ```bash
-php artisan security:install
+php artisan pasak:install
 ```
 
 #### Aset yang Didapat Pengguna Setelah Menjalankan Perintah Ini:
@@ -89,7 +89,7 @@ php artisan security:install
 6. ⚙️ **Penyematan Variabel ke `.env` & `.env.example`**: Installer secara otomatis menambahkan blok konfigurasi lengkap disertai **penjelasan fungsi berbahasa Indonesia** untuk setiap variabel (`SECURITY_*`) langsung ke berkas `.env` dan `.env.example` aplikasi Anda.
 7. 📊 **(Opsional) Dashboard monitoring Starter Kit**: Tampilan monitoring Livewire (`resources/views/pages/security/`) atau React (`resources/js/pages/security/`), wajib login. Dipublikasikan bila Anda menambahkan opsi `--with-dashboard` atau `--with-react-dashboard`.
 
-#### Opsi Perintah `security:install`:
+#### Opsi Perintah `pasak:install`:
 
 | Opsi                     | Keterangan                                                                                         |
 | :----------------------- | :------------------------------------------------------------------------------------------------- |
@@ -106,19 +106,19 @@ php artisan security:install
 
 ```bash
 # 1. Konfigurasi saja
-php artisan vendor:publish --tag=security-config
+php artisan vendor:publish --tag=pasak-config
 
 # 2. Migrasi database saja
-php artisan vendor:publish --tag=security-migrations
+php artisan vendor:publish --tag=pasak-migrations
 
 # 3. Konfigurasi server Nginx saja
-php artisan vendor:publish --tag=security-nginx
+php artisan vendor:publish --tag=pasak-nginx
 
 # 4. Aturan hardening Apache .htaccess saja
-php artisan vendor:publish --tag=security-htaccess --force
+php artisan vendor:publish --tag=pasak-htaccess --force
 
 # 5. Halaman blokir default saja
-php artisan vendor:publish --tag=security-views --force
+php artisan vendor:publish --tag=pasak-views --force
 
 # 6. Dashboard monitoring Blade (Livewire Starter Kit)
 php artisan vendor:publish --tag=starterkit-blade --force
@@ -130,7 +130,7 @@ php artisan vendor:publish --tag=starterkit-tsx --force
 php artisan vendor:publish --tag=starterkit-all --force
 
 # 9. Seluruh aset sekaligus
-php artisan vendor:publish --tag=security-all --force
+php artisan vendor:publish --tag=pasak-all --force
 ```
 
 Jalankan migrasi database:
@@ -143,10 +143,10 @@ php artisan migrate
 
 Paket ini menyediakan panel monitoring siap pakai untuk **starter kit resmi Laravel (Blade & React/TSX)** yang dapat dipublikasikan langsung ke dalam aplikasi host di prefix **`/security`**.
 
-Tersedia opsi instalasi fleksibel lewat `php artisan security:install`:
-- **Blade / Livewire**: `php artisan security:install --with-blade` (atau `--tag=starterkit-blade`)
-- **React / TSX**: `php artisan security:install --with-tsx` (atau `--tag=starterkit-tsx`)
-- **Keduanya**: `php artisan security:install --with-both` (atau `--tag=starterkit-all`)
+Tersedia opsi instalasi fleksibel lewat `php artisan pasak:install`:
+- **Blade / Livewire**: `php artisan pasak:install --with-blade` (atau `--tag=starterkit-blade`)
+- **React / TSX**: `php artisan pasak:install --with-tsx` (atau `--tag=starterkit-tsx`)
+- **Keduanya**: `php artisan pasak:install --with-both` (atau `--tag=starterkit-all`)
 
 #### a. Blade Starter Kit (Livewire + Flux UI)
 
@@ -392,72 +392,72 @@ $request->validate([
 
 Paket ini menyertakan perintah Artisan lengkap untuk otomasi di server produksi:
 
-### 1. Pemindaian Log Akses Web Server (`security:scan-logs`)
+### 1. Pemindaian Log Akses Web Server (`pasak:scan-logs`)
 
 Memindai berkas log Apache atau Nginx, mendeteksi pola serangan, dan memblokir IP penyerang secara otomatis:
 
 ```bash
 # Pratinjau temuan tanpa memodifikasi database (dry-run)
-php artisan security:scan-logs --file=/var/log/nginx/access.log --dry-run
+php artisan pasak:scan-logs --file=/var/log/nginx/access.log --dry-run
 
 # Pindai, impor ke log keamanan, dan blokir IP penyerang zero-tolerance
-php artisan security:scan-logs --file=/var/log/nginx/access.log --import --block
+php artisan pasak:scan-logs --file=/var/log/nginx/access.log --import --block
 ```
 
-### 2. Manajemen Baseline Integritas Berkas (`security:baseline`)
+### 2. Manajemen Baseline Integritas Berkas (`pasak:baseline`)
 
 ```bash
 # Menampilkan status verifikasi integritas berkas
-php artisan security:baseline
+php artisan pasak:baseline
 
 # Membuat baseline baru
-php artisan security:baseline --create
+php artisan pasak:baseline --create
 
 # Menghapus baseline
-php artisan security:baseline --destroy
+php artisan pasak:baseline --destroy
 ```
 
-### 3. Membuka Blokir IP (`security:unblock-ip`)
+### 3. Membuka Blokir IP (`pasak:unblock-ip`)
 
 ```bash
-php artisan security:unblock-ip 198.51.100.50
+php artisan pasak:unblock-ip 198.51.100.50
 ```
 
-### 4. Pembersihan Log Kedaluwarsa (`security:prune-logs`)
+### 4. Pembersihan Log Kedaluwarsa (`pasak:prune-logs`)
 
 ```bash
 # Menghapus log lebih tua dari durasi retensi terkonfigurasi (default: 90 hari)
-php artisan security:prune-logs
+php artisan pasak:prune-logs
 
 # Menghapus log lebih tua dari 30 hari
-php artisan security:prune-logs --days=30
+php artisan pasak:prune-logs --days=30
 ```
 
-### 5. Pembersihan Data Residu Pentest (`security:purge-injected-data`)
+### 5. Pembersihan Data Residu Pentest (`pasak:purge-injected-data`)
 
 Mendeteksi dan menghapus payload injeksi sisa pengujian keamanan (seperti `{{7*7}}`, `.htaccess`, path traversal) dari tabel aplikasi:
 
 ```bash
 # Mode simulasi (hanya mendeteksi data tercemar)
-php artisan security:purge-injected-data
+php artisan pasak:purge-injected-data
 
 # Hapus data yang terindikasi
-php artisan security:purge-injected-data --force
+php artisan pasak:purge-injected-data --force
 ```
 
-### 6. Pembaruan Otomatis & Sinkronisasi Komponen (`security:upgrade`)
+### 6. Pembaruan Otomatis & Sinkronisasi Komponen (`pasak:upgrade`)
 
 Periksa rilis terbaru dan perbarui package sekaligus sinkronkan migrasi database, rute kustom, dan tampilan dashboard monitoring:
 
 ```bash
 # Periksa apakah ada versi baru yang tersedia
-php artisan security:upgrade --check
+php artisan pasak:upgrade --check
 
 # Jalankan proses upgrade dan sinkronisasi otomatis
-php artisan security:upgrade
+php artisan pasak:upgrade
 
 # Sinkronkan aset lokal tanpa composer update
-php artisan security:upgrade --no-composer --force
+php artisan pasak:upgrade --no-composer --force
 ```
 
 > **Notifikasi Otomatis**: Saat menjalankan `php artisan serve` atau `composer run dev`, sistem akan secara otomatis memeriksa versi terbaru dari Packagist/GitHub secara non-blocking dan menampilkan notifikasi di terminal konsol bila versi baru telah dirilis.
@@ -470,7 +470,7 @@ Paket ini menyertakan template konfigurasi hardened siap pakai untuk web server 
 
 ### 1. Nginx Hardened WAF (`nginx.conf`)
 
-Diterbitkan via `php artisan vendor:publish --tag=security-nginx`:
+Diterbitkan via `php artisan vendor:publish --tag=pasak-nginx`:
 
 1. **Dua Zona Rate Limiting Terpisah**:
     - `auth_limit`: 5 request/menit (burst 5) untuk endpoint sensitif (`/login`, `/register`, `/forgot-password`, `/reset-password`, dll.).
@@ -488,7 +488,7 @@ Diterbitkan via `php artisan vendor:publish --tag=security-nginx`:
 
 ### 2. Apache & LiteSpeed Hardened (`public/.htaccess`)
 
-Diterapkan otomatis via `php artisan security:install` atau `php artisan vendor:publish --tag=security-htaccess`:
+Diterapkan otomatis via `php artisan pasak:install` atau `php artisan vendor:publish --tag=pasak-htaccess`:
 
 1. **Front Controller & Authorization Header**: Routing Laravel standar, pemeliharaan header `Authorization` dan `X-XSRF-Token`.
 2. **Blokir Akses ke Dotfile (`<FilesMatch "^\.">`)**:

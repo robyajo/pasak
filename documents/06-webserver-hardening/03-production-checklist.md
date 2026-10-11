@@ -22,7 +22,7 @@ Gunakan daftar periksa (*checklist*) ini sebelum meluncurkan aplikasi ke lingkun
 - [ ] **Buat Baseline SHA-256 Pertama Kali**:
   Segera setelah deployment rilis selesai dijalankan:
   ```bash
-  php artisan security:baseline --force
+  php artisan pasak:baseline --force
   ```
   Ini mengunci hash berkas inti resmi (`app/`, `config/`, `routes/`, `public/index.php`, `bootstrap/app.php`).
 
@@ -52,7 +52,7 @@ chmod -R 775 /var/www/aplikasi-anda/bootstrap/cache
   ```bash
   * * * * * cd /var/www/aplikasi-anda && php artisan schedule:run >> /dev/null 2>&1
   ```
-- [ ] Pastikan cron pembersih log usang harian aktif (`security:prune-logs` pada jam 02:30).
+- [ ] Pastikan cron pembersih log usang harian aktif (`pasak:prune-logs` pada jam 02:30).
 
 ---
 
@@ -80,10 +80,10 @@ Jika karena suatu insiden tak terduga, IP kantor pusat atau IP pimpinan terbloki
 1. Hubungkan ke server melalui SSH.
 2. Jalankan perintah unblock instan:
    ```bash
-   php artisan security:unblock-ip 103.11.22.33
+   php artisan pasak:unblock-ip 103.11.22.33
    ```
    Atau jika darurat skala luas:
    ```bash
-   php artisan security:unblock-ip --all
+   php artisan pasak:unblock-ip --all
    ```
 3. Tambahkan IP tersebut ke variabel `SECURITY_WHITELIST` di berkas `.env` agar tidak terulang kembali.

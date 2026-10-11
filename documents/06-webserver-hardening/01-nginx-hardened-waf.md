@@ -2,7 +2,7 @@
 
 Keamanan sebuah aplikasi web harus menerapkan prinsip **Pertahanan Berlapis (Defense in Depth)**. WAF di tingkat aplikasi PHP sangat kuat dalam memahami logika bisnis, namun penyerang dapat menghabiskan sumber daya CPU server sebelum request sempat diproses oleh PHP.
 
-Paket ini menyertakan template konfigurasi Nginx siap pakai (`stubs/nginx.conf.stub` atau dipublikasikan melalui `php artisan security:install`), yang dirancang khusus untuk memblokir serangan di lapisan web server Nginx tercepat.
+Paket ini menyertakan template konfigurasi Nginx siap pakai (`stubs/nginx.conf.stub` atau dipublikasikan melalui `php artisan pasak:install`), yang dirancang khusus untuk memblokir serangan di lapisan web server Nginx tercepat.
 
 ---
 
@@ -223,8 +223,8 @@ add_header Permissions-Policy "camera=(), microphone=(), geolocation=()" always;
 Template siap pakai di atas telah dikemas secara terintegrasi di dalam [`stubs/nginx.conf.stub`](file:///Users/robykartis/Documents/KOMINFO/GITHUB/PHP/laravel-security/pasak/stubs/nginx.conf.stub) dan dapat dipublikasikan ke aplikasi Laravel Anda melalui:
 
 ```bash
-php artisan security:install
+php artisan pasak:install
 # atau secara spesifik:
-php artisan vendor:publish --tag=security-nginx --force
+php artisan vendor:publish --tag=pasak-nginx --force
 ```
 File hasil publish akan berada di `nginx.conf` di root direktori aplikasi host Anda, siap disalin ke `/etc/nginx/sites-available/`.

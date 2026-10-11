@@ -46,7 +46,7 @@ graph TD
     Discovery --> Hook2[3. Core Auth Events: Event::listen<br/>Failed & Login Events Otomatis Diawasi]
     Discovery --> Hook3[4. Core HTTP Kernel: Middleware Aliases<br/>security.block, security.detect, security.admin]
     Discovery --> Hook4[5. Core Authorization: Gate<br/>Gate::define('manage-security-monitor')]
-    Discovery --> Hook5[6. Core Artisan CLI: Console Commands<br/>security:install, security:scan-logs, dll]
+    Discovery --> Hook5[6. Core Artisan CLI: Console Commands<br/>pasak:install, pasak:scan-logs, dll]
     Discovery --> Hook6[7. Core Scheduler: Schedule Runner<br/>Prune log harian & liveness heartbeat]
     Discovery --> Hook7[8. Core Validation: ValidationRule<br/>SafeImageFile, SafeAssetPath]
 ```
@@ -111,7 +111,7 @@ Paket mendefinisikan gate `'manage-security-monitor'` yang langsung terhubung ke
 
 Menyediakan 6 perintah CLI bawaan yang otomatis tersedia di `php artisan`:
 
-- `security:install`, `security:scan-logs`, `security:baseline`, `security:unblock-ip`, `security:prune-logs`, `security:purge-injected-data`.
+- `pasak:install`, `pasak:scan-logs`, `pasak:baseline`, `pasak:unblock-ip`, `pasak:prune-logs`, `pasak:purge-injected-data`.
 
 ### 7. Task Scheduler Otomatis
 

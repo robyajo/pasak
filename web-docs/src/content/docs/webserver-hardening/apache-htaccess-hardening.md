@@ -156,10 +156,10 @@ Options -Indexes
 
 ## 3. Cara Menerapkan ke Aplikasi Laravel Anda
 
-### Opsi 1: Otomatis via `security:install` (Direkomendasikan)
+### Opsi 1: Otomatis via `pasak:install` (Direkomendasikan)
 Saat Anda menjalankan:
 ```bash
-php artisan security:install
+php artisan pasak:install
 ```
 Perintah ini akan mendeteksi keberadaan berkas `public/.htaccess`:
 - Jika berkas sudah ada, installer akan membuat cadangan otomatis:
@@ -169,13 +169,13 @@ Perintah ini akan mendeteksi keberadaan berkas `public/.htaccess`:
   dan menyisipkan blok hardening ke berkas yang ada tanpa menghapus aturan rewrite kustom Anda.
 - Jika ingin menimpa total dengan berkas bersih bawaan paket:
   ```bash
-  php artisan security:install --force
+  php artisan pasak:install --force
   ```
 
 ### Opsi 2: Manual via Vendor Publish Tag
 Anda juga dapat mempublikasikannya langsung menggunakan tag Artisan Laravel:
 ```bash
-php artisan vendor:publish --tag=security-htaccess --force
+php artisan vendor:publish --tag=pasak-htaccess --force
 ```
 
 ---
@@ -216,9 +216,9 @@ Selain penguatan berbasis `.htaccess` di tingkat folder `public/`, paket menyedi
 
 ### Cara Mempublikasikan Berkas VirtualHost:
 ```bash
-php artisan vendor:publish --tag=security-apache
+php artisan vendor:publish --tag=pasak-apache
 ```
-*(Atau otomatis dipublikasikan bersamaan saat menjalankan `php artisan security:install`).*
+*(Atau otomatis dipublikasikan bersamaan saat menjalankan `php artisan pasak:install`).*
 
 ### Berkas Konfigurasi `apache2.conf`:
 ```apache
