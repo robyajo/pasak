@@ -1,6 +1,6 @@
 <?php
 
-namespace Internal\SecurityMonitor\Models;
+namespace Internal\Pasak\Models;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -23,7 +23,7 @@ class LoginAttempt extends Model
 {
     public function getTable()
     {
-        return config('security.table_names.login_attempts', parent::getTable());
+        return config('pasak.table_names.login_attempts', parent::getTable());
     }
 
     protected $fillable = [

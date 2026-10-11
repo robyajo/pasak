@@ -1,7 +1,7 @@
 <?php
 
-use Internal\SecurityMonitor\Models\BlockedIp;
-use Internal\SecurityMonitor\Models\SecurityLog;
+use Internal\Pasak\Models\BlockedIp;
+use Internal\Pasak\Models\SecurityLog;
 
 function attackFrom(string $ip = '198.51.100.7'): void
 {
@@ -9,11 +9,11 @@ function attackFrom(string $ip = '198.51.100.7'): void
 }
 
 beforeEach(function () {
-    config()->set('security.enabled', true);
-    config()->set('security.block_enforcement', true);
-    config()->set('security.auto_block.enabled', true);
-    config()->set('security.auto_block.threshold', 3);
-    config()->set('security.auto_block.window_minutes', 10);
+    config()->set('pasak.enabled', true);
+    config()->set('pasak.block_enforcement', true);
+    config()->set('pasak.auto_block.enabled', true);
+    config()->set('pasak.auto_block.threshold', 3);
+    config()->set('pasak.auto_block.window_minutes', 10);
 });
 
 test('ip that is blocked receives a 403 response', function () {
@@ -45,7 +45,7 @@ test('expired blocks do not reject requests', function () {
 });
 
 test('ip on whitelist is never blocked even after threshold is exceeded', function () {
-    config()->set('security.whitelist', ['198.51.100.7']);
+    config()->set('pasak.whitelist', ['198.51.100.7']);
     attackFrom();
 
     for ($i = 0; $i < 5; $i++) {
@@ -95,7 +95,7 @@ test('prune command removes logs older than the retention period', function () {
         'threat_level' => 'critical',
     ]);
 
-    $this->artisan('security:prune-logs', ['--days' => 30])->assertSuccessful();
+    $this->artisan('pasak:prune-logs', ['--days' => 30])->assertSuccessful();
 
     expect(SecurityLog::query()->count())->toBe(1)
         ->and(SecurityLog::query()->first()->ip_address)->toBe('198.51.100.22');

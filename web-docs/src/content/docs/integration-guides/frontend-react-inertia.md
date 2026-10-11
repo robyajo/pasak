@@ -1,11 +1,11 @@
 ---
 title: "Integrasi Frontend React / Inertia"
-description: "Karena robyajo/laravel-security-monitor dirancang secara Headless (Pure REST API), Anda dapat membangun antarmuka dashboard keamanan dan penanganan error..."
+description: "Karena robyajo/pasak dirancang secara Headless (Pure REST API), Anda dapat membangun antarmuka dashboard keamanan dan penanganan error..."
 sidebar:
   order: 1
 ---
 
-Karena **`robyajo/laravel-security-monitor`** dirancang secara **Headless (Pure REST API)**, Anda dapat membangun antarmuka dashboard keamanan dan penanganan error pemblokiran menggunakan React dan Inertia.js sesuai kebutuhan desain aplikasi Anda.
+Karena **`robyajo/pasak`** dirancang secara **Headless (Pure REST API)**, Anda dapat membangun antarmuka dashboard keamanan dan penanganan error pemblokiran menggunakan React dan Inertia.js sesuai kebutuhan desain aplikasi Anda.
 
 ---
 
@@ -244,7 +244,7 @@ npm run build
 
 Panel dapat diakses pada `/security`.
 
-> ℹ️ Halaman di-render **server-side** oleh controller Inertia bawaan paket (`Internal\SecurityMonitor\Http\Controllers\Dashboard\*`). Mutasi (blokir IP, hapus log, approve tiket) dikirim sebagai permintaan Inertia biasa, sehingga **tidak** memerlukan token API terpisah dan tidak bergantung pada REST API `/api/security/*`.
+> ℹ️ Halaman di-render **server-side** oleh controller Inertia bawaan paket (`Internal\Pasak\Http\Controllers\Dashboard\*`). Mutasi (blokir IP, hapus log, approve tiket) dikirim sebagai permintaan Inertia biasa, sehingga **tidak** memerlukan token API terpisah dan tidak bergantung pada REST API `/api/security/*`.
 
 > 🔒 **Wajib Login**: Rute dashboard memakai middleware `web` + `auth`, dan secara bawaan juga `security.admin` (Gate `manage-security-monitor`). Untuk mengizinkan semua pengguna yang sudah login (tanpa syarat admin), kosongkan `security.dashboard.admin_middleware` pada `config/security.php`.
 

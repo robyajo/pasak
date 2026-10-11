@@ -2,7 +2,7 @@
 
 # ==============================================================================
 # Git Automated Push & Optional Tagging Script
-# Repository: robyajo/laravel-security-monitor
+# Repository: robyajo/pasak
 #
 # Setiap kali dijalankan, skrip ini SELALU melakukan pengecekan versi:
 #   - Versi sekarang    : tag rilis semver terakhir (mis. v1.0.3)
@@ -27,7 +27,7 @@ NC='\033[0m' # No Color
 # Helper Functions
 print_header() {
     echo -e "${BLUE}======================================================================${NC}"
-    echo -e "${BOLD}${CYAN}  🛡️  Laravel Security Monitor — Git Push & Tagging Helper${NC}"
+    echo -e "${BOLD}${CYAN}  🛡️  Pasak — Git Push & Tagging Helper${NC}"
     echo -e "${BLUE}======================================================================${NC}"
 }
 
@@ -351,7 +351,7 @@ if [ -n "$TAG_NAME" ]; then
 
         echo ""
         print_info "🚀 Paket versi ${TAG_NAME} kini siap dideteksi secara otomatis oleh Packagist!"
-        echo -e "   Periksa katalog rilis di: ${BLUE}https://packagist.org/packages/robyajo/laravel-security-monitor${NC}"
+        echo -e "   Periksa katalog rilis di: ${BLUE}https://packagist.org/packages/robyajo/pasak${NC}"
     fi
 else
     print_info "Melewatkan pembuatan tag (tidak ada tag yang ditentukan)."

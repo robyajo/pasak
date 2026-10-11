@@ -1,9 +1,9 @@
 ---
-title: Laravel Security Monitor
-description: Dokumentasi resmi robyajo/laravel-security-monitor (Bulwark) — WAF mandiri, karantina perangkat, proteksi login bertingkat, pemindai webshell, dan REST API headless untuk Laravel 10–13. Keamanan Siber & Informasi Pemerintah Kota Pekanbaru (security-dev.pekanbaru.go.id).
+title: Pasak
+description: Dokumentasi resmi robyajo/pasak (Bulwark) — WAF mandiri, karantina perangkat, proteksi login bertingkat, pemindai webshell, dan REST API headless untuk Laravel 10–13. Keamanan Siber & Informasi Pemerintah Kota Pekanbaru (security-dev.pekanbaru.go.id).
 template: splash
 hero:
-    title: Laravel Security Monitor
+    title: Pasak
     tagline: WAF mandiri, karantina perangkat, proteksi login bertingkat, dan pemindai integritas server — 100% murni PHP untuk Laravel 10 sampai 13 di lingkungan Pemerintah Kota Pekanbaru.
     image:
         alt: Logo Bulwark
@@ -26,7 +26,7 @@ import {
 } from "@astrojs/starlight/components";
 import pkg from "../../data/package.json";
 
-Paket **`robyajo/laravel-security-monitor`** (Bulwark) adalah Web Application Firewall
+Paket **`robyajo/pasak`** (Bulwark) adalah Web Application Firewall
 (WAF) mandiri untuk Laravel yang mengikuti standar paket Spatie: **100% murni PHP**,
 tanpa dependensi NPM/Node, dan tanpa memaksakan satu jenis frontend.
 
@@ -85,7 +85,7 @@ tanpa dependensi NPM/Node, dan tanpa memaksakan satu jenis frontend.
 1. Pasang paket melalui Composer.
 
     ```bash
-    composer require robyajo/laravel-security-monitor
+    composer require robyajo/pasak
     ```
 
 2. Publikasikan konfigurasi, migrasi, dashboard, dan template web server sekaligus.
@@ -113,7 +113,7 @@ flowchart TD
     Client(["HTTP Request"]) --> Nginx["Nginx / Apache Hardened WAF"]
     Nginx -->|Lolos| PHP["Laravel Front Controller"]
 
-    subgraph LSM ["Laravel Security Monitor"]
+    subgraph LSM ["Pasak"]
         PHP --> BlockMW["Middleware: BlockIpAddress"]
         BlockMW -->|IP / Device Terblokir| Ret403["HTTP 403: Akses Ditolak"]
         BlockMW -->|Lolos| ThreatMW["Middleware: DetectSecurityThreats"]

@@ -1,6 +1,6 @@
 # 03. Konfigurasi Lengkap & Environment Variable
 
-Seluruh perilaku **`robyajo/laravel-security-monitor`** dikontrol melalui berkas konfigurasi `config/security.php`. Konfigurasi ini dirancang agar dapat disesuaikan tanpa perlu mengubah kode sumber paket, cukup melalui berkas `.env`.
+Seluruh perilaku **`robyajo/pasak`** dikontrol melalui berkas konfigurasi `config/security.php`. Konfigurasi ini dirancang agar dapat disesuaikan tanpa perlu mengubah kode sumber paket, cukup melalui berkas `.env`.
 
 ---
 

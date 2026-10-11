@@ -58,7 +58,7 @@ curl -X POST "https://domain-anda.com/api/security/trusted-ips/save-my-ip" \
 Setelah IP terdaftar di tabel `trusted_ips`:
 1. Aplikasi host dapat memeriksa keterpercayaan IP melalui relasi Eloquent atau service:
    ```php
-   use Internal\SecurityMonitor\Services\UserLoginService;
+   use Internal\Pasak\Services\UserLoginService;
 
    $isTrusted = app(UserLoginService::class)->isIpTrusted(
        ip: $request->ip(),

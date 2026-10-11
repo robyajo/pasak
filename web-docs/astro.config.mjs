@@ -27,25 +27,25 @@ export default defineConfig({
 
   integrations: [
     starlight({
-      title: "Laravel Security Monitor",
+      title: "Pasak",
       defaultLocale: "root",
       locales: {
         root: { label: "Bahasa Indonesia", lang: "id" },
       },
       description:
-        "Dokumentasi resmi robyajo/laravel-security-monitor (Bulwark) — WAF mandiri, karantina perangkat, proteksi login bertingkat, dashboard monitoring Pure Vanilla CSS, pemindai webshell, dan REST API headless untuk Laravel 10–13. Keamanan Siber & Informasi Pemerintah Kota Pekanbaru (security-dev.pekanbaru.go.id).",
-      logo: { src: "./src/assets/logo.svg", alt: "Laravel Security Monitor" },
+        "Dokumentasi resmi robyajo/pasak (Bulwark) — WAF mandiri, karantina perangkat, proteksi login bertingkat, dashboard monitoring Pure Vanilla CSS, pemindai webshell, dan REST API headless untuk Laravel 10–13. Keamanan Siber & Informasi Pemerintah Kota Pekanbaru (security-dev.pekanbaru.go.id).",
+      logo: { src: "./src/assets/logo.svg", alt: "Pasak" },
       favicon: "/favicon.svg",
       social: [
         {
           icon: "github",
           label: "GitHub",
-          href: "https://github.com/robyajo/laravel-security-monitor",
+          href: "https://github.com/robyajo/pasak",
         },
         {
           icon: "link",
           label: "Packagist",
-          href: "https://packagist.org/packages/robyajo/laravel-security-monitor",
+          href: "https://packagist.org/packages/robyajo/pasak",
         },
       ],
       lastUpdated: true,
@@ -94,7 +94,7 @@ export default defineConfig({
         { label: "Changelog", slug: "changelog" },
         {
           label: "Packagist",
-          link: "https://packagist.org/packages/robyajo/laravel-security-monitor",
+          link: "https://packagist.org/packages/robyajo/pasak",
           attrs: { target: "_blank", rel: "noopener" },
         },
       ],

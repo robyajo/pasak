@@ -1,5 +1,5 @@
 name: Bug report
-description: Report a reproducible bug in Laravel Security Monitor.
+description: Report a reproducible bug in Pasak.
 title: "[Bug]: "
 labels: ["bug"]
 body:

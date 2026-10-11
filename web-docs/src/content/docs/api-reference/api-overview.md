@@ -1,11 +1,11 @@
 ---
 title: "Konvensi & Spesifikasi Headless REST API"
-description: "Seluruh fungsionalitas manajemen paket robyajo/laravel-security-monitor diekspos melalui antarmuka REST API JSON standar tanpa keterikatan antarmuka..."
+description: "Seluruh fungsionalitas manajemen paket robyajo/pasak diekspos melalui antarmuka REST API JSON standar tanpa keterikatan antarmuka..."
 sidebar:
   order: 1
 ---
 
-Seluruh fungsionalitas manajemen paket **`robyajo/laravel-security-monitor`** diekspos melalui antarmuka REST API JSON standar tanpa keterikatan antarmuka pengguna (headless). Hal ini memungkinkan paket diintegrasikan ke dashboard apa pun: React, Vue, Livewire, Filament, Inertia, Blade kustom, ataupun aplikasi seluler.
+Seluruh fungsionalitas manajemen paket **`robyajo/pasak`** diekspos melalui antarmuka REST API JSON standar tanpa keterikatan antarmuka pengguna (headless). Hal ini memungkinkan paket diintegrasikan ke dashboard apa pun: React, Vue, Livewire, Filament, Inertia, Blade kustom, ataupun aplikasi seluler.
 
 ---
 

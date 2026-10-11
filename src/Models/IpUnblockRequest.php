@@ -1,6 +1,6 @@
 <?php
 
-namespace Internal\SecurityMonitor\Models;
+namespace Internal\Pasak\Models;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -31,7 +31,7 @@ class IpUnblockRequest extends Model
     public function getTable()
     {
         return config(
-            'security.table_names.ip_unblock_requests',
+            'pasak.table_names.ip_unblock_requests',
             parent::getTable(),
         );
     }
@@ -63,7 +63,7 @@ class IpUnblockRequest extends Model
     public function resolver(): BelongsTo
     {
         return $this->belongsTo(
-            config('security.user_model', 'App\\Models\\User'),
+            config('pasak.user_model', 'App\\Models\\User'),
             'resolved_by',
         );
     }

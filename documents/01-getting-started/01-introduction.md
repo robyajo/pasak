@@ -9,7 +9,7 @@ Dalam pengembangan aplikasi berbasis Laravel modern di lingkungan enterprise dan
 3. **Penyalahgunaan IP Bersama (Shared NAT/Router)**: Ketika seorang penyerang berada di jaringan Wi-Fi publik, kantor, atau kampus yang sama dengan ratusan pengguna sah, pemblokiran berbasis IP publik akan menyebabkan _collateral damage_—seluruh kantor kehilangan akses ke aplikasi.
 4. **Credential Stuffing & DoS Regex (ReDoS)**: Serangan brute-force menggunakan botnet terdistribusi serta pengiriman string panjang berpola untuk memicu kegagalan komputasi CPU akibat regex backtracking berulang (_Catastrophic Backtracking_).
 
-**`robyajo/laravel-security-monitor`** (Bulwark) dibangun dari pengalaman lapangan menangani insiden nyata tersebut, dikemas menjadi paket mandiri, modular, dan berperforma tinggi.
+**`robyajo/pasak`** (Bulwark) dibangun dari pengalaman lapangan menangani insiden nyata tersebut, dikemas menjadi paket mandiri, modular, dan berperforma tinggi.
 
 ---
 
@@ -19,7 +19,7 @@ Berbeda dengan paket aplikasi yang mengikat pengguna ke antarmuka atau bundler J
 
 > 🌟 **Nol Dependensi NPM / Node.js**: Paket ini adalah **100% Murni PHP untuk Laravel**. Anda **TIDAK PERNAH** memerlukan `npm install`, `node`, `vite build`, atau bundler frontend apa pun untuk menjalankan paket ini.
 
-Setelah paket dipasang melalui `composer require robyajo/laravel-security-monitor`, pengembang **bebas menerapkannya di mana saja** di seluruh ekosistem Laravel:
+Setelah paket dipasang melalui `composer require robyajo/pasak`, pengembang **bebas menerapkannya di mana saja** di seluruh ekosistem Laravel:
 
 - ✅ **Aplikasi Laravel Blade Murni**: Bekerja langsung dengan view HTML standar dan sesi cookie.
 - ✅ **Aplikasi API Backend Murni (Headless)**: Menyuplai REST API JSON untuk aplikasi mobile (Flutter/React Native) atau SPA frontend terpisah.
@@ -35,7 +35,7 @@ Sama seperti paket Spatie terpopuler, paket ini menyatu secara elegan ke dalam t
 
 ```mermaid
 graph TD
-    Composer[composer require robyajo/laravel-security-monitor] --> Discovery[1. Laravel Package Auto-Discovery<br/>SecurityMonitorServiceProvider + Facade]
+    Composer[composer require robyajo/pasak] --> Discovery[1. Laravel Package Auto-Discovery<br/>PasakServiceProvider + Facade]
 
     Discovery --> Hook1[2. Core Eloquent: HasSecurityRelations Trait<br/>User::logins(), User::trustedIps()]
     Discovery --> Hook2[3. Core Auth Events: Event::listen<br/>Failed & Login Events Otomatis Diawasi]
@@ -54,10 +54,10 @@ Di dalam `composer.json`, paket mendeklarasikan ServiceProvider dan Facade bawaa
 "extra": {
     "laravel": {
         "providers": [
-            "Internal\\SecurityMonitor\\SecurityMonitorServiceProvider"
+            "Internal\\Pasak\\PasakServiceProvider"
         ],
         "aliases": {
-            "SecurityMonitor": "Internal\\SecurityMonitor\\Facades\\SecurityMonitor"
+            "Pasak": "Internal\\Pasak\\Facades\\Pasak"
         }
     }
 }
@@ -70,7 +70,7 @@ Laravel otomatis memuat provider ini saat proses booting. Pengembang tidak perlu
 Sama seperti menambahkan `use HasRoles;` pada paket Spatie Permission, pengembang cukup menambahkan satu baris ke model `User` miliknya:
 
 ```php
-use Internal\SecurityMonitor\Concerns\HasSecurityRelations;
+use Internal\Pasak\Concerns\HasSecurityRelations;
 
 class User extends Authenticatable
 {
@@ -82,7 +82,7 @@ Ini langsung membuka relasi `$user->logins()`, `$user->trustedIps()`, `$user->se
 
 ### 3. Mengaitkan Event Otentikasi Bawaan Laravel
 
-Tanpa perlu memodifikasi controller login aplikasi Anda, `SecurityMonitorServiceProvider` secara otomatis mendaftarkan listener ke event inti Laravel:
+Tanpa perlu memodifikasi controller login aplikasi Anda, `PasakServiceProvider` secara otomatis mendaftarkan listener ke event inti Laravel:
 
 - `\Illuminate\Auth\Events\Failed` ➔ Otomatis mencatat kegagalan dan menghitung stepped lockout.
 - `\Illuminate\Auth\Events\Login` ➔ Otomatis mereset hitungan lockout dan merekam sesi login aktif.

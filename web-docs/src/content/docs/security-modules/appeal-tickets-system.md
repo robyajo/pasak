@@ -67,6 +67,6 @@ Administrator dapat mengelola tiket melalui panel admin atau API REST:
    **Otomasi Sistem**:
    - Status tiket berubah menjadi `approved`.
    - Kolom `resolved_by` diisi ID administrator dan `resolved_at` dicatat.
-   - Sistem **secara otomatis memanggil `SecurityMonitorService::unblockIp()`** untuk mencabut blokir pada IP/perangkat yang bersangkutan tanpa perlu tindakan manual tambahan.
+   - Sistem **secara otomatis memanggil `PasakService::unblockIp()`** untuk mencabut blokir pada IP/perangkat yang bersangkutan tanpa perlu tindakan manual tambahan.
 3. **Menolak Permohonan (Reject)**:
    Body dengan `"action": "reject"` dan catatan penolakan. Blokir tetap aktif.

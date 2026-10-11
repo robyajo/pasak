@@ -1,6 +1,6 @@
 <?php
 
-namespace Internal\SecurityMonitor\Models;
+namespace Internal\Pasak\Models;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -32,7 +32,10 @@ class SecurityLog extends Model
 {
     public function getTable()
     {
-        return config('security.table_names.security_logs', parent::getTable());
+        return config(
+            'pasak.table_names.pasak_logs',
+            config('pasak.table_names.security_logs', 'pasak_logs')
+        );
     }
 
     public const LEVELS = ['low', 'medium', 'high', 'critical'];
@@ -87,7 +90,7 @@ class SecurityLog extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(
-            config('security.user_model', 'App\\Models\\User'),
+            config('pasak.user_model', 'App\\Models\\User'),
         );
     }
 

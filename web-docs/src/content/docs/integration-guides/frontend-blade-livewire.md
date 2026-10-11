@@ -1,11 +1,11 @@
 ---
 title: "Integrasi Frontend Blade & Livewire"
-description: "Jika aplikasi host Anda menggunakan template berbasis Blade atau Livewire, integrasi dengan robyajo/laravel-security-monitor sangat cepat dan intuitif."
+description: "Jika aplikasi host Anda menggunakan template berbasis Blade atau Livewire, integrasi dengan robyajo/pasak sangat cepat dan intuitif."
 sidebar:
   order: 2
 ---
 
-Jika aplikasi host Anda menggunakan template berbasis Blade atau Livewire, integrasi dengan **`robyajo/laravel-security-monitor`** sangat cepat dan intuitif.
+Jika aplikasi host Anda menggunakan template berbasis Blade atau Livewire, integrasi dengan **`robyajo/pasak`** sangat cepat dan intuitif.
 
 ---
 

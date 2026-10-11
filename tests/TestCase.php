@@ -1,21 +1,21 @@
 <?php
 
-namespace Internal\SecurityMonitor\Tests;
+namespace Internal\Pasak\Tests;
 
 use Illuminate\Contracts\Http\Kernel as KernelContract;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
 use Illuminate\Support\Facades\Schema;
-use Internal\SecurityMonitor\Http\Middleware\BlockIpAddress;
-use Internal\SecurityMonitor\Http\Middleware\DetectSecurityThreats;
-use Internal\SecurityMonitor\SecurityMonitorServiceProvider;
+use Internal\Pasak\Http\Middleware\BlockIpAddress;
+use Internal\Pasak\Http\Middleware\DetectSecurityThreats;
+use Internal\Pasak\PasakServiceProvider;
 use Orchestra\Testbench\TestCase as OrchestraTestCase;
 
 abstract class TestCase extends OrchestraTestCase
 {
     protected function getPackageProviders($app): array
     {
-        return [SecurityMonitorServiceProvider::class];
+        return [PasakServiceProvider::class];
     }
 
     protected function defineEnvironment($app): void
@@ -28,10 +28,10 @@ abstract class TestCase extends OrchestraTestCase
         ]);
 
         $app['config']->set('auth.providers.users.model', TestUser::class);
-        $app['config']->set('security.user_model', TestUser::class);
-        $app['config']->set('security.enabled', true);
-        $app['config']->set('security.block_enforcement', true);
-        $app['config']->set('security.routes.enabled', true);
+        $app['config']->set('pasak.user_model', TestUser::class);
+        $app['config']->set('pasak.enabled', true);
+        $app['config']->set('pasak.block_enforcement', true);
+        $app['config']->set('pasak.routes.enabled', true);
 
         $kernel = $app->make(KernelContract::class);
 

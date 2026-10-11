@@ -1,19 +1,19 @@
 <?php
 
-namespace Internal\SecurityMonitor\Console\Commands;
+namespace Internal\Pasak\Console\Commands;
 
 use Illuminate\Console\Command;
-use Internal\SecurityMonitor\Models\SecurityLog;
+use Internal\Pasak\Models\SecurityLog;
 
 class PruneSecurityLogs extends Command
 {
-    protected $signature = 'security:prune-logs {--days= : Override the configured retention period}';
+    protected $signature = 'pasak:prune-logs {--days= : Override the configured retention period}';
 
     protected $description = 'Hapus log keamanan yang lebih lama dari masa retensi yang dikonfigurasi';
 
     public function handle(): int
     {
-        $days = (int) ($this->option('days') ?? config('security.retention_days', 90));
+        $days = (int) ($this->option('days') ?? config('pasak.retention_days', 90));
 
         if ($days <= 0) {
             $this->info('Retensi log keamanan dinonaktifkan, tidak ada log yang dihapus.');

@@ -1,9 +1,9 @@
 <?php
 
-namespace Internal\SecurityMonitor\Console\Commands;
+namespace Internal\Pasak\Console\Commands;
 
 use Illuminate\Console\Command;
-use Internal\SecurityMonitor\Services\ServerSecurityService;
+use Internal\Pasak\Services\ServerSecurityService;
 
 /**
  * Membuat / memeriksa baseline hash berkas penting.
@@ -14,7 +14,7 @@ use Internal\SecurityMonitor\Services\ServerSecurityService;
  */
 class SecurityBaselineCommand extends Command
 {
-    protected $signature = 'security:baseline
+    protected $signature = 'pasak:baseline
                             {--check : Bandingkan berkas saat ini dengan baseline tanpa menulis apa pun}
                             {--prune : Hapus baseline yang tersimpan}
                             {--force : Lewati konfirmasi saat membuat baseline}';
@@ -61,7 +61,7 @@ class SecurityBaselineCommand extends Command
         $summary = $service->baselineSummary();
 
         if (! $summary['exists']) {
-            $this->warn('Baseline belum dibuat. Jalankan php artisan security:baseline terlebih dahulu.');
+            $this->warn('Baseline belum dibuat. Jalankan php artisan pasak:baseline terlebih dahulu.');
 
             return self::FAILURE;
         }

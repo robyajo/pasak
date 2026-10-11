@@ -1,6 +1,6 @@
 # 02. Hardening Apache Web Server (.htaccess)
 
-Halaman ini mendokumentasikan aturan keamanan berkas **`public/.htaccess`** yang disediakan oleh **Laravel Security Monitor (Bulwark)** untuk server yang menggunakan **Apache HTTP Server**, **LiteSpeed**, atau lingkungan shared hosting seperti **cPanel**.
+Halaman ini mendokumentasikan aturan keamanan berkas **`public/.htaccess`** yang disediakan oleh **Pasak (Bulwark)** untuk server yang menggunakan **Apache HTTP Server**, **LiteSpeed**, atau lingkungan shared hosting seperti **cPanel**.
 
 Aturan hardening ini dirancang untuk mencegah eksploitasi di tingkat web server sebelum permintaan diproses oleh PHP runtime, mencakup pencegahan eksekusi webshell, bypass ekstensi ganda, eksposur dotfile, hingga kebocoran berkas dump database.
 

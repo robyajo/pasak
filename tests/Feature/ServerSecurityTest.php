@@ -2,8 +2,8 @@
 
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\File;
-use Internal\SecurityMonitor\Services\ServerSecurityService;
-use Internal\SecurityMonitor\Tests\TestUser;
+use Internal\Pasak\Services\ServerSecurityService;
+use Internal\Pasak\Tests\TestUser;
 
 beforeEach(function () {
     Cache::flush();
@@ -53,7 +53,7 @@ test('admin can retrieve server scan report via api', function () {
     ]);
 
     $response = $this->actingAs($admin)
-        ->getJson('/api/security/server');
+        ->getJson('/api/pasak/server');
 
     $response->assertSuccessful();
     $response->assertJsonStructure([
@@ -75,14 +75,14 @@ test('admin can create and delete baseline via api', function () {
 
     // Create baseline
     $postResponse = $this->actingAs($admin)
-        ->postJson('/api/security/server/baseline');
+        ->postJson('/api/pasak/server/baseline');
 
     $postResponse->assertSuccessful();
     $postResponse->assertJson(['success' => true]);
 
     // Delete baseline
     $delResponse = $this->actingAs($admin)
-        ->deleteJson('/api/security/server/baseline');
+        ->deleteJson('/api/pasak/server/baseline');
 
     $delResponse->assertSuccessful();
     $delResponse->assertJson(['success' => true]);

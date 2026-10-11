@@ -1,6 +1,6 @@
 <?php
 
-namespace Internal\SecurityMonitor\Services;
+namespace Internal\Pasak\Services;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -9,9 +9,9 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
-use Internal\SecurityMonitor\Models\BlockedIp;
-use Internal\SecurityMonitor\Models\LoginAttempt;
-use Internal\SecurityMonitor\Models\SecurityLog;
+use Internal\Pasak\Models\BlockedIp;
+use Internal\Pasak\Models\LoginAttempt;
+use Internal\Pasak\Models\SecurityLog;
 use Laravel\Fortify\Features;
 use Throwable;
 
@@ -29,16 +29,16 @@ use Throwable;
  */
 class ServerSecurityService
 {
-    public const CACHE_KEY = 'security:server-scan';
+    public const CACHE_KEY = 'pasak:server-scan';
 
     /** Kunci cache daftar berkas mencurigakan. */
-    public const SUSPICIOUS_CACHE_KEY = 'security:suspicious-files';
+    public const SUSPICIOUS_CACHE_KEY = 'pasak:suspicious-files';
 
     /** Lokasi baseline hash (relatif terhadap storage_path()). */
     public const BASELINE_PATH = 'app/security/baseline.json';
 
     /** Kunci cache heartbeat scheduler (diisi oleh routes/console.php). */
-    public const HEARTBEAT_KEY = 'security:schedule-heartbeat';
+    public const HEARTBEAT_KEY = 'pasak:schedule-heartbeat';
 
     /** Ekstensi yang tidak boleh berada di folder publik. */
     protected const DANGEROUS_EXTENSIONS = [
@@ -146,7 +146,7 @@ class ServerSecurityService
     protected const DEFAULT_SUSPICIOUS_EXCLUDES = [
         'config/security.php',
         'app/Services/ServerSecurityService.php',
-        'app/Services/SecurityMonitorService.php',
+        'app/Services/PasakService.php',
         'app/Http/Middleware/DetectSecurityThreats.php',
         'app/Console/Commands/SecurityBaselineCommand.php',
         'app/Console/Commands/PurgeInjectedData.php',
@@ -157,7 +157,7 @@ class ServerSecurityService
     ];
 
     public function __construct(
-        protected SecurityMonitorService $security,
+        protected PasakService $security,
         protected LoginThrottleService $throttle,
     ) {}
 
@@ -176,7 +176,7 @@ class ServerSecurityService
     {
         $minutes = max(
             1,
-            (int) config('security.server_scan.cache_minutes', 10),
+            (int) config('pasak.server_scan.cache_minutes', 10),
         );
 
         if (! $force) {
@@ -416,7 +416,7 @@ class ServerSecurityService
         );
 
         // Dibaca sama seperti CheckPublicApiHeader agar hasil pemeriksaan konsisten.
-        $apiKey = (string) config('security.server_scan.public_api_key', '');
+        $apiKey = (string) config('pasak.server_scan.public_api_key', '');
         $defaultKey = in_array($apiKey, ['', 'change-me'], true);
         $checks[] = $this->check(
             'public_api_key',
@@ -450,7 +450,7 @@ class ServerSecurityService
         );
 
         // Dibaca sama seperti bootstrap/app.php (trustProxies).
-        $proxies = (string) config('security.server_scan.trusted_proxies', '');
+        $proxies = (string) config('pasak.server_scan.trusted_proxies', '');
         $checks[] = $this->check(
             'trusted_proxies',
             'Aplikasi',
@@ -471,20 +471,20 @@ class ServerSecurityService
             'security_monitor',
             'Aplikasi',
             'app',
-            'Pemantauan keamanan (SECURITY_MONITOR_ENABLED)',
+            'Pemantauan keamanan (PASAK_MONITOR_ENABLED)',
             $monitor ? 'ok' : 'critical',
             $monitor ? 'aktif' : 'nonaktif',
             $monitor
                 ? 'Deteksi ancaman, pencatatan log, dan pemblokiran IP berjalan.'
                 : 'Pemantauan dimatikan sehingga serangan tidak terdeteksi maupun tercatat.',
-            $monitor ? null : 'Setel SECURITY_MONITOR_ENABLED=true pada .env.',
+            $monitor ? null : 'Setel PASAK_MONITOR_ENABLED=true pada .env.',
         );
 
         $checks[] = $this->check(
             'security_enforcement',
             'Aplikasi',
             'app',
-            'Penegakan blokir IP (SECURITY_BLOCK_ENFORCEMENT)',
+            'Penegakan blokir IP (PASAK_BLOCK_ENFORCEMENT)',
             $this->security->enforcementEnabled() ? 'ok' : 'warning',
             $this->security->enforcementEnabled() ? 'aktif' : 'nonaktif',
             $this->security->enforcementEnabled()
@@ -492,10 +492,10 @@ class ServerSecurityService
                 : 'IP terblokir masih dapat mengakses aplikasi; hanya tercatat di log.',
             $this->security->enforcementEnabled()
                 ? null
-                : 'Setel SECURITY_BLOCK_ENFORCEMENT=true pada .env.',
+                : 'Setel PASAK_BLOCK_ENFORCEMENT=true pada .env.',
         );
 
-        $instant = (bool) config('security.instant_block.enabled', true);
+        $instant = (bool) config('pasak.instant_block.enabled', true);
         $checks[] = $this->check(
             'instant_block',
             'Aplikasi',
@@ -508,10 +508,10 @@ class ServerSecurityService
                 : 'Pola serangan berbahaya hanya dicatat, tidak langsung memblokir IP.',
             $instant
                 ? null
-                : 'Setel SECURITY_INSTANT_BLOCK_ENABLED=true pada .env.',
+                : 'Setel PASAK_INSTANT_BLOCK_ENABLED=true pada .env.',
         );
 
-        $whitelist = array_filter((array) config('security.whitelist', []));
+        $whitelist = array_filter((array) config('pasak.whitelist', []));
         $checks[] = $this->check(
             'whitelist',
             'Aplikasi',
@@ -523,7 +523,7 @@ class ServerSecurityService
                 ? 'Tanpa whitelist, admin yang salah memicu deteksi dapat ikut terblokir (harus dibuka lewat CLI).'
                 : 'IP pada daftar putih tidak pernah diblokir otomatis.',
             $whitelist === []
-                ? 'Tambahkan IP kantor/internal ke SECURITY_IP_WHITELIST.'
+                ? 'Tambahkan IP kantor/internal ke PASAK_IP_WHITELIST.'
                 : null,
         );
 
@@ -796,7 +796,7 @@ class ServerSecurityService
                     implode(', ', array_slice($uploadScan['files'], 0, 8)),
             $uploadScan['files'] === []
                 ? null
-                : 'Jalankan php artisan security:purge-injected-data --model=... lalu hapus berkas tersebut secara manual.',
+                : 'Jalankan php artisan pasak:purge-injected-data --model=... lalu hapus berkas tersebut secara manual.',
         );
 
         $htaccess = [
@@ -864,7 +864,7 @@ class ServerSecurityService
         $logSize = $this->directorySize(storage_path('logs'));
         $warningMb = max(
             1,
-            (int) config('security.server_scan.log_size_warning_mb', 100),
+            (int) config('pasak.server_scan.log_size_warning_mb', 100),
         );
         $logMb = $logSize / 1_048_576;
         $checks[] = $this->check(
@@ -896,8 +896,8 @@ class ServerSecurityService
                 ? 'Serangan yang ditolak web server sebelum sampai ke PHP (mis. berkas .php yang di-return 403, probe .env, scanning massal) hanya tercatat di access log, sehingga tidak akan pernah muncul di Log Keamanan.'
                 : 'Tersedia: '.implode(', ', array_slice($accessLogs, 0, 3)),
             $accessLogs === []
-                ? 'Setel SECURITY_ACCESS_LOG_PATHS ke lokasi access log (mis. /var/log/nginx/access.log) dan pastikan user aplikasi boleh membacanya.'
-                : 'Jalankan php artisan security:scan-logs untuk menganalisis berkas tersebut.',
+                ? 'Setel PASAK_ACCESS_LOG_PATHS ke lokasi access log (mis. /var/log/nginx/access.log) dan pastikan user aplikasi boleh membacanya.'
+                : 'Jalankan php artisan pasak:scan-logs untuk menganalisis berkas tersebut.',
         );
 
         return $checks;
@@ -918,7 +918,7 @@ class ServerSecurityService
 
         $maxAdmins = max(
             1,
-            (int) config('security.server_scan.max_admin_accounts', 5),
+            (int) config('pasak.server_scan.max_admin_accounts', 5),
         );
         $admins = $this->adminQuery()->get([
             'id',
@@ -1041,7 +1041,7 @@ class ServerSecurityService
                     count((array) ($baseline['files'] ?? [])).
                     ' berkas yang dipantau.',
             $baseline === null
-                ? 'Klik "Buat Baseline" pada halaman ini (atau jalankan php artisan security:baseline).'
+                ? 'Klik "Buat Baseline" pada halaman ini (atau jalankan php artisan pasak:baseline).'
                 : null,
         );
 
@@ -1088,7 +1088,7 @@ class ServerSecurityService
         $recent = $this->recentChanges();
         $days = max(
             1,
-            (int) config('security.server_scan.recent_changes_days', 7),
+            (int) config('pasak.server_scan.recent_changes_days', 7),
         );
         $checks[] = $this->check(
             'recent_changes',
@@ -1150,7 +1150,7 @@ class ServerSecurityService
 
         $sevenDays = $this->securityLogStats();
         $checks[] = $this->check(
-            'security_activity',
+            'pasak.activity',
             'Pemantauan & Log',
             'monitoring',
             'Aktivitas keamanan 7 hari terakhir',
@@ -1168,7 +1168,7 @@ class ServerSecurityService
                     '. Log lengkap tersedia di halaman Log Keamanan.',
         );
 
-        $retention = (int) config('security.log_retention_days', 90);
+        $retention = (int) config('pasak.log_retention_days', 90);
         $checks[] = $this->check(
             'log_retention',
             'Pemantauan & Log',
@@ -1178,9 +1178,9 @@ class ServerSecurityService
             $retention === 0 ? 'selamanya' : $retention.' hari',
             $retention === 0
                 ? 'Log disimpan tanpa batas sehingga tabel dapat tumbuh besar dan memperlambat query.'
-                : 'Log lama dihapus otomatis oleh security:prune-logs setiap pukul 02:30.',
+                : 'Log lama dihapus otomatis oleh pasak:prune-logs setiap pukul 02:30.',
             $retention === 0
-                ? 'Setel SECURITY_LOG_RETENTION_DAYS (mis. 90) pada .env.'
+                ? 'Setel PASAK_LOG_RETENTION_DAYS (mis. 90) pada .env.'
                 : null,
         );
 
@@ -1352,7 +1352,7 @@ class ServerSecurityService
      */
     public function watchedFiles(): array
     {
-        $patterns = (array) config('security.server_scan.integrity_paths', []);
+        $patterns = (array) config('pasak.server_scan.integrity_paths', []);
         $files = [];
 
         foreach ($patterns as $pattern) {
@@ -1571,7 +1571,7 @@ class ServerSecurityService
         try {
             $minutes = max(
                 1,
-                (int) config('security.server_scan.cache_minutes', 10),
+                (int) config('pasak.server_scan.cache_minutes', 10),
             );
             Cache::put(
                 self::SUSPICIOUS_CACHE_KEY,
@@ -1783,7 +1783,7 @@ class ServerSecurityService
 
         $limit = max(
             500,
-            (int) config('security.server_scan.max_files_scanned', 20000),
+            (int) config('pasak.server_scan.max_files_scanned', 20000),
         );
         $count = 0;
 
@@ -2248,7 +2248,7 @@ class ServerSecurityService
 
     protected function userModel(): string
     {
-        return config('security.user_model', "App\Models\User");
+        return config('pasak.user_model', "App\Models\User");
     }
 
     protected function lockoutCount(): int
@@ -2385,7 +2385,7 @@ class ServerSecurityService
 
         $limit = max(
             100,
-            (int) config('security.server_scan.max_files_scanned', 20000),
+            (int) config('pasak.server_scan.max_files_scanned', 20000),
         );
         $suspicious = [];
         $scanned = 0;
@@ -2489,11 +2489,11 @@ class ServerSecurityService
         $freePercent = (int) round(($free / $total) * 100);
         $critical = max(
             1,
-            (int) config('security.server_scan.disk_critical_percent', 10),
+            (int) config('pasak.server_scan.disk_critical_percent', 10),
         );
         $warning = max(
             $critical,
-            (int) config('security.server_scan.disk_warning_percent', 20),
+            (int) config('pasak.server_scan.disk_warning_percent', 20),
         );
 
         return [
@@ -2551,7 +2551,7 @@ class ServerSecurityService
     {
         $files = [];
 
-        foreach ((array) config('security.access_log.paths', []) as $pattern) {
+        foreach ((array) config('pasak.access_log.paths', []) as $pattern) {
             foreach (glob((string) $pattern) ?: [] as $path) {
                 if (is_file($path) && is_readable($path)) {
                     $files[] = $path;
@@ -2571,12 +2571,12 @@ class ServerSecurityService
     {
         $days = max(
             1,
-            (int) config('security.server_scan.recent_changes_days', 7),
+            (int) config('pasak.server_scan.recent_changes_days', 7),
         );
         $threshold = now()->subDays($days)->getTimestamp();
         $limit = max(
             500,
-            (int) config('security.server_scan.max_files_scanned', 20000),
+            (int) config('pasak.server_scan.max_files_scanned', 20000),
         );
 
         $files = [];
@@ -2671,7 +2671,7 @@ class ServerSecurityService
             return [
                 'status' => 'warning',
                 'value' => 'belum terdeteksi',
-                'detail' => 'Belum ada tanda penjadwal berjalan. Tanpa scheduler, pembersihan log otomatis (security:prune-logs) tidak pernah dijalankan.',
+                'detail' => 'Belum ada tanda penjadwal berjalan. Tanpa scheduler, pembersihan log otomatis (pasak:prune-logs) tidak pernah dijalankan.',
                 'recommendation' => 'Tambahkan cron: * * * * * cd /path/artisan && php artisan schedule:run >> /dev/null 2>&1',
             ];
         }

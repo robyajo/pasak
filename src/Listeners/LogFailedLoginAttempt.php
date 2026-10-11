@@ -1,12 +1,12 @@
 <?php
 
-namespace Internal\SecurityMonitor\Listeners;
+namespace Internal\Pasak\Listeners;
 
 use Illuminate\Auth\Events\Failed;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
-use Internal\SecurityMonitor\Services\LoginThrottleService;
-use Internal\SecurityMonitor\Services\SecurityMonitorService;
+use Internal\Pasak\Services\LoginThrottleService;
+use Internal\Pasak\Services\PasakService;
 use Throwable;
 
 /**
@@ -19,7 +19,7 @@ use Throwable;
 class LogFailedLoginAttempt
 {
     public function __construct(
-        protected SecurityMonitorService $service,
+        protected PasakService $service,
         protected LoginThrottleService $throttle,
         protected Request $request,
     ) {}

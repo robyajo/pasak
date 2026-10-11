@@ -1,7 +1,7 @@
-# Dokumentasi Laravel Security Monitor (Astro + Starlight)
+# Dokumentasi Pasak (Astro + Starlight)
 
 Situs dokumentasi resmi untuk paket
-[`robyajo/laravel-security-monitor`](../README.md), dibangun dengan **Astro** dan
+[`robyajo/pasak`](../README.md), dibangun dengan **Astro** dan
 tema **[Starlight](https://starlight.astro.build)**.
 
 > ℹ️ Folder `web/` **tidak disertakan** saat paket dipasang lewat Composer
@@ -144,11 +144,11 @@ Contoh konfigurasi siap pakai ada di [`nginx.conf`](./nginx.conf). Ringkasnya:
 npm ci && npm run build
 
 # 2) Unggah
-rsync -a --delete dist/ user@<vps>:/var/www/laravel-security-monitor-docs/
+rsync -a --delete dist/ user@<vps>:/var/www/pasak-docs/
 
 # 3) VPS
-sudo cp nginx.conf /etc/nginx/sites-available/laravel-security-monitor-docs
-sudo ln -s /etc/nginx/sites-available/laravel-security-monitor-docs /etc/nginx/sites-enabled/
+sudo cp nginx.conf /etc/nginx/sites-available/pasak-docs
+sudo ln -s /etc/nginx/sites-available/pasak-docs /etc/nginx/sites-enabled/
 sudo nginx -t && sudo systemctl reload nginx
 sudo certbot --nginx -d docs.example.com   # TLS Let's Encrypt
 ```

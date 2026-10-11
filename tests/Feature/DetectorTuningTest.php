@@ -1,7 +1,7 @@
 <?php
 
-use Internal\SecurityMonitor\Models\BlockedIp;
-use Internal\SecurityMonitor\Services\SecurityMonitorService;
+use Internal\Pasak\Models\BlockedIp;
+use Internal\Pasak\Services\PasakService;
 
 /**
  * Penjaga keseimbangan pola deteksi:
@@ -139,7 +139,7 @@ function detectorFormat(array $threats): string
 }
 
 test('lalu lintas nyata tidak pernah memicu blokir instan', function () {
-    $service = app(SecurityMonitorService::class);
+    $service = app(PasakService::class);
 
     foreach (detectorLegitCases() as $label => $haystacks) {
         $threats = $service->inspectHaystacks($haystacks);
@@ -149,14 +149,14 @@ test('lalu lintas nyata tidak pernah memicu blokir instan', function () {
         expect($instant)->toBe([], sprintf(
             'Input nyata "%s" memicu blokir instan %d hari: %s',
             $label,
-            (int) config('security.instant_block.duration_hours'),
+            (int) config('pasak.instant_block.duration_hours'),
             detectorFormat($instant)
         ));
     }
 });
 
 test('konten admin sehari-hari tidak terdeteksi sama sekali', function () {
-    $service = app(SecurityMonitorService::class);
+    $service = app(PasakService::class);
     $cases = detectorLegitCases();
 
     foreach (detectorMustBeCleanCases() as $label) {
@@ -171,7 +171,7 @@ test('konten admin sehari-hari tidak terdeteksi sama sekali', function () {
 });
 
 test('pola serangan tetap terdeteksi setelah pola dirapatkan', function () {
-    $service = app(SecurityMonitorService::class);
+    $service = app(PasakService::class);
 
     foreach (detectorAttackCases() as $label => [$haystacks, $expectsInstant]) {
         $threats = $service->inspectHaystacks($haystacks);
@@ -187,8 +187,8 @@ test('pola serangan tetap terdeteksi setelah pola dirapatkan', function () {
 });
 
 test('pola deteksi tidak rawan ReDoS', function () {
-    $service = app(SecurityMonitorService::class);
-    $max = max(500, (int) config('security.max_inspect_length', 4000));
+    $service = app(PasakService::class);
+    $max = max(500, (int) config('pasak.max_inspect_length', 4000));
 
     $payloads = [
         'php + spasi' => '.php'.str_repeat(' ', $max),
@@ -219,7 +219,7 @@ test('pola deteksi tidak rawan ReDoS', function () {
 });
 
 test('blokir instan aktif pada percobaan pertama lewat request sungguhan', function () {
-    config()->set('security.whitelist', []);
+    config()->set('pasak.whitelist', []);
 
     $this->withServerVariables(['REMOTE_ADDR' => '198.51.100.70']);
 

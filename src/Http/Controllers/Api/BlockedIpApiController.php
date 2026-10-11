@@ -1,18 +1,18 @@
 <?php
 
-namespace Internal\SecurityMonitor\Http\Controllers\Api;
+namespace Internal\Pasak\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
-use Internal\SecurityMonitor\Models\BlockedIp;
-use Internal\SecurityMonitor\Models\SecurityLog;
-use Internal\SecurityMonitor\Services\SecurityMonitorService;
+use Internal\Pasak\Models\BlockedIp;
+use Internal\Pasak\Models\SecurityLog;
+use Internal\Pasak\Services\PasakService;
 
 class BlockedIpApiController extends Controller
 {
     public function __construct(
-        protected SecurityMonitorService $service
+        protected PasakService $service
     ) {}
 
     public function index(Request $request): JsonResponse

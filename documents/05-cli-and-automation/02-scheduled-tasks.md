@@ -1,6 +1,6 @@
 # 02. Tugas Terjadwal (Cron & Scheduler)
 
-`SecurityMonitorServiceProvider` menyertakan registrasi otomatis ke sistem scheduler bawaan Laravel (`Illuminate\Console\Scheduling\Schedule`). Tugas-tugas ini beroperasi secara otonom di latar belakang untuk menjaga higienitas basis data dan integritas server.
+`PasakServiceProvider` menyertakan registrasi otomatis ke sistem scheduler bawaan Laravel (`Illuminate\Console\Scheduling\Schedule`). Tugas-tugas ini beroperasi secara otonom di latar belakang untuk menjaga higienitas basis data dan integritas server.
 
 ---
 

@@ -1,11 +1,11 @@
 <?php
 
-namespace Internal\SecurityMonitor\Services;
+namespace Internal\Pasak\Services;
 
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
-use Internal\SecurityMonitor\Models\LoginAttempt;
-use Internal\SecurityMonitor\Models\SecurityLog;
+use Internal\Pasak\Models\LoginAttempt;
+use Internal\Pasak\Models\SecurityLog;
 use Throwable;
 
 /**
@@ -24,7 +24,7 @@ use Throwable;
  */
 class LoginThrottleService
 {
-    public function __construct(protected SecurityMonitorService $security) {}
+    public function __construct(protected PasakService $security) {}
 
     public function enabled(): bool
     {
@@ -197,7 +197,7 @@ class LoginThrottleService
 
     protected function config(string $key, mixed $default = null): mixed
     {
-        return config('security.login_lockout.'.$key, $default);
+        return config('pasak.login_lockout.'.$key, $default);
     }
 
     protected function find(?string $email, ?string $ip): ?LoginAttempt

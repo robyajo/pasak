@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # ==============================================================================
-# VPS Build & Auto-Deploy Helper for Laravel Security Monitor Docs (Astro)
+# VPS Build & Auto-Deploy Helper for Pasak Docs (Astro)
 # Repository: robyajo/web-laravel-security
 #
 # Masalah yang diselesaikan skrip ini:
@@ -35,7 +35,7 @@ NC='\033[0m' # No Color
 # Helper Functions
 print_header() {
     echo -e "${BLUE}======================================================================${NC}"
-    echo -e "${BOLD}${CYAN}  🚀 Laravel Security Monitor Docs — VPS Build & Deploy Helper${NC}"
+    echo -e "${BOLD}${CYAN}  🚀 Pasak Docs — VPS Build & Deploy Helper${NC}"
     echo -e "${BLUE}======================================================================${NC}"
 }
 
@@ -63,7 +63,7 @@ show_help() {
     echo ""
     echo -e "${BOLD}OPSI:${NC}"
     echo -e "  -b, --branch <nama>    Nama branch git target (default: branch aktif atau main)"
-    echo -e "  -d, --deploy <path>    Direktori web server tujuan (default: /var/www/laravel-security-monitor-docs)"
+    echo -e "  -d, --deploy <path>    Direktori web server tujuan (default: /var/www/pasak-docs)"
     echo -e "  --no-pull              Lewati tahap git pull (hanya sync & build lokal)"
     echo -e "  --no-deploy            Lewati penyalinan ke direktori web server (hanya build dist/)"
     echo -e "  --hard-reset           Reset keras seluruh repositori lokal sebelum pull (git reset --hard)"

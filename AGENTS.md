@@ -1,11 +1,11 @@
-# Agent Guidelines for `robyajo/laravel-security-monitor`
+# Agent Guidelines for `robyajo/pasak`
 
 ## 1. Project Overview & Foundational Context
 
-This repository is **`robyajo/laravel-security-monitor`** (Bulwark), an enterprise-grade, standalone, headless self-hosted Web Application Firewall (WAF), threat detection engine, and security auditing library for the Laravel ecosystem.
+This repository is **`robyajo/pasak`** (Bulwark), an enterprise-grade, standalone, headless self-hosted Web Application Firewall (WAF), threat detection engine, and security auditing library for the Laravel ecosystem.
 
-- **Package Name**: `robyajo/laravel-security-monitor`
-- **Root Namespace**: `Internal\SecurityMonitor\`
+- **Package Name**: `robyajo/pasak`
+- **Root Namespace**: `Internal\Pasak\`
 - **Target Environments**: PHP `^8.2 | ^8.3 | ^8.4`, Laravel `^10.0 | ^11.0 | ^12.0 | ^13.0`
 - **Package Type**: `library` (Composer only)
 
@@ -13,7 +13,7 @@ This repository is **`robyajo/laravel-security-monitor`** (Bulwark), an enterpri
 
 - **100% Pure PHP**: This package MUST NOT introduce any NPM, Node.js, or frontend build step dependency.
 - **Spatie-Style Core Integration**: Like popular Spatie packages (`spatie/laravel-permission`, `spatie/laravel-activitylog`, `spatie/laravel-honeypot`), once installed via `composer require`, the package hooks directly and cleanly into Laravel Core:
-    1. **Package Auto-Discovery**: `SecurityMonitorServiceProvider` & `SecurityMonitor` Facade.
+    1. **Package Auto-Discovery**: `PasakServiceProvider` & `Pasak` Facade.
     2. **Eloquent Model Trait**: `HasSecurityRelations` trait on the host `User` model (analogous to Spatie's `HasRoles`).
     3. **Core Auth Event Hooks**: Listens to native `\Illuminate\Auth\Events\Failed` and `Login` events automatically.
     4. **Core HTTP Kernel & Middleware**: Aliased as `'security.block'`, `'security.detect'`, `'security.admin'`, `'security.activity'`, with optional zero-touch auto-registration (`SECURITY_AUTO_REGISTER_MIDDLEWARE=true`).
@@ -70,7 +70,7 @@ The repository contains an authoritative, 24-chapter documentation suite located
 
 When working in this repository, you MUST activate the relevant skills located in `.agents/skills/`:
 
-1. **`laravel-security-monitor`** (`.agents/skills/laravel-security-monitor/SKILL.md`):
+1. **`pasak`** (`.agents/skills/pasak/SKILL.md`):
     - **Activate whenever**: Writing, modifying, tuning, or testing WAF detection signatures, instant blocking rules, device-level quarantine, stepped login throttle, server security & webshell scanning, access log streaming, headless REST API controllers, Eloquent models, or Pest test cases.
 2. **`pest-testing`** (`.agents/skills/pest-testing/SKILL.md`):
     - **Activate whenever**: Writing or running tests using Pest PHP and Orchestra Testbench.
@@ -100,7 +100,7 @@ When working in this repository, you MUST activate the relevant skills located i
         return config('security.table_names.blocked_ips', parent::getTable());
     }
     ```
-- **Eloquent Host Integration**: Host apps integrate with the package using `Internal\SecurityMonitor\Concerns\HasSecurityRelations` on their `User` model.
+- **Eloquent Host Integration**: Host apps integrate with the package using `Internal\Pasak\Concerns\HasSecurityRelations` on their `User` model.
 
 ### 4.3. Device-Level Quarantine & Reverse Proxy Support
 
@@ -127,7 +127,7 @@ When working in this repository, you MUST activate the relevant skills located i
     ```bash
     ./vendor/bin/pest --filter=InstantBlockTest
     ```
-- **Test Harness**: All tests extend `Internal\SecurityMonitor\Tests\TestCase` which sets up an in-memory SQLite database (`:memory:`), auto-migrates package tables, and registers middleware.
+- **Test Harness**: All tests extend `Internal\Pasak\Tests\TestCase` which sets up an in-memory SQLite database (`:memory:`), auto-migrates package tables, and registers middleware.
 - **Quality Invariant**: **All 64+ tests and 274+ assertions must pass with zero failures before any work is considered complete.**
 
 ---
@@ -139,7 +139,7 @@ documents/                 # Authoritative 24-chapter documentation suite + inde
 src/
 ├── Concerns/              # Reusable Eloquent traits (HasSecurityRelations)
 ├── Console/Commands/      # Artisan commands (security:install, security:scan-logs, security:baseline, etc.)
-├── Facades/               # Static facade accessors (SecurityMonitor)
+├── Facades/               # Static facade accessors (Pasak)
 ├── Http/
 │   ├── Controllers/Api/   # Headless JSON REST API controllers
 │   ├── Controllers/Dashboard/ # Inertia + React dashboard controllers
@@ -148,7 +148,7 @@ src/
 ├── Models/                # Eloquent models with dynamic table names
 ├── Rules/                 # Validation rules (SafeImageFile, SafeAssetPath)
 ├── Services/              # Core security engines & business logic
-└── SecurityMonitorServiceProvider.php # Package bootstrapping & registration
+└── PasakServiceProvider.php # Package bootstrapping & registration
 
 config/
 └── security.php           # Full signature definitions & default options
@@ -178,7 +178,7 @@ stubs/
 - Use PHP 8 constructor property promotion:
     ```php
     public function __construct(
-        protected SecurityMonitorService $security,
+        protected PasakService $security,
     ) {}
     ```
 - Prefer PHPDoc blocks with array shape type definitions for complex array structures.

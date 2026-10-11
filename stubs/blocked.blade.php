@@ -1,5 +1,5 @@
 {{--
-    Default 403 "blocked" page for robyajo/laravel-security-monitor.
+    Default 403 "blocked" page for robyajo/pasak.
 
     Dipublikasikan oleh:  php artisan vendor:publish --tag=security-views
     Tujuan default:       resources/views/errors/blocked.blade.php
@@ -128,7 +128,7 @@
         var result = document.getElementById('security-appeal-result');
         if (!form || !result) { return; }
 
-        var endpoint = @json(url(config('security.routes.prefix', 'api/security') . '/unblock-tickets/submit'));
+        var endpoint = @json(url(config('pasak.routes.prefix', 'api/pasak') . '/unblock-tickets/submit'));
         var button = form.querySelector('button[type="submit"]');
 
         form.addEventListener('submit', function (event) {

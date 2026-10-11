@@ -1,10 +1,10 @@
-# Laravel Security Monitor (Bulwark)
+# Pasak (Bulwark)
 
 ## Dokumentasi Resmi & Panduan Penggunaan Lengkap
 
 > **Versi Paket**: `1.1.0` | **PHP**: `^8.2 | ^8.3 | ^8.4 | ^8.5` | **Laravel**: `^10.0 | ^11.0 | ^12.0 | ^13.0` | **Lisensi**: `MIT`
 
-Selamat datang di dokumentasi resmi **`robyajo/laravel-security-monitor`** (Bulwark). Dokumentasi ini dirancang untuk memberikan panduan komprehensif mulai dari konsep arsitektur, instalasi, konfigurasi, integrasi REST API headless, modul keamanan tingkat lanjut, otomasi Artisan CLI, hingga hardening web server Nginx di lingkungan produksi.
+Selamat datang di dokumentasi resmi **`robyajo/pasak`** (Bulwark). Dokumentasi ini dirancang untuk memberikan panduan komprehensif mulai dari konsep arsitektur, instalasi, konfigurasi, integrasi REST API headless, modul keamanan tingkat lanjut, otomasi Artisan CLI, hingga hardening web server Nginx di lingkungan produksi.
 
 ---
 
@@ -66,7 +66,7 @@ flowchart TD
     Client([HTTP Request]) --> Nginx[Nginx Hardened WAF<br/>Dual-Zone Rate Limit & FastCGI Filter]
     Nginx -->|Lolos Pemeriksaan| PHP[Laravel Front Controller<br/>public/index.php]
 
-    subgraph LSM ["Laravel Security Monitor (Bulwark)"]
+    subgraph LSM ["Pasak (Bulwark)"]
         PHP --> BlockMW[Middleware: BlockIpAddress]
         BlockMW -->|IP / Device Terdaftar Aktif| Ret403[HTTP 403: Akses Ditolak<br/>+ Reference ID]
         BlockMW -->|Lolos| ThreatMW[Middleware: DetectSecurityThreats]

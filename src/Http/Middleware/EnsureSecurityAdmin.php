@@ -1,6 +1,6 @@
 <?php
 
-namespace Internal\SecurityMonitor\Http\Middleware;
+namespace Internal\Pasak\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
@@ -21,12 +21,14 @@ class EnsureSecurityAdmin
             return $this->unauthorized($request);
         }
 
-        if (Gate::has('manage-security-monitor')) {
-            if (! Gate::allows('manage-security-monitor')) {
-                return $this->forbidden($request);
-            }
+        foreach (['manage-pasak', 'manage-security-monitor'] as $ability) {
+            if (Gate::has($ability)) {
+                if (! Gate::allows($ability)) {
+                    return $this->forbidden($request);
+                }
 
-            return $next($request);
+                return $next($request);
+            }
         }
 
         if (method_exists($user, 'isAdmin') && $user->isAdmin()) {

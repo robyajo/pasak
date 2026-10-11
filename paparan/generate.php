@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 /**
  * Generator presentasi PowerPoint (.pptx) untuk
- * robyajo/laravel-security-monitor (Bulwark).
+ * robyajo/pasak (Bulwark).
  *
  * Tanpa dependensi eksternal — hanya memakai ekstensi PHP:
  *   - zip  (ZipArchive)
@@ -301,10 +301,10 @@ function contentSlide(array $s): string
 $slides = [
     [
         "kind" => "title",
-        "title" => "Laravel Security Monitor",
+        "title" => "Pasak",
         "subtitle" => "Bulwark — WAF & Threat Engine Headless untuk Laravel",
         "footer" =>
-            "robyajo/laravel-security-monitor  ·  v1.0.6  ·  Lisensi MIT",
+            "robyajo/pasak  ·  v1.0.6  ·  Lisensi MIT",
     ],
     [
         "kind" => "content",
@@ -405,7 +405,7 @@ $slides = [
         "kind" => "content",
         "title" => "Arsitektur & Integrasi",
         "bullets" => [
-            "Auto-discovery: `SecurityMonitorServiceProvider` + Facade `SecurityMonitor`.",
+            "Auto-discovery: `PasakServiceProvider` + Facade `Pasak`.",
             "Trait `HasSecurityRelations` pada model `User` host.",
             "Middleware teraliasing: `security.block`, `security.detect`, `security.admin`, `security.activity`.",
             "Gate `manage-security-monitor` untuk otorisasi admin.",
@@ -449,7 +449,7 @@ $slides = [
         "kind" => "content",
         "title" => "Instalasi Cepat",
         "bullets" => [
-            "`composer require robyajo/laravel-security-monitor`",
+            "`composer require robyajo/pasak`",
             "`php artisan security:install`",
             "`php artisan migrate`",
             "Tambahkan trait `HasSecurityRelations` ke model `User` dan daftarkan middleware.",
@@ -486,9 +486,9 @@ $slides = [
         "kind" => "content",
         "title" => "Tautan",
         "bullets" => [
-            "Repositori: `github.com/robyajo/laravel-security-monitor`",
-            "Packagist: `packagist.org/packages/robyajo/laravel-security-monitor`",
-            "Instalasi: `composer require robyajo/laravel-security-monitor`",
+            "Repositori: `github.com/robyajo/pasak`",
+            "Packagist: `packagist.org/packages/robyajo/pasak`",
+            "Instalasi: `composer require robyajo/pasak`",
             "Dokumentasi: direktori `documents/` (25 bab) + portal `documents/index.html`",
         ],
     ],
@@ -525,7 +525,7 @@ XML;
 
 $coreXml = <<<'XML'
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<cp:coreProperties xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:dcmitype="http://purl.org/dc/dcmitype/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><dc:title>Laravel Security Monitor (Bulwark)</dc:title><dc:subject>WAF &amp; Threat Engine Headless untuk Laravel</dc:subject><dc:creator>Roby</dc:creator><cp:lastModifiedBy>Roby</cp:lastModifiedBy><dcterms:created xsi:type="dcterms:W3CDTF">2026-10-02T00:00:00Z</dcterms:created><dcterms:modified xsi:type="dcterms:W3CDTF">2026-10-02T00:00:00Z</dcterms:modified></cp:coreProperties>
+<cp:coreProperties xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:dcmitype="http://purl.org/dc/dcmitype/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><dc:title>Pasak (Bulwark)</dc:title><dc:subject>WAF &amp; Threat Engine Headless untuk Laravel</dc:subject><dc:creator>Roby</dc:creator><cp:lastModifiedBy>Roby</cp:lastModifiedBy><dcterms:created xsi:type="dcterms:W3CDTF">2026-10-02T00:00:00Z</dcterms:created><dcterms:modified xsi:type="dcterms:W3CDTF">2026-10-02T00:00:00Z</dcterms:modified></cp:coreProperties>
 XML;
 
 $totalSlides = count($slides);

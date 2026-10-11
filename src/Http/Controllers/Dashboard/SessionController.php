@@ -1,6 +1,6 @@
 <?php
 
-namespace Internal\SecurityMonitor\Http\Controllers\Dashboard;
+namespace Internal\Pasak\Http\Controllers\Dashboard;
 
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -8,10 +8,10 @@ use Illuminate\Routing\Controller;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
-use Internal\SecurityMonitor\Models\TrustedIp;
-use Internal\SecurityMonitor\Models\UserLogin;
-use Internal\SecurityMonitor\Services\SecurityMonitorService;
-use Internal\SecurityMonitor\Services\UserLoginService;
+use Internal\Pasak\Models\TrustedIp;
+use Internal\Pasak\Models\UserLogin;
+use Internal\Pasak\Services\PasakService;
+use Internal\Pasak\Services\UserLoginService;
 
 /**
  * User session tracking page for the Inertia + React dashboard.
@@ -87,7 +87,7 @@ class SessionController extends Controller
         ]);
     }
 
-    public function storeMyIp(Request $request, SecurityMonitorService $security): RedirectResponse
+    public function storeMyIp(Request $request, PasakService $security): RedirectResponse
     {
         $user = $request->user();
 

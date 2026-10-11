@@ -1,14 +1,14 @@
 <?php
 
-namespace Internal\SecurityMonitor\Http\Controllers\Dashboard;
+namespace Internal\Pasak\Http\Controllers\Dashboard;
 
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Inertia\Inertia;
 use Inertia\Response;
-use Internal\SecurityMonitor\Models\IpUnblockRequest;
-use Internal\SecurityMonitor\Services\SecurityMonitorService;
+use Internal\Pasak\Models\IpUnblockRequest;
+use Internal\Pasak\Services\PasakService;
 
 /**
  * Unblock appeal tickets page for the Inertia + React dashboard.
@@ -54,7 +54,7 @@ class TicketController extends Controller
         ]);
     }
 
-    public function respond(Request $request, int $id, SecurityMonitorService $security): RedirectResponse
+    public function respond(Request $request, int $id, PasakService $security): RedirectResponse
     {
         $ticket = IpUnblockRequest::query()->find($id);
 

@@ -1,17 +1,17 @@
 <?php
 
 use Illuminate\Http\UploadedFile;
-use Internal\SecurityMonitor\Models\BlockedIp;
-use Internal\SecurityMonitor\Models\SecurityLog;
-use Internal\SecurityMonitor\Rules\SafeAssetPath;
-use Internal\SecurityMonitor\Tests\TestUser;
+use Internal\Pasak\Models\BlockedIp;
+use Internal\Pasak\Models\SecurityLog;
+use Internal\Pasak\Rules\SafeAssetPath;
+use Internal\Pasak\Tests\TestUser;
 
 beforeEach(function () {
-    config()->set('security.enabled', true);
-    config()->set('security.block_enforcement', true);
-    config()->set('security.instant_block.enabled', true);
-    config()->set('security.instant_block.duration_hours', 720);
-    config()->set('security.whitelist', []);
+    config()->set('pasak.enabled', true);
+    config()->set('pasak.block_enforcement', true);
+    config()->set('pasak.instant_block.enabled', true);
+    config()->set('pasak.instant_block.duration_hours', 720);
+    config()->set('pasak.whitelist', []);
 });
 
 test('null byte and double extension upload filename triggers an instant block', function () {
@@ -168,7 +168,7 @@ test('the unblock command lifts a block', function () {
         'is_active' => true,
     ]);
 
-    $this->artisan('security:unblock-ip 198.51.100.61')->assertSuccessful();
+    $this->artisan('pasak:unblock-ip 198.51.100.61')->assertSuccessful();
 
     expect($block->fresh()->is_active)->toBeFalse();
 });

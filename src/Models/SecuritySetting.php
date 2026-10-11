@@ -1,12 +1,12 @@
 <?php
 
-namespace Internal\SecurityMonitor\Models;
+namespace Internal\Pasak\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
 
 /**
- * Persisted key-value settings for Laravel Security Monitor.
+ * Persisted key-value settings for Pasak.
  *
  * @property int $id
  * @property string $key
@@ -16,7 +16,10 @@ use Illuminate\Support\Carbon;
  */
 class SecuritySetting extends Model
 {
-    protected $table = 'security_settings';
+    public function getTable()
+    {
+        return config('pasak.table_names.settings', 'pasak_settings');
+    }
 
     protected $fillable = [
         'key',

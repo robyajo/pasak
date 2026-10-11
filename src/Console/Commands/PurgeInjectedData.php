@@ -1,6 +1,6 @@
 <?php
 
-namespace Internal\SecurityMonitor\Console\Commands;
+namespace Internal\Pasak\Console\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Database\Eloquent\Model;
@@ -17,7 +17,7 @@ use Throwable;
  */
 class PurgeInjectedData extends Command
 {
-    protected $signature = 'security:purge-injected-data
+    protected $signature = 'pasak:purge-injected-data
                             {--force : Hapus data yang terdeteksi (tanpa opsi ini hanya menampilkan daftar)}
                             {--marker=* : Marker spesifik yang dicari, mis. --marker=wne (boleh diulang)}
                             {--model=* : Batasi ke model tertentu}';
@@ -43,8 +43,8 @@ class PurgeInjectedData extends Command
         $markers = array_filter((array) $this->option('marker'));
         $markers = $markers === [] ? $this->defaultMarkers : $markers;
 
-        // Targets can be defined in config('security.purge_targets')
-        $allTargets = (array) config('security.purge_targets', []);
+        // Targets can be defined in config('pasak.purge_targets')
+        $allTargets = (array) config('pasak.purge_targets', []);
 
         // Filter only targets whose models exist
         $validTargets = [];
@@ -60,7 +60,7 @@ class PurgeInjectedData extends Command
             : array_intersect_key($validTargets, array_flip($only));
 
         if ($targets === []) {
-            $this->warn('Tidak ada target model yang dikonfigurasi di config("security.purge_targets").');
+            $this->warn('Tidak ada target model yang dikonfigurasi di config("pasak.purge_targets").');
             $this->line('Tambahkan target pembersihan pada konfigurasi Anda, contoh:');
             $this->line('  "purge_targets" => [');
             $this->line('      "posts" => ["model" => \App\Models\Post::class, "columns" => ["title", "content"]],');
@@ -132,7 +132,7 @@ class PurgeInjectedData extends Command
 
         if ($force) {
             $this->info("Selesai. {$totalDeleted} dari {$totalFound} baris dihapus.");
-            $this->comment('Jalankan "php artisan security:purge-injected-data" lagi untuk memastikan sudah bersih.');
+            $this->comment('Jalankan "php artisan pasak:purge-injected-data" lagi untuk memastikan sudah bersih.');
         } else {
             $this->comment("{$totalFound} baris perlu dibersihkan. Jalankan ulang dengan --force untuk menghapusnya.");
         }

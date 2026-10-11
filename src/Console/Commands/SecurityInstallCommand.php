@@ -1,13 +1,13 @@
 <?php
 
-namespace Internal\SecurityMonitor\Console\Commands;
+namespace Internal\Pasak\Console\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
 
 class SecurityInstallCommand extends Command
 {
-    protected $signature = 'security:install
+    protected $signature = 'pasak:install
                             {--force : Timpa berkas konfigurasi, migrasi, nginx, htaccess, dan halaman blokir yang sudah ada}
                             {--without-nginx : Jangan publikasikan berkas nginx.conf}
                             {--without-apache : Jangan publikasikan berkas apache2.conf}
@@ -16,7 +16,7 @@ class SecurityInstallCommand extends Command
                             {--without-env : Jangan tambahkan variabel konfigurasi ke berkas .env}
                             {--without-user-trait : Jangan tambahkan trait HasSecurityRelations ke model User}
                             {--without-middleware : Jangan daftarkan middleware WAF ke bootstrap/app.php atau Kernel.php}
-                            {--without-routes : Jangan publikasikan berkas routes/security.php dan routes/security-api.php}
+                            {--without-routes : Jangan publikasikan berkas routes/pasak.php dan routes/pasak-api.php}
                             {--without-api : Jangan periksa atau pasang rute API (install:api)}
                             {--with-dashboard : Publikasikan tampilan dashboard monitoring Livewire / Blade Starter Kit}
                             {--with-blade : Publikasikan tampilan dashboard monitoring Livewire / Blade Starter Kit (alias)}
@@ -26,11 +26,11 @@ class SecurityInstallCommand extends Command
                             {--stack= : Tentukan stack tampilan dashboard (blade, tsx, both, none)}
                             {--with-htaccess : Paksa perbarui berkas public/.htaccess dengan aturan hardening}';
 
-    protected $description = 'Instalasi dan publikasi aset Laravel Security Monitor (konfigurasi, migrasi, Nginx, Apache .htaccess, halaman blokir, tampilan Blade/TSX, trait User, middleware WAF, rute web & API kustom, dan .env)';
+    protected $description = 'Instalasi dan publikasi aset Pasak (konfigurasi, migrasi, Nginx, Apache .htaccess, halaman blokir, tampilan Blade/TSX, trait User, middleware WAF, rute web & API kustom, dan .env)';
 
     public function handle(): int
     {
-        $this->info('Memulai instalasi Laravel Security Monitor (Bulwark)...');
+        $this->info('Memulai instalasi Pasak (Bulwark)...');
         $this->newLine();
 
         $force = (bool) $this->option('force');
@@ -66,7 +66,7 @@ class SecurityInstallCommand extends Command
         // Jika dijalankan interaktif di terminal (bukan test suite) dan opsi dashboard belum dipilih
         if (! app()->runningUnitTests() && ! $withDashboard && ! $withReactDashboard && ! $withoutViews && $this->input->isInteractive()) {
             $choice = $this->choice(
-                'Sediakan tampilan dashboard monitoring di prefix /security (wajib login)?',
+                'Sediakan tampilan dashboard monitoring di prefix /pasak (wajib login)?',
                 [
                     'blade' => 'Blade (Livewire / Flux UI Starter Kit)',
                     'tsx' => 'TSX (Inertia + React / shadcn Starter Kit)',
@@ -89,14 +89,14 @@ class SecurityInstallCommand extends Command
         // 1. Publish Config
         $this->comment('Mempublikasikan berkas konfigurasi...');
         $this->call('vendor:publish', [
-            '--tag' => 'security-config',
+            '--tag' => 'pasak-config',
             '--force' => $force,
         ]);
 
         // 2. Publish Migrations
         $this->comment('Mempublikasikan berkas migrasi database...');
         $this->call('vendor:publish', [
-            '--tag' => 'security-migrations',
+            '--tag' => 'pasak-migrations',
             '--force' => $force,
         ]);
 
@@ -106,7 +106,7 @@ class SecurityInstallCommand extends Command
                 'Mempublikasikan konfigurasi server Nginx (nginx.conf)...',
             );
             $this->call('vendor:publish', [
-                '--tag' => 'security-nginx',
+                '--tag' => 'pasak-nginx',
                 '--force' => $force,
             ]);
         }
@@ -117,7 +117,7 @@ class SecurityInstallCommand extends Command
                 'Mempublikasikan konfigurasi server Apache2 (apache2.conf)...',
             );
             $this->call('vendor:publish', [
-                '--tag' => 'security-apache',
+                '--tag' => 'pasak-apache',
                 '--force' => $force,
             ]);
         }
@@ -136,7 +136,7 @@ class SecurityInstallCommand extends Command
                 'Mempublikasikan halaman blokir default (resources/views/errors/blocked.blade.php)...',
             );
             $this->call('vendor:publish', [
-                '--tag' => 'security-views',
+                '--tag' => 'pasak-views',
                 '--force' => $force,
             ]);
         }
@@ -144,7 +144,7 @@ class SecurityInstallCommand extends Command
         // 6. Publish Blade / Livewire Starter Kit monitoring dashboard
         if ($withDashboard) {
             $this->comment(
-                'Mempublikasikan dashboard monitoring Blade (resources/views/pages/security)...',
+                'Mempublikasikan dashboard monitoring Blade (resources/views/pages/pasak)...',
             );
             $this->call('vendor:publish', [
                 '--tag' => 'starterkit-blade',
@@ -155,7 +155,7 @@ class SecurityInstallCommand extends Command
         // 7. Publish React / TSX Starter Kit monitoring dashboard
         if ($withReactDashboard) {
             $this->comment(
-                'Mempublikasikan dashboard monitoring TSX (resources/js/pages/security & components)...',
+                'Mempublikasikan dashboard monitoring TSX (resources/js/pages/pasak & components)...',
             );
             $this->call('vendor:publish', [
                 '--tag' => 'starterkit-tsx',
@@ -179,10 +179,10 @@ class SecurityInstallCommand extends Command
             $this->registerMiddlewareInApp();
         }
 
-        // 10. Ensure API support & publish customizable route files (routes/security.php & routes/security-api.php)
+        // 10. Ensure API support & publish customizable route files (routes/pasak.php & routes/pasak-api.php)
         if (! $withoutRoutes) {
             $this->comment(
-                'Menyiapkan rute mandiri (routes/security.php & routes/security-api.php)...',
+                'Menyiapkan rute mandiri (routes/pasak.php & routes/pasak-api.php)...',
             );
             $this->publishSecurityRoutes($force, $withoutApi);
         }
@@ -199,94 +199,90 @@ class SecurityInstallCommand extends Command
         $this->info('Instalasi aset berhasil diselesaikan!');
         $this->newLine();
 
+        $dashboardPrefix = '/'.ltrim((string) config('pasak.dashboard.prefix', 'pasak'), '/');
+        $steps = [];
+        $steps[] = ["Jalankan migrasi database:", 'php artisan migrate'];
+        if (! $withoutUserTrait) {
+            $steps[] = ['Model User: Trait HasSecurityRelations berhasil disematkan secara otomatis.'];
+        } else {
+            $steps[] = [
+                'Tambahkan trait HasSecurityRelations ke model User:',
+                'use Internal\Pasak\Concerns\HasSecurityRelations;',
+            ];
+        }
+        if (! $withoutMiddleware) {
+            $steps[] = ['Middleware WAF: BlockIpAddress & DetectSecurityThreats berhasil didaftarkan otomatis.'];
+        } else {
+            $steps[] = [
+                'Daftarkan middleware proteksi WAF di bootstrap/app.php (Laravel 11+) atau app/Http/Kernel.php (Laravel 10):',
+                '\Internal\Pasak\Http\Middleware\BlockIpAddress::class',
+                '\Internal\Pasak\Http\Middleware\DetectSecurityThreats::class',
+            ];
+        }
+        if (! $withoutRoutes) {
+            $steps[] = ['Rute kustom: berkas routes/pasak.php (web) dan routes/pasak-api.php (API) siap dikustomisasi.'];
+        }
+        $steps[] = [
+            'Sesuaikan variabel PASAK_* di berkas .env, minimal:',
+            'PASAK_IP_WHITELIST=127.0.0.1,::1,<ip-kantor-anda>   # agar IP internal tidak pernah diblokir',
+            'PASAK_SUPPORT_EMAIL=security@domain-anda.test          # tampil di halaman blokir 403',
+        ];
+        $steps[] = [
+            'Aktifkan scheduler Laravel agar pembersihan log & heartbeat berjalan (sekali saja):',
+            '* * * * * cd /path-ke-proyek && php artisan schedule:run >> /dev/null 2>&1',
+        ];
+        $steps[] = [
+            'Buat baseline integritas berkas (deteksi backdoor):',
+            'php artisan pasak:baseline --create',
+        ];
+        $steps[] = [
+            'Uji cepat: buka satu URL normal (harus 200) lalu simulasi probe aman (harus 403 + tercatat):',
+            "curl -I https://domain-anda.test/                                  # 200",
+            "curl -I 'https://domain-anda.test/?q=%7B%7B7*7%7D%7D'               # 403",
+        ];
+        if (! $withoutNginx) {
+            $steps[] = ['Web server Nginx: periksa dan sesuaikan nginx.conf di root proyek, lalu reload nginx.'];
+        }
+        if (! $withoutApache) {
+            $steps[] = ['Web server Apache2: periksa dan sesuaikan apache2.conf di root proyek, lalu reload apache2.'];
+        }
+        if (! $withoutHtaccess) {
+            $steps[] = ['Apache / cPanel: public/.htaccess telah diperkuat terhadap upload webshell, double extension, dotfile, dan file backup.'];
+        }
+        if (! $withoutViews) {
+            $steps[] = ['Halaman blokir: sesuaikan resources/views/errors/blocked.blade.php dengan branding aplikasi Anda.'];
+        }
+        if ($withDashboard && $withReactDashboard) {
+            $steps[] = [
+                "Dashboard Blade & TSX: siap diakses pada prefix {$dashboardPrefix} (wajib login).",
+                'Ganti driver aktif di .env (PASAK_DASHBOARD_DRIVER=livewire atau react).',
+            ];
+        } elseif ($withDashboard) {
+            $steps[] = ["Dashboard Blade: siap diakses pada prefix {$dashboardPrefix} (wajib login)."];
+        } elseif ($withReactDashboard) {
+            $steps[] = [
+                "Dashboard TSX: siap diakses pada prefix {$dashboardPrefix} (wajib login).",
+                'Jalankan npm run build untuk memproses aset TSX pada Vite.',
+            ];
+        } else {
+            $steps[] = ['Dashboard monitoring (opsional): sediakan kapan saja dengan php artisan pasak:install --with-blade atau --with-tsx.'];
+        }
+        if (config('pasak.access_log.auto_scan_enabled', false) === false) {
+            $steps[] = [
+                'Opsional: pindai access log web server untuk serangan yang tak sampai ke PHP:',
+                'php artisan pasak:scan-logs --since="24 hours ago"',
+            ];
+        }
+
         $this->line(
             '<fg=cyan>Langkah selanjutnya untuk mengaktifkan proteksi & dashboard:</>',
         );
-        $this->line('  1. Jalankan migrasi database:');
-        $this->line('     <fg=yellow>php artisan migrate</>');
-        if (! $withoutUserTrait) {
-            $this->line(
-                '  2. Model User: Trait <fg=green>HasSecurityRelations</> berhasil disematkan secara otomatis.',
-            );
-        } else {
-            $this->line(
-                '  2. Tambahkan trait <fg=yellow>HasSecurityRelations</> ke model User:',
-            );
-            $this->line(
-                "     <fg=gray>use Internal\SecurityMonitor\Concerns\HasSecurityRelations;</>",
-            );
-        }
-        if (! $withoutMiddleware) {
-            $this->line(
-                '  3. Middleware WAF: <fg=green>BlockIpAddress</> & <fg=green>DetectSecurityThreats</> berhasil didaftarkan otomatis.',
-            );
-        } else {
-            $this->line(
-                '  3. Daftarkan middleware proteksi WAF di <fg=yellow>bootstrap/app.php</> (Laravel 11+)',
-            );
-            $this->line(
-                '     atau <fg=yellow>app/Http/Kernel.php</> (Laravel 10):',
-            );
-            $this->line(
-                "     <fg=gray>\Internal\SecurityMonitor\Http\Middleware\BlockIpAddress::class</>",
-            );
-            $this->line(
-                "     <fg=gray>\Internal\SecurityMonitor\Http\Middleware\DetectSecurityThreats::class</>",
-            );
-        }
-        if (! $withoutRoutes) {
-            $this->line(
-                '  4. Rute Kustom: Berkas <fg=green>routes/security.php</> (web) dan <fg=green>routes/security-api.php</> (API) siap dikustomisasi.',
-            );
-        }
-        $this->line(
-            '  5. Sesuaikan nilai variabel <fg=yellow>SECURITY_*</> di berkas <fg=yellow>.env</>',
-        );
-        if (! $withoutNginx) {
-            $this->line(
-                '  6. Web Server Nginx: Periksa dan sesuaikan <fg=yellow>nginx.conf</> di root proyek.',
-            );
-        }
-        if (! $withoutApache) {
-            $this->line(
-                '  7. Web Server Apache2: Periksa dan sesuaikan <fg=yellow>apache2.conf</> di root proyek.',
-            );
-        }
-        if (! $withoutHtaccess) {
-            $this->line(
-                '  8. Web Server Apache / cPanel: Berkas <fg=yellow>public/.htaccess</> telah diperkuat',
-            );
-            $this->line(
-                '     terhadap upload webshell, double extension, pembacaan dotfile, dan file backup.',
-            );
-        }
-        if (! $withoutViews) {
-            $this->line(
-                '  8. Halaman blokir: Sesuaikan <fg=yellow>resources/views/errors/blocked.blade.php</> sesuai branding aplikasi Anda.',
-            );
-        }
-        if ($withDashboard && $withReactDashboard) {
-            $this->line(
-                '  9. Dashboard Blade & TSX: Siap diakses pada prefix <fg=yellow>/security</> (wajib login pengguna).',
-            );
-            $this->line(
-                '     Ganti driver aktif di .env (<fg=yellow>SECURITY_DASHBOARD_DRIVER=blade</> atau <fg=yellow>react</>).',
-            );
-        } elseif ($withDashboard) {
-            $this->line(
-                '  9. Dashboard Blade: Siap diakses pada prefix <fg=yellow>/security</> (wajib login pengguna).',
-            );
-        } elseif ($withReactDashboard) {
-            $this->line(
-                '  9. Dashboard TSX: Siap diakses pada prefix <fg=yellow>/security</> (wajib login pengguna).',
-            );
-            $this->line(
-                '     Jalankan <fg=yellow>npm run build</> untuk memproses aset TSX pada Vite.',
-            );
-        } else {
-            $this->line(
-                '  9. Dashboard monitoring (opsional): Sediakan kapan saja dengan <fg=yellow>php artisan security:install --with-blade</> atau <fg=yellow>--with-tsx</>.',
-            );
+        foreach ($steps as $index => $lines) {
+            $number = $index + 1;
+            $this->line("  {$number}. {$lines[0]}");
+            foreach (array_slice($lines, 1) as $detail) {
+                $this->line("     <fg=yellow>{$detail}</>");
+            }
         }
 
         return self::SUCCESS;
@@ -388,8 +384,8 @@ class SecurityInstallCommand extends Command
         if ($withDashboard || $withReactDashboard) {
             $driver = ($withReactDashboard && ! $withDashboard) ? 'react' : 'livewire';
             $stubContent = str_replace(
-                ['SECURITY_DASHBOARD_ENABLED=false', 'SECURITY_DASHBOARD_DRIVER=livewire'],
-                ['SECURITY_DASHBOARD_ENABLED=true', "SECURITY_DASHBOARD_DRIVER={$driver}"],
+                ['PASAK_DASHBOARD_ENABLED=false', 'PASAK_DASHBOARD_DRIVER=livewire'],
+                ['PASAK_DASHBOARD_ENABLED=true', "PASAK_DASHBOARD_DRIVER={$driver}"],
                 $stubContent
             );
         }
@@ -410,22 +406,22 @@ class SecurityInstallCommand extends Command
             }
 
             $currentContent = File::get($targetPath);
-            if (str_contains($currentContent, 'SECURITY_MONITOR_ENABLED')) {
+            if (str_contains($currentContent, 'PASAK_MONITOR_ENABLED')) {
                 if ($withDashboard || $withReactDashboard) {
                     $driver = ($withReactDashboard && ! $withDashboard) ? 'react' : 'livewire';
                     $updated = preg_replace(
-                        '/SECURITY_DASHBOARD_ENABLED=(false|0)/',
-                        'SECURITY_DASHBOARD_ENABLED=true',
+                        '/PASAK_DASHBOARD_ENABLED=(false|0)/',
+                        'PASAK_DASHBOARD_ENABLED=true',
                         $currentContent
                     );
                     $updated = preg_replace(
-                        '/SECURITY_DASHBOARD_DRIVER=[^\r\n]+/',
-                        "SECURITY_DASHBOARD_DRIVER={$driver}",
+                        '/PASAK_DASHBOARD_DRIVER=[^\r\n]+/',
+                        "PASAK_DASHBOARD_DRIVER={$driver}",
                         (string) $updated
                     );
                     if ($updated !== null && $updated !== $currentContent) {
                         File::put($targetPath, $updated);
-                        $this->info("  ✓ Berkas {$envFile} diperbarui: SECURITY_DASHBOARD_ENABLED=true ({$driver}).");
+                        $this->info("  ✓ Berkas {$envFile} diperbarui: PASAK_DASHBOARD_ENABLED=true ({$driver}).");
                     }
                 }
                 $this->line(
@@ -452,7 +448,7 @@ class SecurityInstallCommand extends Command
             app_path('User.php'),
         ];
 
-        $userModelClass = config('security.user_model');
+        $userModelClass = config('pasak.user_model');
         if (is_string($userModelClass) && class_exists($userModelClass)) {
             try {
                 $reflector = new \ReflectionClass($userModelClass);
@@ -487,9 +483,9 @@ class SecurityInstallCommand extends Command
             return;
         }
 
-        // 1. Tambahkan import `use Internal\SecurityMonitor\Concerns\HasSecurityRelations;`
-        $importStatement = "use Internal\\SecurityMonitor\\Concerns\\HasSecurityRelations;\n";
-        if (! str_contains($content, 'use Internal\\SecurityMonitor\\Concerns\\HasSecurityRelations;')) {
+        // 1. Tambahkan import `use Internal\Pasak\Concerns\HasSecurityRelations;`
+        $importStatement = "use Internal\\Pasak\\Concerns\\HasSecurityRelations;\n";
+        if (! str_contains($content, 'use Internal\\Pasak\\Concerns\\HasSecurityRelations;')) {
             $lastUsePos = strrpos($content, "\nuse ");
             if ($lastUsePos !== false) {
                 $endOfLine = strpos($content, "\n", $lastUsePos + 1);
@@ -549,8 +545,8 @@ class SecurityInstallCommand extends Command
             if (preg_match('/->withMiddleware\s*\(\s*function\s*\(\s*(?:Middleware\s+)?\$([a-zA-Z0-9_]+)\s*\)(?:\s*:\s*void)?\s*\{/i', $content, $matches, PREG_OFFSET_CAPTURE)) {
                 $varName = $matches[1][0];
                 $snippet = "        \${$varName}->append([\n"
-                    ."            \\Internal\\SecurityMonitor\\Http\\Middleware\\BlockIpAddress::class,\n"
-                    ."            \\Internal\\SecurityMonitor\\Http\\Middleware\\DetectSecurityThreats::class,\n"
+                    ."            \\Internal\\Pasak\\Http\\Middleware\\BlockIpAddress::class,\n"
+                    ."            \\Internal\\Pasak\\Http\\Middleware\\DetectSecurityThreats::class,\n"
                     ."        ]);\n";
 
                 $matchEnd = $matches[0][1] + strlen($matches[0][0]);
@@ -582,8 +578,8 @@ class SecurityInstallCommand extends Command
                 return;
             }
 
-            $middlewareSnippet = "        \\Internal\\SecurityMonitor\\Http\\Middleware\\BlockIpAddress::class,\n"
-                ."        \\Internal\\SecurityMonitor\\Http\\Middleware\\DetectSecurityThreats::class,\n";
+            $middlewareSnippet = "        \\Internal\\Pasak\\Http\\Middleware\\BlockIpAddress::class,\n"
+                ."        \\Internal\\Pasak\\Http\\Middleware\\DetectSecurityThreats::class,\n";
 
             if (preg_match('/protected\s+\$middleware\s*=\s*\[/i', $content, $matches, PREG_OFFSET_CAPTURE)) {
                 $pos = $matches[0][1] + strlen($matches[0][0]);
@@ -676,7 +672,7 @@ PHP
     }
 
     /**
-     * Publikasikan berkas rute security.php dan security-api.php ke direktori routes/ host application.
+     * Publikasikan berkas rute pasak.php dan pasak-api.php ke direktori routes/ host application.
      */
     protected function publishSecurityRoutes(bool $force, bool $withoutApi = false): void
     {
@@ -689,55 +685,55 @@ PHP
             File::makeDirectory($routesDir, 0755, true, true);
         }
 
-        // 1. Publikasikan routes/security-api.php
-        $apiStubPath = __DIR__.'/../../../stubs/routes/security-api.php.stub';
+        // 1. Publikasikan routes/pasak-api.php
+        $apiStubPath = __DIR__.'/../../../stubs/routes/pasak-api.php.stub';
         if (! File::exists($apiStubPath)) {
-            $apiStubPath = dirname(__DIR__, 2).'/stubs/routes/security-api.php.stub';
+            $apiStubPath = dirname(__DIR__, 2).'/stubs/routes/pasak-api.php.stub';
         }
-        $targetApiPath = base_path('routes/security-api.php');
+        $targetApiPath = base_path('routes/pasak-api.php');
 
         if (File::exists($apiStubPath)) {
             if (! File::exists($targetApiPath) || $force) {
                 File::copy($apiStubPath, $targetApiPath);
-                $this->info('  ✓ Berkas routes/security-api.php berhasil dibuat.');
+                $this->info('  ✓ Berkas routes/pasak-api.php berhasil dibuat.');
             } else {
-                $this->line('  ✓ Berkas routes/security-api.php sudah ada.');
+                $this->line('  ✓ Berkas routes/pasak-api.php sudah ada.');
             }
         }
 
-        // 2. Publikasikan routes/security.php
-        $webStubPath = __DIR__.'/../../../stubs/routes/security.php.stub';
+        // 2. Publikasikan routes/pasak.php
+        $webStubPath = __DIR__.'/../../../stubs/routes/pasak.php.stub';
         if (! File::exists($webStubPath)) {
-            $webStubPath = dirname(__DIR__, 2).'/stubs/routes/security.php.stub';
+            $webStubPath = dirname(__DIR__, 2).'/stubs/routes/pasak.php.stub';
         }
-        $targetWebPath = base_path('routes/security.php');
+        $targetWebPath = base_path('routes/pasak.php');
 
         if (File::exists($webStubPath)) {
             if (! File::exists($targetWebPath) || $force) {
                 File::copy($webStubPath, $targetWebPath);
-                $this->info('  ✓ Berkas routes/security.php berhasil dibuat (render view langsung).');
+                $this->info('  ✓ Berkas routes/pasak.php berhasil dibuat (render view langsung).');
             } else {
-                $this->line('  ✓ Berkas routes/security.php sudah ada.');
+                $this->line('  ✓ Berkas routes/pasak.php sudah ada.');
             }
         }
 
-        // 3. Sertakan routes/security.php di routes/web.php jika belum ada
+        // 3. Sertakan routes/pasak.php di routes/web.php jika belum ada
         $webRouteFile = base_path('routes/web.php');
         if (File::exists($webRouteFile)) {
             $webContent = File::get($webRouteFile);
             if (! str_contains($webContent, 'security.php')) {
                 File::append($webRouteFile, "\nrequire __DIR__.'/security.php';\n");
-                $this->info('  ✓ Berkas routes/web.php menyertakan routes/security.php.');
+                $this->info('  ✓ Berkas routes/web.php menyertakan routes/pasak.php.');
             }
         }
 
-        // 4. Sertakan routes/security-api.php di routes/api.php jika belum ada
+        // 4. Sertakan routes/pasak-api.php di routes/api.php jika belum ada
         $apiRouteFile = base_path('routes/api.php');
         if (File::exists($apiRouteFile)) {
             $apiContent = File::get($apiRouteFile);
             if (! str_contains($apiContent, 'security-api.php')) {
                 File::append($apiRouteFile, "\nrequire __DIR__.'/security-api.php';\n");
-                $this->info('  ✓ Berkas routes/api.php menyertakan routes/security-api.php.');
+                $this->info('  ✓ Berkas routes/api.php menyertakan routes/pasak-api.php.');
             }
         }
     }

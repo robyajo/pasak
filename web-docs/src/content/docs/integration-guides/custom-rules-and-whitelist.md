@@ -76,7 +76,7 @@ SECURITY_WHITELIST="127.0.0.1,::1,192.168.1.0/24,10.10.0.0/16,103.11.22.33"
 ```
 
 ### Logika Pemeriksaan Subnet:
-Metode `SecurityMonitorService::isWhitelisted()` secara otomatis mendukung:
+Metode `PasakService::isWhitelisted()` secara otomatis mendukung:
 1. **Pencocokan Alamat IPv4 / IPv6 Tunggal**: (misal `127.0.0.1`, `::1`).
 2. **Pencocokan Notasi CIDR Subnet**: (misal `192.168.1.0/24` atau `10.0.0.0/8`).
 3. **Pencocokan Wildcard Sederhana**: (misal `192.168.*.*`).

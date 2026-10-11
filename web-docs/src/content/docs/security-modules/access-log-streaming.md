@@ -75,7 +75,7 @@ SECURITY_ACCESS_LOG_AUTO_SCAN_HOURS=24
 SECURITY_ACCESS_LOG_PATHS=/var/log/nginx/access.log,/var/log/nginx/error.log
 ```
 
-Ketika opsi ini aktif, `SecurityMonitorServiceProvider` akan secara otomatis menjadwalkan perintah:
+Ketika opsi ini aktif, `PasakServiceProvider` akan secara otomatis menjadwalkan perintah:
 ```bash
 php artisan security:scan-logs --import --min-level=high --since="24 hours ago"
 ```

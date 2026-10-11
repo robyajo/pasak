@@ -7,7 +7,7 @@ import pkg from '../data/package.json';
 // serta skrip Mermaid.
 const { head, entry } = Astro.locals.starlightRoute;
 const title = entry.data.title;
-const description = entry.data.description || 'Dokumentasi resmi robyajo/laravel-security-monitor (Bulwark) — Enterprise Headless Web Application Firewall untuk Laravel.';
+const description = entry.data.description || 'Dokumentasi resmi robyajo/pasak (Bulwark) — Enterprise Headless Web Application Firewall untuk Laravel.';
 const pathname = Astro.url.pathname;
 const siteOrigin = Astro.site ? Astro.site.origin : (Astro.url.origin || 'https://docs.example.com');
 const canonicalUrl = new URL(pathname, siteOrigin).href;
@@ -65,7 +65,7 @@ const allKeywords = [
   'laravel security monitor',
   'bulwark waf',
   'bulwark laravel',
-  'robyajo/laravel-security-monitor',
+  'robyajo/pasak',
   'robyajo',
   'roby karti s',
 
@@ -125,10 +125,10 @@ const allKeywords = [
 const websiteSchema = {
   '@context': 'https://schema.org',
   '@type': 'WebSite',
-  name: 'Laravel Security Monitor',
-  alternateName: ['Bulwark', 'robyajo/laravel-security-monitor', 'Security Pekanbaru', 'Laravel Security Pekanbaru', 'Diskominfo Pekanbaru Security'],
+  name: 'Pasak',
+  alternateName: ['Bulwark', 'robyajo/pasak', 'Security Pekanbaru', 'Laravel Security Pekanbaru', 'Diskominfo Pekanbaru Security'],
   url: siteOrigin + '/',
-  description: 'Dokumentasi resmi robyajo/laravel-security-monitor (Bulwark) — Enterprise Headless Web Application Firewall & Audit Library untuk Laravel. Layanan Keamanan Sistem Informasi & Siber Kota Pekanbaru (security-dev.pekanbaru.go.id).',
+  description: 'Dokumentasi resmi robyajo/pasak (Bulwark) — Enterprise Headless Web Application Firewall & Audit Library untuk Laravel. Layanan Keamanan Sistem Informasi & Siber Kota Pekanbaru (security-dev.pekanbaru.go.id).',
   inLanguage: 'id-ID',
   keywords: allKeywords,
 };
@@ -136,13 +136,13 @@ const websiteSchema = {
 const softwareSchema = {
   '@context': 'https://schema.org',
   '@type': 'SoftwareApplication',
-  name: 'Laravel Security Monitor (Bulwark)',
+  name: 'Pasak (Bulwark)',
   applicationCategory: 'SecurityApplication',
   operatingSystem: 'PHP ^8.2 | ^8.3 | ^8.4, Laravel ^10 | ^11 | ^12 | ^13',
   softwareVersion: pkg?.packagist?.version || '2.0.10',
   license: 'https://opensource.org/licenses/MIT',
-  url: 'https://github.com/robyajo/laravel-security-monitor',
-  downloadUrl: 'https://packagist.org/packages/robyajo/laravel-security-monitor',
+  url: 'https://github.com/robyajo/pasak',
+  downloadUrl: 'https://packagist.org/packages/robyajo/pasak',
   keywords: allKeywords,
   author: {
     '@type': 'Person',
@@ -171,7 +171,7 @@ const articleSchema = !isHome ? {
   },
   publisher: {
     '@type': 'Organization',
-    name: 'Laravel Security Monitor',
+    name: 'Pasak',
     url: siteOrigin + '/',
     logo: {
       '@type': 'ImageObject',
@@ -210,7 +210,7 @@ const breadcrumbSchema = breadcrumbItems.length > 1 ? {
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="630" />
 <meta property="og:image:type" content="image/png" />
-<meta property="og:image:alt" content="Laravel Security Monitor (Bulwark) — Enterprise Headless WAF" />
+<meta property="og:image:alt" content="Pasak (Bulwark) — Enterprise Headless WAF" />
 <meta property="og:locale" content="id_ID" />
 <meta name="twitter:image" content={ogImageUrl} />
 <meta name="twitter:card" content="summary_large_image" />

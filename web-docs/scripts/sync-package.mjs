@@ -19,7 +19,7 @@ const here = dirname(fileURLToPath(import.meta.url));
 const webRoot = join(here, '..');
 const pkgRoot = join(webRoot, '..');
 
-const PACKAGE = 'robyajo/laravel-security-monitor';
+const PACKAGE = 'robyajo/pasak';
 const REPOSITORY = `https://github.com/${PACKAGE}`;
 const PACKAGIST = `https://packagist.org/packages/${PACKAGE}`;
 const RAW_CHANGELOG = `https://raw.githubusercontent.com/${PACKAGE}/main/CHANGELOG.md`;
@@ -62,7 +62,7 @@ async function fetchWithTimeout(url, as = 'text', timeout = 15000) {
 	try {
 		const response = await fetch(url, {
 			signal: controller.signal,
-			headers: { 'User-Agent': 'laravel-security-monitor-docs' },
+			headers: { 'User-Agent': 'pasak-docs' },
 		});
 
 		if (!response.ok) {

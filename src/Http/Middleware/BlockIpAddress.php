@@ -1,11 +1,11 @@
 <?php
 
-namespace Internal\SecurityMonitor\Http\Middleware;
+namespace Internal\Pasak\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use Internal\SecurityMonitor\Models\BlockedIp;
-use Internal\SecurityMonitor\Services\SecurityMonitorService;
+use Internal\Pasak\Models\BlockedIp;
+use Internal\Pasak\Services\PasakService;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -16,7 +16,7 @@ class BlockIpAddress
 {
     public function handle(Request $request, Closure $next): Response
     {
-        $service = app(SecurityMonitorService::class);
+        $service = app(PasakService::class);
         $ip = $service->resolveClientIp($request);
         $deviceId = $service->resolveDeviceId($request);
         $localIp = $service->resolveLocalIp($request);
@@ -79,7 +79,7 @@ class BlockIpAddress
         Request $request,
         mixed $block = null,
     ): Response {
-        $service = app(SecurityMonitorService::class);
+        $service = app(PasakService::class);
         $ip = $service->resolveClientIp($request);
         $deviceId = $service->resolveDeviceId($request);
         $localIp = $service->resolveLocalIp($request);
@@ -190,7 +190,7 @@ class BlockIpAddress
         ?string $reason = null,
         array $extra = [],
     ): Response {
-        $service = app(SecurityMonitorService::class);
+        $service = app(PasakService::class);
         $ip = $service->resolveClientIp($request);
         $deviceId = $service->resolveDeviceId($request);
         $localIp = $service->resolveLocalIp($request);

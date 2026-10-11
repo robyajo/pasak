@@ -1,9 +1,9 @@
 {
-  "name": "robyajo/laravel-security-monitor",
+  "name": "robyajo/pasak",
   "version": "2.1.0",
-  "repository": "https://github.com/robyajo/laravel-security-monitor",
+  "repository": "https://github.com/robyajo/pasak",
   "packagist": {
-    "url": "https://packagist.org/packages/robyajo/laravel-security-monitor",
+    "url": "https://packagist.org/packages/robyajo/pasak",
     "version": "2.1.0",
     "released": "2026-10-09"
   },

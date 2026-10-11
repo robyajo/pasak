@@ -12,7 +12,7 @@ parameters:
     reportUnmatchedIgnoredErrors: false
     ignoreErrors:
         # The trait is consumed by the host application's User model.
-        - '#Trait Internal\\SecurityMonitor\\Concerns\\HasSecurityRelations is used zero times and is not analysed#'
+        - '#Trait Internal\\Pasak\\Concerns\\HasSecurityRelations is used zero times and is not analysed#'
         # Dynamic filesystem / runtime state checks
         - '#Negated boolean expression is always true.#'
         - '#Instanceof between .*Request and .*Request will always evaluate to true.#'

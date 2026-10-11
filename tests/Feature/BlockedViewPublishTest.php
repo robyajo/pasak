@@ -52,7 +52,7 @@ test('security install command publishes the default blocked view', function () 
         File::delete($path);
     }
 
-    $this->artisan('security:install', [
+    $this->artisan('pasak:install', [
         '--force' => true,
     ])->assertSuccessful();
 
@@ -66,7 +66,7 @@ test('security install command respects without-views option', function () {
         File::delete($path);
     }
 
-    $this->artisan('security:install', [
+    $this->artisan('pasak:install', [
         '--without-views' => true,
     ])->assertSuccessful();
 

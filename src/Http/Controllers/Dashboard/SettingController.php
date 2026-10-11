@@ -1,19 +1,19 @@
 <?php
 
-namespace Internal\SecurityMonitor\Http\Controllers\Dashboard;
+namespace Internal\Pasak\Http\Controllers\Dashboard;
 
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Inertia\Inertia;
 use Inertia\Response;
-use Internal\SecurityMonitor\Services\SecurityMonitorService;
-use Internal\SecurityMonitor\Services\VersionCheckService;
+use Internal\Pasak\Services\PasakService;
+use Internal\Pasak\Services\VersionCheckService;
 
 class SettingController extends Controller
 {
     public function __construct(
-        protected SecurityMonitorService $securityService,
+        protected PasakService $securityService,
     ) {}
 
     /**

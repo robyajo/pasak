@@ -1,14 +1,14 @@
 <?php
 
-namespace Internal\SecurityMonitor\Http\Controllers\Dashboard;
+namespace Internal\Pasak\Http\Controllers\Dashboard;
 
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Inertia\Inertia;
 use Inertia\Response;
-use Internal\SecurityMonitor\Models\LoginAttempt;
-use Internal\SecurityMonitor\Services\ServerSecurityService;
+use Internal\Pasak\Models\LoginAttempt;
+use Internal\Pasak\Services\ServerSecurityService;
 
 /**
  * Server audit page for the Inertia + React dashboard.

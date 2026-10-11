@@ -1,13 +1,13 @@
 <?php
 
 use Illuminate\Http\Request;
-use Internal\SecurityMonitor\Models\BlockedIp;
-use Internal\SecurityMonitor\Models\IpUnblockRequest;
-use Internal\SecurityMonitor\Services\SecurityMonitorService;
-use Internal\SecurityMonitor\Tests\TestUser;
+use Internal\Pasak\Models\BlockedIp;
+use Internal\Pasak\Models\IpUnblockRequest;
+use Internal\Pasak\Services\PasakService;
+use Internal\Pasak\Tests\TestUser;
 
 test('device-scoped block only blocks the offending device while innocent devices on same public router IP remain unblocked', function () {
-    $service = app(SecurityMonitorService::class);
+    $service = app(PasakService::class);
     $publicRouterIp = '158.140.185.154';
     $rogueDeviceId = 'dev-rogue-device-001';
     $rogueLocalIp = '192.168.1.15';
@@ -51,7 +51,7 @@ test('device-scoped block only blocks the offending device while innocent device
 });
 
 test('ip-scoped block blocks all devices coming from that router public IP', function () {
-    $service = app(SecurityMonitorService::class);
+    $service = app(PasakService::class);
     $publicRouterIp = '158.140.185.154';
 
     BlockedIp::create([
@@ -81,7 +81,7 @@ test('submitting appeal ticket records device_id and local_ip', function () {
     $localIp = '192.168.1.42';
 
     $response = $this->withServerVariables(['REMOTE_ADDR' => $publicIp])
-        ->postJson('/api/security/unblock-tickets/submit', [
+        ->postJson('/api/pasak/unblock-tickets/submit', [
             'name' => 'Budi Santoso',
             'email' => 'budi@example.com',
             'phone' => '08123456789',
@@ -133,7 +133,7 @@ test('approving unblock ticket unblocks the specific device and lifts block', fu
     ]);
 
     $response = $this->actingAs($admin)
-        ->postJson("/api/security/unblock-tickets/{$ticket->id}/respond", [
+        ->postJson("/api/pasak/unblock-tickets/{$ticket->id}/respond", [
             'action' => 'approve',
             'admin_notes' => 'Disetujui setelah diverifikasi bukan bot.',
             'whitelist_ip' => true,
@@ -146,12 +146,12 @@ test('approving unblock ticket unblocks the specific device and lifts block', fu
     expect($ticket->status)->toBe('approved');
     expect($blocked->is_active)->toBeFalse();
 
-    $service = app(SecurityMonitorService::class);
+    $service = app(PasakService::class);
     expect($service->activeBlock($publicIp, $deviceId, $localIp))->toBeNull();
 });
 
 test('security monitor resolves real client IP behind reverse proxy headers', function () {
-    $service = app(SecurityMonitorService::class);
+    $service = app(PasakService::class);
 
     $requestCf = Request::create('/', 'GET');
     $requestCf->headers->set('CF-Connecting-IP', '203.0.113.199');
@@ -167,10 +167,10 @@ test('security monitor resolves real client IP behind reverse proxy headers', fu
 });
 
 test('instant block automatically isolates only the attacker device without blocking other users on the same WiFi router', function () {
-    config()->set('security.enabled', true);
-    config()->set('security.block_enforcement', true);
-    config()->set('security.instant_block.enabled', true);
-    config()->set('security.instant_block.scope', 'device');
+    config()->set('pasak.enabled', true);
+    config()->set('pasak.block_enforcement', true);
+    config()->set('pasak.instant_block.enabled', true);
+    config()->set('pasak.instant_block.scope', 'device');
 
     $sharedRouterIp = '103.247.10.55';
     $attackerUa = 'SqlMapAttacker/1.0';
@@ -202,11 +202,11 @@ test('instant block automatically isolates only the attacker device without bloc
 });
 
 test('auto block automatically isolates only the attacker device without blocking innocent devices on the same WiFi router', function () {
-    config()->set('security.enabled', true);
-    config()->set('security.block_enforcement', true);
-    config()->set('security.auto_block.enabled', true);
-    config()->set('security.auto_block.threshold', 3);
-    config()->set('security.auto_block.scope', 'device');
+    config()->set('pasak.enabled', true);
+    config()->set('pasak.block_enforcement', true);
+    config()->set('pasak.auto_block.enabled', true);
+    config()->set('pasak.auto_block.threshold', 3);
+    config()->set('pasak.auto_block.scope', 'device');
 
     $sharedRouterIp = '103.247.10.77';
     $attackerDeviceId = 'rogue-laptop-office-wifi';

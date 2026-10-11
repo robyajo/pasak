@@ -57,7 +57,7 @@ test('security install command runs and publishes htaccess configuration', funct
         File::delete($publishedPath);
     }
 
-    $this->artisan('security:install', [
+    $this->artisan('pasak:install', [
         '--force' => true,
     ])->assertSuccessful();
 
@@ -76,7 +76,7 @@ test('security install command appends hardening to existing htaccess and create
     $publishedPath = public_path('.htaccess');
     File::put($publishedPath, "# Custom User Rewrite Rules\nRewriteEngine On\n");
 
-    $this->artisan('security:install')
+    $this->artisan('pasak:install')
         ->assertSuccessful();
 
     expect(File::exists($publishedPath))->toBeTrue();
@@ -99,7 +99,7 @@ test('security install command respects without-htaccess option', function () {
         File::delete($publishedPath);
     }
 
-    $this->artisan('security:install', [
+    $this->artisan('pasak:install', [
         '--without-htaccess' => true,
     ])->assertSuccessful();
 
@@ -113,26 +113,26 @@ test('security install command appends environment variables to env and env exam
     File::put($envPath, "APP_NAME=Laravel\nAPP_ENV=local\n");
     File::put($envExamplePath, "APP_NAME=Laravel\nAPP_ENV=local\n");
 
-    $this->artisan('security:install')
+    $this->artisan('pasak:install')
         ->assertSuccessful();
 
     $envContent = File::get($envPath);
     $exampleContent = File::get($envExamplePath);
 
-    expect($envContent)->toContain('SECURITY_MONITOR_ENABLED=true')
-        ->and($envContent)->toContain('SECURITY_INSTANT_BLOCK_ENABLED=true')
+    expect($envContent)->toContain('PASAK_MONITOR_ENABLED=true')
+        ->and($envContent)->toContain('PASAK_INSTANT_BLOCK_ENABLED=true')
         ->and($envContent)->toContain('Sakelar utama WAF')
-        ->and($exampleContent)->toContain('SECURITY_MONITOR_ENABLED=true');
+        ->and($exampleContent)->toContain('PASAK_MONITOR_ENABLED=true');
 });
 
 test('security install command respects without-env option', function () {
     $envPath = base_path('.env');
     File::put($envPath, "APP_NAME=Laravel\nAPP_ENV=local\n");
 
-    $this->artisan('security:install', [
+    $this->artisan('pasak:install', [
         '--without-env' => true,
     ])->assertSuccessful();
 
     $envContent = File::get($envPath);
-    expect($envContent)->not->toContain('SECURITY_MONITOR_ENABLED');
+    expect($envContent)->not->toContain('PASAK_MONITOR_ENABLED');
 });

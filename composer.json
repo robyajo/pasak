@@ -1,6 +1,6 @@
 {
-    "name": "robyajo/laravel-security-monitor",
-    "description": "Enterprise-grade headless self-hosted WAF, threat detection engine, zero-tolerance blocking, stepped login lockout, and security auditing toolkit for Laravel.",
+    "name": "robyajo/pasak",
+    "description": "Pasak - enterprise-grade headless self-hosted WAF, threat detection engine, zero-tolerance blocking, stepped login lockout, and security auditing toolkit for Laravel.",
     "keywords": [
         "laravel",
         "security",
@@ -14,11 +14,11 @@
         "security-audit",
         "headless"
     ],
-    "homepage": "https://github.com/robyajo/laravel-security-monitor",
+    "homepage": "https://github.com/robyajo/pasak",
     "support": {
-        "issues": "https://github.com/robyajo/laravel-security-monitor/issues",
-        "source": "https://github.com/robyajo/laravel-security-monitor",
-        "docs": "https://github.com/robyajo/laravel-security-monitor#readme"
+        "issues": "https://github.com/robyajo/pasak/issues",
+        "source": "https://github.com/robyajo/pasak",
+        "docs": "https://github.com/robyajo/pasak#readme"
     },
     "funding": [
         {
@@ -58,12 +58,15 @@
     },
     "autoload": {
         "psr-4": {
-            "Internal\\SecurityMonitor\\": "src/"
-        }
+            "Internal\\Pasak\\": "src/"
+        },
+        "files": [
+            "src/compat.php"
+        ]
     },
     "autoload-dev": {
         "psr-4": {
-            "Internal\\SecurityMonitor\\Tests\\": "tests/"
+            "Internal\\Pasak\\Tests\\": "tests/"
         }
     },
     "scripts": {
@@ -77,10 +80,11 @@
     "extra": {
         "laravel": {
             "providers": [
-                "Internal\\SecurityMonitor\\SecurityMonitorServiceProvider"
+                "Internal\\Pasak\\PasakServiceProvider"
             ],
             "aliases": {
-                "SecurityMonitor": "Internal\\SecurityMonitor\\Facades\\SecurityMonitor"
+                "Pasak": "Internal\\Pasak\\Facades\\Pasak",
+                "SecurityMonitor": "Internal\\Pasak\\Facades\\Pasak"
             }
         }
     },

@@ -1,17 +1,17 @@
 <?php
 
-use Internal\SecurityMonitor\Models\BlockedIp;
-use Internal\SecurityMonitor\Services\SecurityMonitorService;
-use Internal\SecurityMonitor\Tests\TestUser;
+use Internal\Pasak\Models\BlockedIp;
+use Internal\Pasak\Services\PasakService;
+use Internal\Pasak\Tests\TestUser;
 
 beforeEach(function () {
-    config()->set('security.enabled', true);
-    config()->set('security.block_enforcement', true);
-    config()->set('security.auto_block.enabled', true);
-    config()->set('security.auto_block.threshold', 3);
-    config()->set('security.auto_block.scope', 'device');
-    config()->set('security.instant_block.enabled', true);
-    config()->set('security.instant_block.scope', 'device');
+    config()->set('pasak.enabled', true);
+    config()->set('pasak.block_enforcement', true);
+    config()->set('pasak.auto_block.enabled', true);
+    config()->set('pasak.auto_block.threshold', 3);
+    config()->set('pasak.auto_block.scope', 'device');
+    config()->set('pasak.instant_block.enabled', true);
+    config()->set('pasak.instant_block.scope', 'device');
 });
 
 test('admin can retrieve current security settings via api', function () {
@@ -22,7 +22,7 @@ test('admin can retrieve current security settings via api', function () {
         'role' => 'admin',
     ]);
 
-    $response = $this->actingAs($admin)->getJson('/api/security/settings');
+    $response = $this->actingAs($admin)->getJson('/api/pasak/settings');
 
     $response->assertSuccessful();
     $response->assertJson([
@@ -44,10 +44,10 @@ test('admin can update settings to switch between device and ip scope', function
         'role' => 'admin',
     ]);
 
-    $service = app(SecurityMonitorService::class);
+    $service = app(PasakService::class);
 
     // 1. Update to IP scope
-    $response = $this->actingAs($admin)->postJson('/api/security/settings', [
+    $response = $this->actingAs($admin)->postJson('/api/pasak/settings', [
         'auto_block_scope' => 'ip',
         'instant_block_scope' => 'ip',
         'auto_block_threshold' => 5,
@@ -68,7 +68,7 @@ test('admin can update settings to switch between device and ip scope', function
     expect($service->getSetting('auto_block.threshold'))->toBe(5);
 
     // 2. Switch back to device scope
-    $response2 = $this->actingAs($admin)->postJson('/api/security/settings', [
+    $response2 = $this->actingAs($admin)->postJson('/api/pasak/settings', [
         'auto_block_scope' => 'device',
         'instant_block_scope' => 'device',
         'auto_block_threshold' => 3,
@@ -89,7 +89,7 @@ test('admin can update settings to switch between device and ip scope', function
 });
 
 test('dynamic setting switches auto block behavior from device isolation to entire router ip', function () {
-    $service = app(SecurityMonitorService::class);
+    $service = app(PasakService::class);
     $sharedRouterIp = '103.247.10.99';
     $attackerDeviceId = 'attacker-device-99';
     $innocentDeviceId = 'innocent-device-99';

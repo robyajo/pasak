@@ -1,13 +1,13 @@
 <?php
 
-namespace Internal\SecurityMonitor\Http\Controllers\Dashboard;
+namespace Internal\Pasak\Http\Controllers\Dashboard;
 
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Inertia\Inertia;
 use Inertia\Response;
-use Internal\SecurityMonitor\Models\SecurityLog;
+use Internal\Pasak\Models\SecurityLog;
 
 /**
  * Security log management page for the Inertia + React dashboard.

@@ -1,11 +1,11 @@
 <?php
 
-namespace Internal\SecurityMonitor\Listeners;
+namespace Internal\Pasak\Listeners;
 
 use Illuminate\Auth\Events\Login;
 use Illuminate\Support\Facades\Gate;
-use Internal\SecurityMonitor\Services\LoginThrottleService;
-use Internal\SecurityMonitor\Services\SecurityMonitorService;
+use Internal\Pasak\Services\LoginThrottleService;
+use Internal\Pasak\Services\PasakService;
 
 /**
  * Mengosongkan riwayat kegagalan login setelah pengguna berhasil masuk,
@@ -16,7 +16,7 @@ class ResetLoginAttempts
 {
     public function __construct(
         protected LoginThrottleService $throttle,
-        protected SecurityMonitorService $security,
+        protected PasakService $security,
     ) {}
 
     public function handle(Login $event): void
@@ -28,7 +28,7 @@ class ResetLoginAttempts
         if (
             $ip &&
             $event->user &&
-            Gate::forUser($event->user)->allows('manage-security-monitor')
+            Gate::forUser($event->user)->allows('manage-pasak')
         ) {
             $this->security->unblockIp($ip);
         }

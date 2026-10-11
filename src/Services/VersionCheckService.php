@@ -1,6 +1,6 @@
 <?php
 
-namespace Internal\SecurityMonitor\Services;
+namespace Internal\Pasak\Services;
 
 use Composer\InstalledVersions;
 use Illuminate\Support\Facades\Cache;
@@ -18,12 +18,12 @@ class VersionCheckService
     /**
      * Endpoint API Packagist v2.
      */
-    public const PACKAGIST_URL = 'https://repo.packagist.org/p2/robyajo/laravel-security-monitor.json';
+    public const PACKAGIST_URL = 'https://repo.packagist.org/p2/robyajo/pasak.json';
 
     /**
      * Fallback endpoint API GitHub Tags.
      */
-    public const GITHUB_TAGS_URL = 'https://api.github.com/repos/robyajo/laravel-security-monitor/tags';
+    public const GITHUB_TAGS_URL = 'https://api.github.com/repos/robyajo/pasak/tags';
 
     /**
      * Menandai apakah notifikasi terminal sudah dicetak dalam siklus proses PHP ini.
@@ -36,8 +36,8 @@ class VersionCheckService
     public function getCurrentVersion(): string
     {
         try {
-            if (class_exists(InstalledVersions::class) && InstalledVersions::isInstalled('robyajo/laravel-security-monitor')) {
-                $pretty = (string) InstalledVersions::getPrettyVersion('robyajo/laravel-security-monitor');
+            if (class_exists(InstalledVersions::class) && InstalledVersions::isInstalled('robyajo/pasak')) {
+                $pretty = (string) InstalledVersions::getPrettyVersion('robyajo/pasak');
                 if (! empty($pretty) && ! str_starts_with($pretty, 'dev-')) {
                     return ltrim($pretty, 'v');
                 }
@@ -46,7 +46,7 @@ class VersionCheckService
             // Lanjutkan ke fallback konstanta
         }
 
-        return ltrim(SecurityMonitorService::VERSION, 'v');
+        return ltrim(PasakService::VERSION, 'v');
     }
 
     /**
@@ -72,7 +72,7 @@ class VersionCheckService
         }
 
         if ($latest) {
-            $ttl = (int) config('security.version_check.cache_ttl', 3600);
+            $ttl = (int) config('pasak.version_check.cache_ttl', 3600);
             try {
                 Cache::put(self::CACHE_KEY, $latest, $ttl);
             } catch (Throwable) {
@@ -92,7 +92,7 @@ class VersionCheckService
             $response = Http::timeout(2)
                 ->connectTimeout(1)
                 ->withHeaders([
-                    'User-Agent' => 'laravel-security-monitor/'.$this->getCurrentVersion(),
+                    'User-Agent' => 'pasak/'.$this->getCurrentVersion(),
                     'Accept' => 'application/json',
                 ])
                 ->get(self::PACKAGIST_URL);
@@ -101,7 +101,7 @@ class VersionCheckService
                 return null;
             }
 
-            $packages = $response->json('packages.robyajo/laravel-security-monitor') ?? [];
+            $packages = $response->json('packages.robyajo/pasak') ?? [];
 
             foreach ($packages as $pkg) {
                 $rawVersion = (string) ($pkg['version'] ?? '');
@@ -128,7 +128,7 @@ class VersionCheckService
             $response = Http::timeout(2)
                 ->connectTimeout(1)
                 ->withHeaders([
-                    'User-Agent' => 'laravel-security-monitor/'.$this->getCurrentVersion(),
+                    'User-Agent' => 'pasak/'.$this->getCurrentVersion(),
                     'Accept' => 'application/vnd.github.v3+json',
                 ])
                 ->get(self::GITHUB_TAGS_URL);
@@ -177,7 +177,7 @@ class VersionCheckService
             return;
         }
 
-        if (! (bool) config('security.version_check.enabled', true)) {
+        if (! (bool) config('pasak.version_check.enabled', true)) {
             return;
         }
 
@@ -194,7 +194,7 @@ class VersionCheckService
             '',
             '  <bg=blue;fg=white;options=bold> BULWARK SECURITY </> <options=bold;fg=yellow>Pembaruan Tersedia!</> Versi terbaru <options=bold;fg=green>v'.$latest.'</> telah dirilis (versi saat ini: <fg=red>v'.$current.'</>).',
             '  <fg=gray>Jalankan perintah berikut untuk memperbarui package dan menyinkronkan seluruh komponen:</>',
-            '  <options=bold;fg=cyan>php artisan security:upgrade</>',
+            '  <options=bold;fg=cyan>php artisan pasak:upgrade</>',
             '',
         ]);
     }

@@ -1,11 +1,11 @@
 <?php
 
-namespace Internal\SecurityMonitor\Services;
+namespace Internal\Pasak\Services;
 
 use Carbon\CarbonInterface;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
-use Internal\SecurityMonitor\Models\SecurityLog;
+use Internal\Pasak\Models\SecurityLog;
 use Throwable;
 
 /**
@@ -24,7 +24,7 @@ use Throwable;
  */
 class AccessLogScannerService
 {
-    public function __construct(protected SecurityMonitorService $security) {}
+    public function __construct(protected PasakService $security) {}
 
     /**
      * Berkas log default yang diperiksa bila `--file` tidak diisi.
@@ -33,7 +33,7 @@ class AccessLogScannerService
      */
     public function defaultFiles(): array
     {
-        $configured = array_filter((array) config('security.access_log.paths', []));
+        $configured = array_filter((array) config('pasak.access_log.paths', []));
 
         $candidates = $configured !== [] ? $configured : [
             '/var/log/nginx/access.log',
@@ -66,7 +66,7 @@ class AccessLogScannerService
         $minLevel = $this->normalizeLevel($options['min_level'] ?? null);
         $since = $options['since'] ?? null;
         $until = $options['until'] ?? null;
-        $maxLines = max(1000, (int) config('security.access_log.max_lines', 500_000));
+        $maxLines = max(1000, (int) config('pasak.access_log.max_lines', 500_000));
 
         $stats = [
             'files' => [],
@@ -144,7 +144,7 @@ class AccessLogScannerService
         try {
             while (($line = fgets($handle)) !== false) {
                 if (++$stats['total_lines'] > $maxLines) {
-                    $stats['error'] = "Dibatasi {$maxLines} baris pertama (SECURITY_ACCESS_LOG_MAX_LINES).";
+                    $stats['error'] = "Dibatasi {$maxLines} baris pertama (PASAK_ACCESS_LOG_MAX_LINES).";
 
                     break;
                 }

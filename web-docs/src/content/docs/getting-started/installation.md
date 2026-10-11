@@ -1,11 +1,11 @@
 ---
 title: "Panduan Instalasi & Migrasi"
-description: "Halaman ini memandu proses instalasi paket robyajo/laravel-security-monitor ke dalam aplikasi Laravel Anda."
+description: "Halaman ini memandu proses instalasi paket robyajo/pasak ke dalam aplikasi Laravel Anda."
 sidebar:
     order: 2
 ---
 
-Halaman ini memandu proses instalasi paket **`robyajo/laravel-security-monitor`** ke dalam aplikasi Laravel Anda.
+Halaman ini memandu proses instalasi paket **`robyajo/pasak`** ke dalam aplikasi Laravel Anda.
 
 > 🌟 **Nol Ketergantungan NPM (Zero NPM)**: Paket ini murni PHP Composer library standar seperti paket Spatie. Anda **tidak perlu** menginstal dependensi npm atau menjalankan build tools frontend.
 
@@ -28,7 +28,7 @@ Pastikan lingkungan server Anda memenuhi spesifikasi minimum berikut:
 Jika paket sudah diterbitkan di Packagist:
 
 ```bash
-composer require robyajo/laravel-security-monitor
+composer require robyajo/pasak
 ```
 
 ### Menggunakan Repositori Lokal / Private Git (Monorepo atau Path)
@@ -39,7 +39,7 @@ Jika Anda menggunakan paket ini secara internal sebelum publikasi ke Packagist, 
 "repositories": [
     {
         "type": "path",
-        "url": "../laravel-security-monitor",
+        "url": "../pasak",
         "options": {
             "symlink": true
         }
@@ -50,7 +50,7 @@ Jika Anda menggunakan paket ini secara internal sebelum publikasi ke Packagist, 
 Kemudian pasang paket:
 
 ```bash
-composer require robyajo/laravel-security-monitor:@dev
+composer require robyajo/pasak:@dev
 ```
 
 ---
@@ -76,7 +76,7 @@ Perintah ini akan secara otomatis:
     - Menambahkan blok konfigurasi lengkap (`SECURITY_*`) disertai dokumentasi penjelasan fungsi berbahasa Indonesia langsung di bagian bawah berkas `.env` dan `.env.example`.
     - Menggunakan deteksi cerdas agar tidak terjadi duplikasi jika variabel sudah pernah ditambahkan sebelumnya.
 6. **Menyematkan Trait `HasSecurityRelations` ke Model User**:
-    - Secara otomatis mendeteksi model `User` (`app/Models/User.php`) dan menambahkan import `use Internal\SecurityMonitor\Concerns\HasSecurityRelations;` serta menyematkan trait `HasSecurityRelations`.
+    - Secara otomatis mendeteksi model `User` (`app/Models/User.php`) dan menambahkan import `use Internal\Pasak\Concerns\HasSecurityRelations;` serta menyematkan trait `HasSecurityRelations`.
     - Idempotent: tidak akan menduplikasi jika trait sudah ada.
 7. **Mendaftarkan Middleware WAF ke Aplikasi Host**:
     - Otomatis mendaftarkan `BlockIpAddress` dan `DetectSecurityThreats` ke dalam `bootstrap/app.php` (Laravel 11 & 12) atau `app/Http/Kernel.php` (Laravel 10).
@@ -209,7 +209,7 @@ Buka model pengguna aplikasi Anda (biasanya `app/Models/User.php`) dan sertakan 
 namespace App\Models;
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Internal\SecurityMonitor\Concerns\HasSecurityRelations;
+use Internal\Pasak\Concerns\HasSecurityRelations;
 
 class User extends Authenticatable
 {
@@ -235,19 +235,19 @@ Paket menyediakan 4 middleware terisolasi:
 
 | Alias               | Kelas Middleware                                                 | Peran                                                                                                       |
 | :------------------ | :--------------------------------------------------------------- | :---------------------------------------------------------------------------------------------------------- |
-| `security.block`    | `Internal\SecurityMonitor\Http\Middleware\BlockIpAddress`        | Menolak request dari IP/perangkat yang sedang terblokir aktif (HTTP 403).                                   |
-| `security.detect`   | `Internal\SecurityMonitor\Http\Middleware\DetectSecurityThreats` | Menginspeksi payload request terhadap tanda-tanda serangan siber dan mengaktifkan auto-block/instant block. |
-| `security.admin`    | `Internal\SecurityMonitor\Http\Middleware\EnsureSecurityAdmin`   | Memastikan hanya user dengan wewenang admin yang dapat mengakses REST API admin.                            |
-| `security.activity` | `Internal\SecurityMonitor\Http\Middleware\TrackUserActivity`     | Memperbarui heartbeat aktivitas login pengguna di database (ter-throttle 45 detik).                         |
+| `security.block`    | `Internal\Pasak\Http\Middleware\BlockIpAddress`        | Menolak request dari IP/perangkat yang sedang terblokir aktif (HTTP 403).                                   |
+| `security.detect`   | `Internal\Pasak\Http\Middleware\DetectSecurityThreats` | Menginspeksi payload request terhadap tanda-tanda serangan siber dan mengaktifkan auto-block/instant block. |
+| `security.admin`    | `Internal\Pasak\Http\Middleware\EnsureSecurityAdmin`   | Memastikan hanya user dengan wewenang admin yang dapat mengakses REST API admin.                            |
+| `security.activity` | `Internal\Pasak\Http\Middleware\TrackUserActivity`     | Memperbarui heartbeat aktivitas login pengguna di database (ter-throttle 45 detik).                         |
 
 ### Pendaftaran pada Laravel 11 / 12 / 13 (`bootstrap/app.php`)
 
 ```php
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Middleware;
-use Internal\SecurityMonitor\Http\Middleware\BlockIpAddress;
-use Internal\SecurityMonitor\Http\Middleware\DetectSecurityThreats;
-use Internal\SecurityMonitor\Http\Middleware\TrackUserActivity;
+use Internal\Pasak\Http\Middleware\BlockIpAddress;
+use Internal\Pasak\Http\Middleware\DetectSecurityThreats;
+use Internal\Pasak\Http\Middleware\TrackUserActivity;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -276,8 +276,8 @@ Buka `app/Http/Kernel.php` dan tambahkan ke array `$middleware`:
 ```php
 protected $middleware = [
     // ...
-    \Internal\SecurityMonitor\Http\Middleware\BlockIpAddress::class,
-    \Internal\SecurityMonitor\Http\Middleware\DetectSecurityThreats::class,
+    \Internal\Pasak\Http\Middleware\BlockIpAddress::class,
+    \Internal\Pasak\Http\Middleware\DetectSecurityThreats::class,
 ];
 ```
 
@@ -331,6 +331,6 @@ Panel tersedia di `/security` dan berisi enam modul: **Overview**, **Security Lo
         'driver' => env('SECURITY_DASHBOARD_DRIVER', 'livewire'),
         'prefix' => env('SECURITY_DASHBOARD_PREFIX', 'security'),
         'middleware' => ['web', 'auth'],
-        'admin_middleware' => ['Internal\\SecurityMonitor\\Http\\Middleware\\EnsureSecurityAdmin'],
+        'admin_middleware' => ['Internal\\Pasak\\Http\\Middleware\\EnsureSecurityAdmin'],
     ],
     ```

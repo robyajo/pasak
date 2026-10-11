@@ -5,9 +5,9 @@ use Illuminate\Support\Facades\Route;
 
 afterEach(function () {
     $directories = [
-        resource_path('views/pages/security'),
-        resource_path('js/pages/security'),
-        resource_path('js/components/security'),
+        resource_path('views/pages/pasak'),
+        resource_path('js/pages/pasak'),
+        resource_path('js/components/pasak'),
     ];
 
     foreach ($directories as $directory) {
@@ -20,13 +20,13 @@ afterEach(function () {
 test(
     'dashboard is disabled by default so the package stays headless',
     function () {
-        expect(config('security.dashboard.enabled'))
+        expect(config('pasak.dashboard.enabled'))
             ->toBeFalse()
-            ->and(config('security.dashboard.driver'))
+            ->and(config('pasak.dashboard.driver'))
             ->toBe('livewire')
-            ->and(config('security.dashboard.prefix'))
-            ->toBe('security')
-            ->and(config('security.dashboard.middleware'))
+            ->and(config('pasak.dashboard.prefix'))
+            ->toBe('pasak')
+            ->and(config('pasak.dashboard.middleware'))
             ->toContain('auth');
     },
 );
@@ -34,7 +34,7 @@ test(
 test(
     'starterkit livewire tag publishes the monitoring views and configuration',
     function () {
-        $directory = resource_path('views/pages/security');
+        $directory = resource_path('views/pages/pasak');
 
         if (File::isDirectory($directory)) {
             File::deleteDirectory($directory);
@@ -69,7 +69,7 @@ test(
 test(
     'typo-compatible staterkit livewire alias publishes the monitoring views',
     function () {
-        $directory = resource_path('views/pages/security');
+        $directory = resource_path('views/pages/pasak');
 
         if (File::isDirectory($directory)) {
             File::deleteDirectory($directory);
@@ -87,8 +87,8 @@ test(
 test(
     'starterkit react tag publishes the react pages, components, and configuration',
     function () {
-        $pages = resource_path('js/pages/security');
-        $components = resource_path('js/components/security');
+        $pages = resource_path('js/pages/pasak');
+        $components = resource_path('js/components/pasak');
 
         foreach ([$pages, $components] as $directory) {
             if (File::isDirectory($directory)) {
@@ -113,7 +113,7 @@ test(
             ->toBeTrue()
             ->and(File::exists($pages.'/tickets.tsx'))
             ->toBeTrue()
-            ->and(File::exists($components.'/security-nav.tsx'))
+            ->and(File::exists($components.'/pasak-nav.tsx'))
             ->toBeTrue();
 
         expect(File::get($pages.'/overview.tsx'))->toContain(
@@ -125,7 +125,7 @@ test(
 test(
     'typo-compatible staterkit react alias publishes the react pages',
     function () {
-        $pages = resource_path('js/pages/security');
+        $pages = resource_path('js/pages/pasak');
 
         if (File::isDirectory($pages)) {
             File::deleteDirectory($pages);
@@ -141,10 +141,10 @@ test(
 );
 
 test('react dashboard routes are gated behind authentication', function () {
-    $routes = File::get(__DIR__.'/../../routes/security-dashboard-react.php');
+    $routes = File::get(__DIR__.'/../../routes/pasak-dashboard-react.php');
 
     expect($routes)
-        ->toContain("config('security.dashboard.middleware', ['web', 'auth'])")
+        ->toContain("config('pasak.dashboard.middleware', ['web', 'auth'])")
         ->and($routes)
         ->toContain('OverviewController::class')
         ->and($routes)
@@ -156,13 +156,13 @@ test('react dashboard routes are gated behind authentication', function () {
 test(
     'security install command can publish the react dashboard with the with-react-dashboard flag',
     function () {
-        $pages = resource_path('js/pages/security');
+        $pages = resource_path('js/pages/pasak');
 
         if (File::isDirectory($pages)) {
             File::deleteDirectory($pages);
         }
 
-        $this->artisan('security:install', [
+        $this->artisan('pasak:install', [
             '--force' => true,
             '--with-react-dashboard' => true,
             '--without-nginx' => true,
@@ -180,11 +180,11 @@ test(
         // The published dashboard must always be gated behind authentication, and
         // the package only registers the page-component routes when Livewire is
         // actually installed in the host application.
-        $routes = File::get(__DIR__.'/../../routes/security-dashboard.php');
+        $routes = File::get(__DIR__.'/../../routes/pasak-dashboard.php');
 
         expect($routes)
             ->toContain(
-                "config('security.dashboard.middleware', ['web', 'auth'])",
+                "config('pasak.dashboard.middleware', ['web', 'auth'])",
             )
             ->and($routes)
             ->toContain('Route::livewire')
@@ -198,13 +198,13 @@ test(
 test(
     'security install command can publish the dashboard with the with-dashboard flag',
     function () {
-        $directory = resource_path('views/pages/security');
+        $directory = resource_path('views/pages/pasak');
 
         if (File::isDirectory($directory)) {
             File::deleteDirectory($directory);
         }
 
-        $this->artisan('security:install', [
+        $this->artisan('pasak:install', [
             '--force' => true,
             '--with-dashboard' => true,
             '--without-nginx' => true,
@@ -219,7 +219,7 @@ test(
 test(
     'starterkit blade tag publishes the blade views',
     function () {
-        $directory = resource_path('views/pages/security');
+        $directory = resource_path('views/pages/pasak');
 
         if (File::isDirectory($directory)) {
             File::deleteDirectory($directory);
@@ -237,7 +237,7 @@ test(
 test(
     'starterkit tsx tag publishes the tsx pages and components',
     function () {
-        $pages = resource_path('js/pages/security');
+        $pages = resource_path('js/pages/pasak');
 
         if (File::isDirectory($pages)) {
             File::deleteDirectory($pages);
@@ -255,8 +255,8 @@ test(
 test(
     'security install command can publish with with-blade and with-tsx flags',
     function () {
-        $bladeDir = resource_path('views/pages/security');
-        $tsxDir = resource_path('js/pages/security');
+        $bladeDir = resource_path('views/pages/pasak');
+        $tsxDir = resource_path('js/pages/pasak');
 
         if (File::isDirectory($bladeDir)) {
             File::deleteDirectory($bladeDir);
@@ -265,7 +265,7 @@ test(
             File::deleteDirectory($tsxDir);
         }
 
-        $this->artisan('security:install', [
+        $this->artisan('pasak:install', [
             '--force' => true,
             '--with-blade' => true,
             '--without-nginx' => true,
@@ -275,7 +275,7 @@ test(
 
         expect(File::exists($bladeDir.'/overview.blade.php'))->toBeTrue();
 
-        $this->artisan('security:install', [
+        $this->artisan('pasak:install', [
             '--force' => true,
             '--with-tsx' => true,
             '--without-nginx' => true,
@@ -290,8 +290,8 @@ test(
 test(
     'security install command can publish both blade and tsx views with with-both',
     function () {
-        $bladeDir = resource_path('views/pages/security');
-        $tsxDir = resource_path('js/pages/security');
+        $bladeDir = resource_path('views/pages/pasak');
+        $tsxDir = resource_path('js/pages/pasak');
 
         if (File::isDirectory($bladeDir)) {
             File::deleteDirectory($bladeDir);
@@ -300,7 +300,7 @@ test(
             File::deleteDirectory($tsxDir);
         }
 
-        $this->artisan('security:install', [
+        $this->artisan('pasak:install', [
             '--force' => true,
             '--with-both' => true,
             '--without-nginx' => true,
@@ -318,8 +318,8 @@ test(
 test(
     'security install command supports stack option for blade and tsx',
     function () {
-        $bladeDir = resource_path('views/pages/security');
-        $tsxDir = resource_path('js/pages/security');
+        $bladeDir = resource_path('views/pages/pasak');
+        $tsxDir = resource_path('js/pages/pasak');
 
         if (File::isDirectory($bladeDir)) {
             File::deleteDirectory($bladeDir);
@@ -328,7 +328,7 @@ test(
             File::deleteDirectory($tsxDir);
         }
 
-        $this->artisan('security:install', [
+        $this->artisan('pasak:install', [
             '--force' => true,
             '--stack' => 'blade',
             '--without-nginx' => true,
@@ -338,7 +338,7 @@ test(
 
         expect(File::exists($bladeDir.'/overview.blade.php'))->toBeTrue();
 
-        $this->artisan('security:install', [
+        $this->artisan('pasak:install', [
             '--force' => true,
             '--stack' => 'tsx',
             '--without-nginx' => true,

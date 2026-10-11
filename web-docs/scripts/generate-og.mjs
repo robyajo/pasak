@@ -83,7 +83,7 @@ const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" v
 
     <!-- Main Title -->
     <text x="0" y="80" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="52" font-weight="800" fill="#f8fafc" letter-spacing="-1">
-      Laravel Security Monitor
+      Pasak
     </text>
 
     <!-- Subtitle -->
@@ -142,7 +142,7 @@ const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" v
       PHP ^8.2 | ^8.3 | ^8.4  •  Laravel ^10 | ^11 | ^12 | ^13  •  100% Pure PHP  •  Zero NPM
     </text>
     <text x="1000" y="24" text-anchor="end" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="16" font-weight="700" fill="#38bdf8">
-      github.com/robyajo/laravel-security-monitor
+      github.com/robyajo/pasak
     </text>
   </g>
 </svg>`;

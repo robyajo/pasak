@@ -33,9 +33,9 @@ async function main() {
 
   // 3. Update site.webmanifest
   const manifest = {
-    name: 'Laravel Security Monitor',
+    name: 'Pasak',
     short_name: 'Bulwark WAF',
-    description: 'Dokumentasi resmi robyajo/laravel-security-monitor (Bulwark) — Enterprise Headless Web Application Firewall untuk Laravel.',
+    description: 'Dokumentasi resmi robyajo/pasak (Bulwark) — Enterprise Headless Web Application Firewall untuk Laravel.',
     icons: [
       {
         src: '/android-chrome-192x192.png',

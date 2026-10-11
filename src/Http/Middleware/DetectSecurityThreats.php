@@ -1,11 +1,11 @@
 <?php
 
-namespace Internal\SecurityMonitor\Http\Middleware;
+namespace Internal\Pasak\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use Internal\SecurityMonitor\Models\SecurityLog;
-use Internal\SecurityMonitor\Services\SecurityMonitorService;
+use Internal\Pasak\Models\SecurityLog;
+use Internal\Pasak\Services\PasakService;
 use Symfony\Component\HttpFoundation\Response;
 use Throwable;
 
@@ -15,7 +15,7 @@ use Throwable;
  */
 class DetectSecurityThreats
 {
-    public function __construct(protected SecurityMonitorService $service) {}
+    public function __construct(protected PasakService $service) {}
 
     public function handle(Request $request, Closure $next): Response
     {
@@ -92,7 +92,7 @@ class DetectSecurityThreats
      */
     protected function shouldReject(array $threats): bool
     {
-        if (! config('security.block_suspicious_requests', false)) {
+        if (! config('pasak.block_suspicious_requests', false)) {
             return false;
         }
 

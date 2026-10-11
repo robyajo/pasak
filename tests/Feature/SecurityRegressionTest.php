@@ -2,11 +2,11 @@
 
 use Illuminate\Auth\Events\Login;
 use Illuminate\Http\Request;
-use Internal\SecurityMonitor\Models\TrustedIp;
-use Internal\SecurityMonitor\Models\UserLogin;
-use Internal\SecurityMonitor\Services\SecurityMonitorService;
-use Internal\SecurityMonitor\Services\ServerSecurityService;
-use Internal\SecurityMonitor\Services\UserLoginService;
+use Internal\Pasak\Models\TrustedIp;
+use Internal\Pasak\Models\UserLogin;
+use Internal\Pasak\Services\PasakService;
+use Internal\Pasak\Services\ServerSecurityService;
+use Internal\Pasak\Services\UserLoginService;
 
 test('login event records a user login session', function () {
     $user = $this->createRegularUser();
@@ -74,7 +74,7 @@ test('admin login automatically lifts an ip block', function () {
     );
 
     $admin = $this->createAdminUser();
-    $security = app(SecurityMonitorService::class);
+    $security = app(PasakService::class);
 
     $security->block('203.0.113.99', [
         'reason' => 'uji regresi',
@@ -98,8 +98,8 @@ test('server scan runs when admin accounts exist', function () {
 });
 
 test('application audit marks a strong public api key and trusted proxies as ok', function () {
-    config()->set('security.server_scan.public_api_key', 'long-random-secret-value');
-    config()->set('security.server_scan.trusted_proxies', '10.0.0.1');
+    config()->set('pasak.server_scan.public_api_key', 'long-random-secret-value');
+    config()->set('pasak.server_scan.trusted_proxies', '10.0.0.1');
 
     $checks = collect(app(ServerSecurityService::class)->scan(force: true)['categories'])
         ->flatMap(fn (array $category): array => $category['checks'])
@@ -111,8 +111,8 @@ test('application audit marks a strong public api key and trusted proxies as ok'
 });
 
 test('application audit warns when public api key and trusted proxies are empty', function () {
-    config()->set('security.server_scan.public_api_key', '');
-    config()->set('security.server_scan.trusted_proxies', '');
+    config()->set('pasak.server_scan.public_api_key', '');
+    config()->set('pasak.server_scan.trusted_proxies', '');
 
     $checks = collect(app(ServerSecurityService::class)->scan(force: true)['categories'])
         ->flatMap(fn (array $category): array => $category['checks'])

@@ -54,7 +54,7 @@ $template = <<<'HTML'
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Laravel Security Monitor (Bulwark) — Portal Dokumentasi Resmi</title>
+    <title>Pasak (Bulwark) — Portal Dokumentasi Resmi</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -88,14 +88,14 @@ $template = <<<'HTML'
             <a href="#" onclick="loadDoc(0); return false;" class="flex items-center gap-3">
                 <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-sky-600 to-indigo-600 text-xl shadow-lg shadow-sky-600/30">🛡️</div>
                 <div class="flex items-center gap-2">
-                    <span class="hidden text-base font-extrabold sm:inline">Laravel Security Monitor</span>
+                    <span class="hidden text-base font-extrabold sm:inline">Pasak</span>
                     <span class="rounded-full border border-sky-400/30 bg-sky-400/10 px-2 py-0.5 text-[11px] font-bold uppercase tracking-wide text-sky-500 dark:text-sky-300">Bulwark v__VERSION__</span>
                 </div>
             </a>
         </div>
         <div class="flex items-center gap-2">
             <button onclick="toggleTheme()" class="rounded-lg border border-slate-200 bg-white px-3.5 py-2 text-sm font-semibold transition hover:border-sky-400 dark:border-slate-700 dark:bg-slate-800">🌓 <span class="hidden sm:inline">Ganti Tema</span></button>
-            <a href="https://github.com/robyajo/laravel-security-monitor" target="_blank" class="rounded-lg border border-slate-200 bg-white px-3.5 py-2 text-sm font-semibold transition hover:border-sky-400 dark:border-slate-700 dark:bg-slate-800">GitHub</a>
+            <a href="https://github.com/robyajo/pasak" target="_blank" class="rounded-lg border border-slate-200 bg-white px-3.5 py-2 text-sm font-semibold transition hover:border-sky-400 dark:border-slate-700 dark:bg-slate-800">GitHub</a>
         </div>
     </header>
 

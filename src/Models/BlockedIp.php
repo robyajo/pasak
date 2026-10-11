@@ -1,6 +1,6 @@
 <?php
 
-namespace Internal\SecurityMonitor\Models;
+namespace Internal\Pasak\Models;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -29,7 +29,7 @@ class BlockedIp extends Model
 {
     public function getTable()
     {
-        return config('security.table_names.blocked_ips', parent::getTable());
+        return config('pasak.table_names.blocked_ips', parent::getTable());
     }
 
     protected $fillable = [
@@ -62,7 +62,7 @@ class BlockedIp extends Model
     public function blockedBy(): BelongsTo
     {
         return $this->belongsTo(
-            config('security.user_model', 'App\\Models\\User'),
+            config('pasak.user_model', 'App\\Models\\User'),
             'blocked_by',
         );
     }

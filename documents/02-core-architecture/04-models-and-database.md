@@ -1,6 +1,6 @@
 # 04. Model Database & Dynamic Decoupling
 
-Salah satu prinsip desain fundamental dari **`robyajo/laravel-security-monitor`** adalah **Loose Coupling** (keterikatan longgar). Paket ini tidak pernah mengasumsikan model `User` bawaan Laravel atau nama tabel yang paten, melainkan menyelesaikan semuanya secara dinamis melalui konfigurasi.
+Salah satu prinsip desain fundamental dari **`robyajo/pasak`** adalah **Loose Coupling** (keterikatan longgar). Paket ini tidak pernah mengasumsikan model `User` bawaan Laravel atau nama tabel yang paten, melainkan menyelesaikan semuanya secara dinamis melalui konfigurasi.
 
 ---
 
@@ -30,7 +30,7 @@ SECURITY_TRUSTED_IPS_TABLE=auth_trusted_devices
 
 ## 2. Rincian Model Eloquent
 
-### A. `BlockedIp` (`Internal\SecurityMonitor\Models\BlockedIp`)
+### A. `BlockedIp` (`Internal\Pasak\Models\BlockedIp`)
 Menyimpan data entitas yang sedang diblokir atau pernah diblokir.
 
 | Kolom | Tipe Data | Deskripsi |
@@ -57,7 +57,7 @@ Menyimpan data entitas yang sedang diblokir atau pernah diblokir.
 
 ---
 
-### B. `SecurityLog` (`Internal\SecurityMonitor\Models\SecurityLog`)
+### B. `SecurityLog` (`Internal\Pasak\Models\SecurityLog`)
 Menyimpan rekam jejak setiap ancaman keamanan yang terdeteksi oleh WAF.
 
 | Kolom | Tipe Data | Deskripsi |
@@ -82,7 +82,7 @@ Menyimpan rekam jejak setiap ancaman keamanan yang terdeteksi oleh WAF.
 
 ---
 
-### C. `LoginAttempt` (`Internal\SecurityMonitor\Models\LoginAttempt`)
+### C. `LoginAttempt` (`Internal\Pasak\Models\LoginAttempt`)
 Melacak kegagalan otentikasi untuk mitigasi brute force bertingkat (*stepped lockout*).
 
 | Kolom | Tipe Data | Deskripsi |
@@ -98,7 +98,7 @@ Melacak kegagalan otentikasi untuk mitigasi brute force bertingkat (*stepped loc
 
 ---
 
-### D. `IpUnblockRequest` (`Internal\SecurityMonitor\Models\IpUnblockRequest`)
+### D. `IpUnblockRequest` (`Internal\Pasak\Models\IpUnblockRequest`)
 Menyimpan tiket banding yang diajukan oleh pengguna publik yang terblokir.
 
 | Kolom | Tipe Data | Deskripsi |
@@ -131,13 +131,13 @@ Menyimpan tiket banding yang diajukan oleh pengguna publik yang terblokir.
 
 ## 3. Integrasi Trait `HasSecurityRelations`
 
-Untuk menghubungkan model `User` aplikasi Anda dengan model-model di atas, cukup gunakan trait `Internal\SecurityMonitor\Concerns\HasSecurityRelations`:
+Untuk menghubungkan model `User` aplikasi Anda dengan model-model di atas, cukup gunakan trait `Internal\Pasak\Concerns\HasSecurityRelations`:
 
 ```php
 namespace App\Models;
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Internal\SecurityMonitor\Concerns\HasSecurityRelations;
+use Internal\Pasak\Concerns\HasSecurityRelations;
 
 class User extends Authenticatable
 {

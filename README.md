@@ -1,13 +1,13 @@
-# Laravel Security Monitor (Bulwark)
+# Pasak (Bulwark)
 
-[![Run Tests](https://github.com/robyajo/laravel-security-monitor/actions/workflows/run-tests.yml/badge.svg)](https://github.com/robyajo/laravel-security-monitor/actions/workflows/run-tests.yml)
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/robyajo/laravel-security-monitor.svg)](https://packagist.org/packages/robyajo/laravel-security-monitor)
-[![Total Downloads](https://img.shields.io/packagist/dt/robyajo/laravel-security-monitor.svg)](https://packagist.org/packages/robyajo/laravel-security-monitor)
+[![Run Tests](https://github.com/robyajo/pasak/actions/workflows/run-tests.yml/badge.svg)](https://github.com/robyajo/pasak/actions/workflows/run-tests.yml)
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/robyajo/pasak.svg)](https://packagist.org/packages/robyajo/pasak)
+[![Total Downloads](https://img.shields.io/packagist/dt/robyajo/pasak.svg)](https://packagist.org/packages/robyajo/pasak)
 [![PHP Version](https://img.shields.io/badge/php-%5E8.2%20%7C%20%5E8.3%20%7C%20%5E8.4%20%7C%20%5E8.5-blue.svg)](https://www.php.net/supported-versions.php)
 [![Laravel Version](https://img.shields.io/badge/laravel-%5E10.0%20%7C%20%5E11.0%20%7C%20%5E12.0%20%7C%20%5E13.0-red.svg)](https://laravel.com/docs/releases)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
-**Laravel Security Monitor** (Bulwark) adalah paket keamanan komprehensif (_Self-Hosted WAF & Threat Engine_) berbasis **Headless REST API** untuk ekosistem Laravel. Paket ini murni PHP Composer library (Zero-NPM / standar Spatie) yang dirancang khusus untuk memproteksi aplikasi web internal dari serangan siber tingkat lanjut, injeksi payload pentest, eksploitasi webshell, dan brute force tanpa mengikat aplikasi ke template frontend tertentu.
+**Pasak** (Bulwark) adalah paket keamanan komprehensif (_Self-Hosted WAF & Threat Engine_) berbasis **Headless REST API** untuk ekosistem Laravel. Paket ini murni PHP Composer library (Zero-NPM / standar Spatie) yang dirancang khusus untuk memproteksi aplikasi web internal dari serangan siber tingkat lanjut, injeksi payload pentest, eksploitasi webshell, dan brute force tanpa mengikat aplikasi ke template frontend tertentu.
 
 > 📚 **Portal Dokumentasi Resmi Lengkap**: Tersedia 25 bab dokumentasi mendalam di direktori [`documents/`](./documents/README.md) serta portal interaktif offline [`documents/index.html`](./documents/index.html).
 
@@ -60,11 +60,11 @@
 ### 1. Pasang Paket via Composer
 
 ```bash
-composer require robyajo/laravel-security-monitor:^1.1
+composer require robyajo/pasak:^1.1
 ```
 
 > **Penting — jangan pakai `@dev` di produksi.** Menulis
-> `composer require robyajo/laravel-security-monitor:@dev` memaksa Composer
+> `composer require robyajo/pasak:@dev` memaksa Composer
 > mengambil branch default `dev-main` (kode yang belum dirilis), bukan tag rilis
 > stabil. Selalu pakai constraint rilis (mis. `^1.1`) atau tanpa constraint sama
 > sekali. Flag `@dev` hanya diperlukan saat mengembangkan paket ini lewat
@@ -198,7 +198,7 @@ Buka model `App\Models\User.php` dan tambahkan trait `HasSecurityRelations`:
 namespace App\Models;
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Internal\SecurityMonitor\Concerns\HasSecurityRelations;
+use Internal\Pasak\Concerns\HasSecurityRelations;
 
 class User extends Authenticatable
 {
@@ -232,20 +232,20 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         // Daftarkan penegakan WAF dan blokir IP secara global
-        $middleware->append(\Internal\SecurityMonitor\Http\Middleware\BlockIpAddress::class);
-        $middleware->append(\Internal\SecurityMonitor\Http\Middleware\DetectSecurityThreats::class);
+        $middleware->append(\Internal\Pasak\Http\Middleware\BlockIpAddress::class);
+        $middleware->append(\Internal\Pasak\Http\Middleware\DetectSecurityThreats::class);
 
         // Lacak aktivitas sesi pengguna di grup web
         $middleware->web(append: [
-            \Internal\SecurityMonitor\Http\Middleware\TrackUserActivity::class,
+            \Internal\Pasak\Http\Middleware\TrackUserActivity::class,
         ]);
 
         // Alias middleware keamanan
         $middleware->alias([
-            'security.block' => \Internal\SecurityMonitor\Http\Middleware\BlockIpAddress::class,
-            'security.detect' => \Internal\SecurityMonitor\Http\Middleware\DetectSecurityThreats::class,
-            'security.admin' => \Internal\SecurityMonitor\Http\Middleware\EnsureSecurityAdmin::class,
-            'security.activity' => \Internal\SecurityMonitor\Http\Middleware\TrackUserActivity::class,
+            'security.block' => \Internal\Pasak\Http\Middleware\BlockIpAddress::class,
+            'security.detect' => \Internal\Pasak\Http\Middleware\DetectSecurityThreats::class,
+            'security.admin' => \Internal\Pasak\Http\Middleware\EnsureSecurityAdmin::class,
+            'security.activity' => \Internal\Pasak\Http\Middleware\TrackUserActivity::class,
         ]);
     })
     ->create();
@@ -256,22 +256,22 @@ return Application::configure(basePath: dirname(__DIR__))
 ```php
 protected $middleware = [
     // ...
-    \Internal\SecurityMonitor\Http\Middleware\BlockIpAddress::class,
-    \Internal\SecurityMonitor\Http\Middleware\DetectSecurityThreats::class,
+    \Internal\Pasak\Http\Middleware\BlockIpAddress::class,
+    \Internal\Pasak\Http\Middleware\DetectSecurityThreats::class,
 ];
 
 protected $middlewareGroups = [
     'web' => [
         // ...
-        \Internal\SecurityMonitor\Http\Middleware\TrackUserActivity::class,
+        \Internal\Pasak\Http\Middleware\TrackUserActivity::class,
     ],
 ];
 
 protected $middlewareAliases = [
-    'security.block' => \Internal\SecurityMonitor\Http\Middleware\BlockIpAddress::class,
-    'security.detect' => \Internal\SecurityMonitor\Http\Middleware\DetectSecurityThreats::class,
-    'security.admin' => \Internal\SecurityMonitor\Http\Middleware\EnsureSecurityAdmin::class,
-    'security.activity' => \Internal\SecurityMonitor\Http\Middleware\TrackUserActivity::class,
+    'security.block' => \Internal\Pasak\Http\Middleware\BlockIpAddress::class,
+    'security.detect' => \Internal\Pasak\Http\Middleware\DetectSecurityThreats::class,
+    'security.admin' => \Internal\Pasak\Http\Middleware\EnsureSecurityAdmin::class,
+    'security.activity' => \Internal\Pasak\Http\Middleware\TrackUserActivity::class,
 ];
 ```
 
@@ -367,7 +367,7 @@ Paket menyediakan aturan validasi siap pakai untuk request form aplikasi Anda:
 Memvalidasi unggahan gambar dan mencegah serangan _polyglot image_ (gambar JPEG/PNG sah yang diinjeksi kode `<?php`), ekstensi ganda berbahaya, dan SVG bereksekusi JavaScript/XSS:
 
 ```php
-use Internal\SecurityMonitor\Rules\SafeImageFile;
+use Internal\Pasak\Rules\SafeImageFile;
 
 $request->validate([
     'avatar' => ['required', 'file', new SafeImageFile(maxKilobytes: 2048)],
@@ -379,7 +379,7 @@ $request->validate([
 Memvalidasi string path aset gambar/ikon agar terbebas dari path traversal, probe direktori sensitif, dan file `.htaccess`:
 
 ```php
-use Internal\SecurityMonitor\Rules\SafeAssetPath;
+use Internal\Pasak\Rules\SafeAssetPath;
 
 $request->validate([
     'icon_path' => ['required', 'string', new SafeAssetPath],
@@ -522,7 +522,7 @@ Hasil uji: **82 passed (333 assertions)** 100% Passed mencakup:
 - `DeviceLevelBlockingTest`: Uji isolasi perangkat pada IP publik bersama.
 - `ServerSecurityTest`: Audit keamanan lingkungan, baseline SHA-256, dan webshell sanitizer.
 - `AccessLogScanTest`: Uji parser streaming log akses web server.
-- `SecurityMonitorTest`: Uji ambang batas auto-blocking dan rotasi log.
+- `PasakTest`: Uji ambang batas auto-blocking dan rotasi log.
 - `NginxPublishTest`: Verifikasi publikasi konfigurasi hardened virtual host Nginx.
 - `HtaccessPublishTest`: Verifikasi publikasi, penambahan aturan otomatis, dan pencadangan `.htaccess` Apache.
 

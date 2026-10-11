@@ -11,7 +11,7 @@ Jika penanganan header proxy tidak dilakukan dengan benar, sistem keamanan dapat
 
 ## 1. Urutan Prioritas Resolusi IP
 
-Metode `SecurityMonitorService::resolveClientIp(Request $request)` melakukan resolusi alamat IP klien nyata (*Real Client IP*) dengan urutan prioritas yang aman:
+Metode `PasakService::resolveClientIp(Request $request)` melakukan resolusi alamat IP klien nyata (*Real Client IP*) dengan urutan prioritas yang aman:
 
 1. **`CF-Connecting-IP`**: Header standar dari Cloudflare. Ini adalah header paling tepercaya jika domain Anda menggunakan proxy Cloudflare, karena Cloudflare membersihkan dan menimpa header ini di level edge network mereka.
 2. **`X-Real-IP`**: Ditetapkan oleh reverse proxy Nginx terpercaya (`proxy_set_header X-Real-IP $remote_addr;`).
@@ -64,7 +64,7 @@ protected $headers = Request::HEADER_X_FORWARDED_FOR | Request::HEADER_X_FORWARD
 
 ## 3. Resolusi Identitas Perangkat (`device_id` & `local_ip`)
 
-Selain alamat IP publik, `SecurityMonitorService` mengekstrak parameter identitas perangkat melalui metode:
+Selain alamat IP publik, `PasakService` mengekstrak parameter identitas perangkat melalui metode:
 
 - **`resolveDeviceId(Request $request)`**:
   1. Header `X-Device-Id`

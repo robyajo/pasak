@@ -1,10 +1,10 @@
 <?php
 
-namespace Internal\SecurityMonitor\Console\Commands;
+namespace Internal\Pasak\Console\Commands;
 
 use Illuminate\Console\Command;
-use Internal\SecurityMonitor\Models\BlockedIp;
-use Internal\SecurityMonitor\Services\SecurityMonitorService;
+use Internal\Pasak\Models\BlockedIp;
+use Internal\Pasak\Services\PasakService;
 
 /**
  * Escape hatch so an administrator can never be permanently locked out of the
@@ -12,14 +12,14 @@ use Internal\SecurityMonitor\Services\SecurityMonitorService;
  */
 class UnblockIpAddress extends Command
 {
-    protected $signature = 'security:unblock-ip
+    protected $signature = 'pasak:unblock-ip
                             {ip? : Alamat IP yang akan dibuka blokirnya}
                             {--all : Buka blokir seluruh IP}
                             {--list : Tampilkan daftar IP yang sedang diblokir}';
 
     protected $description = 'Buka blokir alamat IP yang diblokir oleh Security Monitor';
 
-    public function handle(SecurityMonitorService $service): int
+    public function handle(PasakService $service): int
     {
         if ($this->option('list') || (! $this->argument('ip') && ! $this->option('all'))) {
             return $this->listBlocks();

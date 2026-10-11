@@ -43,7 +43,7 @@ test('security install command runs and publishes nginx configuration', function
         File::delete($publishedPath);
     }
 
-    $this->artisan('security:install', [
+    $this->artisan('pasak:install', [
         '--force' => true,
     ])->assertSuccessful();
 

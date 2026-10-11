@@ -1,7 +1,7 @@
-# Rencana & Kebutuhan Publikasi Packagist: `robyajo/laravel-security-monitor`
+# Rencana & Kebutuhan Publikasi Packagist: `robyajo/pasak`
 
 > **Dokumen Rencana Rilis Resmi**  
-> **Paket**: `robyajo/laravel-security-monitor` (Bulwark)  
+> **Paket**: `robyajo/pasak` (Bulwark)  
 > **Status**: Siap Rilis (100% Decoupled Standalone Library, Pure PHP, Zero NPM)  
 > **Target Lingkungan**: PHP `^8.2 | ^8.3 | ^8.4`, Laravel `^10.0 | ^11.0 | ^12.0 | ^13.0`  
 > **Lisensi**: MIT
@@ -10,7 +10,7 @@
 
 ## Daftar Isi
 
-1. [Fokus Tunggal: `laravel-security-monitor`](#1-fokus-tunggal-laravel-security-monitor)
+1. [Fokus Tunggal: `pasak`](#1-fokus-tunggal-pasak)
 2. [Status Kesiapan Repositori Saat Ini](#2-status-kesiapan-repositori-saat-ini)
 3. [Arsitektur Terintegrasi & Dekopling Penuh](#3-arsitektur-terintegrasi--dekopling-penuh)
 4. [Standar Desain Spatie (100% Pure PHP & Zero NPM)](#4-standar-desain-spatie-100-pure-php--zero-npm)
@@ -23,9 +23,9 @@
 
 ---
 
-## 1. Fokus Tunggal: `laravel-security-monitor`
+## 1. Fokus Tunggal: `pasak`
 
-Berdasarkan evaluasi arsitektur final, strategi rilis **difokuskan 100% pada satu paket utama yang utuh**: **`robyajo/laravel-security-monitor`**.
+Berdasarkan evaluasi arsitektur final, strategi rilis **difokuskan 100% pada satu paket utama yang utuh**: **`robyajo/pasak`**.
 
 ---
 
@@ -35,7 +35,7 @@ Repositori paket saat ini telah berdiri sendiri secara penuh di direktori paket:
 
 | Komponen                        |     Status      | Catatan Verifikasi                                                                 |
 | :------------------------------ | :-------------: | :--------------------------------------------------------------------------------- |
-| **Pemisahan Kode (Decoupling)** | ✅ 100% Selesai | Seluruh referensi `App\` telah diubah ke `Internal\SecurityMonitor\`.              |
+| **Pemisahan Kode (Decoupling)** | ✅ 100% Selesai | Seluruh referensi `App\` telah diubah ke `Internal\Pasak\`.              |
 | **Model User Dinamis**          | ✅ 100% Selesai | Menggunakan `config('security.user_model')` + Trait `HasSecurityRelations`.        |
 | **Nama Tabel Dinamis**          | ✅ 100% Selesai | Seluruh model membaca nama tabel dari `config('security.table_names.*')`.          |
 | **Bebas Dependensi NPM**        | ✅ 100% Selesai | Murni Composer library (`type: library`), nol ketergantungan build tool frontend.  |
@@ -51,8 +51,8 @@ Paket ini menggabungkan 6 kapabilitas keamanan enterprise dalam satu kesatuan ar
 
 ```mermaid
 graph TD
-    UserApp[Aplikasi Laravel Host] --> Composer[composer require robyajo/laravel-security-monitor]
-    Composer --> Provider[SecurityMonitorServiceProvider<br/>Auto-Discovery Core Hooks]
+    UserApp[Aplikasi Laravel Host] --> Composer[composer require robyajo/pasak]
+    Composer --> Provider[PasakServiceProvider<br/>Auto-Discovery Core Hooks]
 
     subgraph CoreCapabilities ["Kapabilitas Keamanan Terintegrasi"]
         Provider --> WAF[1. WAF & Zero-Tolerance Engine<br/>Instant 30d block & sliding window]
@@ -71,7 +71,7 @@ graph TD
 Paket ini mengikuti standar konvensi paket ekosistem Spatie (`spatie/laravel-permission`):
 
 1. **Auto-Discovery Tanpa Konfigurasi Manual**:
-   Laravel otomatis mendeteksi `SecurityMonitorServiceProvider` dan Facade `SecurityMonitor`.
+   Laravel otomatis mendeteksi `PasakServiceProvider` dan Facade `Pasak`.
 2. **Satu Baris Trait Eloquent**:
    Pengguna cukup menambahkan `use HasSecurityRelations;` pada model `App\Models\User`.
 3. **Core Event Listeners Otomatis**:
@@ -89,7 +89,7 @@ Berkas `composer.json` telah dikonfigurasi untuk standar katalog Packagist:
 
 ```json
 {
-    "name": "robyajo/laravel-security-monitor",
+    "name": "robyajo/pasak",
     "description": "Enterprise-grade headless self-hosted WAF, threat detection engine, zero-tolerance blocking, stepped login lockout, and security auditing toolkit for Laravel.",
     "keywords": [
         "laravel",
@@ -104,11 +104,11 @@ Berkas `composer.json` telah dikonfigurasi untuk standar katalog Packagist:
         "security-audit",
         "headless"
     ],
-    "homepage": "https://github.com/robyajo/laravel-security-monitor",
+    "homepage": "https://github.com/robyajo/pasak",
     "support": {
-        "issues": "https://github.com/robyajo/laravel-security-monitor/issues",
-        "source": "https://github.com/robyajo/laravel-security-monitor",
-        "docs": "https://github.com/robyajo/laravel-security-monitor#readme"
+        "issues": "https://github.com/robyajo/pasak/issues",
+        "source": "https://github.com/robyajo/pasak",
+        "docs": "https://github.com/robyajo/pasak#readme"
     },
     "type": "library",
     "license": "MIT",
@@ -137,21 +137,21 @@ Berkas `composer.json` telah dikonfigurasi untuk standar katalog Packagist:
     },
     "autoload": {
         "psr-4": {
-            "Internal\\SecurityMonitor\\": "src/"
+            "Internal\\Pasak\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Internal\\SecurityMonitor\\Tests\\": "tests/"
+            "Internal\\Pasak\\Tests\\": "tests/"
         }
     },
     "extra": {
         "laravel": {
             "providers": [
-                "Internal\\SecurityMonitor\\SecurityMonitorServiceProvider"
+                "Internal\\Pasak\\PasakServiceProvider"
             ],
             "aliases": {
-                "SecurityMonitor": "Internal\\SecurityMonitor\\Facades\\SecurityMonitor"
+                "Pasak": "Internal\\Pasak\\Facades\\Pasak"
             }
         }
     },
@@ -178,11 +178,11 @@ Berkas `.github/workflows/run-tests.yml` telah dipasang untuk menguji kompatibil
 
 ### Langkah 1: Inisialisasi & Push ke GitHub Publik
 
-1. Buat repositori baru di GitHub: `https://github.com/robyajo/laravel-security-monitor`.
+1. Buat repositori baru di GitHub: `https://github.com/robyajo/pasak`.
 2. Pastikan visibility disetel **Public**.
 3. Push seluruh berkas paket ke branch `main`:
     ```bash
-    git remote add origin https://github.com/robyajo/laravel-security-monitor.git
+    git remote add origin https://github.com/robyajo/pasak.git
     git branch -M main
     git push -u origin main
     ```
@@ -200,9 +200,9 @@ git push origin v1.0.0
 
 1. Buka [https://packagist.org/packages/submit](https://packagist.org/packages/submit) dan login menggunakan akun GitHub Anda.
 2. Masukkan URL repositori:
-   `https://github.com/robyajo/laravel-security-monitor`
+   `https://github.com/robyajo/pasak`
 3. Klik **Check**, lalu klik **Submit**.
-4. Paket akan terdaftar dengan nama **`robyajo/laravel-security-monitor`**.
+4. Paket akan terdaftar dengan nama **`robyajo/pasak`**.
 
 ### Langkah 4: Aktifkan GitHub Webhook Otomatis
 
@@ -226,7 +226,7 @@ composer create-project laravel/laravel test-security-app
 cd test-security-app
 
 # 2. Pasang paket dari Packagist
-composer require robyajo/laravel-security-monitor
+composer require robyajo/pasak
 
 # 3. Jalankan instalasi aset
 php artisan security:install

@@ -1,11 +1,11 @@
 ---
 title: "Tugas Terjadwal (Cron & Scheduler)"
-description: "SecurityMonitorServiceProvider menyertakan registrasi otomatis ke sistem scheduler bawaan Laravel (Illuminate\\Console\\Scheduling\\Schedule). Tugas-tugas..."
+description: "PasakServiceProvider menyertakan registrasi otomatis ke sistem scheduler bawaan Laravel (Illuminate\\Console\\Scheduling\\Schedule). Tugas-tugas..."
 sidebar:
   order: 2
 ---
 
-`SecurityMonitorServiceProvider` menyertakan registrasi otomatis ke sistem scheduler bawaan Laravel (`Illuminate\Console\Scheduling\Schedule`). Tugas-tugas ini beroperasi secara otonom di latar belakang untuk menjaga higienitas basis data dan integritas server.
+`PasakServiceProvider` menyertakan registrasi otomatis ke sistem scheduler bawaan Laravel (`Illuminate\Console\Scheduling\Schedule`). Tugas-tugas ini beroperasi secara otonom di latar belakang untuk menjaga higienitas basis data dan integritas server.
 
 ---
 

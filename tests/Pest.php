@@ -1,6 +1,6 @@
 <?php
 
-use Internal\SecurityMonitor\Tests\TestCase;
+use Internal\Pasak\Tests\TestCase;
 
 // Pest 3+ exposes the `pest()` helper; Pest 2 (used by Laravel 10 /
 // Orchestra Testbench 8) only provides `uses()`.

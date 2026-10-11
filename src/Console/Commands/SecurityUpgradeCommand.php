@@ -1,25 +1,25 @@
 <?php
 
-namespace Internal\SecurityMonitor\Console\Commands;
+namespace Internal\Pasak\Console\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\File;
-use Internal\SecurityMonitor\Services\VersionCheckService;
+use Internal\Pasak\Services\VersionCheckService;
 use Symfony\Component\Process\Process;
 use Throwable;
 
 class SecurityUpgradeCommand extends Command
 {
-    protected $signature = 'security:upgrade
+    protected $signature = 'pasak:upgrade
                             {--check : Hanya periksa apakah ada versi baru tanpa menjalankan pembaruan}
                             {--force : Paksa jalankan pembaruan dan sinkronisasi meskipun sudah di versi terbaru}
                             {--no-composer : Lewati pembaruan package via Composer (hanya sinkronkan aset lokal)}
                             {--no-migrate : Lewati eksekusi migrasi database}
-                            {--sync-routes : Paksa sinkronkan ulang berkas routes/security.php dan routes/security-api.php}
+                            {--sync-routes : Paksa sinkronkan ulang berkas routes/pasak.php dan routes/pasak-api.php}
                             {--sync-views : Paksa sinkronkan ulang berkas tampilan dashboard (Blade / React)}';
 
-    protected $description = 'Periksa dan perbarui package Laravel Security Monitor (Bulwark) ke versi terbaru serta sinkronkan migrasi, rute, dan tampilan dashboard';
+    protected $description = 'Periksa dan perbarui package Pasak (Bulwark) ke versi terbaru serta sinkronkan migrasi, rute, dan tampilan dashboard';
 
     public function handle(VersionCheckService $versionChecker): int
     {
@@ -41,7 +41,7 @@ class SecurityUpgradeCommand extends Command
         if ($this->option('check')) {
             if ($hasUpdate) {
                 $this->warn("  Tersedia pembaruan: v{$current} → v{$latest}");
-                $this->line('  Jalankan <info>php artisan security:upgrade</info> untuk memperbarui.');
+                $this->line('  Jalankan <info>php artisan pasak:upgrade</info> untuk memperbarui.');
             } else {
                 $this->info("  ✓ Package sudah berada pada versi terbaru (v{$current}).");
             }
@@ -68,7 +68,7 @@ class SecurityUpgradeCommand extends Command
         if (! $this->option('no-composer')) {
             $this->comment('1/5. Memperbarui package via Composer...');
             $composer = $this->findComposer();
-            $cmd = array_merge($composer, ['update', 'robyajo/laravel-security-monitor', '--with-all-dependencies']);
+            $cmd = array_merge($composer, ['update', 'robyajo/pasak', '--with-all-dependencies']);
 
             if (function_exists('proc_open')) {
                 try {
@@ -85,7 +85,7 @@ class SecurityUpgradeCommand extends Command
                     }
                 } catch (Throwable $e) {
                     $this->warn('  Gagal menjalankan Composer otomatis: '.$e->getMessage());
-                    $this->line('  Silakan jalankan <info>composer update robyajo/laravel-security-monitor</info> secara manual jika diperlukan.');
+                    $this->line('  Silakan jalankan <info>composer update robyajo/pasak</info> secara manual jika diperlukan.');
                 }
             } else {
                 $this->warn('  Fungsi proc_open dinonaktifkan di server. Silakan jalankan composer update secara manual.');
@@ -99,7 +99,7 @@ class SecurityUpgradeCommand extends Command
         // 2. Publish & Run Migrations
         $this->comment('2/5. Menyinkronkan dan menerapkan migrasi database...');
         $this->call('vendor:publish', [
-            '--tag' => 'security-migrations',
+            '--tag' => 'pasak-migrations',
             '--force' => true,
         ]);
         if (! $this->option('no-migrate')) {
@@ -110,15 +110,15 @@ class SecurityUpgradeCommand extends Command
 
         // 3. Synchronize routes
         $this->comment('3/5. Menyinkronkan berkas rute kustom...');
-        $hasWebRoutes = File::exists(base_path('routes/security.php'));
-        $hasApiRoutes = File::exists(base_path('routes/security-api.php'));
+        $hasWebRoutes = File::exists(base_path('routes/pasak.php'));
+        $hasApiRoutes = File::exists(base_path('routes/pasak-api.php'));
 
         if ($hasWebRoutes || $hasApiRoutes || $this->option('sync-routes')) {
             $this->call('vendor:publish', [
-                '--tag' => 'security-routes',
+                '--tag' => 'pasak-routes',
                 '--force' => true,
             ]);
-            $this->info('  ✓ Berkas routes/security.php dan routes/security-api.php telah disinkronkan.');
+            $this->info('  ✓ Berkas routes/pasak.php dan routes/pasak-api.php telah disinkronkan.');
         } else {
             $this->line('  (Rute internal paket aktif secara otomatis, berkas rute lokal tidak ditemukan).');
         }
@@ -126,12 +126,12 @@ class SecurityUpgradeCommand extends Command
 
         // 4. Synchronize dashboard views
         $this->comment('4/5. Menyinkronkan tampilan dashboard monitoring...');
-        $hasBladeViews = File::isDirectory(resource_path('views/pages/security'));
-        $hasReactViews = File::isDirectory(resource_path('js/pages/security'));
+        $hasBladeViews = File::isDirectory(resource_path('views/pages/pasak'));
+        $hasReactViews = File::isDirectory(resource_path('js/pages/pasak'));
 
         if ($hasBladeViews || $this->option('sync-views')) {
             $this->call('vendor:publish', [
-                '--tag' => 'security-dashboard-blade-views',
+                '--tag' => 'pasak-dashboard-blade-views',
                 '--force' => true,
             ]);
             $this->info('  ✓ Tampilan dashboard Blade/Livewire telah disinkronkan.');
@@ -139,7 +139,7 @@ class SecurityUpgradeCommand extends Command
 
         if ($hasReactViews) {
             $this->call('vendor:publish', [
-                '--tag' => 'security-dashboard-react-views',
+                '--tag' => 'pasak-dashboard-react-views',
                 '--force' => true,
             ]);
             $this->info('  ✓ Tampilan dashboard React/Inertia telah disinkronkan.');
@@ -147,7 +147,7 @@ class SecurityUpgradeCommand extends Command
 
         if (File::exists(resource_path('views/errors/blocked.blade.php'))) {
             $this->call('vendor:publish', [
-                '--tag' => 'security-views',
+                '--tag' => 'pasak-views',
                 '--force' => true,
             ]);
             $this->info('  ✓ Halaman error blokir (errors/blocked.blade.php) telah disinkronkan.');
@@ -166,7 +166,7 @@ class SecurityUpgradeCommand extends Command
         $this->newLine();
 
         $refreshedVersion = $versionChecker->getCurrentVersion();
-        $this->info("  🎉 Laravel Security Monitor berhasil diperbarui dan disinkronkan (v{$refreshedVersion})!");
+        $this->info("  🎉 Pasak berhasil diperbarui dan disinkronkan (v{$refreshedVersion})!");
         $this->newLine();
 
         return 0;

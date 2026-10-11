@@ -1,18 +1,18 @@
 <?php
 
-namespace Internal\SecurityMonitor\Http\Controllers\Api;
+namespace Internal\Pasak\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Str;
-use Internal\SecurityMonitor\Models\IpUnblockRequest;
-use Internal\SecurityMonitor\Services\SecurityMonitorService;
+use Internal\Pasak\Models\IpUnblockRequest;
+use Internal\Pasak\Services\PasakService;
 
 class IpUnblockRequestApiController extends Controller
 {
     public function __construct(
-        protected SecurityMonitorService $service
+        protected PasakService $service
     ) {}
 
     /**

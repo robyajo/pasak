@@ -1,13 +1,13 @@
 <?php
 
-namespace Internal\SecurityMonitor\Tests\Feature;
+namespace Internal\Pasak\Tests\Feature;
 
 use Illuminate\Console\Events\CommandStarting;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Http;
-use Internal\SecurityMonitor\Services\VersionCheckService;
-use Internal\SecurityMonitor\Tests\TestCase;
+use Internal\Pasak\Services\VersionCheckService;
+use Internal\Pasak\Tests\TestCase;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
 
@@ -32,9 +32,9 @@ class SecurityVersionCheckTest extends TestCase
     public function test_can_fetch_and_cache_latest_version_from_packagist(): void
     {
         Http::fake([
-            'https://repo.packagist.org/p2/robyajo/laravel-security-monitor.json' => Http::response([
+            'https://repo.packagist.org/p2/robyajo/pasak.json' => Http::response([
                 'packages' => [
-                    'robyajo/laravel-security-monitor' => [
+                    'robyajo/pasak' => [
                         ['version' => 'v99.0.0'],
                         ['version' => 'v2.0.7'],
                     ],
@@ -53,8 +53,8 @@ class SecurityVersionCheckTest extends TestCase
     public function test_fallback_to_github_if_packagist_fails(): void
     {
         Http::fake([
-            'https://repo.packagist.org/p2/robyajo/laravel-security-monitor.json' => Http::response(null, 500),
-            'https://api.github.com/repos/robyajo/laravel-security-monitor/tags' => Http::response([
+            'https://repo.packagist.org/p2/robyajo/pasak.json' => Http::response(null, 500),
+            'https://api.github.com/repos/robyajo/pasak/tags' => Http::response([
                 ['name' => 'v98.5.1'],
                 ['name' => 'v2.0.7'],
             ], 200),
@@ -70,9 +70,9 @@ class SecurityVersionCheckTest extends TestCase
     public function test_notifies_user_in_terminal_when_update_available(): void
     {
         Http::fake([
-            'https://repo.packagist.org/p2/robyajo/laravel-security-monitor.json' => Http::response([
+            'https://repo.packagist.org/p2/robyajo/pasak.json' => Http::response([
                 'packages' => [
-                    'robyajo/laravel-security-monitor' => [
+                    'robyajo/pasak' => [
                         ['version' => 'v99.9.9'],
                     ],
                 ],
@@ -87,7 +87,7 @@ class SecurityVersionCheckTest extends TestCase
 
         $this->assertStringContainsString('Pembaruan Tersedia', $content);
         $this->assertStringContainsString('v99.9.9', $content);
-        $this->assertStringContainsString('php artisan security:upgrade', $content);
+        $this->assertStringContainsString('php artisan pasak:upgrade', $content);
 
         // Notifikasi hanya dicetak satu kali per proses
         $secondOutput = new BufferedOutput;
@@ -97,12 +97,12 @@ class SecurityVersionCheckTest extends TestCase
 
     public function test_respects_version_check_disabled_configuration(): void
     {
-        config(['security.version_check.enabled' => false]);
+        config(['pasak.version_check.enabled' => false]);
 
         Http::fake([
-            'https://repo.packagist.org/p2/robyajo/laravel-security-monitor.json' => Http::response([
+            'https://repo.packagist.org/p2/robyajo/pasak.json' => Http::response([
                 'packages' => [
-                    'robyajo/laravel-security-monitor' => [
+                    'robyajo/pasak' => [
                         ['version' => 'v99.9.9'],
                     ],
                 ],
@@ -119,9 +119,9 @@ class SecurityVersionCheckTest extends TestCase
     public function test_command_starting_triggers_notice_on_serve_and_dev(): void
     {
         Http::fake([
-            'https://repo.packagist.org/p2/robyajo/laravel-security-monitor.json' => Http::response([
+            'https://repo.packagist.org/p2/robyajo/pasak.json' => Http::response([
                 'packages' => [
-                    'robyajo/laravel-security-monitor' => [
+                    'robyajo/pasak' => [
                         ['version' => 'v99.0.0'],
                     ],
                 ],
@@ -135,15 +135,15 @@ class SecurityVersionCheckTest extends TestCase
 
         $content = $output->fetch();
         $this->assertStringContainsString('Pembaruan Tersedia', $content);
-        $this->assertStringContainsString('php artisan security:upgrade', $content);
+        $this->assertStringContainsString('php artisan pasak:upgrade', $content);
     }
 
     public function test_command_starting_does_not_trigger_notice_on_other_commands(): void
     {
         Http::fake([
-            'https://repo.packagist.org/p2/robyajo/laravel-security-monitor.json' => Http::response([
+            'https://repo.packagist.org/p2/robyajo/pasak.json' => Http::response([
                 'packages' => [
-                    'robyajo/laravel-security-monitor' => [
+                    'robyajo/pasak' => [
                         ['version' => 'v99.0.0'],
                     ],
                 ],
@@ -161,35 +161,35 @@ class SecurityVersionCheckTest extends TestCase
     public function test_upgrade_command_check_option(): void
     {
         Http::fake([
-            'https://repo.packagist.org/p2/robyajo/laravel-security-monitor.json' => Http::response([
+            'https://repo.packagist.org/p2/robyajo/pasak.json' => Http::response([
                 'packages' => [
-                    'robyajo/laravel-security-monitor' => [
+                    'robyajo/pasak' => [
                         ['version' => 'v99.1.0'],
                     ],
                 ],
             ], 200),
         ]);
 
-        $this->artisan('security:upgrade', ['--check' => true])
+        $this->artisan('pasak:upgrade', ['--check' => true])
             ->expectsOutputToContain('Tersedia pembaruan: v')
             ->expectsOutputToContain('v99.1.0')
-            ->expectsOutputToContain('php artisan security:upgrade')
+            ->expectsOutputToContain('php artisan pasak:upgrade')
             ->assertExitCode(0);
     }
 
     public function test_upgrade_command_sync_only_with_no_composer(): void
     {
         Http::fake([
-            'https://repo.packagist.org/p2/robyajo/laravel-security-monitor.json' => Http::response([
+            'https://repo.packagist.org/p2/robyajo/pasak.json' => Http::response([
                 'packages' => [
-                    'robyajo/laravel-security-monitor' => [
+                    'robyajo/pasak' => [
                         ['version' => 'v2.0.8'],
                     ],
                 ],
             ], 200),
         ]);
 
-        $this->artisan('security:upgrade', [
+        $this->artisan('pasak:upgrade', [
             '--force' => true,
             '--no-composer' => true,
         ])

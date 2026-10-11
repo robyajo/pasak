@@ -1,6 +1,6 @@
 <?php
 
-namespace Internal\SecurityMonitor\Http\Controllers\Dashboard;
+namespace Internal\Pasak\Http\Controllers\Dashboard;
 
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -8,8 +8,8 @@ use Illuminate\Routing\Controller;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
-use Internal\SecurityMonitor\Models\BlockedIp;
-use Internal\SecurityMonitor\Services\SecurityMonitorService;
+use Internal\Pasak\Models\BlockedIp;
+use Internal\Pasak\Services\PasakService;
 
 /**
  * Blocked IP management page for the Inertia + React dashboard.
@@ -61,7 +61,7 @@ class BlockedIpController extends Controller
         ]);
     }
 
-    public function store(Request $request, SecurityMonitorService $security): RedirectResponse
+    public function store(Request $request, PasakService $security): RedirectResponse
     {
         $validated = $request->validate([
             'ip_address' => ['required', 'string', 'max:45'],

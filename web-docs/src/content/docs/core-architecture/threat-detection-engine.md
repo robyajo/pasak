@@ -1,11 +1,11 @@
 ---
 title: "Threat Detection Engine & Zero-Tolerance WAF"
-description: "Mesin deteksi ancaman (SecurityMonitorService::inspect()) adalah jantung dari Web Application Firewall (WAF) mandiri di dalam paket ini. Mesin ini..."
+description: "Mesin deteksi ancaman (PasakService::inspect()) adalah jantung dari Web Application Firewall (WAF) mandiri di dalam paket ini. Mesin ini..."
 sidebar:
   order: 1
 ---
 
-Mesin deteksi ancaman (`SecurityMonitorService::inspect()`) adalah jantung dari Web Application Firewall (WAF) mandiri di dalam paket ini. Mesin ini bertugas menganalisis seluruh lalu lintas HTTP yang masuk dan menentukan apakah suatu request bersifat berbahaya, mencurigakan, atau sah.
+Mesin deteksi ancaman (`PasakService::inspect()`) adalah jantung dari Web Application Firewall (WAF) mandiri di dalam paket ini. Mesin ini bertugas menganalisis seluruh lalu lintas HTTP yang masuk dan menentukan apakah suatu request bersifat berbahaya, mencurigakan, atau sah.
 
 ---
 

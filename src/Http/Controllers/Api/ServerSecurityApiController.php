@@ -1,13 +1,13 @@
 <?php
 
-namespace Internal\SecurityMonitor\Http\Controllers\Api;
+namespace Internal\Pasak\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
-use Internal\SecurityMonitor\Models\LoginAttempt;
-use Internal\SecurityMonitor\Services\LoginThrottleService;
-use Internal\SecurityMonitor\Services\ServerSecurityService;
+use Internal\Pasak\Models\LoginAttempt;
+use Internal\Pasak\Services\LoginThrottleService;
+use Internal\Pasak\Services\ServerSecurityService;
 
 class ServerSecurityApiController extends Controller
 {

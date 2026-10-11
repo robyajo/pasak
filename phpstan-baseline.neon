@@ -64,13 +64,13 @@ parameters:
 			message: '#^Call to function method_exists\(\) with Illuminate\\Http\\UploadedFile and ''get'' will always evaluate to true\.$#'
 			identifier: function.alreadyNarrowedType
 			count: 1
-			path: src/Services/SecurityMonitorService.php
+			path: src/Services/PasakService.php
 
 		-
 			message: '#^Variable \$block in PHPDoc tag @var does not match assigned variable \$blockQuery\.$#'
 			identifier: varTag.differentVariable
 			count: 1
-			path: src/Services/SecurityMonitorService.php
+			path: src/Services/PasakService.php
 
 		-
 			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$two_factor_confirmed_at\.$#'

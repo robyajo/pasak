@@ -1,11 +1,11 @@
 ---
 title: "Changelog"
-description: "Riwayat lengkap perubahan paket robyajo/laravel-security-monitor. Versi terbaru: v2.1.0."
+description: "Riwayat lengkap perubahan paket robyajo/pasak. Versi terbaru: v2.1.0."
 ---
 
-Versi terbaru: **v2.1.0** · [Packagist](https://packagist.org/packages/robyajo/laravel-security-monitor) · [Repositori GitHub](https://github.com/robyajo/laravel-security-monitor)
+Versi terbaru: **v2.1.0** · [Packagist](https://packagist.org/packages/robyajo/pasak) · [Repositori GitHub](https://github.com/robyajo/pasak)
 
-All notable changes to `robyajo/laravel-security-monitor` will be documented in this file.
+All notable changes to `robyajo/pasak` will be documented in this file.
 
 ## [2.1.0] - 2026-10-09
 
@@ -59,7 +59,7 @@ All notable changes to `robyajo/laravel-security-monitor` will be documented in 
 
 - **Perintah Baru `php artisan security:upgrade`**:
   - Perintah artisan terpadu untuk memeriksa, memperbarui, dan menyinkronkan seluruh komponen package:
-    - `php artisan security:upgrade`: Memperbarui package via Composer (`composer update robyajo/laravel-security-monitor`), menerapkan migrasi database terbaru (`php artisan migrate`), menyinkronkan rute kustom (`routes/security.php` & `routes/security-api.php`), menyinkronkan tampilan dashboard monitoring (Blade/Livewire & React/TSX), serta membersihkan cache framework.
+    - `php artisan security:upgrade`: Memperbarui package via Composer (`composer update robyajo/pasak`), menerapkan migrasi database terbaru (`php artisan migrate`), menyinkronkan rute kustom (`routes/security.php` & `routes/security-api.php`), menyinkronkan tampilan dashboard monitoring (Blade/Livewire & React/TSX), serta membersihkan cache framework.
     - Opsi `--check`: Hanya memeriksa status versi tanpa menjalankan proses pembaruan.
     - Opsi `--force`: Memaksa pembaruan dan sinkronisasi aset meskipun sudah di versi terbaru.
     - Opsi `--no-composer`: Melewati pembaruan Composer (hanya sinkronisasi aset lokal).
@@ -120,7 +120,7 @@ All notable changes to `robyajo/laravel-security-monitor` will be documented in 
   - Web routes in `routes/security.php` render directly to views (`pages::security.*` / `resources/views/pages/security/*` for Livewire/Blade or Inertia controllers for React) so developers have full control to customize URL prefixes, middleware, layout wrappers, and custom pages.
   - Added `security-routes`, `security-routes-web`, and `security-routes-api` publication tags to `php artisan vendor:publish`.
   - Added `--without-routes` and `--without-api` flags to `php artisan security:install`.
-  - Smart route loading in `SecurityMonitorServiceProvider`: prioritized host route files if customized and prevents route duplication with host `routes/web.php` and `routes/api.php`.
+  - Smart route loading in `PasakServiceProvider`: prioritized host route files if customized and prevents route duplication with host `routes/web.php` and `routes/api.php`.
 
 ## [2.0.4] - 2026-10-05
 
@@ -192,7 +192,7 @@ All notable changes to `robyajo/laravel-security-monitor` will be documented in 
 ### Changed
 
 - README: the install command now uses the explicit stable constraint
-  (`composer require robyajo/laravel-security-monitor:^1.1`) and warns against
+  (`composer require robyajo/pasak:^1.1`) and warns against
   `@dev`, which forces the unreleased `dev-main` branch instead of a tagged
   release.
 
@@ -232,7 +232,7 @@ All notable changes to `robyajo/laravel-security-monitor` will be documented in 
 - **React (Inertia) Starter Kit monitoring dashboard** (optional): publish six
   server-rendered Inertia + React pages and shared components with
   `php artisan vendor:publish --tag=starterkit-react`. Backed by the new
-  `Internal\SecurityMonitor\Http\Controllers\Dashboard\*` controllers, so no
+  `Internal\Pasak\Http\Controllers\Dashboard\*` controllers, so no
   separate API token is required. Enable with `SECURITY_DASHBOARD_DRIVER=react`.
 - `--with-dashboard` and `--with-react-dashboard` options on
   `php artisan security:install`.

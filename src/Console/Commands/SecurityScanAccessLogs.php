@@ -1,13 +1,13 @@
 <?php
 
-namespace Internal\SecurityMonitor\Console\Commands;
+namespace Internal\Pasak\Console\Commands;
 
 use Carbon\CarbonInterface;
 use Illuminate\Console\Command;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
-use Internal\SecurityMonitor\Services\AccessLogScannerService;
-use Internal\SecurityMonitor\Services\SecurityMonitorService;
+use Internal\Pasak\Services\AccessLogScannerService;
+use Internal\Pasak\Services\PasakService;
 use Throwable;
 
 /**
@@ -17,14 +17,14 @@ use Throwable;
  *
  * Contoh pemakaian di server:
  *
- *   php artisan security:scan-logs                       # semua berkas default
- *   php artisan security:scan-logs --ip=104.207.74.38    # lacak satu IP
- *   php artisan security:scan-logs --since="2 days ago"  # batasi rentang waktu
- *   php artisan security:scan-logs --import --block      # catat + blokir
+ *   php artisan pasak:scan-logs                       # semua berkas default
+ *   php artisan pasak:scan-logs --ip=104.207.74.38    # lacak satu IP
+ *   php artisan pasak:scan-logs --since="2 days ago"  # batasi rentang waktu
+ *   php artisan pasak:scan-logs --import --block      # catat + blokir
  */
 class SecurityScanAccessLogs extends Command
 {
-    protected $signature = 'security:scan-logs
+    protected $signature = 'pasak:scan-logs
                             {--file=* : Berkas log yang diperiksa (boleh diulang; default dari config/security.php)}
                             {--ip= : Tampilkan hanya aktivitas satu alamat IP}
                             {--since= : Hanya baris sejak waktu tertentu, mis. "2 days ago" atau "2026-09-20 00:00"}
@@ -33,20 +33,20 @@ class SecurityScanAccessLogs extends Command
                             {--top=20 : Jumlah IP yang ditampilkan}
                             {--samples : Tampilkan contoh request tiap IP}
                             {--json : Keluarkan hasil sebagai JSON}
-                            {--import : Simpan temuan ke tabel security_logs}
+                            {--import : Simpan temuan ke tabel pasak_logs}
                             {--block : Blokir IP yang memicu zero tolerance signature (otomatis dicatat ke log)}
                             {--dry-run : Tampilkan rencana impor/pemblokiran tanpa mengubah apa pun}';
 
     protected $description = 'Analisis access log web server untuk mendeteksi serangan yang tidak tercatat aplikasi';
 
-    public function handle(AccessLogScannerService $scanner, SecurityMonitorService $security): int
+    public function handle(AccessLogScannerService $scanner, PasakService $security): int
     {
         $files = $this->resolveFiles($scanner);
 
         if ($files === []) {
             $this->error('Tidak ada berkas access log yang dapat dibaca.');
             $this->line('Tentukan lokasinya, mis.: --file=/var/log/nginx/access.log');
-            $this->line('atau setel SECURITY_ACCESS_LOG_PATHS pada .env.');
+            $this->line('atau setel PASAK_ACCESS_LOG_PATHS pada .env.');
 
             return self::FAILURE;
         }
@@ -212,12 +212,12 @@ class SecurityScanAccessLogs extends Command
     /**
      * @param  array<int, array<string, mixed>>  $attackers
      */
-    protected function importFindings(array $attackers, AccessLogScannerService $scanner, SecurityMonitorService $security): void
+    protected function importFindings(array $attackers, AccessLogScannerService $scanner, PasakService $security): void
     {
         $this->newLine();
 
         if ($this->option('dry-run')) {
-            $this->warn(sprintf('[dry-run] %d IP akan dicatat ke security_logs.', count($attackers)));
+            $this->warn(sprintf('[dry-run] %d IP akan dicatat ke pasak_logs.', count($attackers)));
 
             return;
         }
@@ -254,14 +254,14 @@ class SecurityScanAccessLogs extends Command
             }
         }
 
-        $this->info("{$created} temuan access log disimpan ke security_logs.");
+        $this->info("{$created} temuan access log disimpan ke pasak_logs.");
         $this->line('Tinjau di halaman /security/logs (jenis event "access_log:*").');
     }
 
     /**
      * @param  array<int, array<string, mixed>>  $attackers
      */
-    protected function blockAttackers(array $attackers, AccessLogScannerService $scanner, SecurityMonitorService $security): void
+    protected function blockAttackers(array $attackers, AccessLogScannerService $scanner, PasakService $security): void
     {
         $candidates = array_values(array_filter(
             $attackers,
@@ -304,7 +304,7 @@ class SecurityScanAccessLogs extends Command
                 'reason' => 'Diblokir dari analisis access log: '.$this->primaryRule($candidate),
                 'notes' => $scanner->attackerSummary($candidate),
                 'source' => 'automatic',
-                'duration_hours' => (int) config('security.instant_block.duration_hours', 720),
+                'duration_hours' => (int) config('pasak.instant_block.duration_hours', 720),
             ]);
 
             $security->log([
@@ -325,7 +325,7 @@ class SecurityScanAccessLogs extends Command
         $this->info("{$blocked} IP diblokir, {$skipped} dilewati.");
 
         if ($blocked > 0) {
-            $this->line('Buka blokir bila salah: php artisan security:unblock-ip <ip>');
+            $this->line('Buka blokir bila salah: php artisan pasak:unblock-ip <ip>');
         }
     }
 

@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\File;
-use Internal\SecurityMonitor\Console\Commands\SecurityInstallCommand;
+use Internal\Pasak\Console\Commands\SecurityInstallCommand;
 
 $tempDir = '';
 
@@ -66,14 +66,14 @@ PHP
         ->and($definition->hasOption('without-api'))->toBeTrue();
 });
 
-test('security routes tag publishes security.php and security-api.php', function () {
-    $this->artisan('vendor:publish', ['--tag' => 'security-routes'])
+test('pasak routes tag publishes pasak.php and pasak-api.php', function () {
+    $this->artisan('vendor:publish', ['--tag' => 'pasak-routes'])
         ->assertSuccessful();
 
-    expect(File::exists(base_path('routes/security.php')))->toBeTrue();
-    expect(File::exists(base_path('routes/security-api.php')))->toBeTrue();
+    expect(File::exists(base_path('routes/pasak.php')))->toBeTrue();
+    expect(File::exists(base_path('routes/pasak-api.php')))->toBeTrue();
 
     // Clean up
-    @unlink(base_path('routes/security.php'));
-    @unlink(base_path('routes/security-api.php'));
+    @unlink(base_path('routes/pasak.php'));
+    @unlink(base_path('routes/pasak-api.php'));
 });

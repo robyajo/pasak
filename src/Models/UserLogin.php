@@ -1,6 +1,6 @@
 <?php
 
-namespace Internal\SecurityMonitor\Models;
+namespace Internal\Pasak\Models;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -35,7 +35,7 @@ class UserLogin extends Model
 {
     public function getTable()
     {
-        return config('security.table_names.user_logins', parent::getTable());
+        return config('pasak.table_names.user_logins', parent::getTable());
     }
 
     protected $fillable = [
@@ -74,7 +74,7 @@ class UserLogin extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(
-            config('security.user_model', 'App\\Models\\User'),
+            config('pasak.user_model', 'App\\Models\\User'),
         );
     }
 

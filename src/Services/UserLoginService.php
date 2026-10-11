@@ -1,6 +1,6 @@
 <?php
 
-namespace Internal\SecurityMonitor\Services;
+namespace Internal\Pasak\Services;
 
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\Model;
@@ -9,8 +9,8 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
-use Internal\SecurityMonitor\Models\TrustedIp;
-use Internal\SecurityMonitor\Models\UserLogin;
+use Internal\Pasak\Models\TrustedIp;
+use Internal\Pasak\Models\UserLogin;
 use Throwable;
 
 class UserLoginService
@@ -22,7 +22,7 @@ class UserLoginService
         Authenticatable $user,
         Request $request,
     ): UserLogin {
-        $securityService = app(SecurityMonitorService::class);
+        $securityService = app(PasakService::class);
         $ip = $securityService->resolveClientIp($request);
         $deviceId = $securityService->resolveDeviceId($request);
         $localIp = $securityService->resolveLocalIp($request);
