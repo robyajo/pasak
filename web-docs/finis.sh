@@ -2,20 +2,22 @@
 
 # ==============================================================================
 # VPS Build & Auto-Deploy Helper for Pasak Docs (Astro)
-# Repository: robyajo/web-laravel-security
+# Repository: robyajo/pasak (folder web-docs/)
 #
 # Masalah yang diselesaikan skrip ini:
-#   Saat 'pnpm run build' dijalankan di VPS, skrip 'sync-package.mjs' memodifikasi:
+#   Saat 'pnpm run build' dijalankan di VPS, skrip 'sync-package.mjs' meregenerasi:
 #     - src/content/docs/changelog.md
 #     - src/data/package.json
-#   Akibatnya, saat rilis baru di-push dan 'git pull' dijalankan di VPS, Git error:
+#     - public/downloads/Pasak-Bulwark.pptx
+#   Berkas-berkas itu tidak di-track git, tetapi salinan lama yang masih
+#   ter-track / termodifikasi manual bisa membuat 'git pull' error:
 #     "error: Your local changes would be overwritten by merge"
 #
 # Skrip ini secara otomatis:
 #   1. Membersihkan perubahan lokal pada berkas hasil auto-generate (conflict-free).
 #   2. Menarik (git pull) pembaruan kode terbaru dari origin/main.
 #   3. Memasang dependensi (pnpm install) bila diperlukan.
-#   4. Menyinkronkan ulang CHANGELOG.md & versi Packagist terbaru secara bersih.
+#   4. Menyinkronkan ulang CHANGELOG.md, versi Packagist, & deck presentasi (.pptx).
 #   5. Melakukan kompilasi 'pnpm run build' (Astro statis + indeks Pagefind).
 #   6. (Opsional) Menyalin hasil build dist/ ke direktori Nginx & reload web server.
 # ==============================================================================
@@ -150,10 +152,12 @@ if [ "$IS_GIT_REPO" = true ] && [ "$SKIP_PULL" = false ]; then
         git reset --hard HEAD
         git clean -fd -e node_modules -e dist
     else
-        # Kembalikan file auto-generate yang sering menimbulkan konflik saat pull
+        # Kembalikan file auto-generate yang sering menimbulkan konflik saat pull.
+        # (changelog.md & package.json kini untracked; checkout aman jadi no-op bila tak ada.)
         print_info "Mengembalikan berkas auto-generate agar git pull tidak bentrok..."
         git checkout -- src/content/docs/changelog.md 2>/dev/null || true
         git checkout -- src/data/package.json 2>/dev/null || true
+        git checkout -- public/downloads/Pasak-Bulwark.pptx 2>/dev/null || true
     fi
 
     # Lakukan git pull
@@ -202,10 +206,10 @@ echo ""
 # ==============================================================================
 # LANGKAH 3: SINKRONKAN ULANG CHANGELOG & METADATA PAKET
 # ==============================================================================
-echo -e "${BOLD}${CYAN}[3/5] Sinkronisasi Versi, Metadata & Changelog Terbaru...${NC}"
+echo -e "${BOLD}${CYAN}[3/5] Sinkronisasi Versi, Metadata, Changelog & Deck Presentasi...${NC}"
 if [ -f "scripts/sync-package.mjs" ]; then
     node scripts/sync-package.mjs
-    print_success "Metadata paket dan Changelog berhasil disinkronkan."
+    print_success "Metadata paket, Changelog, dan deck .pptx berhasil disinkronkan."
 else
     print_warning "scripts/sync-package.mjs tidak ditemukan, dilewati."
 fi
