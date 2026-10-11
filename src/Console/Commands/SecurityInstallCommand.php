@@ -201,7 +201,7 @@ class SecurityInstallCommand extends Command
 
         $dashboardPrefix = '/'.ltrim((string) config('pasak.dashboard.prefix', 'pasak'), '/');
         $steps = [];
-        $steps[] = ["Jalankan migrasi database:", 'php artisan migrate'];
+        $steps[] = ['Jalankan migrasi database:', 'php artisan migrate'];
         if (! $withoutUserTrait) {
             $steps[] = ['Model User: Trait HasSecurityRelations berhasil disematkan secara otomatis.'];
         } else {
@@ -237,7 +237,7 @@ class SecurityInstallCommand extends Command
         ];
         $steps[] = [
             'Uji cepat: buka satu URL normal (harus 200) lalu simulasi probe aman (harus 403 + tercatat):',
-            "curl -I https://domain-anda.test/                                  # 200",
+            'curl -I https://domain-anda.test/                                  # 200',
             "curl -I 'https://domain-anda.test/?q=%7B%7B7*7%7D%7D'               # 403",
         ];
         if (! $withoutNginx) {

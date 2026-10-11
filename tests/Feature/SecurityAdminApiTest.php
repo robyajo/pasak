@@ -11,13 +11,13 @@ beforeEach(function () {
 });
 
 test('unauthenticated users cannot access admin security api', function () {
-    $response = $this->getJson(route('security.logs.index'));
+    $response = $this->getJson(route('pasak.logs.index'));
     $response->assertStatus(401);
 });
 
 test('regular users receive 403 forbidden on admin security api', function () {
     $response = $this->actingAs($this->regularUser)
-        ->getJson(route('security.logs.index'));
+        ->getJson(route('pasak.logs.index'));
 
     $response->assertStatus(403);
 });
@@ -33,7 +33,7 @@ test('admin can retrieve paginated security logs with stats', function () {
     ]);
 
     $response = $this->actingAs($this->admin)
-        ->getJson(route('security.logs.index'));
+        ->getJson(route('pasak.logs.index'));
 
     $response->assertOk()
         ->assertJsonPath('success', true)
@@ -48,7 +48,7 @@ test('admin can retrieve paginated security logs with stats', function () {
 
 test('admin can manually block an ip address via json api', function () {
     $response = $this->actingAs($this->admin)
-        ->postJson(route('security.blocked-ips.store'), [
+        ->postJson(route('pasak.blocked-ips.store'), [
             'ip_address' => '198.51.100.5',
             'reason' => 'Manual blocking test',
             'duration_hours' => 48,
@@ -63,7 +63,7 @@ test('admin can manually block an ip address via json api', function () {
 test('admin cannot block their own ip address', function () {
     $response = $this->actingAs($this->admin)
         ->withServerVariables(['REMOTE_ADDR' => '203.0.113.10'])
-        ->postJson(route('security.blocked-ips.store'), [
+        ->postJson(route('pasak.blocked-ips.store'), [
             'ip_address' => '203.0.113.10',
             'reason' => 'Trying to block own ip',
         ]);
@@ -80,20 +80,20 @@ test('admin can toggle and delete blocked ip', function () {
     ]);
 
     $toggleResponse = $this->actingAs($this->admin)
-        ->patchJson(route('security.blocked-ips.toggle', $block->id));
+        ->patchJson(route('pasak.blocked-ips.toggle', $block->id));
 
     $toggleResponse->assertOk();
     expect($block->fresh()->is_active)->toBeFalse();
 
     $deleteResponse = $this->actingAs($this->admin)
-        ->deleteJson(route('security.blocked-ips.destroy', $block->id));
+        ->deleteJson(route('pasak.blocked-ips.destroy', $block->id));
 
     $deleteResponse->assertOk();
     expect(BlockedIp::query()->find($block->id))->toBeNull();
 });
 
 test('public client can submit unblock appeal ticket and check status', function () {
-    $submitResponse = $this->postJson(route('security.unblock-tickets.submit'), [
+    $submitResponse = $this->postJson(route('pasak.unblock-tickets.submit'), [
         'name' => 'John Doe',
         'email' => 'john@example.com',
         'reason' => 'My IP was accidentally blocked during testing.',
@@ -105,7 +105,7 @@ test('public client can submit unblock appeal ticket and check status', function
     $ticketNumber = $submitResponse->json('ticket_number');
     expect($ticketNumber)->not->toBeEmpty();
 
-    $checkResponse = $this->getJson(route('security.unblock-tickets.check', $ticketNumber));
+    $checkResponse = $this->getJson(route('pasak.unblock-tickets.check', $ticketNumber));
     $checkResponse->assertOk()
         ->assertJsonPath('data.status', 'pending');
 });
@@ -127,7 +127,7 @@ test('admin can approve unblock appeal ticket and automatically lift block', fun
     ]);
 
     $response = $this->actingAs($this->admin)
-        ->postJson(route('security.unblock-tickets.respond', $ticket->id), [
+        ->postJson(route('pasak.unblock-tickets.respond', $ticket->id), [
             'action' => 'approve',
             'admin_notes' => 'Approved by administrator',
         ]);
@@ -142,7 +142,7 @@ test('admin can approve unblock appeal ticket and automatically lift block', fun
 test('authenticated user can store current ip as trusted ip', function () {
     $response = $this->actingAs($this->regularUser)
         ->withServerVariables(['REMOTE_ADDR' => '203.0.113.55'])
-        ->postJson(route('security.trusted-ips.store-my-ip'), [
+        ->postJson(route('pasak.trusted-ips.store-my-ip'), [
             'device_name' => 'Work Laptop',
         ]);
 

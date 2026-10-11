@@ -17,7 +17,7 @@ test('nginx configuration stub can be published using vendor publish tag', funct
     }
 
     $this->artisan('vendor:publish', [
-        '--tag' => 'security-nginx',
+        '--tag' => 'pasak-nginx',
         '--force' => true,
     ])->assertSuccessful();
 

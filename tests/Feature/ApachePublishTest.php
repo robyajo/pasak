@@ -17,7 +17,7 @@ test('apache2 configuration stub can be published using vendor publish tag', fun
     }
 
     $this->artisan('vendor:publish', [
-        '--tag' => 'security-apache',
+        '--tag' => 'pasak-apache',
         '--force' => true,
     ])->assertSuccessful();
 

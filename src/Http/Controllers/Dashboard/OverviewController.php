@@ -30,7 +30,7 @@ class OverviewController extends Controller
                 ->map(fn ($row): array => (array) $row)
                 ->all(),
             'urls' => [
-                'self' => route('security.dashboard.overview'),
+                'self' => route('pasak.dashboard.overview'),
             ],
         ]);
     }

@@ -140,7 +140,7 @@ class BlockIpAddress
                     'remaining' => null,
                     'referenceId' => $referenceId,
                     'supportEmail' => config(
-                        'security.support_email',
+                        'pasak.support_email',
                         'security@example.com',
                     ),
                 ],
@@ -229,7 +229,7 @@ class BlockIpAddress
                     'remaining' => null,
                     'referenceId' => $referenceId,
                     'supportEmail' => config(
-                        'security.support_email',
+                        'pasak.support_email',
                         'security@example.com',
                     ),
                 ],

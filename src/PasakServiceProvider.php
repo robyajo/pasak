@@ -46,7 +46,7 @@ class PasakServiceProvider extends ServiceProvider
     {
         $this->mergeConfigFrom(__DIR__.'/../config/pasak.php', 'pasak');
 
-        // Backward compatibility: old installs publish config/security.php
+        // Backward compatibility: old installs publish config/pasak.php
         // with SECURITY_* env vars. Merge it as fallback for missing keys.
         $legacyConfig = config('security');
         if (is_array($legacyConfig)) {
@@ -93,9 +93,7 @@ class PasakServiceProvider extends ServiceProvider
         });
 
         $this->app->alias(PasakService::class, 'pasak');
-        $this->app->alias(PasakService::class, 'security.monitor');
         $this->app->alias(VersionCheckService::class, 'pasak.version');
-        $this->app->alias(VersionCheckService::class, 'security.version');
     }
 
     /**
@@ -129,14 +127,6 @@ class PasakServiceProvider extends ServiceProvider
             ],
             'pasak-config',
         );
-        $this->publishes(
-            [
-                __DIR__.'/../config/pasak.php' => config_path(
-                    'security.php',
-                ),
-            ],
-            'security-config',
-        );
 
         // Migrations
         $this->publishes(
@@ -146,14 +136,6 @@ class PasakServiceProvider extends ServiceProvider
                 ),
             ],
             'pasak-migrations',
-        );
-        $this->publishes(
-            [
-                __DIR__.'/../database/migrations' => database_path(
-                    'migrations',
-                ),
-            ],
-            'security-migrations',
         );
 
         // Nginx Hardened Configuration
@@ -165,14 +147,6 @@ class PasakServiceProvider extends ServiceProvider
             ],
             'pasak-nginx',
         );
-        $this->publishes(
-            [
-                __DIR__.'/../stubs/nginx.conf.stub' => base_path(
-                    'nginx.conf',
-                ),
-            ],
-            'security-nginx',
-        );
 
         // Apache 2 VirtualHost Hardened Configuration
         $this->publishes(
@@ -183,14 +157,6 @@ class PasakServiceProvider extends ServiceProvider
             ],
             'pasak-apache',
         );
-        $this->publishes(
-            [
-                __DIR__.'/../stubs/apache2.conf.stub' => base_path(
-                    'apache2.conf',
-                ),
-            ],
-            'security-apache',
-        );
 
         // Apache .htaccess Hardened Configuration
         $this->publishes(
@@ -198,12 +164,6 @@ class PasakServiceProvider extends ServiceProvider
                 __DIR__.'/../stubs/htaccess.stub' => public_path('.htaccess'),
             ],
             'pasak-htaccess',
-        );
-        $this->publishes(
-            [
-                __DIR__.'/../stubs/htaccess.stub' => public_path('.htaccess'),
-            ],
-            'security-htaccess',
         );
 
         // Default 403 "blocked" error page
@@ -214,14 +174,6 @@ class PasakServiceProvider extends ServiceProvider
                 ),
             ],
             'pasak-views',
-        );
-        $this->publishes(
-            [
-                __DIR__.'/../stubs/blocked.blade.php' => resource_path(
-                    'views/errors/blocked.blade.php',
-                ),
-            ],
-            'security-views',
         );
 
         // Publish All Assets (Config, Migrations, Nginx, Apache2, Htaccess, Blocked View)
@@ -246,27 +198,6 @@ class PasakServiceProvider extends ServiceProvider
             ],
             'pasak-all',
         );
-        $this->publishes(
-            [
-                __DIR__.'/../config/pasak.php' => config_path(
-                    'security.php',
-                ),
-                __DIR__.'/../database/migrations' => database_path(
-                    'migrations',
-                ),
-                __DIR__.'/../stubs/nginx.conf.stub' => base_path(
-                    'nginx.conf',
-                ),
-                __DIR__.'/../stubs/apache2.conf.stub' => base_path(
-                    'apache2.conf',
-                ),
-                __DIR__.'/../stubs/htaccess.stub' => public_path('.htaccess'),
-                __DIR__.'/../stubs/blocked.blade.php' => resource_path(
-                    'views/errors/blocked.blade.php',
-                ),
-            ],
-            'security-all',
-        );
 
         // Pasak Route Stubs (routes/pasak.php & routes/pasak-api.php)
         $pasakRouteStubs = [
@@ -278,7 +209,6 @@ class PasakServiceProvider extends ServiceProvider
             ),
         ];
         $this->publishes($pasakRouteStubs, 'pasak-routes');
-        $this->publishes($pasakRouteStubs, 'security-routes');
 
         $this->publishes(
             [
@@ -288,14 +218,6 @@ class PasakServiceProvider extends ServiceProvider
             ],
             'pasak-routes-web',
         );
-        $this->publishes(
-            [
-                __DIR__.'/../stubs/routes/pasak.php.stub' => base_path(
-                    'routes/pasak.php',
-                ),
-            ],
-            'security-routes-web',
-        );
 
         $this->publishes(
             [
@@ -304,14 +226,6 @@ class PasakServiceProvider extends ServiceProvider
                 ),
             ],
             'pasak-routes-api',
-        );
-        $this->publishes(
-            [
-                __DIR__.'/../stubs/routes/pasak-api.php.stub' => base_path(
-                    'routes/pasak-api.php',
-                ),
-            ],
-            'security-routes-api',
         );
 
         // Livewire Starter Kit Monitoring Dashboard (views + configuration).
@@ -442,7 +356,7 @@ class PasakServiceProvider extends ServiceProvider
         }
 
         // Jika rute sudah didaftarkan (misalnya oleh routes/api.php di host), hindari duplikasi
-        if (Route::has('security.logs.index')) {
+        if (Route::has('pasak.logs.index')) {
             return;
         }
 
@@ -461,7 +375,7 @@ class PasakServiceProvider extends ServiceProvider
      * Register the optional Starter Kit monitoring dashboard.
      *
      * The dashboard is only wired up when it has been explicitly enabled via
-     * "security.dashboard.enabled" and the matching frontend package is present
+     * "pasak.dashboard.enabled" and the matching frontend package is present
      * in the host application. Its views are published separately using:
      *
      *     php artisan vendor:publish --tag=starterkit-livewire
@@ -474,7 +388,7 @@ class PasakServiceProvider extends ServiceProvider
         }
 
         // Jika rute dashboard sudah didaftarkan (misalnya oleh routes/web.php di host), hindari duplikasi
-        if (Route::has('security.dashboard.overview')) {
+        if (Route::has('pasak.dashboard.overview')) {
             return;
         }
 
@@ -603,32 +517,18 @@ class PasakServiceProvider extends ServiceProvider
                 return ! (bool) config('pasak.dashboard.admin_only', false);
             });
         }
-
-        // Backward compatibility: old installs use manage-security-monitor.
-        if (! Gate::has('manage-security-monitor')) {
-            Gate::define('manage-security-monitor', function ($user) {
-                return Gate::forUser($user)->allows('manage-pasak');
-            });
-        }
     }
 
     protected function registerMiddleware(): void
     {
         $router = $this->app->make(Router::class);
         $router->aliasMiddleware('pasak.admin', EnsureSecurityAdmin::class);
-        $router->aliasMiddleware('security.admin', EnsureSecurityAdmin::class);
         $router->aliasMiddleware('pasak.block', BlockIpAddress::class);
-        $router->aliasMiddleware('security.block', BlockIpAddress::class);
         $router->aliasMiddleware(
             'pasak.detect',
             DetectSecurityThreats::class,
         );
-        $router->aliasMiddleware(
-            'security.detect',
-            DetectSecurityThreats::class,
-        );
         $router->aliasMiddleware('pasak.activity', TrackUserActivity::class);
-        $router->aliasMiddleware('security.activity', TrackUserActivity::class);
 
         if (config('pasak.auto_register_middleware', false)) {
             $this->app->booted(function (): void {

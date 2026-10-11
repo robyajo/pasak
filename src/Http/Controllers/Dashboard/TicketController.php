@@ -47,9 +47,9 @@ class TicketController extends Controller
                 'status' => $status,
             ],
             'urls' => [
-                'index' => route('security.dashboard.tickets'),
-                'respond' => route('security.dashboard.tickets.respond', ['id' => '__ID__']),
-                'destroy' => route('security.dashboard.tickets.destroy', ['id' => '__ID__']),
+                'index' => route('pasak.dashboard.tickets'),
+                'respond' => route('pasak.dashboard.tickets.respond', ['id' => '__ID__']),
+                'destroy' => route('pasak.dashboard.tickets.destroy', ['id' => '__ID__']),
             ],
         ]);
     }

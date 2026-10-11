@@ -55,9 +55,9 @@ class LogController extends Controller
                 'event_type' => $eventType,
             ],
             'urls' => [
-                'index' => route('security.dashboard.logs'),
-                'clear' => route('security.dashboard.logs.clear'),
-                'destroy' => route('security.dashboard.logs.destroy', ['id' => '__ID__']),
+                'index' => route('pasak.dashboard.logs'),
+                'clear' => route('pasak.dashboard.logs.clear'),
+                'destroy' => route('pasak.dashboard.logs.destroy', ['id' => '__ID__']),
             ],
         ]);
     }

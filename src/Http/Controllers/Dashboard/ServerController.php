@@ -33,19 +33,19 @@ class ServerController extends Controller
             'suspicious' => $server->suspiciousFiles($force),
             'lockouts' => $server->activeLockouts(),
             'urls' => [
-                'index' => route('security.dashboard.server'),
-                'refresh' => route('security.dashboard.server', [
+                'index' => route('pasak.dashboard.server'),
+                'refresh' => route('pasak.dashboard.server', [
                     'refresh' => 1,
                 ]),
-                'baseline' => route('security.dashboard.server.baseline'),
+                'baseline' => route('pasak.dashboard.server.baseline'),
                 'baselineDestroy' => route(
-                    'security.dashboard.server.baseline.destroy',
+                    'pasak.dashboard.server.baseline.destroy',
                 ),
                 'suspiciousDestroy' => route(
-                    'security.dashboard.server.suspicious-files.destroy',
+                    'pasak.dashboard.server.suspicious-files.destroy',
                 ),
                 'lockoutDestroy' => route(
-                    'security.dashboard.lockouts.destroy',
+                    'pasak.dashboard.lockouts.destroy',
                     ['id' => '__ID__'],
                 ),
             ],

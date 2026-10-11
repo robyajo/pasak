@@ -25,7 +25,7 @@ use Throwable;
 class SecurityScanAccessLogs extends Command
 {
     protected $signature = 'pasak:scan-logs
-                            {--file=* : Berkas log yang diperiksa (boleh diulang; default dari config/security.php)}
+                            {--file=* : Berkas log yang diperiksa (boleh diulang; default dari config/pasak.php)}
                             {--ip= : Tampilkan hanya aktivitas satu alamat IP}
                             {--since= : Hanya baris sejak waktu tertentu, mis. "2 days ago" atau "2026-09-20 00:00"}
                             {--until= : Hanya baris sampai waktu tertentu}

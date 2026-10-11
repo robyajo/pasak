@@ -45,11 +45,11 @@ class SessionController extends Controller
                 'search' => $search,
             ],
             'urls' => [
-                'index' => route('security.dashboard.sessions'),
-                'loginDestroy' => route('security.dashboard.user-sessions.destroy', ['id' => '__ID__']),
-                'sessionDestroy' => route('security.dashboard.sessions.destroy', ['sessionId' => '__SESSION__']),
-                'trustedDestroy' => route('security.dashboard.trusted-ips.destroy', ['id' => '__ID__']),
-                'storeMyIp' => route('security.dashboard.trusted-ips.store-my-ip'),
+                'index' => route('pasak.dashboard.sessions'),
+                'loginDestroy' => route('pasak.dashboard.user-sessions.destroy', ['id' => '__ID__']),
+                'sessionDestroy' => route('pasak.dashboard.sessions.destroy', ['sessionId' => '__SESSION__']),
+                'trustedDestroy' => route('pasak.dashboard.trusted-ips.destroy', ['id' => '__ID__']),
+                'storeMyIp' => route('pasak.dashboard.trusted-ips.store-my-ip'),
             ],
         ]);
     }

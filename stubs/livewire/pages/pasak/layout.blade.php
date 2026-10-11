@@ -630,56 +630,56 @@
             <nav>
                 <ul class="sec-nav-list">
                     <li>
-                        <a href="{{ route('security.dashboard.overview') }}"
-                           class="sec-nav-item {{ request()->routeIs('security.dashboard.overview') ? 'active' : '' }}"
+                        <a href="{{ route('pasak.dashboard.overview') }}"
+                           class="sec-nav-item {{ request()->routeIs('pasak.dashboard.overview') ? 'active' : '' }}"
                            wire:navigate>
                             <span>📊</span>
                             <span>{{ __('Overview') }}</span>
                         </a>
                     </li>
                     <li>
-                        <a href="{{ route('security.dashboard.logs') }}"
-                           class="sec-nav-item {{ request()->routeIs('security.dashboard.logs') ? 'active' : '' }}"
+                        <a href="{{ route('pasak.dashboard.logs') }}"
+                           class="sec-nav-item {{ request()->routeIs('pasak.dashboard.logs') ? 'active' : '' }}"
                            wire:navigate>
                             <span>📜</span>
                             <span>{{ __('Security Logs') }}</span>
                         </a>
                     </li>
                     <li>
-                        <a href="{{ route('security.dashboard.blocked-ips') }}"
-                           class="sec-nav-item {{ request()->routeIs('security.dashboard.blocked-ips') ? 'active' : '' }}"
+                        <a href="{{ route('pasak.dashboard.blocked-ips') }}"
+                           class="sec-nav-item {{ request()->routeIs('pasak.dashboard.blocked-ips') ? 'active' : '' }}"
                            wire:navigate>
                             <span>🚫</span>
                             <span>{{ __('Blocked IPs') }}</span>
                         </a>
                     </li>
                     <li>
-                        <a href="{{ route('security.dashboard.server') }}"
-                           class="sec-nav-item {{ request()->routeIs('security.dashboard.server') ? 'active' : '' }}"
+                        <a href="{{ route('pasak.dashboard.server') }}"
+                           class="sec-nav-item {{ request()->routeIs('pasak.dashboard.server') ? 'active' : '' }}"
                            wire:navigate>
                             <span>🛡️</span>
                             <span>{{ __('Server Audit') }}</span>
                         </a>
                     </li>
                     <li>
-                        <a href="{{ route('security.dashboard.sessions') }}"
-                           class="sec-nav-item {{ request()->routeIs('security.dashboard.sessions') ? 'active' : '' }}"
+                        <a href="{{ route('pasak.dashboard.sessions') }}"
+                           class="sec-nav-item {{ request()->routeIs('pasak.dashboard.sessions') ? 'active' : '' }}"
                            wire:navigate>
                             <span>👥</span>
                             <span>{{ __('Sessions') }}</span>
                         </a>
                     </li>
                     <li>
-                        <a href="{{ route('security.dashboard.tickets') }}"
-                           class="sec-nav-item {{ request()->routeIs('security.dashboard.tickets') ? 'active' : '' }}"
+                        <a href="{{ route('pasak.dashboard.tickets') }}"
+                           class="sec-nav-item {{ request()->routeIs('pasak.dashboard.tickets') ? 'active' : '' }}"
                            wire:navigate>
                             <span>📩</span>
                             <span>{{ __('Appeals') }}</span>
                         </a>
                     </li>
                     <li>
-                        <a href="{{ route('security.dashboard.settings') }}"
-                           class="sec-nav-item {{ request()->routeIs('security.dashboard.settings') ? 'active' : '' }}"
+                        <a href="{{ route('pasak.dashboard.settings') }}"
+                           class="sec-nav-item {{ request()->routeIs('pasak.dashboard.settings') ? 'active' : '' }}"
                            wire:navigate>
                             <span>⚙️</span>
                             <span>{{ __('Settings') }}</span>

@@ -34,7 +34,7 @@ test('htaccess configuration stub can be published using vendor publish tag', fu
     }
 
     $this->artisan('vendor:publish', [
-        '--tag' => 'security-htaccess',
+        '--tag' => 'pasak-htaccess',
         '--force' => true,
     ])->assertSuccessful();
 

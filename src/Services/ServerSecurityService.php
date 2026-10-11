@@ -144,7 +144,7 @@ class ServerSecurityService
 
     /** Berkas bawaan yang selalu dikecualikan dari pemindaian berkas mencurigakan / webshell. */
     protected const DEFAULT_SUSPICIOUS_EXCLUDES = [
-        'config/security.php',
+        'config/pasak.php',
         'app/Services/ServerSecurityService.php',
         'app/Services/PasakService.php',
         'app/Http/Middleware/DetectSecurityThreats.php',
@@ -1739,7 +1739,7 @@ class ServerSecurityService
             'routes/web.php',
             'routes/api.php',
             'routes/console.php',
-            'config/security.php',
+            'config/pasak.php',
             'app/Providers/AppServiceProvider.php',
         ];
 

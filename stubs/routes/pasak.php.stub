@@ -20,7 +20,7 @@ $driver = strtolower((string) config('pasak.dashboard.driver', 'blade'));
 
 Route::middleware(array_merge($middleware, $adminMiddleware))
     ->prefix($prefix)
-    ->name('security.dashboard.')
+    ->name('pasak.dashboard.')
     ->group(function () use ($driver) {
         if (in_array($driver, ['react', 'tsx'], true) && class_exists(\Inertia\Inertia::class)) {
             // Rute controller Inertia + React (render komponen di resources/js/pages/pasak)

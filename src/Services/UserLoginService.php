@@ -365,7 +365,7 @@ class UserLoginService
         // 2. Fetch corresponding users (model user dikonfigurasi secara dinamis)
         /** @var class-string<Model> $userModel */
         $userModel = (string) config(
-            'security.user_model',
+            'pasak.user_model',
             'App\\Models\\User',
         );
         $users = $userModel::query()

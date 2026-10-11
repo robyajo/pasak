@@ -14,10 +14,10 @@ use Internal\Pasak\Http\Controllers\Dashboard\TicketController;
 | Security Monitor Inertia + React Dashboard Routes
 |--------------------------------------------------------------------------
 |
-| Rute ini hanya dimuat ketika "security.dashboard.enabled" bernilai true,
-| "security.dashboard.driver" disetel ke "react", dan paket Inertia tersedia.
+| Rute ini hanya dimuat ketika "pasak.dashboard.enabled" bernilai true,
+| "pasak.dashboard.driver" disetel ke "react", dan paket Inertia tersedia.
 | Seluruh halaman dilindungi middleware autentikasi dan, secara default, juga
-| middleware "security.admin" (Gate "manage-security-monitor").
+| middleware "security.admin" (Gate "manage-pasak").
 |
 */
 
@@ -27,7 +27,7 @@ $adminMiddleware = array_filter((array) config('pasak.dashboard.admin_middleware
 
 Route::middleware(array_merge($middleware, $adminMiddleware))
     ->prefix($prefix)
-    ->name('security.dashboard.')
+    ->name('pasak.dashboard.')
     ->group(function (): void {
         Route::get('/', OverviewController::class)->name('overview');
 

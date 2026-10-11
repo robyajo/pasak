@@ -148,9 +148,9 @@ test('react dashboard routes are gated behind authentication', function () {
         ->and($routes)
         ->toContain('OverviewController::class')
         ->and($routes)
-        ->toContain("->name('security.dashboard.')");
+        ->toContain("->name('pasak.dashboard.')");
 
-    expect(Route::has('security.dashboard.overview'))->toBeFalse();
+    expect(Route::has('pasak.dashboard.overview'))->toBeFalse();
 });
 
 test(
@@ -189,9 +189,9 @@ test(
             ->and($routes)
             ->toContain('Route::livewire')
             ->and($routes)
-            ->toContain("->name('security.dashboard.')");
+            ->toContain("->name('pasak.dashboard.')");
 
-        expect(Route::has('security.dashboard.overview'))->toBeFalse();
+        expect(Route::has('pasak.dashboard.overview'))->toBeFalse();
     },
 );
 

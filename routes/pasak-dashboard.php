@@ -7,10 +7,10 @@ use Illuminate\Support\Facades\Route;
 | Security Monitor Livewire Dashboard Routes
 |--------------------------------------------------------------------------
 |
-| Rute ini hanya dimuat ketika "security.dashboard.enabled" bernilai true dan
+| Rute ini hanya dimuat ketika "pasak.dashboard.enabled" bernilai true dan
 | paket Livewire tersedia di aplikasi host. Seluruh halaman dilindungi oleh
 | middleware autentikasi ("auth") dan, secara default, juga oleh middleware
-| "security.admin" yang memeriksa Gate "manage-security-monitor".
+| "security.admin" yang memeriksa Gate "manage-pasak".
 |
 */
 
@@ -20,7 +20,7 @@ $adminMiddleware = array_filter((array) config('pasak.dashboard.admin_middleware
 
 Route::middleware(array_merge($middleware, $adminMiddleware))
     ->prefix($prefix)
-    ->name('security.dashboard.')
+    ->name('pasak.dashboard.')
     ->group(function () {
         Route::livewire('/', 'pages::pasak.overview')->name('overview');
         Route::livewire('logs', 'pages::pasak.logs')->name('logs');

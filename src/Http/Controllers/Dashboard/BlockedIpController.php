@@ -53,10 +53,10 @@ class BlockedIpController extends Controller
                 'status' => $status,
             ],
             'urls' => [
-                'index' => route('security.dashboard.blocked-ips'),
-                'store' => route('security.dashboard.blocked-ips.store'),
-                'toggle' => route('security.dashboard.blocked-ips.toggle', ['id' => '__ID__']),
-                'destroy' => route('security.dashboard.blocked-ips.destroy', ['id' => '__ID__']),
+                'index' => route('pasak.dashboard.blocked-ips'),
+                'store' => route('pasak.dashboard.blocked-ips.store'),
+                'toggle' => route('pasak.dashboard.blocked-ips.toggle', ['id' => '__ID__']),
+                'destroy' => route('pasak.dashboard.blocked-ips.destroy', ['id' => '__ID__']),
             ],
         ]);
     }

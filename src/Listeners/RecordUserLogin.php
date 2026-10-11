@@ -14,7 +14,7 @@ class RecordUserLogin
     {
         $user = $event->user;
         $userModel = (string) config(
-            'security.user_model',
+            'pasak.user_model',
             'App\\Models\\User',
         );
 

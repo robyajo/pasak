@@ -21,14 +21,12 @@ class EnsureSecurityAdmin
             return $this->unauthorized($request);
         }
 
-        foreach (['manage-pasak', 'manage-security-monitor'] as $ability) {
-            if (Gate::has($ability)) {
-                if (! Gate::allows($ability)) {
-                    return $this->forbidden($request);
-                }
-
-                return $next($request);
+        if (Gate::has('manage-pasak')) {
+            if (! Gate::allows('manage-pasak')) {
+                return $this->forbidden($request);
             }
+
+            return $next($request);
         }
 
         if (method_exists($user, 'isAdmin') && $user->isAdmin()) {

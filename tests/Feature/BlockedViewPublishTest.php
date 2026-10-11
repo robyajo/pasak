@@ -32,7 +32,7 @@ test('blocked view stub can be published using vendor publish tag', function () 
     }
 
     $this->artisan('vendor:publish', [
-        '--tag' => 'security-views',
+        '--tag' => 'pasak-views',
         '--force' => true,
     ])->assertSuccessful();
 

@@ -21,7 +21,7 @@ $adminMiddleware = (array) config('pasak.routes.admin_middleware', [
     'Internal\Pasak\Http\Middleware\EnsureSecurityAdmin',
 ]);
 
-Route::prefix($prefix)->middleware($middleware)->name('security.')->group(function () use ($authMiddleware, $adminMiddleware) {
+Route::prefix($prefix)->middleware($middleware)->name('pasak.')->group(function () use ($authMiddleware, $adminMiddleware) {
     // Public Endpoints
     Route::post('unblock-tickets/submit', [IpUnblockRequestApiController::class, 'submit'])->name('unblock-tickets.submit');
     Route::get('unblock-tickets/check/{ticketNumber}', [IpUnblockRequestApiController::class, 'checkStatus'])->name('unblock-tickets.check');

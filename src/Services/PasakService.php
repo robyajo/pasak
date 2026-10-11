@@ -88,7 +88,7 @@ class PasakService
                 return $this->settingsMemoryCache[$key] = Cache::get("sec_cfg.{$key}");
             }
 
-            if (Schema::hasTable((new \Internal\Pasak\Models\SecuritySetting)->getTable())) {
+            if (Schema::hasTable((new SecuritySetting)->getTable())) {
                 $record = SecuritySetting::query()->where('key', $key)->first();
                 if ($record !== null) {
                     $val = unserialize($record->value);
@@ -114,7 +114,7 @@ class PasakService
         try {
             Cache::forever("sec_cfg.{$key}", $value);
 
-            if (Schema::hasTable((new \Internal\Pasak\Models\SecuritySetting)->getTable())) {
+            if (Schema::hasTable((new SecuritySetting)->getTable())) {
                 SecuritySetting::query()->updateOrCreate(
                     ['key' => $key],
                     ['value' => serialize($value)]
@@ -697,7 +697,7 @@ class PasakService
      * Inspect raw request parts instead of a live Request object.
      *
      * Dipakai oleh pemindai access log (security:scan-access-log) sehingga pola
-     * deteksi tetap hanya didefinisikan sekali di config/security.php.
+     * deteksi tetap hanya didefinisikan sekali di config/pasak.php.
      *
      * @return array<int, array{rule: string, label: string, level: string, evidence: string, instant: bool}>
      */
