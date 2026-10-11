@@ -21,7 +21,7 @@ class SettingController extends Controller
      */
     public function index(VersionCheckService $versionChecker): Response
     {
-        return Inertia::render('security/settings', [
+        return Inertia::render('pasak/settings', [
             'settings' => $this->securityService->getSettings(),
             'version' => [
                 'current' => $versionChecker->getCurrentVersion(),

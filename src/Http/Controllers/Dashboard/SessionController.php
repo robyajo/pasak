@@ -37,7 +37,7 @@ class SessionController extends Controller
             });
         }
 
-        return Inertia::render('security/sessions', [
+        return Inertia::render('pasak/sessions', [
             'logins' => $query->paginate(20)->withQueryString(),
             'trustedIps' => TrustedIp::query()->with('user')->latest('id')->get(),
             'onlineCount' => UserLogin::query()->active(5)->count(),

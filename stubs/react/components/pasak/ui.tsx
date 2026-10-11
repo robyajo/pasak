@@ -93,6 +93,7 @@ export function Button({
     disabled = false,
     onClick,
     type = 'button',
+    title,
     style,
     dangerouslySetInnerHTML,
 }: {
@@ -103,6 +104,7 @@ export function Button({
     disabled?: boolean;
     onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
     type?: 'button' | 'submit' | 'reset';
+    title?: string;
     style?: React.CSSProperties;
     dangerouslySetInnerHTML?: { __html: string };
 }) {
@@ -119,6 +121,7 @@ export function Button({
             type={type}
             disabled={disabled}
             onClick={onClick}
+            title={title}
             className={`sec-btn ${variantClass} ${sizeClass} ${className}`}
             style={{ opacity: disabled ? 0.5 : 1, cursor: disabled ? 'not-allowed' : 'pointer', ...style }}
             dangerouslySetInnerHTML={dangerouslySetInnerHTML}
@@ -135,13 +138,13 @@ export function Badge({
     style,
 }: {
     children: React.ReactNode;
-    variant?: 'critical' | 'high' | 'medium' | 'low' | 'success' | 'default' | 'outline';
+    variant?: 'critical' | 'high' | 'medium' | 'low' | 'warning' | 'success' | 'default' | 'outline';
     className?: string;
     style?: React.CSSProperties;
 }) {
     let variantClass = 'sec-badge-low';
     if (variant === 'critical') variantClass = 'sec-badge-critical';
-    if (variant === 'high') variantClass = 'sec-badge-high';
+    if (variant === 'high' || variant === 'warning') variantClass = 'sec-badge-high';
     if (variant === 'medium') variantClass = 'sec-badge-medium';
     if (variant === 'success') variantClass = 'sec-badge-success';
 
@@ -153,10 +156,12 @@ export function Badge({
 }
 
 export function Input({
+    id,
     type = 'text',
     value,
     defaultValue,
     onChange,
+    onKeyDown,
     placeholder,
     className = '',
     required = false,
@@ -164,10 +169,12 @@ export function Input({
     max,
     style,
 }: {
+    id?: string;
     type?: string;
     value?: string | number;
     defaultValue?: string | number;
     onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
     placeholder?: string;
     className?: string;
     required?: boolean;
@@ -177,10 +184,12 @@ export function Input({
 }) {
     return (
         <input
+            id={id}
             type={type}
             value={value}
             defaultValue={defaultValue}
             onChange={onChange}
+            onKeyDown={onKeyDown}
             placeholder={placeholder}
             required={required}
             min={min}

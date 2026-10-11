@@ -3,6 +3,7 @@
 namespace Internal\Pasak\Console\Commands;
 
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Schema;
 
@@ -94,6 +95,30 @@ class PasakUninstallCommand extends Command
             } catch (\Throwable $e) {
                 $this->warn("  ⚠ Gagal menghapus tabel '{$table}': ".$e->getMessage());
             }
+        }
+
+        // Hapus record migrasi milik Pasak agar install ulang berjalan bersih
+        // (jika tidak, "Nothing to migrate" padahal tabel sudah tidak ada).
+        try {
+            if (Schema::hasTable('migrations')) {
+                $deleted = DB::table('migrations')
+                    ->where('migration', 'like', '%pasak%')
+                    ->orWhereIn('migration', [
+                        '2026_01_01_000001_create_security_blocked_ips_table',
+                        '2026_01_01_000002_create_security_logs_table',
+                        '2026_01_01_000003_create_security_login_attempts_table',
+                        '2026_01_01_000004_create_security_ip_unblock_requests_table',
+                        '2026_01_01_000005_create_security_user_logins_and_trusted_ips_table',
+                        '2026_01_01_000006_create_security_settings_table',
+                    ])
+                    ->delete();
+
+                if ($deleted > 0) {
+                    $this->info("  ✓ {$deleted} record migrasi Pasak dibersihkan.");
+                }
+            }
+        } catch (\Throwable $e) {
+            $this->warn('  ⚠ Gagal membersihkan record migrasi: '.$e->getMessage());
         }
     }
 

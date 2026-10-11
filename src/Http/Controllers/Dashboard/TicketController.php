@@ -35,7 +35,7 @@ class TicketController extends Controller
             });
         }
 
-        return Inertia::render('security/tickets', [
+        return Inertia::render('pasak/tickets', [
             'tickets' => $query->paginate(20)->withQueryString(),
             'stats' => [
                 'pending' => IpUnblockRequest::query()->pending()->count(),

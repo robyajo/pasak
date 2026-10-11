@@ -40,7 +40,7 @@ class LogController extends Controller
             $query->where('event_type', $eventType);
         }
 
-        return Inertia::render('security/logs', [
+        return Inertia::render('pasak/logs', [
             'logs' => $query->paginate(25)->withQueryString(),
             'levels' => SecurityLog::LEVELS,
             'eventTypes' => SecurityLog::query()

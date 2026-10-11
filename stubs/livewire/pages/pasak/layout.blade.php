@@ -1,5 +1,5 @@
 {{--
-    Security Monitor — Vanilla CSS sub-layout dashboard Livewire.
+    Pasak — Vanilla CSS sub-layout dashboard Livewire.
     Mendukung dark mode, responsive, dan 100% tanpa dependensi UI eksternal.
 --}}
 @props(['heading' => null, 'subheading' => null])
@@ -142,6 +142,12 @@
             background: var(--sec-card-hover);
         }
 
+        .sec-nav-icon {
+            width: 18px;
+            height: 18px;
+            flex-shrink: 0;
+        }
+
         .sec-nav-item.active {
             color: var(--sec-primary);
             background: rgba(37, 99, 235, 0.08);
@@ -213,6 +219,29 @@
             font-size: 13px;
             color: var(--sec-text-muted);
             margin: 2px 0 0 0;
+        }
+
+        .sec-card-body {
+            padding: 20px;
+        }
+
+        .sec-card-desc {
+            font-size: 13px;
+            color: var(--sec-text-muted);
+            margin: 0 0 14px 0;
+            line-height: 1.55;
+        }
+
+        .sec-label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            font-size: 13px;
+            color: var(--sec-text);
+        }
+
+        .sec-content > *:last-child {
+            margin-bottom: 0;
         }
 
         /* Grids */
@@ -392,7 +421,7 @@
             border: 1px solid var(--sec-danger-border);
         }
 
-        .sec-badge-high, .sec-badge-orange, .sec-badge-amber {
+        .sec-badge-high, .sec-badge-orange, .sec-badge-amber, .sec-badge-warning {
             background: var(--sec-warning-bg);
             color: var(--sec-warning);
             border: 1px solid var(--sec-warning-border);
@@ -633,7 +662,7 @@
                         <a href="{{ route('pasak.dashboard.overview') }}"
                            class="sec-nav-item {{ request()->routeIs('pasak.dashboard.overview') ? 'active' : '' }}"
                            wire:navigate>
-                            <span>📊</span>
+                            <svg class="sec-nav-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></svg>
                             <span>{{ __('Overview') }}</span>
                         </a>
                     </li>
@@ -641,7 +670,7 @@
                         <a href="{{ route('pasak.dashboard.logs') }}"
                            class="sec-nav-item {{ request()->routeIs('pasak.dashboard.logs') ? 'active' : '' }}"
                            wire:navigate>
-                            <span>📜</span>
+                            <svg class="sec-nav-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 13h6"/><path d="M9 17h6"/></svg>
                             <span>{{ __('Security Logs') }}</span>
                         </a>
                     </li>
@@ -649,7 +678,7 @@
                         <a href="{{ route('pasak.dashboard.blocked-ips') }}"
                            class="sec-nav-item {{ request()->routeIs('pasak.dashboard.blocked-ips') ? 'active' : '' }}"
                            wire:navigate>
-                            <span>🚫</span>
+                            <svg class="sec-nav-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m4.9 4.9 14.2 14.2"/></svg>
                             <span>{{ __('Blocked IPs') }}</span>
                         </a>
                     </li>
@@ -657,7 +686,7 @@
                         <a href="{{ route('pasak.dashboard.server') }}"
                            class="sec-nav-item {{ request()->routeIs('pasak.dashboard.server') ? 'active' : '' }}"
                            wire:navigate>
-                            <span>🛡️</span>
+                            <svg class="sec-nav-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="20" height="8" x="2" y="2" rx="2"/><rect width="20" height="8" x="2" y="14" rx="2"/><path d="M6 6h.01"/><path d="M6 18h.01"/></svg>
                             <span>{{ __('Server Audit') }}</span>
                         </a>
                     </li>
@@ -665,7 +694,7 @@
                         <a href="{{ route('pasak.dashboard.sessions') }}"
                            class="sec-nav-item {{ request()->routeIs('pasak.dashboard.sessions') ? 'active' : '' }}"
                            wire:navigate>
-                            <span>👥</span>
+                            <svg class="sec-nav-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
                             <span>{{ __('Sessions') }}</span>
                         </a>
                     </li>
@@ -673,7 +702,7 @@
                         <a href="{{ route('pasak.dashboard.tickets') }}"
                            class="sec-nav-item {{ request()->routeIs('pasak.dashboard.tickets') ? 'active' : '' }}"
                            wire:navigate>
-                            <span>📩</span>
+                            <svg class="sec-nav-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg>
                             <span>{{ __('Appeals') }}</span>
                         </a>
                     </li>
@@ -681,7 +710,7 @@
                         <a href="{{ route('pasak.dashboard.settings') }}"
                            class="sec-nav-item {{ request()->routeIs('pasak.dashboard.settings') ? 'active' : '' }}"
                            wire:navigate>
-                            <span>⚙️</span>
+                            <svg class="sec-nav-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
                             <span>{{ __('Settings') }}</span>
                         </a>
                     </li>

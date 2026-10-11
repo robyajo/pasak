@@ -21,7 +21,7 @@ class OverviewController extends Controller
             $range = 'week';
         }
 
-        return Inertia::render('security/overview', [
+        return Inertia::render('pasak/overview', [
             'range' => $range,
             'stats' => $security->stats(),
             'levels' => $security->levelBreakdown(),

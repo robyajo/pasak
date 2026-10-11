@@ -25,7 +25,7 @@ class ServerController extends Controller
             $server->forget();
         }
 
-        return Inertia::render('security/server', [
+        return Inertia::render('pasak/server', [
             'report' => $server->scan($force),
             'environment' => $server->environmentInfo(),
             'baseline' => $server->baselineSummary(),

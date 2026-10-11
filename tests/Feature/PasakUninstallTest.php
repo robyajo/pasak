@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Schema;
 
@@ -96,4 +97,13 @@ test('pasak uninstall respects keep options', function () {
     $this->artisan('pasak:uninstall', ['--force' => true, '--keep-tables' => true])->assertSuccessful();
 
     expect(Schema::hasTable('blocked_ips'))->toBeTrue();
+});
+
+test('pasak uninstall removes its migration records so reinstall recreates tables', function () {
+    expect(DB::table('migrations')->where('migration', '2026_01_01_000001_create_pasak_tables')->exists())->toBeTrue();
+
+    $this->artisan('pasak:uninstall', ['--force' => true])->assertSuccessful();
+
+    expect(DB::table('migrations')->where('migration', 'like', '%pasak%')->exists())->toBeFalse()
+        ->and(Schema::hasTable('blocked_ips'))->toBeFalse();
 });

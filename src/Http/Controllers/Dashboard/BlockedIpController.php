@@ -40,7 +40,7 @@ class BlockedIpController extends Controller
             $query->whereNull('expires_at')->where('is_active', true);
         }
 
-        return Inertia::render('security/blocked-ips', [
+        return Inertia::render('pasak/blocked-ips', [
             'blocks' => $query->paginate(25)->withQueryString(),
             'stats' => [
                 'total' => BlockedIp::query()->count(),
