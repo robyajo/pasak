@@ -21,12 +21,10 @@ interface MermaidApi {
 function currentTheme(): "dark" | "default" {
     const attr = document.documentElement.dataset.theme;
 
-    if (attr === "light") return "default";
     if (attr === "dark") return "dark";
+    if (attr === "light") return "default";
 
-    return window.matchMedia("(prefers-color-scheme: dark)").matches
-        ? "dark"
-        : "default";
+    return "default";
 }
 
 function sanitizeMermaidSource(source: string): string {

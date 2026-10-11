@@ -1,0 +1,314 @@
+---
+// Komponen Pencarian Kustom Pasak (Neobrutalism UI)
+// Membungkus pencarian bawaan Starlight (Pagefind) dan menambahkan
+// saran kata kunci populer tepat di bawah input pencarian.
+import DefaultSearch from "@astrojs/starlight/components/Search.astro";
+
+const searchSuggestions = [
+    {
+        label: "Install & Setup",
+        query: "composer require robyajo/pasak",
+        icon: "📦",
+    },
+    {
+        label: "WAF Rules",
+        query: "waf zero tolerance instant block",
+        icon: "🛡️",
+    },
+    {
+        label: "Karantina Perangkat",
+        query: "device quarantine fingerprint",
+        icon: "📱",
+    },
+    {
+        label: "Stepped Throttle",
+        query: "login throttle lockout delay",
+        icon: "⏳",
+    },
+    {
+        label: "Webshell Scan",
+        query: "audit webshell baseline sha256",
+        icon: "🔍",
+    },
+    { label: "REST API", query: "api reference headless endpoint", icon: "⚡" },
+    {
+        label: "Nginx Hardening",
+        query: "webserver hardening nginx config",
+        icon: "🔒",
+    },
+];
+---
+
+<div class="pk-search-container">
+    <DefaultSearch>
+        <slot />
+    </DefaultSearch>
+
+    <!-- Template saran pencarian yang akan disuntikkan ke dalam dialog pencarian Pagefind -->
+    <template id="pk-suggestions-template">
+        <div class="pk-search-suggestions">
+            <div class="pk-suggestions-header">
+                <span class="pk-suggestions-icon">💡</span>
+                <span>Saran Pencarian Populer:</span>
+            </div>
+            <div class="pk-suggestions-chips">
+                {searchSuggestions.map((item) => (
+                    <button
+                        type="button"
+                        class="pk-suggestion-chip"
+                        data-query={item.query}
+                        title={`Cari "${item.query}"`}
+                    >
+                        <span class="pk-chip-icon">{item.icon}</span>
+                        <span class="pk-chip-label">{item.label}</span>
+                    </button>
+                ))}
+            </div>
+        </div>
+    </template>
+</div>
+
+<script>
+    // Menyuntikkan wadah saran pencarian ke dalam modal pencarian Pagefind saat dibuka
+    const setupSearchSuggestions = () => {
+        const template = document.getElementById(
+            "pk-suggestions-template",
+        ) as HTMLTemplateElement | null;
+        if (!template) return;
+
+        // Amati penambahan dialog Pagefind atau buka dialog
+        const attachSuggestions = () => {
+            const dialog = document.querySelector("dialog#starlight__search");
+            if (!dialog) return;
+
+            // Cari input search Pagefind
+            const searchForm = dialog.querySelector(".pagefind-ui__form");
+            if (!searchForm) return;
+
+            // Periksa apakah saran sudah disuntikkan sebelumnya
+            if (dialog.querySelector(".pk-search-suggestions")) return;
+
+            const clone = template.content.cloneNode(true) as DocumentFragment;
+            const suggestionsEl = clone.querySelector(".pk-search-suggestions");
+
+            if (suggestionsEl) {
+                // Sisipkan tepat di bawah form pencarian Pagefind
+                searchForm.insertAdjacentElement("afterend", suggestionsEl);
+
+                // Tambahkan event click ke setiap chip saran
+                const chips = suggestionsEl.querySelectorAll<HTMLButtonElement>(
+                    ".pk-suggestion-chip",
+                );
+                chips.forEach((chip) => {
+                    chip.addEventListener("click", () => {
+                        const query = chip.dataset.query;
+                        if (!query) return;
+
+                        const input = dialog.querySelector<HTMLInputElement>(
+                            ".pagefind-ui__search-input",
+                        );
+                        if (input) {
+                            input.value = query;
+                            // Picu event input agar Pagefind langsung melakukan pencarian
+                            input.dispatchEvent(
+                                new Event("input", { bubbles: true }),
+                            );
+                            input.focus();
+                        }
+                    });
+                });
+            }
+        };
+
+        // Pasang observer untuk mendeteksi saat modal pencarian dibuka
+        const observer = new MutationObserver(() => {
+            attachSuggestions();
+        });
+
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true,
+        });
+
+        // Jalankan sekali saat inisialisasi
+        attachSuggestions();
+    };
+
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", setupSearchSuggestions);
+    } else {
+        setupSearchSuggestions();
+    }
+    document.addEventListener("astro:page-load", setupSearchSuggestions);
+</script>
+
+<style is:global>
+    /* ==========================================================================
+       STYLING SARAN PENCARIAN & MODAL (NEOBRUTALISM STYLE)
+       ========================================================================== */
+    dialog {
+        background-color: #ffffff !important;
+        border: 2px solid var(--sl-color-hairline) !important;
+        border-radius: 0.625rem !important;
+        box-shadow: 6px 6px 0px var(--pk-shadow) !important;
+    }
+
+    dialog::backdrop {
+        background-color: rgba(15, 23, 42, 0.45) !important;
+    }
+
+    :root[data-theme="dark"] dialog {
+        background-color: var(--sl-color-gray-6) !important;
+    }
+
+    :root[data-theme="dark"] dialog::backdrop {
+        background-color: rgba(9, 13, 22, 0.75) !important;
+    }
+
+    /* Input Field Pagefind */
+    #starlight__search .pagefind-ui__search-input {
+        font-family: var(--sl-font) !important;
+        font-size: 1rem !important;
+        font-weight: 600 !important;
+        color: #0f172a !important;
+        border: 2px solid var(--sl-color-hairline) !important;
+        box-shadow: 3px 3px 0px var(--pk-shadow) !important;
+        border-radius: 0.5rem !important;
+        background: #ffffff !important;
+        padding: 0.75rem 1rem !important;
+        transform: translate(0, 0);
+        transition:
+            transform 120ms ease,
+            box-shadow 120ms ease,
+            border-color 120ms ease !important;
+    }
+
+    :root[data-theme="dark"] #starlight__search .pagefind-ui__search-input {
+        color: var(--sl-color-white) !important;
+        background: var(--sl-color-black) !important;
+    }
+
+    #starlight__search .pagefind-ui__search-input:focus {
+        border-color: var(--sl-color-accent) !important;
+        outline: none !important;
+        box-shadow: 4px 4px 0px var(--sl-color-accent) !important;
+    }
+
+    /* Wadah Saran Pencarian Tepat di Bawah Inputan */
+    .pk-search-suggestions {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        padding: 0.75rem 0.85rem;
+        border: 2px solid var(--sl-color-hairline);
+        border-radius: 0.5rem;
+        background-color: #f1f5f9;
+        box-shadow: 3px 3px 0px var(--pk-shadow);
+        margin: 0.75rem 0;
+    }
+
+    :root[data-theme="dark"] .pk-search-suggestions {
+        background-color: var(--sl-color-black);
+        border-color: var(--sl-color-hairline);
+    }
+
+    .pk-suggestions-header {
+        display: flex;
+        align-items: center;
+        gap: 0.35rem;
+        font-size: 0.75rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--sl-color-gray-3);
+    }
+
+    .pk-suggestions-icon {
+        font-size: 0.85rem;
+    }
+
+    .pk-suggestions-chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.45rem;
+    }
+
+    /* Chip Saran Interaktif (Animasi Neobrutalism Terbenam saat Hover) */
+    .pk-suggestion-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        padding: 0.3rem 0.65rem;
+        border-radius: 0.375rem;
+        border: 2px solid var(--sl-color-hairline);
+        background-color: #ffffff;
+        box-shadow: 2px 2px 0px var(--pk-shadow);
+        color: #0f172a;
+        font-family: var(--sl-font);
+        font-size: 0.8rem;
+        font-weight: 700;
+        cursor: pointer;
+        transform: translate(0, 0);
+        transition:
+            transform 120ms cubic-bezier(0.16, 1, 0.3, 1),
+            box-shadow 120ms cubic-bezier(0.16, 1, 0.3, 1),
+            border-color 120ms ease,
+            color 120ms ease !important;
+    }
+
+    :root[data-theme="dark"] .pk-suggestion-chip {
+        background-color: var(--sl-color-gray-6);
+        color: var(--sl-color-white);
+    }
+
+    /* Hover: Animasi Neobrutalism seolah terbenam */
+    .pk-suggestion-chip:hover {
+        transform: translate(1.5px, 1.5px) !important;
+        box-shadow: 0.5px 0.5px 0px var(--pk-shadow) !important;
+        border-color: var(--sl-color-accent) !important;
+        color: var(--sl-color-accent) !important;
+    }
+
+    .pk-suggestion-chip:active {
+        transform: translate(2px, 2px) !important;
+        box-shadow: 0px 0px 0px !important;
+    }
+
+    .pk-chip-icon {
+        font-size: 0.85rem;
+        line-height: 1;
+    }
+
+    /* Hasil Pencarian Pagefind */
+    #starlight__search .pagefind-ui__result {
+        border: 2px solid var(--sl-color-hairline) !important;
+        border-radius: 0.5rem !important;
+        background: #ffffff !important;
+        box-shadow: 3px 3px 0px var(--pk-shadow) !important;
+        margin-bottom: 0.75rem !important;
+        padding: 0.75rem 1rem !important;
+        transition:
+            transform 120ms cubic-bezier(0.16, 1, 0.3, 1),
+            box-shadow 120ms cubic-bezier(0.16, 1, 0.3, 1),
+            border-color 120ms ease !important;
+    }
+
+    :root[data-theme="dark"] #starlight__search .pagefind-ui__result {
+        background: var(--sl-color-gray-6) !important;
+    }
+
+    #starlight__search .pagefind-ui__result:hover {
+        transform: translate(1.5px, 1.5px) !important;
+        box-shadow: 1.5px 1.5px 0px var(--pk-shadow) !important;
+        border-color: var(--sl-color-accent) !important;
+    }
+
+    #starlight__search .pagefind-ui__result-link {
+        color: #0f172a !important;
+        font-weight: 800 !important;
+    }
+
+    :root[data-theme="dark"] #starlight__search .pagefind-ui__result-link {
+        color: var(--sl-color-white) !important;
+    }
+</style>

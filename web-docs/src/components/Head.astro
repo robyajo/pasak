@@ -188,6 +188,15 @@ const breadcrumbSchema = breadcrumbItems.length > 1 && !isNotFound ? {
 } : null;
 ---
 
+{/* Pastikan default theme selalu 'light' secara instan dan tanpa FOUC */}
+<script is:inline>
+  (() => {
+    const stored = typeof localStorage !== 'undefined' && localStorage.getItem('starlight-theme');
+    const theme = stored === 'dark' ? 'dark' : 'light';
+    document.documentElement.dataset.theme = theme;
+  })();
+</script>
+
 {head.map(({ tag: Tag, attrs, content }) => <Tag {...attrs} set:html={content} />)}
 
 <!-- Tipografi Google Fonts: Plus Jakarta Sans & JetBrains Mono -->

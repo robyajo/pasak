@@ -121,28 +121,28 @@ const highlights = [
     {
         icon: "shield-check",
         title: "Zero-Tolerance WAF",
-        desc: "Blokir instan 30 hari untuk signature berbahaya seperti null byte, traversal, & webshell.",
+        desc: "Blokir instan 30 hari untuk signature berbahaya: null byte, traversal, & webshell.",
     },
     {
         icon: "device",
         title: "Karantina Perangkat",
-        desc: "Isolasi perangkat penyerang secara presisi tanpa memblokir seluruh kantor di IP NAT bersama.",
+        desc: "Isolasi penyerang pada level perangkat tanpa blokir subnet IP NAT bersama.",
     },
     {
         icon: "clock",
         title: "Login Bertingkat",
-        desc: "Lockout eksponensial 1 menit hingga 24 jam untuk menumpas brute force & credential stuffing.",
+        desc: "Lockout eksponensial 1 menit s.d. 24 jam melawan brute force & credential stuffing.",
     },
     {
         icon: "file-code",
         title: "Audit Integritas File",
-        desc: "Baseline SHA-256 berkas inti framework dan pemindai webshell otomatis berkala.",
+        desc: "Baseline SHA-256 file framework inti & pemindai webshell otomatis berkala.",
     },
 ];
 ---
 
 <footer class="sl-flex pk-footer-wrapper">
-    {/* Halaman Dokumentasi: Footer bersih & fokus (hanya metadata artikel, pagination, dan 1 baris copyright minimal) */}
+    {/* Halaman Dokumentasi: Footer minimalis, bersih, tanpa distraksi */}
     {!isHome ? (
         <>
             <div class="meta sl-flex">
@@ -159,15 +159,13 @@ const highlights = [
             </div>
         </>
     ) : (
-        /* Halaman Beranda (/): Tampilan footer lengkap, kaya informasi & direktori tautan SEO */
+        /* Halaman Beranda (/): Tampilan Neobrutalism Modern & Minimalis */
         <div
             class="pk-footer"
             role="contentinfo"
             aria-label="Footer Pasak Security"
         >
-            <div class="pk-footer-glow" aria-hidden="true"></div>
-
-            {/* Brand & Action Header */}
+            {/* Top Brand & Actions */}
             <div class="pk-footer-top">
                 <div class="pk-footer-brand">
                     <div class="pk-footer-brand-title">
@@ -179,8 +177,8 @@ const highlights = [
                             <Image
                                 src={logo}
                                 alt="Logo Pasak"
-                                width={34}
-                                height={34}
+                                width={32}
+                                height={32}
                                 class="pk-footer-logo"
                             />
                         </a>
@@ -191,10 +189,9 @@ const highlights = [
                     </div>
 
                     <p class="pk-footer-desc">
-                        Web Application Firewall mandiri dan modul audit
+                        Web Application Firewall mandiri &amp; modul audit
                         keamanan <strong>100% Native PHP</strong> untuk
-                        ekosistem <strong>Laravel 10 sampai 13</strong>.
-                        Dikembangkan untuk memperkuat postur ketahanan siber
+                        <strong>Laravel 10–13</strong>. Standar ketahanan siber
                         sistem informasi pemerintahan dan enterprise.
                     </p>
 
@@ -209,12 +206,9 @@ const highlights = [
                             class="pk-pill pk-pill-version"
                             title="Versi paket rilis terbaru di Packagist"
                         >
-                            <span
-                                class="pk-pulse-dot"
-                                aria-hidden="true"
-                            ></span>
+                            <span class="pk-dot" aria-hidden="true"></span>
                             <span>v{version}</span>
-                            <span class="pk-pill-sub">Rilis Stabil</span>
+                            <span class="pk-pill-sub">Stabil</span>
                         </a>
 
                         <span class="pk-pill pk-pill-neutral">
@@ -224,7 +218,7 @@ const highlights = [
                                 viewBox="0 0 24 24"
                                 fill="none"
                                 stroke="currentColor"
-                                stroke-width="2"
+                                stroke-width="2.5"
                                 stroke-linecap="round"
                                 stroke-linejoin="round"
                                 aria-hidden="true"
@@ -241,7 +235,7 @@ const highlights = [
                                 viewBox="0 0 24 24"
                                 fill="none"
                                 stroke="currentColor"
-                                stroke-width="2"
+                                stroke-width="2.5"
                                 stroke-linecap="round"
                                 stroke-linejoin="round"
                                 aria-hidden="true"
@@ -265,25 +259,25 @@ const highlights = [
                 <div class="pk-footer-actions">
                     <div class="pk-install-box">
                         <span class="pk-install-label">
-                            Pasang Cepat via Composer:
+                            Instalasi Composer:
                         </span>
                         <button
                             type="button"
                             class="pk-copy-btn"
                             data-copy={installCmd}
                             aria-label="Salin perintah composer require robyajo/pasak"
-                            title="Klik untuk menyalin perintah instalasi"
+                            title="Klik untuk menyalin"
                         >
                             <span class="pk-copy-prompt">$</span>
                             <code class="pk-copy-code">{installCmd}</code>
                             <span class="pk-copy-icon" aria-hidden="true">
                                 <svg
-                                    width="15"
-                                    height="15"
+                                    width="14"
+                                    height="14"
                                     viewBox="0 0 24 24"
                                     fill="none"
                                     stroke="currentColor"
-                                    stroke-width="2"
+                                    stroke-width="2.5"
                                     stroke-linecap="round"
                                     stroke-linejoin="round"
                                 >
@@ -313,16 +307,15 @@ const highlights = [
                             target="_blank"
                             rel="noopener"
                             class="pk-social-btn"
-                            aria-label="Repositori GitHub robyajo/pasak"
-                            title="Lihat Source Code di GitHub"
+                            aria-label="GitHub robyajo/pasak"
                         >
                             <svg
-                                width="16"
-                                height="16"
+                                width="15"
+                                height="15"
                                 viewBox="0 0 24 24"
                                 fill="none"
                                 stroke="currentColor"
-                                stroke-width="2"
+                                stroke-width="2.5"
                                 stroke-linecap="round"
                                 stroke-linejoin="round"
                                 aria-hidden="true"
@@ -341,16 +334,15 @@ const highlights = [
                             target="_blank"
                             rel="noopener"
                             class="pk-social-btn"
-                            aria-label="Paket Resmi di Packagist"
-                            title="Unduh Paket di Packagist"
+                            aria-label="Packagist robyajo/pasak"
                         >
                             <svg
-                                width="16"
-                                height="16"
+                                width="15"
+                                height="15"
                                 viewBox="0 0 24 24"
                                 fill="none"
                                 stroke="currentColor"
-                                stroke-width="2"
+                                stroke-width="2.5"
                                 stroke-linecap="round"
                                 stroke-linejoin="round"
                                 aria-hidden="true"
@@ -367,15 +359,14 @@ const highlights = [
                             rel="noopener"
                             class="pk-social-btn pk-social-btn-csirt"
                             aria-label="Portal Keamanan Siber Pekanbaru"
-                            title="Portal Resmi Keamanan Siber Pemerintah Kota Pekanbaru"
                         >
                             <svg
-                                width="16"
-                                height="16"
+                                width="15"
+                                height="15"
                                 viewBox="0 0 24 24"
                                 fill="none"
                                 stroke="currentColor"
-                                stroke-width="2"
+                                stroke-width="2.5"
                                 stroke-linecap="round"
                                 stroke-linejoin="round"
                                 aria-hidden="true"
@@ -383,25 +374,25 @@ const highlights = [
                                 <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
                                 <circle cx="12" cy="11" r="3" />
                             </svg>
-                            <span>Pekanbaru CSIRT</span>
+                            <span>CSIRT</span>
                         </a>
                     </div>
                 </div>
             </div>
 
-            {/* 4 Pilar Keamanan Pasak */}
+            {/* 4 Pilar Keamanan Pasak (Neobrutalism Cards) */}
             <div class="pk-footer-highlights">
                 {highlights.map((h) => (
                     <div class="pk-highlight-card">
                         <div class="pk-highlight-icon" aria-hidden="true">
                             {h.icon === "shield-check" && (
                                 <svg
-                                    width="16"
-                                    height="16"
+                                    width="15"
+                                    height="15"
                                     viewBox="0 0 24 24"
                                     fill="none"
                                     stroke="currentColor"
-                                    stroke-width="2"
+                                    stroke-width="2.5"
                                     stroke-linecap="round"
                                     stroke-linejoin="round"
                                 >
@@ -411,12 +402,12 @@ const highlights = [
                             )}
                             {h.icon === "device" && (
                                 <svg
-                                    width="16"
-                                    height="16"
+                                    width="15"
+                                    height="15"
                                     viewBox="0 0 24 24"
                                     fill="none"
                                     stroke="currentColor"
-                                    stroke-width="2"
+                                    stroke-width="2.5"
                                     stroke-linecap="round"
                                     stroke-linejoin="round"
                                 >
@@ -433,12 +424,12 @@ const highlights = [
                             )}
                             {h.icon === "clock" && (
                                 <svg
-                                    width="16"
-                                    height="16"
+                                    width="15"
+                                    height="15"
                                     viewBox="0 0 24 24"
                                     fill="none"
                                     stroke="currentColor"
-                                    stroke-width="2"
+                                    stroke-width="2.5"
                                     stroke-linecap="round"
                                     stroke-linejoin="round"
                                 >
@@ -448,12 +439,12 @@ const highlights = [
                             )}
                             {h.icon === "file-code" && (
                                 <svg
-                                    width="16"
-                                    height="16"
+                                    width="15"
+                                    height="15"
                                     viewBox="0 0 24 24"
                                     fill="none"
                                     stroke="currentColor"
-                                    stroke-width="2"
+                                    stroke-width="2.5"
                                     stroke-linecap="round"
                                     stroke-linejoin="round"
                                 >
@@ -472,7 +463,7 @@ const highlights = [
                 ))}
             </div>
 
-            {/* Direktori Tautan Navigasi (4 Kolom Terstruktur & Responsif) */}
+            {/* Navigasi 4 Kolom */}
             <div class="pk-footer-nav-grid">
                 {navColumns.map((col) => (
                     <nav class="pk-footer-col" aria-label={col.heading}>
@@ -501,7 +492,7 @@ const highlights = [
                 ))}
             </div>
 
-            {/* Bottom Bar: Copyright, Lisensi, & Akreditasi Pemko Pekanbaru */}
+            {/* Bottom Bar: Copyright & Akreditasi */}
             <div class="pk-footer-bottom">
                 <div class="pk-bottom-left">
                     <p class="pk-bottom-copy">
@@ -509,9 +500,8 @@ const highlights = [
                         Berlisensi Open-Source MIT.
                     </p>
                     <p class="pk-bottom-author">
-                        Arsitektur &amp; Pengembangan oleh{" "}
-                        <strong>Roby Karti S.</strong> untuk Ekosistem Keamanan
-                        Laravel.
+                        Dikembangkan oleh <strong>Roby Karti S.</strong> untuk
+                        Ekosistem Keamanan Laravel.
                     </p>
                 </div>
 
@@ -521,7 +511,7 @@ const highlights = [
                         target="_blank"
                         rel="noopener"
                         class="pk-pekanbaru-badge"
-                        title="Kunjungi Portal Keamanan Siber & Diskominfo Kota Pekanbaru"
+                        title="Kunjungi Portal Keamanan Siber & Sandi Diskominfo Kota Pekanbaru"
                     >
                         <span class="pk-seal-icon" aria-hidden="true">
                             <svg
@@ -530,7 +520,7 @@ const highlights = [
                                 viewBox="0 0 24 24"
                                 fill="none"
                                 stroke="currentColor"
-                                stroke-width="2"
+                                stroke-width="2.5"
                                 stroke-linecap="round"
                                 stroke-linejoin="round"
                             >
@@ -558,7 +548,7 @@ const highlights = [
 </footer>
 
 <script>
-    // Penanganan interaktif salin perintah Composer (hanya aktif bila tombol salin ada)
+    // Copy button dengan tactile feedback
     const setupCopyButtons = () => {
         const copyBtns =
             document.querySelectorAll<HTMLButtonElement>(".pk-copy-btn");
@@ -574,7 +564,7 @@ const highlights = [
                     btn.classList.add("is-copied");
                     setTimeout(() => {
                         btn.classList.remove("is-copied");
-                    }, 2200);
+                    }, 2000);
                 } catch {
                     const textarea = document.createElement("textarea");
                     textarea.value = text;
@@ -587,7 +577,7 @@ const highlights = [
                         btn.classList.add("is-copied");
                         setTimeout(
                             () => btn.classList.remove("is-copied"),
-                            2200,
+                            2000,
                         );
                     } finally {
                         document.body.removeChild(textarea);
@@ -611,14 +601,14 @@ const highlights = [
     .pk-footer-wrapper {
         display: flex;
         flex-direction: column;
-        gap: 1.5rem;
+        gap: 1.25rem;
         margin-top: 2rem;
     }
 
     .pk-doc-footer {
-        margin-top: 2rem;
-        padding-top: 1.25rem;
-        border-top: 1px solid var(--sl-color-hairline);
+        margin-top: 1.5rem;
+        padding-top: 1rem;
+        border-top: 2px solid var(--sl-color-hairline);
         text-align: center;
         font-size: 0.8rem;
         line-height: 1.5;
@@ -630,74 +620,35 @@ const highlights = [
     }
 
     .pk-doc-footer strong {
-        color: var(--sl-color-gray-3);
-        font-weight: 600;
+        color: var(--sl-color-gray-2);
+        font-weight: 700;
     }
 
     /* ==========================================================================
-       HOMEPAGE RICH FOOTER
+       HOMEPAGE NEOBRUTALISM FOOTER (SOLID BORDER + HARD SHADOW, NO BLUR)
        ========================================================================== */
     .pk-footer {
         position: relative;
-        overflow: hidden;
         margin-top: 1.5rem;
-        padding: 2.25rem 2rem 1.75rem;
-        border-radius: 1.5rem;
-        border: 1px solid var(--sl-color-hairline);
-        background: linear-gradient(
-            180deg,
-            rgba(15, 23, 42, 0.7) 0%,
-            rgba(11, 15, 25, 0.95) 100%
-        );
-        box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.35);
+        padding: 2rem 1.75rem 1.5rem;
+        border-radius: 0.625rem;
+        border: 2px solid var(--sl-color-hairline);
+        background: var(--sl-color-gray-6);
+        box-shadow: 4px 4px 0px var(--pk-shadow);
         font-family: var(--sl-font);
         font-size: var(--sl-text-sm);
         color: var(--sl-color-gray-2);
-    }
-
-    :global(:root[data-theme="light"]) .pk-footer {
-        background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
-        box-shadow: 0 10px 30px -5px rgba(15, 23, 42, 0.05);
-        border-color: #e2e8f0;
-    }
-
-    .pk-footer-glow {
-        pointer-events: none;
-        position: absolute;
-        top: -6rem;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 38rem;
-        height: 12rem;
-        max-width: 100%;
-        border-radius: 9999px;
-        background: radial-gradient(
-            circle,
-            rgba(56, 189, 248, 0.18) 0%,
-            rgba(99, 102, 241, 0.08) 50%,
-            transparent 80%
-        );
-        filter: blur(48px);
-    }
-
-    :global(:root[data-theme="light"]) .pk-footer-glow {
-        background: radial-gradient(
-            circle,
-            rgba(2, 132, 199, 0.1) 0%,
-            transparent 70%
-        );
     }
 
     /* ==========================================================================
        TOP ROW: BRAND & ACTIONS
        ========================================================================== */
     .pk-footer-top {
-        position: relative;
         display: flex;
         flex-direction: column;
-        gap: 2rem;
-        padding-bottom: 2rem;
-        border-bottom: 1px solid var(--sl-color-hairline);
+        gap: 1.75rem;
+        padding-bottom: 1.75rem;
+        border-bottom: 2px solid var(--sl-color-hairline);
     }
 
     @media (min-width: 58rem) {
@@ -716,7 +667,7 @@ const highlights = [
         display: flex;
         align-items: center;
         gap: 0.75rem;
-        margin-bottom: 0.85rem;
+        margin-bottom: 0.75rem;
     }
 
     .pk-footer-logo-link {
@@ -724,16 +675,16 @@ const highlights = [
         align-items: center;
         justify-content: center;
         text-decoration: none;
-        transition: transform 0.15s ease;
+        transform: translate(0, 0);
+        transition: transform 120ms cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     .pk-footer-logo-link:hover {
-        transform: scale(1.05) !important;
+        transform: translate(2px, 2px);
     }
 
     .pk-footer-logo {
-        border-radius: 0.5rem;
-        filter: drop-shadow(0 2px 6px rgba(56, 189, 248, 0.3));
+        border-radius: 0.375rem;
     }
 
     .pk-footer-title-text {
@@ -750,28 +701,36 @@ const highlights = [
     }
 
     .pk-brand-tag {
-        font-size: 0.75rem;
-        font-weight: 700;
+        font-size: 0.7rem;
+        font-weight: 800;
         text-transform: uppercase;
         letter-spacing: 0.05em;
         padding: 0.15rem 0.5rem;
-        border-radius: 0.375rem;
-        background: var(--sl-color-accent-low);
-        color: var(--sl-color-text-accent);
-        border: 1px solid rgba(56, 189, 248, 0.25);
+        border-radius: 0.25rem;
+        background: #38bdf8;
+        color: #000;
+        border: 2px solid #0f172a;
+        box-shadow: 2px 2px 0px #0f172a;
+    }
+
+    :global(:root[data-theme="dark"]) .pk-brand-tag {
+        background: var(--sl-color-accent);
+        color: #000;
+        border: 2px solid #000;
+        box-shadow: 2px 2px 0px #000;
     }
 
     .pk-footer-desc {
-        margin: 0 0 1.25rem;
-        font-size: 0.9rem;
-        line-height: 1.65;
+        margin: 0 0 1rem;
+        font-size: 0.875rem;
+        line-height: 1.6;
         color: var(--sl-color-gray-2);
         max-width: 34rem;
     }
 
     .pk-footer-desc strong {
         color: var(--sl-color-white);
-        font-weight: 600;
+        font-weight: 700;
     }
 
     .pk-footer-meta-pills {
@@ -785,81 +744,78 @@ const highlights = [
         display: inline-flex;
         align-items: center;
         gap: 0.4rem;
-        padding: 0.3rem 0.7rem;
-        border-radius: 9999px;
+        padding: 0.25rem 0.65rem;
+        border-radius: 0.375rem;
+        border: 2px solid var(--sl-color-hairline);
+        box-shadow: 2px 2px 0px var(--pk-shadow);
         font-size: 0.75rem;
-        font-weight: 600;
+        font-weight: 700;
         text-decoration: none;
         line-height: 1;
+        background: var(--sl-color-gray-6);
+        color: var(--sl-color-white);
+        transform: translate(0, 0);
         transition:
-            border-color 0.12s ease,
-            background-color 0.12s ease;
+            transform 120ms cubic-bezier(0.16, 1, 0.3, 1),
+            box-shadow 120ms cubic-bezier(0.16, 1, 0.3, 1),
+            border-color 120ms ease;
+    }
+
+    .pk-pill:hover {
+        transform: translate(1px, 1px) !important;
+        box-shadow: 1px 1px 0px var(--pk-shadow) !important;
+    }
+
+    .pk-pill:active {
+        transform: translate(2px, 2px) !important;
+        box-shadow: 0px 0px 0px var(--pk-shadow) !important;
     }
 
     .pk-pill-version {
-        border: 1px solid rgba(52, 211, 153, 0.4);
-        background: rgba(52, 211, 153, 0.12);
-        color: #34d399;
-    }
-
-    :global(:root[data-theme="light"]) .pk-pill-version {
-        border-color: rgba(5, 150, 105, 0.35);
-        background: #ecfdf5;
+        border-color: #059669;
         color: #065f46;
+        background: #ecfdf5;
     }
 
-    .pk-pill-version:hover {
-        background: rgba(52, 211, 153, 0.2);
+    :global(:root[data-theme="dark"]) .pk-pill-version {
         border-color: #34d399;
+        color: #34d399;
+        background: transparent;
     }
 
     .pk-pill-sub {
-        font-weight: 400;
+        font-weight: 500;
         opacity: 0.85;
     }
 
-    .pk-pulse-dot {
-        width: 0.45rem;
-        height: 0.45rem;
+    .pk-dot {
+        width: 0.4rem;
+        height: 0.4rem;
         border-radius: 9999px;
-        background-color: #34d399;
-        box-shadow: 0 0 6px #34d399;
-    }
-
-    :global(:root[data-theme="light"]) .pk-pulse-dot {
-        background-color: #059669;
-        box-shadow: 0 0 4px #059669;
+        background-color: currentColor;
     }
 
     .pk-pill-neutral {
-        border: 1px solid var(--sl-color-hairline);
-        background: rgba(255, 255, 255, 0.03);
-        color: var(--sl-color-gray-3);
-    }
-
-    :global(:root[data-theme="light"]) .pk-pill-neutral {
-        background: #ffffff;
         color: var(--sl-color-gray-2);
-        border-color: #e2e8f0;
     }
 
     /* Actions Column: Quick Install Box & Socials */
     .pk-footer-actions {
         display: flex;
         flex-direction: column;
-        gap: 1rem;
+        gap: 0.85rem;
         min-width: 17rem;
     }
 
     .pk-install-box {
         display: flex;
         flex-direction: column;
-        gap: 0.45rem;
+        gap: 0.35rem;
     }
 
     .pk-install-label {
         font-size: 0.75rem;
-        font-weight: 700;
+        font-weight: 800;
         text-transform: uppercase;
         letter-spacing: 0.05em;
         color: var(--sl-color-gray-3);
@@ -870,33 +826,38 @@ const highlights = [
         display: flex;
         align-items: center;
         gap: 0.6rem;
-        padding: 0.65rem 0.9rem;
-        border-radius: 0.625rem;
-        border: 1px solid var(--sl-color-hairline);
-        background: rgba(15, 23, 42, 0.6);
+        padding: 0.6rem 0.85rem;
+        border-radius: 0.5rem;
+        border: 2px solid var(--sl-color-hairline);
+        background: var(--sl-color-gray-6);
+        box-shadow: 3px 3px 0px var(--pk-shadow);
         color: var(--sl-color-white);
         cursor: pointer;
         font-family: var(--sl-font-mono);
         text-align: left;
+        transform: translate(0, 0);
         transition:
-            border-color 0.15s ease,
-            background-color 0.15s ease;
+            transform 120ms cubic-bezier(0.16, 1, 0.3, 1),
+            box-shadow 120ms cubic-bezier(0.16, 1, 0.3, 1),
+            border-color 120ms ease;
     }
 
-    :global(:root[data-theme="light"]) .pk-copy-btn {
-        background: #ffffff;
-        border-color: #cbd5e1;
-        color: #0f172a;
-    }
-
+    /* Hover: Animasi Neobrutalism seolah terbenam */
     .pk-copy-btn:hover {
+        transform: translate(2px, 2px) !important;
+        box-shadow: 1px 1px 0px var(--pk-shadow) !important;
         border-color: var(--sl-color-accent);
-        background: rgba(56, 189, 248, 0.06);
+    }
+
+    /* Active: Terbenam penuh saat diklik */
+    .pk-copy-btn:active {
+        transform: translate(3px, 3px) !important;
+        box-shadow: 0px 0px 0px var(--pk-shadow) !important;
     }
 
     .pk-copy-prompt {
         color: var(--sl-color-accent);
-        font-weight: 700;
+        font-weight: 800;
         user-select: none;
     }
 
@@ -915,11 +876,6 @@ const highlights = [
         display: inline-flex;
         color: var(--sl-color-gray-3);
         flex-shrink: 0;
-        transition: color 0.12s ease;
-    }
-
-    .pk-copy-btn:hover .pk-copy-icon {
-        color: var(--sl-color-text-accent);
     }
 
     .pk-copy-feedback {
@@ -929,21 +885,16 @@ const highlights = [
         transform: translateY(-50%);
         font-size: 0.75rem;
         font-family: var(--sl-font);
-        font-weight: 700;
-        color: #34d399;
-        background: rgba(15, 23, 42, 0.95);
+        font-weight: 800;
+        color: #000;
+        background: #34d399;
         padding: 0.2rem 0.5rem;
-        border-radius: 0.375rem;
-        border: 1px solid rgba(52, 211, 153, 0.4);
+        border-radius: 0.25rem;
+        border: 1.5px solid #000;
+        box-shadow: 2px 2px 0px #000;
         opacity: 0;
         pointer-events: none;
-        transition: opacity 0.15s ease;
-    }
-
-    :global(:root[data-theme="light"]) .pk-copy-feedback {
-        background: #ecfdf5;
-        color: #065f46;
-        border-color: rgba(5, 150, 105, 0.4);
+        transition: opacity 0.1s ease;
     }
 
     .pk-copy-btn.is-copied .pk-copy-feedback {
@@ -954,7 +905,7 @@ const highlights = [
         opacity: 0;
     }
 
-    /* Social Pills */
+    /* Social Buttons */
     .pk-social-links {
         display: flex;
         flex-wrap: wrap;
@@ -965,52 +916,51 @@ const highlights = [
         display: inline-flex;
         align-items: center;
         gap: 0.45rem;
-        padding: 0.45rem 0.85rem;
-        border-radius: 0.5rem;
-        border: 1px solid var(--sl-color-hairline);
-        background: rgba(255, 255, 255, 0.02);
-        font-size: 0.8125rem;
-        font-weight: 600;
-        color: var(--sl-color-gray-2);
+        padding: 0.4rem 0.75rem;
+        border-radius: 0.375rem;
+        border: 2px solid var(--sl-color-hairline);
+        background: var(--sl-color-gray-6);
+        box-shadow: 3px 3px 0px var(--pk-shadow);
+        font-size: 0.8rem;
+        font-weight: 700;
+        color: var(--sl-color-white);
         text-decoration: none;
+        transform: translate(0, 0);
         transition:
-            border-color 0.12s ease,
-            color 0.12s ease,
-            background-color 0.12s ease;
+            transform 120ms cubic-bezier(0.16, 1, 0.3, 1),
+            box-shadow 120ms cubic-bezier(0.16, 1, 0.3, 1),
+            border-color 120ms ease;
     }
 
-    :global(:root[data-theme="light"]) .pk-social-btn {
-        background: #ffffff;
-        border-color: #e2e8f0;
-        color: #334155;
-    }
-
+    /* Hover: Animasi Neobrutalism terbenam */
     .pk-social-btn:hover {
+        transform: translate(2px, 2px) !important;
+        box-shadow: 1px 1px 0px var(--pk-shadow) !important;
         border-color: var(--sl-color-accent);
         color: var(--sl-color-white);
-        background: var(--sl-color-accent-low);
+    }
+
+    /* Active: Terbenam penuh */
+    .pk-social-btn:active {
+        transform: translate(3px, 3px) !important;
+        box-shadow: 0px 0px 0px var(--pk-shadow) !important;
     }
 
     .pk-social-btn-csirt {
-        border-color: rgba(56, 189, 248, 0.3);
+        border-color: var(--sl-color-accent);
         color: var(--sl-color-text-accent);
     }
 
-    .pk-social-btn-csirt:hover {
-        border-color: var(--sl-color-accent);
-        background: rgba(56, 189, 248, 0.12);
-    }
-
     /* ==========================================================================
-       SECURITY PILLARS / HIGHLIGHTS
+       SECURITY PILLARS / HIGHLIGHTS (NEOBRUTALISM CARDS)
        ========================================================================== */
     .pk-footer-highlights {
         display: grid;
         grid-template-columns: 1fr;
-        gap: 0.85rem;
-        margin-top: 1.75rem;
-        padding-bottom: 2rem;
-        border-bottom: 1px solid var(--sl-color-hairline);
+        gap: 0.75rem;
+        margin-top: 1.5rem;
+        padding-bottom: 1.75rem;
+        border-bottom: 2px solid var(--sl-color-hairline);
     }
 
     @media (min-width: 36rem) {
@@ -1027,28 +977,36 @@ const highlights = [
 
     .pk-highlight-card {
         display: flex;
-        gap: 0.75rem;
+        gap: 0.65rem;
         align-items: flex-start;
-        padding: 0.85rem 1rem;
-        border-radius: 0.75rem;
-        background: rgba(255, 255, 255, 0.02);
-        border: 1px solid var(--sl-color-hairline);
+        padding: 0.75rem 0.85rem;
+        border-radius: 0.5rem;
+        background: var(--sl-color-gray-6);
+        border: 2px solid var(--sl-color-hairline);
+        box-shadow: 3px 3px 0px var(--pk-shadow);
+        transform: translate(0, 0);
+        transition:
+            transform 120ms cubic-bezier(0.16, 1, 0.3, 1),
+            box-shadow 120ms cubic-bezier(0.16, 1, 0.3, 1),
+            border-color 120ms ease;
     }
 
-    :global(:root[data-theme="light"]) .pk-highlight-card {
-        background: #ffffff;
-        border-color: #e2e8f0;
+    .pk-highlight-card:hover {
+        transform: translate(2px, 2px);
+        box-shadow: 1px 1px 0px var(--pk-shadow);
+        border-color: var(--sl-color-accent);
     }
 
     .pk-highlight-icon {
         display: flex;
         align-items: center;
         justify-content: center;
-        width: 1.85rem;
-        height: 1.85rem;
-        border-radius: 0.5rem;
+        width: 1.75rem;
+        height: 1.75rem;
+        border-radius: 0.375rem;
         background: var(--sl-color-accent-low);
         color: var(--sl-color-text-accent);
+        border: 1.5px solid var(--sl-color-accent);
         flex-shrink: 0;
         margin-top: 0.1rem;
     }
@@ -1056,27 +1014,27 @@ const highlights = [
     .pk-highlight-title {
         margin: 0;
         font-size: 0.8125rem;
-        font-weight: 700;
+        font-weight: 800;
         color: var(--sl-color-white);
         letter-spacing: -0.01em;
     }
 
     .pk-highlight-desc {
-        margin: 0.2rem 0 0;
+        margin: 0.15rem 0 0;
         font-size: 0.75rem;
         line-height: 1.45;
         color: var(--sl-color-gray-3);
     }
 
     /* ==========================================================================
-       NAVIGATION DIRECTORY (4 BALANCED COLUMNS)
+       NAVIGATION DIRECTORY (4 COLUMNS)
        ========================================================================== */
     .pk-footer-nav-grid {
         position: relative;
         display: grid;
         grid-template-columns: 1fr;
-        gap: 2rem 1.5rem;
-        margin-top: 2rem;
+        gap: 1.75rem 1.25rem;
+        margin-top: 1.75rem;
     }
 
     @media (min-width: 34rem) {
@@ -1099,9 +1057,9 @@ const highlights = [
         display: flex;
         align-items: center;
         gap: 0.45rem;
-        margin: 0 0 1rem;
+        margin: 0 0 0.85rem;
         font-size: 0.75rem;
-        font-weight: 700;
+        font-weight: 800;
         text-transform: uppercase;
         letter-spacing: 0.05em;
         color: var(--sl-color-white);
@@ -1109,10 +1067,10 @@ const highlights = [
 
     .pk-heading-indicator {
         display: inline-block;
-        width: 0.35rem;
-        height: 0.35rem;
-        border-radius: 9999px;
+        width: 0.4rem;
+        height: 0.4rem;
         background-color: var(--sl-color-accent);
+        border: 1px solid var(--sl-color-white);
     }
 
     .pk-footer-links {
@@ -1121,7 +1079,7 @@ const highlights = [
         margin: 0;
         display: flex;
         flex-direction: column;
-        gap: 0.55rem;
+        gap: 0.45rem;
     }
 
     .pk-footer-link {
@@ -1132,43 +1090,52 @@ const highlights = [
         text-decoration: none;
         font-size: 0.84rem;
         line-height: 1.45;
-        transition: color 0.12s ease;
+        font-weight: 500;
+        transform: translate(0, 0);
+        transition:
+            transform 100ms ease,
+            color 100ms ease;
     }
 
-    .pk-footer-link:hover {
-        color: var(--sl-color-text-accent);
-    }
-
-    :global(:root[data-theme="light"]) .pk-footer-link {
+    .pk-footer-link {
         color: #475569;
     }
 
-    :global(:root[data-theme="light"]) .pk-footer-link:hover {
+    .pk-footer-link:hover {
         color: #0284c7;
+        transform: translateX(3px);
+    }
+
+    :global(:root[data-theme="dark"]) .pk-footer-link {
+        color: var(--sl-color-gray-3);
+    }
+
+    :global(:root[data-theme="dark"]) .pk-footer-link:hover {
+        color: var(--sl-color-text-accent);
     }
 
     .pk-link-badge {
         font-size: 0.65rem;
-        font-weight: 700;
-        padding: 0.1rem 0.35rem;
-        border-radius: 0.25rem;
-        background: rgba(56, 189, 248, 0.12);
+        font-weight: 800;
+        padding: 0.05rem 0.35rem;
+        border-radius: 0.2rem;
+        background: var(--sl-color-accent-low);
         color: var(--sl-color-text-accent);
-        border: 1px solid rgba(56, 189, 248, 0.25);
+        border: 1px solid var(--sl-color-accent);
         line-height: 1;
     }
 
     /* ==========================================================================
-       BOTTOM ROW: COPYRIGHT & PEKANBARU ACCREDITATION
+       BOTTOM ROW: COPYRIGHT & AKREDITASI
        ========================================================================== */
     .pk-footer-bottom {
         position: relative;
-        margin-top: 2.25rem;
-        padding-top: 1.5rem;
-        border-top: 1px solid var(--sl-color-hairline);
+        margin-top: 1.75rem;
+        padding-top: 1.25rem;
+        border-top: 2px solid var(--sl-color-hairline);
         display: flex;
         flex-direction: column;
-        gap: 1.25rem;
+        gap: 1rem;
         align-items: flex-start;
     }
 
@@ -1183,7 +1150,7 @@ const highlights = [
     .pk-bottom-left {
         display: flex;
         flex-direction: column;
-        gap: 0.25rem;
+        gap: 0.2rem;
     }
 
     .pk-bottom-copy,
@@ -1196,8 +1163,8 @@ const highlights = [
 
     .pk-bottom-copy strong,
     .pk-bottom-author strong {
-        color: var(--sl-color-gray-2);
-        font-weight: 600;
+        color: var(--sl-color-white);
+        font-weight: 700;
     }
 
     .pk-bottom-right {
@@ -1208,35 +1175,41 @@ const highlights = [
         display: inline-flex;
         align-items: center;
         gap: 0.65rem;
-        padding: 0.55rem 0.95rem;
-        border-radius: 0.75rem;
-        border: 1px solid var(--sl-color-hairline);
-        background: rgba(255, 255, 255, 0.02);
+        padding: 0.45rem 0.85rem;
+        border-radius: 0.5rem;
+        border: 2px solid var(--sl-color-hairline);
+        background: var(--sl-color-gray-6);
+        box-shadow: 3px 3px 0px var(--pk-shadow);
         text-decoration: none;
+        transform: translate(0, 0);
         transition:
-            border-color 0.15s ease,
-            background-color 0.15s ease;
+            transform 120ms cubic-bezier(0.16, 1, 0.3, 1),
+            box-shadow 120ms cubic-bezier(0.16, 1, 0.3, 1),
+            border-color 120ms ease;
     }
 
-    :global(:root[data-theme="light"]) .pk-pekanbaru-badge {
-        background: #ffffff;
-        border-color: #e2e8f0;
-    }
-
+    /* Hover: Terbenam ke dalam bayangan */
     .pk-pekanbaru-badge:hover {
+        transform: translate(2px, 2px) !important;
+        box-shadow: 1px 1px 0px var(--pk-shadow) !important;
         border-color: var(--sl-color-accent);
-        background: var(--sl-color-accent-low);
+    }
+
+    .pk-pekanbaru-badge:active {
+        transform: translate(3px, 3px) !important;
+        box-shadow: 0px 0px 0px var(--pk-shadow) !important;
     }
 
     .pk-seal-icon {
         display: flex;
         align-items: center;
         justify-content: center;
-        width: 1.85rem;
-        height: 1.85rem;
-        border-radius: 9999px;
-        background: rgba(56, 189, 248, 0.12);
+        width: 1.75rem;
+        height: 1.75rem;
+        border-radius: 0.375rem;
+        background: var(--sl-color-accent-low);
         color: var(--sl-color-text-accent);
+        border: 1.5px solid var(--sl-color-accent);
         flex-shrink: 0;
     }
 
@@ -1248,27 +1221,21 @@ const highlights = [
 
     .pk-pekanbaru-gov {
         font-size: 0.78rem;
-        font-weight: 700;
+        font-weight: 800;
         color: var(--sl-color-white);
         letter-spacing: -0.01em;
     }
 
     .pk-pekanbaru-dept {
         font-size: 0.7rem;
+        font-weight: 500;
         color: var(--sl-color-gray-3);
     }
 
     .pk-ext-arrow {
         font-size: 0.85rem;
-        color: var(--sl-color-gray-3);
-        margin-left: 0.2rem;
-        transition:
-            transform 0.15s ease,
-            color 0.15s ease;
-    }
-
-    .pk-pekanbaru-badge:hover .pk-ext-arrow {
-        color: var(--sl-color-text-accent);
-        transform: translate(2px, -2px) !important;
+        font-weight: 800;
+        color: var(--sl-color-accent);
+        margin-left: 0.15rem;
     }
 </style>

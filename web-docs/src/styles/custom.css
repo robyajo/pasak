@@ -1,65 +1,26 @@
 /* ==========================================================================
    Pasak (Bulwark) — Documentation Theme
-   Font Primer: Plus Jakarta Sans (UI & Editorial) & JetBrains Mono (Code)
-   Responsif Mobile: Header hanya menampilkan Logo saja
-   Aset Ikon: Selaras & Berstandar Keamanan Siber
+   Style: Minimalist Modern Neobrutalism (Fast, Zero-Blur, High-Contrast)
+   Inspirasi: neobrutalism.dev (Hard Offset Shadows + Sinking Hover Animation)
+   Font Primer: Plus Jakarta Sans (UI) & JetBrains Mono (Code)
    ========================================================================== */
 
 /* --------------------------------------------------------------------------
-   1. PALET WARNA & VARIABEL TEMA
+   1. PALET WARNA & VARIABEL TEMA (NEOBRUTALISM TOKENS)
    -------------------------------------------------------------------------- */
+/* Variabel Layout & Tipografi Global (Konsisten di Semua Tema) */
 :root {
-    /* Tema Gelap (Dark Mode - Default) */
-    --sl-color-white: #f8fafc; /* slate-50 (judul tajam & berwibawa) */
-    --sl-color-gray-1: #f1f5f9; /* slate-100 */
-    --sl-color-gray-2: #cbd5e1; /* slate-300 (paragraf kontras tinggi & nyaman dibaca) */
-    --sl-color-gray-3: #94a3b8; /* slate-400 (keterangan sekunder) */
-    --sl-color-gray-4: #64748b; /* slate-500 (border netral) */
-    --sl-color-gray-5: #1e293b; /* slate-800 (garis pembatas halus) */
-    --sl-color-gray-6: #0f172a; /* slate-900 (latar kartu & surface) */
-    --sl-color-black: #0b0f19; /* slate-950 (kanvas dasar) */
-
-    /* Aksen Keamanan Utama: Sky Blue & Indigo Glow */
-    --sl-color-accent-low: rgba(14, 165, 233, 0.12);
-    --sl-color-accent: #38bdf8;
-    --sl-color-accent-high: #bae6fd;
-
-    --sl-color-text: var(--sl-color-gray-2);
-    --sl-color-text-accent: var(--sl-color-accent);
-    --sl-color-bg: var(--sl-color-black);
-    --sl-color-bg-nav: rgba(11, 15, 25, 0.92);
-    --sl-color-bg-sidebar: #0e1424;
-    --sl-color-bg-inline-code: rgba(255, 255, 255, 0.08);
-    --sl-color-hairline: var(--sl-color-gray-5);
-
-    /* Status Alerts / Callout */
-    --sl-color-blue: #38bdf8;
-    --sl-color-blue-low: rgba(56, 189, 248, 0.1);
-    --sl-color-blue-high: #bae6fd;
-
-    --sl-color-green: #34d399;
-    --sl-color-green-low: rgba(52, 211, 153, 0.1);
-    --sl-color-green-high: #a7f3d0;
-
-    --sl-color-orange: #fbbf24;
-    --sl-color-orange-low: rgba(251, 191, 36, 0.1);
-    --sl-color-orange-high: #fde68a;
-
-    --sl-color-red: #f87171;
-    --sl-color-red-low: rgba(248, 113, 113, 0.1);
-    --sl-color-red-high: #fecaca;
-
-    /* Tipografi Plus Jakarta Sans & JetBrains Mono */
     --sl-font:
         "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI",
-        Roboto, "Helvetica Neue", Arial, sans-serif;
+        Roboto, sans-serif;
     --sl-font-mono:
         "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
-        "Liberation Mono", monospace;
+        monospace;
     --sl-font-system: var(--sl-font);
 
+    /* Lebar konten default halaman dokumentasi (dengan sidebar) */
     --sl-content-width: 52rem;
-    --sl-line-height: 1.75;
+    --sl-line-height: 1.72;
     --sl-line-height-headings: 1.25;
 
     --sl-text-xs: 0.75rem;
@@ -74,36 +35,49 @@
     --sl-text-5xl: 2.75rem;
 }
 
-:root[data-theme="light"] {
-    /* Tema Terang (Light Mode - Bersih & Tajam) */
-    --sl-color-white: #0f172a; /* slate-900 (judul hitam pekat terbaca) */
-    --sl-color-gray-1: #1e293b; /* slate-800 */
-    --sl-color-gray-2: #334155; /* slate-700 (paragraf kontras tinggi) */
-    --sl-color-gray-3: #475569; /* slate-600 */
-    --sl-color-gray-4: #64748b; /* slate-500 */
-    --sl-color-gray-5: #e2e8f0; /* slate-200 */
-    --sl-color-gray-6: #f8fafc; /* slate-50 */
-    --sl-color-gray-7: #f1f5f9; /* slate-100 */
-    --sl-color-black: #ffffff;
+/* Lebar konten halaman Splash / Beranda / tanpa sidebar (67.5rem tetap di Light & Dark) */
+:root:not([data-has-sidebar]),
+html:not([data-has-sidebar]) {
+    --sl-content-width: 67.5rem;
+}
 
+/* Palet Tema Terang (Light Mode - Default) */
+:root,
+:root[data-theme="light"] {
+    --sl-color-white: #0f172a; /* Teks judul hitam tegas */
+    --sl-color-gray-1: #1e293b;
+    --sl-color-gray-2: #334155; /* Teks paragraf tajam & nyaman dibaca */
+    --sl-color-gray-3: #475569; /* Keterangan sekunder */
+    --sl-color-gray-4: #64748b;
+    --sl-color-gray-5: #0f172a; /* Garis hitam neobrutalis tebal */
+    --sl-color-gray-6: #ffffff; /* Surface kartu & panel putih solid */
+    --sl-color-gray-7: #f8fafc;
+    --sl-color-black: #f8fafc; /* Kanvas dasar */
+
+    /* Aksen Neobrutalism */
     --sl-color-accent-low: #e0f2fe;
     --sl-color-accent: #0284c7;
     --sl-color-accent-high: #0369a1;
 
     --sl-color-text: var(--sl-color-gray-2);
     --sl-color-text-accent: var(--sl-color-accent);
-    --sl-color-bg: #ffffff;
-    --sl-color-bg-nav: rgba(255, 255, 255, 0.94);
-    --sl-color-bg-sidebar: #f8fafc;
+    --sl-color-bg: #f8fafc;
+    --sl-color-bg-nav: #ffffff;
+    --sl-color-bg-sidebar: #ffffff;
     --sl-color-bg-inline-code: rgba(2, 132, 199, 0.08);
-    --sl-color-hairline: #e2e8f0;
+    --sl-color-hairline: #0f172a;
 
+    /* Neobrutalism Hard Offset Shadows di Light Mode */
+    --pk-shadow: #0f172a;
+    --pk-shadow-accent: #0284c7;
+
+    /* Status Alerts / Callout (Neobrutalism Solid) */
     --sl-color-blue: #0284c7;
     --sl-color-blue-low: #f0f9ff;
     --sl-color-blue-high: #075985;
 
     --sl-color-green: #059669;
-    --sl-color-green-low: #f0fdf4;
+    --sl-color-green-low: #ecfdf5;
     --sl-color-green-high: #065f46;
 
     --sl-color-orange: #d97706;
@@ -115,15 +89,61 @@
     --sl-color-red-high: #9f1239;
 }
 
+/* Palet Tema Gelap (Dark Mode) */
+:root[data-theme="dark"] {
+    --sl-color-white: #f8fafc; /* Teks judul kontras tinggi */
+    --sl-color-gray-1: #f1f5f9;
+    --sl-color-gray-2: #cbd5e1; /* Teks paragraf tajam & nyaman dibaca */
+    --sl-color-gray-3: #94a3b8; /* Keterangan sekunder */
+    --sl-color-gray-4: #64748b;
+    --sl-color-gray-5: #334155; /* Border solid neobrutalism (slate-700) */
+    --sl-color-gray-6: #111827; /* Surface kartu & panel (gray-900) */
+    --sl-color-gray-7: #0d121f;
+    --sl-color-black: #090d16; /* Kanvas latar */
+
+    /* Aksen Neobrutalism */
+    --sl-color-accent-low: rgba(56, 189, 248, 0.14);
+    --sl-color-accent: #38bdf8;
+    --sl-color-accent-high: #bae6fd;
+
+    --sl-color-text: var(--sl-color-gray-2);
+    --sl-color-text-accent: var(--sl-color-accent);
+    --sl-color-bg: var(--sl-color-black);
+    --sl-color-bg-nav: #090d16;
+    --sl-color-bg-sidebar: #0d121f;
+    --sl-color-bg-inline-code: rgba(255, 255, 255, 0.08);
+    --sl-color-hairline: #334155;
+
+    /* Neobrutalism Hard Offset Shadows */
+    --pk-shadow: #000000;
+    --pk-shadow-accent: #38bdf8;
+
+    /* Status Alerts / Callout (Neobrutalism Solid) */
+    --sl-color-blue: #38bdf8;
+    --sl-color-blue-low: rgba(56, 189, 248, 0.12);
+    --sl-color-blue-high: #bae6fd;
+
+    --sl-color-green: #34d399;
+    --sl-color-green-low: rgba(52, 211, 153, 0.12);
+    --sl-color-green-high: #a7f3d0;
+
+    --sl-color-orange: #fbbf24;
+    --sl-color-orange-low: rgba(251, 191, 36, 0.12);
+    --sl-color-orange-high: #fde68a;
+
+    --sl-color-red: #f87171;
+    --sl-color-red-low: rgba(248, 113, 113, 0.12);
+    --sl-color-red-high: #fecaca;
+}
+
 /* --------------------------------------------------------------------------
-   2. FONT RENDERING & PENGATURAN GLOBAL
+   2. GLOBAL RESET & PERFORMA CEPAT (ZERO BLUR, TACTILE MECHANICAL FEEL)
    -------------------------------------------------------------------------- */
 html {
     font-family: var(--sl-font);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
-    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
 }
 
 body {
@@ -132,6 +152,7 @@ body {
     line-height: var(--sl-line-height);
     color: var(--sl-color-text);
     letter-spacing: -0.01em;
+    background-color: var(--sl-color-bg);
 }
 
 button,
@@ -147,6 +168,7 @@ textarea {
     animation-duration: 0s !important;
 }
 
+/* Transisi Neobrutalism halus & responsif sesuai standar neobrutalism.dev */
 a,
 button,
 input,
@@ -154,45 +176,53 @@ select,
 .card,
 .sl-link-card,
 .pkg-version,
-summary {
+summary,
+.pk-stat,
+.pk-chip {
     transition:
-        color 0.12s ease,
-        background-color 0.12s ease,
-        border-color 0.12s ease,
-        opacity 0.12s ease !important;
-    transform: none !important;
+        color 120ms ease,
+        background-color 120ms ease,
+        border-color 120ms ease,
+        box-shadow 120ms cubic-bezier(0.16, 1, 0.3, 1),
+        transform 120ms cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 
 @media (prefers-reduced-motion: reduce) {
-    *,
-    *::before,
-    *::after {
-        transition-duration: 0.01ms !important;
-        scroll-behavior: auto !important;
+    a,
+    button,
+    input,
+    select,
+    .card,
+    .sl-link-card,
+    .pkg-version,
+    summary,
+    .pk-stat,
+    .pk-chip {
+        transition: none !important;
+        transform: none !important;
     }
 }
 
 /* --------------------------------------------------------------------------
-   3. HEADER & NAVIGASI
+   3. HEADER & NAVIGASI (SOLID & CEPAT — TANPA BLUR FILTER)
    -------------------------------------------------------------------------- */
 header.header {
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border-bottom: 1px solid var(--sl-color-hairline);
+    background-color: var(--sl-color-bg-nav) !important;
+    border-bottom: 2px solid var(--sl-color-hairline) !important;
 }
 
 .title-wrapper {
-    gap: 0.85rem !important;
+    gap: 0.75rem !important;
     align-items: center !important;
 }
 
 .site-title {
     font-family: var(--sl-font) !important;
     font-size: 1.05rem !important;
-    font-weight: 700 !important;
+    font-weight: 800 !important;
     letter-spacing: -0.02em !important;
     color: var(--sl-color-white) !important;
-    gap: 0.75rem !important;
+    gap: 0.65rem !important;
     align-items: center !important;
 }
 
@@ -200,63 +230,72 @@ header.header {
     color: var(--sl-color-accent) !important;
 }
 
-/* Badge versi di header desktop */
+/* Badge versi di header */
 .pkg-version {
-    margin-inline-start: 0.85rem !important;
+    margin-inline-start: 0.75rem !important;
     align-self: center;
     flex: none;
     display: inline-flex;
     align-items: center;
-    padding: 0.15rem 0.6rem;
-    border: 1px solid var(--sl-color-gray-5);
-    border-radius: 999px;
+    padding: 0.15rem 0.55rem;
+    border: 2px solid var(--sl-color-hairline);
+    border-radius: 0.375rem;
+    box-shadow: 2px 2px 0px var(--pk-shadow);
     font-family: var(--sl-font-mono) !important;
     font-size: var(--sl-text-xs);
-    font-weight: 600;
+    font-weight: 700;
     line-height: 1.4;
-    color: var(--sl-color-text-accent);
+    color: var(--sl-color-white);
     background-color: var(--sl-color-gray-6);
     text-decoration: none;
     white-space: nowrap;
+    transform: translate(0, 0);
 }
 
+/* Hover: Animasi Neobrutalism seolah terbenam */
 .pkg-version:hover {
+    transform: translate(1px, 1px) !important;
+    box-shadow: 1px 1px 0px var(--pk-shadow) !important;
     border-color: var(--sl-color-accent);
-    background-color: var(--sl-color-accent-low);
 }
 
-/* --------------------------------------------------------------------------
-   RESPONSIF MOBILE: HEADER MENAMPILKAN LOGO & "PASAK"
-   -------------------------------------------------------------------------- */
+.pkg-version:active {
+    transform: translate(2px, 2px) !important;
+    box-shadow: 0px 0px 0px !important;
+}
+
+/* Header Right Group & Divider */
+.right-group,
+.social-icons {
+    gap: 0.75rem !important;
+    align-items: center !important;
+}
+
+.social-icons::after {
+    content: "" !important;
+    height: 1.5rem !important;
+    border-inline-end: 2px solid var(--sl-color-hairline) !important;
+}
+
+/* Responsif Mobile Header: Tampilkan toggle tema di samping search/menu */
 @media (max-width: 50rem) {
-    /* Judul ringkas "Pasak" bersama icon di mobile */
     .site-title .title-brand {
         display: none !important;
     }
-
     .site-title .title-product {
         display: inline !important;
-        font-weight: 700 !important;
+        font-weight: 800 !important;
         font-size: 0.95rem !important;
         color: var(--sl-color-white) !important;
-        letter-spacing: -0.02em !important;
     }
-
     .pkg-version {
         display: none !important;
     }
-
     .title-wrapper {
         gap: 0.5rem !important;
         padding: 0 !important;
         margin: 0 !important;
     }
-
-    .site-title {
-        gap: 0.5rem !important;
-        padding: 0.2rem 0 !important;
-    }
-
     .site-title img {
         height: 1.85rem !important;
         width: auto !important;
@@ -264,14 +303,22 @@ header.header {
         display: block !important;
         object-fit: contain !important;
     }
+    .right-group {
+        display: flex !important;
+        gap: 0.5rem !important;
+    }
+    .right-group .social-icons,
+    .right-group .social-icons::after {
+        display: none !important;
+    }
 }
 
 /* --------------------------------------------------------------------------
-   4. TIPOGRAFI & KENYAMANAN MEMBACA DOKUMENTASI (PLUS JAKARTA SANS)
+   4. TIPOGRAFI & KONTEN DOKUMENTASI
    -------------------------------------------------------------------------- */
 .sl-markdown-content {
     font-family: var(--sl-font);
-    font-size: 1.0125rem;
+    font-size: 1rem;
     line-height: var(--sl-line-height);
     color: var(--sl-color-text);
     letter-spacing: -0.01em;
@@ -279,8 +326,8 @@ header.header {
 
 .sl-markdown-content h1 {
     font-family: var(--sl-font) !important;
-    font-size: clamp(1.95rem, 3.8vw, 2.5rem) !important;
-    font-weight: 800 !important;
+    font-size: clamp(1.9rem, 3.6vw, 2.4rem) !important;
+    font-weight: 850 !important;
     letter-spacing: -0.035em !important;
     line-height: 1.2 !important;
     color: var(--sl-color-white) !important;
@@ -290,138 +337,134 @@ header.header {
 
 .sl-markdown-content h2 {
     font-family: var(--sl-font) !important;
-    font-size: clamp(1.4rem, 2.6vw, 1.7rem) !important;
-    font-weight: 700 !important;
+    font-size: clamp(1.35rem, 2.5vw, 1.65rem) !important;
+    font-weight: 800 !important;
     letter-spacing: -0.025em !important;
     line-height: 1.28 !important;
     color: var(--sl-color-white) !important;
-    margin-top: 2.75rem !important;
+    margin-top: 2.5rem !important;
     margin-bottom: 0.85rem !important;
-    padding-bottom: 0.5rem !important;
-    border-bottom: 1px solid var(--sl-color-gray-5) !important;
+    padding-bottom: 0.45rem !important;
+    border-bottom: 2px solid var(--sl-color-hairline) !important;
 }
 
 .sl-markdown-content h3 {
     font-family: var(--sl-font) !important;
     font-size: clamp(1.15rem, 2vw, 1.35rem) !important;
-    font-weight: 650 !important;
+    font-weight: 750 !important;
     letter-spacing: -0.02em !important;
     line-height: 1.35 !important;
     color: var(--sl-color-white) !important;
-    margin-top: 2.25rem !important;
-    margin-bottom: 0.65rem !important;
+    margin-top: 2rem !important;
+    margin-bottom: 0.6rem !important;
 }
 
 .sl-markdown-content h4 {
     font-family: var(--sl-font) !important;
     font-size: 1.05rem !important;
-    font-weight: 600 !important;
+    font-weight: 700 !important;
     letter-spacing: -0.015em !important;
     line-height: 1.4 !important;
     color: var(--sl-color-white) !important;
-    margin-top: 1.75rem !important;
+    margin-top: 1.5rem !important;
     margin-bottom: 0.5rem !important;
 }
 
 .sl-markdown-content p {
-    margin-top: 1.15rem;
-    margin-bottom: 1.15rem;
-    line-height: 1.75;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    line-height: 1.72;
 }
 
 .sl-markdown-content strong,
 .sl-markdown-content b {
-    font-weight: 700;
+    font-weight: 750;
     color: var(--sl-color-white);
-}
-
-.sl-markdown-content ul,
-.sl-markdown-content ol {
-    padding-inline-start: 1.4rem;
-    margin-top: 0.85rem;
-    margin-bottom: 1.15rem;
-}
-
-.sl-markdown-content li {
-    margin-top: 0.35rem;
-    margin-bottom: 0.35rem;
-    line-height: 1.7;
-}
-
-.sl-markdown-content li::marker {
-    color: var(--sl-color-accent);
 }
 
 .sl-markdown-content a:not(:where(.not-content *)) {
     color: var(--sl-color-text-accent);
     text-decoration: underline;
-    text-decoration-thickness: 1px;
+    text-decoration-thickness: 2px;
     text-underline-offset: 3px;
-    font-weight: 500;
+    font-weight: 600;
 }
 
 .sl-markdown-content a:not(:where(.not-content *)):hover {
     color: var(--sl-color-white);
-    text-decoration-thickness: 2px;
 }
 
 .sl-markdown-content code:not(:where(.not-content *)) {
     font-family: var(--sl-font-mono) !important;
-    border-radius: 0.375rem;
+    border-radius: 0.25rem;
     padding: 0.15rem 0.45rem;
     font-size: 0.875em;
-    font-weight: 500;
+    font-weight: 600;
     letter-spacing: -0.005em;
-    border: 1px solid var(--sl-color-gray-5);
+    border: 1.5px solid var(--sl-color-hairline);
     background-color: var(--sl-color-bg-inline-code);
     color: var(--sl-color-accent-high);
 }
 
-:root[data-theme="light"]
+:root[data-theme="dark"]
     .sl-markdown-content
     code:not(:where(.not-content *)) {
     color: var(--sl-color-accent-high);
-    border-color: rgba(2, 132, 199, 0.2);
+    border-color: var(--sl-color-hairline);
+    background-color: var(--sl-color-bg-inline-code);
 }
 
 .sl-markdown-content blockquote:not(:where(.not-content *)) {
-    border-inline-start: 3px solid var(--sl-color-accent);
-    background-color: var(--sl-color-accent-low);
+    background-color: var(--sl-color-gray-6);
+    border: 2px solid var(--sl-color-hairline);
+    border-inline-start-width: 5px;
+    border-inline-start-color: var(--sl-color-accent);
+    box-shadow: 3px 3px 0px var(--pk-shadow);
     padding: 0.75rem 1.25rem;
-    border-radius: 0 0.5rem 0.5rem 0;
+    border-radius: 0.375rem;
     margin: 1.25rem 0;
-    color: var(--sl-color-gray-1);
+    color: var(--sl-color-gray-2);
 }
 
 .sl-markdown-content hr:not(:where(.not-content *)) {
     border: 0;
-    border-top: 1px solid var(--sl-color-gray-5);
-    margin: 2.25rem 0;
+    border-top: 2px solid var(--sl-color-hairline);
+    margin: 2rem 0;
 }
 
 /* --------------------------------------------------------------------------
-   5. KARTU FITUR BERSIH & SERAGAM (CARD & CARDGRID)
+   5. KARTU FITUR NEOBRUTALISM (CARD & LINKCARD)
+   Hover Effect Sinking: translate(2px, 2px) & shadow berkurang
    -------------------------------------------------------------------------- */
 .card-grid {
     gap: 1.25rem !important;
 }
 
 .card {
-    border: 1px solid var(--sl-color-gray-5) !important;
+    border: 2px solid var(--sl-color-hairline) !important;
     background-color: var(--sl-color-gray-6) !important;
-    border-radius: 0.75rem !important;
+    border-radius: 0.5rem !important;
     padding: 1.25rem 1.5rem !important;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
+    box-shadow: 4px 4px 0px var(--pk-shadow) !important;
+    transform: translate(0, 0) !important;
 }
 
+/* Hover: Animasi Neobrutalism seolah terbenam */
 .card:hover {
+    transform: translate(2px, 2px) !important;
+    box-shadow: 2px 2px 0px var(--pk-shadow) !important;
     border-color: var(--sl-color-accent) !important;
+}
+
+.card:active {
+    transform: translate(4px, 4px) !important;
+    box-shadow: 0px 0px 0px var(--pk-shadow) !important;
 }
 
 .card .title {
     font-family: var(--sl-font) !important;
-    font-size: 1.125rem !important;
-    font-weight: 700 !important;
+    font-size: 1.1rem !important;
+    font-weight: 800 !important;
     letter-spacing: -0.02em !important;
     color: var(--sl-color-white) !important;
     gap: 0.75rem !important;
@@ -429,10 +472,10 @@ header.header {
 }
 
 .card .icon {
-    border: 1px solid var(--sl-color-accent-low) !important;
+    border: 2px solid var(--sl-color-accent) !important;
     background-color: var(--sl-color-accent-low) !important;
     color: var(--sl-color-text-accent) !important;
-    border-radius: 0.5rem !important;
+    border-radius: 0.375rem !important;
     padding: 0.35rem !important;
 }
 
@@ -447,21 +490,30 @@ header.header {
 
 /* Kartu tautan navigasi */
 .sl-link-card {
-    border: 1px solid var(--sl-color-gray-5) !important;
+    border: 2px solid var(--sl-color-hairline) !important;
     background-color: var(--sl-color-gray-6) !important;
-    border-radius: 0.75rem !important;
+    border-radius: 0.5rem !important;
     padding: 1.25rem 1.5rem !important;
+    box-shadow: 4px 4px 0px var(--pk-shadow) !important;
+    transform: translate(0, 0) !important;
 }
 
+/* Hover: Animasi Neobrutalism seolah terbenam */
 .sl-link-card:hover {
+    transform: translate(2px, 2px) !important;
+    box-shadow: 2px 2px 0px var(--pk-shadow) !important;
     border-color: var(--sl-color-accent) !important;
-    background-color: var(--sl-color-accent-low) !important;
+}
+
+.sl-link-card:active {
+    transform: translate(4px, 4px) !important;
+    box-shadow: 0px 0px 0px var(--pk-shadow) !important;
 }
 
 .sl-link-card .title {
     font-family: var(--sl-font) !important;
     font-size: 1.05rem !important;
-    font-weight: 700 !important;
+    font-weight: 800 !important;
     letter-spacing: -0.02em !important;
     color: var(--sl-color-white) !important;
 }
@@ -474,19 +526,22 @@ header.header {
 }
 
 /* --------------------------------------------------------------------------
-   6. ASIDES / KOTAK PERINGATAN KEAMANAN (CALLOUT)
+   6. CALLOUT / ASIDES NEOBRUTALISM
    -------------------------------------------------------------------------- */
 .starlight-aside {
-    border-radius: 0.625rem !important;
-    border-inline-start-width: 4px !important;
+    border-radius: 0.5rem !important;
+    border: 2px solid var(--sl-color-hairline) !important;
+    border-inline-start-width: 6px !important;
+    box-shadow: 3px 3px 0px var(--pk-shadow) !important;
     padding: 1rem 1.25rem !important;
     margin: 1.5rem 0 !important;
+    background-color: var(--sl-color-gray-6) !important;
 }
 
 .starlight-aside__title {
     font-family: var(--sl-font) !important;
     font-size: 0.95rem !important;
-    font-weight: 700 !important;
+    font-weight: 800 !important;
     letter-spacing: -0.015em !important;
     display: flex !important;
     align-items: center !important;
@@ -498,11 +553,9 @@ header.header {
     font-size: 0.9375rem !important;
     line-height: 1.65 !important;
     color: var(--sl-color-gray-2) !important;
-    letter-spacing: -0.005em !important;
 }
 
 .starlight-aside--note {
-    background-color: var(--sl-color-blue-low) !important;
     border-inline-start-color: var(--sl-color-blue) !important;
 }
 .starlight-aside--note .starlight-aside__title {
@@ -510,7 +563,6 @@ header.header {
 }
 
 .starlight-aside--tip {
-    background-color: var(--sl-color-green-low) !important;
     border-inline-start-color: var(--sl-color-green) !important;
 }
 .starlight-aside--tip .starlight-aside__title {
@@ -518,7 +570,6 @@ header.header {
 }
 
 .starlight-aside--caution {
-    background-color: var(--sl-color-orange-low) !important;
     border-inline-start-color: var(--sl-color-orange) !important;
 }
 .starlight-aside--caution .starlight-aside__title {
@@ -526,7 +577,6 @@ header.header {
 }
 
 .starlight-aside--danger {
-    background-color: var(--sl-color-red-low) !important;
     border-inline-start-color: var(--sl-color-red) !important;
 }
 .starlight-aside--danger .starlight-aside__title {
@@ -534,38 +584,36 @@ header.header {
 }
 
 /* --------------------------------------------------------------------------
-   7. TABEL RESPONSIF & MUDAH DIBACA DI PONSEL
+   7. TABEL SOLID & RESPONSIF
    -------------------------------------------------------------------------- */
 .sl-markdown-content table {
     display: block !important;
     width: 100% !important;
     overflow-x: auto !important;
-    -webkit-overflow-scrolling: touch !important;
-    border-collapse: separate !important;
-    border-spacing: 0 !important;
+    border-collapse: collapse !important;
     margin: 1.5rem 0 !important;
-    border: 1px solid var(--sl-color-gray-5) !important;
+    border: 2px solid var(--sl-color-hairline) !important;
     border-radius: 0.5rem !important;
+    box-shadow: 3px 3px 0px var(--pk-shadow) !important;
     font-family: var(--sl-font) !important;
     font-size: 0.875rem !important;
-    letter-spacing: -0.01em !important;
 }
 
 .sl-markdown-content th {
     background-color: var(--sl-color-gray-6) !important;
     padding: 0.75rem 1rem !important;
-    font-weight: 700 !important;
+    font-weight: 800 !important;
     font-size: 0.8125rem !important;
     text-transform: uppercase !important;
     letter-spacing: 0.05em !important;
     color: var(--sl-color-white) !important;
-    border-bottom: 1px solid var(--sl-color-gray-5) !important;
+    border-bottom: 2px solid var(--sl-color-hairline) !important;
     white-space: nowrap !important;
 }
 
 .sl-markdown-content td {
     padding: 0.75rem 1rem !important;
-    border-bottom: 1px solid var(--sl-color-gray-5) !important;
+    border-bottom: 1px solid var(--sl-color-hairline) !important;
     vertical-align: top !important;
     color: var(--sl-color-gray-2) !important;
     line-height: 1.6 !important;
@@ -575,23 +623,19 @@ header.header {
     border-bottom: none !important;
 }
 
-.sl-markdown-content tr:nth-child(even) td {
-    background-color: rgba(125, 125, 125, 0.03) !important;
-}
-
 /* --------------------------------------------------------------------------
-   8. DIAGRAM MERMAID RESPONSIF
+   8. DIAGRAM MERMAID
    -------------------------------------------------------------------------- */
 .mermaid {
     display: flex;
     justify-content: center;
     margin: 1.5rem 0;
     padding: 1.25rem;
-    border: 1px solid var(--sl-color-gray-5);
-    border-radius: 0.75rem;
+    border: 2px solid var(--sl-color-hairline);
+    border-radius: 0.5rem;
     background: var(--sl-color-gray-6);
+    box-shadow: 3px 3px 0px var(--pk-shadow);
     overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
 }
 
 .mermaid svg {
@@ -600,12 +644,13 @@ header.header {
 }
 
 /* --------------------------------------------------------------------------
-   9. BLOK KODE (EXPRESSIVE CODE & JETBRAINS MONO)
+   9. BLOK KODE (EXPRESSIVE CODE)
    -------------------------------------------------------------------------- */
 .expressive-code {
     margin: 1.25rem 0 !important;
-    border-radius: 0.625rem !important;
-    border: 1px solid var(--sl-color-gray-5) !important;
+    border-radius: 0.5rem !important;
+    border: 2px solid var(--sl-color-hairline) !important;
+    box-shadow: 4px 4px 0px var(--pk-shadow) !important;
     overflow: hidden !important;
 }
 
@@ -614,14 +659,13 @@ header.header {
     padding: 1rem 1.25rem !important;
     font-size: 0.875rem !important;
     line-height: 1.65 !important;
-    letter-spacing: 0 !important;
 }
 
 /* --------------------------------------------------------------------------
-   10. HERO HALAMAN DEPAN (BERSIH & RESPONSIF)
+   10. HERO HALAMAN DEPAN & BUTTONS
    -------------------------------------------------------------------------- */
 .hero {
-    padding: 3rem 0 2rem 0 !important;
+    padding: 2.5rem 0 1.5rem 0 !important;
     gap: 2rem !important;
 }
 
@@ -644,7 +688,7 @@ header.header {
 .hero h1 {
     font-family: var(--sl-font) !important;
     font-size: clamp(2.15rem, 4.5vw, 2.9rem) !important;
-    font-weight: 800 !important;
+    font-weight: 850 !important;
     letter-spacing: -0.035em !important;
     line-height: 1.15 !important;
     color: var(--sl-color-white) !important;
@@ -653,7 +697,7 @@ header.header {
 .hero .tagline {
     font-family: var(--sl-font) !important;
     font-size: clamp(1.025rem, 1.5vw, 1.18rem) !important;
-    font-weight: 400 !important;
+    font-weight: 500 !important;
     letter-spacing: -0.01em !important;
     color: var(--sl-color-gray-3) !important;
     line-height: 1.65 !important;
@@ -669,10 +713,25 @@ header.header {
 .hero .actions a {
     font-family: var(--sl-font) !important;
     border-radius: 0.5rem !important;
-    font-weight: 600 !important;
+    font-weight: 750 !important;
     letter-spacing: -0.01em !important;
     padding: 0.75rem 1.5rem !important;
     font-size: 0.95rem !important;
+    border: 2px solid var(--sl-color-hairline) !important;
+    box-shadow: 4px 4px 0px var(--pk-shadow) !important;
+    transform: translate(0, 0) !important;
+}
+
+/* Hover: Animasi Neobrutalism seolah terbenam */
+.hero .actions a:hover {
+    transform: translate(2px, 2px) !important;
+    box-shadow: 2px 2px 0px var(--pk-shadow) !important;
+    border-color: var(--sl-color-accent) !important;
+}
+
+.hero .actions a:active {
+    transform: translate(4px, 4px) !important;
+    box-shadow: 0px 0px 0px var(--pk-shadow) !important;
 }
 
 /* Meta Bar Informasi Paket pada Halaman Depan */
@@ -682,26 +741,23 @@ header.header {
     align-items: center;
     gap: 0.625rem;
     margin: 1.5rem 0 2rem 0;
-    padding: 0.75rem 1.25rem;
-    border: 1px solid var(--sl-color-gray-5);
-    border-radius: 0.75rem;
+    padding: 0.65rem 1.1rem;
+    border: 2px solid var(--sl-color-hairline);
+    border-radius: 0.5rem;
     background-color: var(--sl-color-gray-6);
+    box-shadow: 3px 3px 0px var(--pk-shadow);
     font-family: var(--sl-font) !important;
     font-size: 0.86rem;
-    font-weight: 500;
+    font-weight: 600;
     letter-spacing: -0.01em;
     color: var(--sl-color-gray-2);
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .hero-meta-bar a {
     color: var(--sl-color-text-accent);
-    text-decoration: none;
-    font-weight: 500;
-}
-
-.hero-meta-bar a:hover {
     text-decoration: underline;
+    text-decoration-thickness: 2px;
+    font-weight: 700;
 }
 
 /* --------------------------------------------------------------------------
@@ -717,44 +773,45 @@ header.header {
 
 .sidebar-content summary {
     font-family: var(--sl-font) !important;
-    font-weight: 700 !important;
+    font-weight: 750 !important;
     letter-spacing: -0.015em !important;
     color: var(--sl-color-white) !important;
 }
 
 .sidebar-content a {
     font-family: var(--sl-font) !important;
-    font-weight: 450 !important;
+    font-weight: 500 !important;
     letter-spacing: -0.008em !important;
 }
 
 .sidebar-content a[aria-current="page"] {
     background-color: var(--sl-color-accent-low) !important;
     color: var(--sl-color-text-accent) !important;
-    font-weight: 650 !important;
+    font-weight: 750 !important;
     border-radius: 0.375rem !important;
+    border-inline-start: 3px solid var(--sl-color-accent) !important;
 }
 
 starlight-toc summary {
     font-family: var(--sl-font) !important;
-    font-weight: 650 !important;
+    font-weight: 750 !important;
     letter-spacing: -0.01em !important;
 }
 
 starlight-toc a {
     font-family: var(--sl-font) !important;
     font-size: 0.84rem !important;
-    font-weight: 450 !important;
+    font-weight: 500 !important;
     line-height: 1.55 !important;
-    letter-spacing: -0.005em !important;
 }
 
 starlight-toc a[aria-current="true"] {
-    font-weight: 650 !important;
+    font-weight: 750 !important;
+    color: var(--sl-color-text-accent) !important;
 }
 
 /* --------------------------------------------------------------------------
-   CHIP NAVIGASI TOPIK (Keywords & FAQ) — Pure Vanilla CSS
+   CHIP NAVIGASI TOPIK (Keywords & FAQ) — NEOBRUTALISM
    -------------------------------------------------------------------------- */
 .pk-chip-row {
     display: flex;
@@ -763,56 +820,50 @@ starlight-toc a[aria-current="true"] {
 }
 .pk-chip {
     display: inline-block;
-    border: 1px solid var(--sl-color-hairline);
-    border-radius: 9999px;
-    padding: 0.375rem 1rem;
-    font-size: 0.875rem;
+    border: 2px solid var(--sl-color-hairline);
+    border-radius: 0.375rem;
+    box-shadow: 3px 3px 0px var(--pk-shadow);
+    padding: 0.3rem 0.85rem;
+    font-size: 0.85rem;
+    font-weight: 700;
     color: var(--sl-color-gray-2);
     text-decoration: none;
+    background: var(--sl-color-gray-6);
+    transform: translate(0, 0);
 }
+
+/* Hover: Animasi Neobrutalism seolah terbenam */
 .pk-chip:hover {
-    border-color: rgba(56, 189, 248, 0.5);
+    transform: translate(1.5px, 1.5px) !important;
+    box-shadow: 1.5px 1.5px 0px var(--pk-shadow) !important;
+    border-color: var(--sl-color-accent);
     color: var(--sl-color-white);
 }
+
+.pk-chip:active {
+    transform: translate(3px, 3px) !important;
+    box-shadow: 0px 0px 0px var(--pk-shadow) !important;
+}
+
 .pk-chip-sky {
-    border-color: rgba(56, 189, 248, 0.3);
-    background: rgba(56, 189, 248, 0.1);
+    border-color: #38bdf8;
     color: var(--sl-color-white);
-    font-weight: 500;
-}
-.pk-chip-sky:hover {
-    background: rgba(56, 189, 248, 0.2);
 }
 .pk-chip-emerald {
-    border-color: rgba(52, 211, 153, 0.3);
-    background: rgba(52, 211, 153, 0.1);
+    border-color: #34d399;
     color: var(--sl-color-white);
-    font-weight: 500;
-}
-.pk-chip-emerald:hover {
-    background: rgba(52, 211, 153, 0.2);
 }
 .pk-chip-amber {
-    border-color: rgba(251, 191, 36, 0.3);
-    background: rgba(251, 191, 36, 0.1);
+    border-color: #fbbf24;
     color: var(--sl-color-white);
-    font-weight: 500;
-}
-.pk-chip-amber:hover {
-    background: rgba(251, 191, 36, 0.2);
 }
 .pk-chip-indigo {
-    border-color: rgba(129, 140, 248, 0.3);
-    background: rgba(129, 140, 248, 0.1);
+    border-color: #818cf8;
     color: var(--sl-color-white);
-    font-weight: 500;
-}
-.pk-chip-indigo:hover {
-    background: rgba(129, 140, 248, 0.2);
 }
 
 /* --------------------------------------------------------------------------
-   STATS BAND & CTA HOMEPAGE — Pure Vanilla CSS
+   STATS BAND & CTA HOMEPAGE — NEOBRUTALISM
    -------------------------------------------------------------------------- */
 .pk-stats {
     display: grid;
@@ -821,78 +872,69 @@ starlight-toc a[aria-current="true"] {
     margin-top: 2rem;
 }
 .pk-stat {
-    border: 1px solid var(--sl-color-hairline);
-    border-radius: 1rem;
+    border: 2px solid var(--sl-color-hairline);
+    border-radius: 0.5rem;
+    box-shadow: 4px 4px 0px var(--pk-shadow);
     padding: 1.25rem;
     text-align: center;
+    background: var(--sl-color-gray-6);
+    transform: translate(0, 0);
 }
+
+/* Hover: Animasi Neobrutalism seolah terbenam */
+.pk-stat:hover {
+    transform: translate(2px, 2px);
+    box-shadow: 2px 2px 0px var(--pk-shadow);
+}
+
 .pk-stat-sky {
-    background: linear-gradient(
-        to bottom,
-        rgba(56, 189, 248, 0.15),
-        transparent
-    );
+    border-color: #38bdf8;
 }
 .pk-stat-emerald {
-    background: linear-gradient(
-        to bottom,
-        rgba(52, 211, 153, 0.15),
-        transparent
-    );
+    border-color: #34d399;
 }
 .pk-stat-amber {
-    background: linear-gradient(
-        to bottom,
-        rgba(251, 191, 36, 0.15),
-        transparent
-    );
+    border-color: #fbbf24;
 }
 .pk-stat-rose {
-    background: linear-gradient(
-        to bottom,
-        rgba(251, 113, 133, 0.15),
-        transparent
-    );
+    border-color: #f87171;
 }
 .pk-stat-value {
     margin: 0;
     font-size: 1.875rem;
-    font-weight: 800;
+    font-weight: 850;
     color: var(--sl-color-white);
 }
 .pk-stat-label {
     margin: 0.25rem 0 0;
     font-size: 0.875rem;
+    font-weight: 600;
     color: var(--sl-color-gray-3);
 }
+
 .pk-cta {
     position: relative;
     margin-top: 2.5rem;
-    overflow: hidden;
-    border: 1px solid rgba(56, 189, 248, 0.25);
-    border-radius: 1.5rem;
-    background: linear-gradient(
-        135deg,
-        rgba(56, 189, 248, 0.15),
-        transparent 55%,
-        rgba(99, 102, 241, 0.15)
-    );
+    border: 2px solid var(--sl-color-accent);
+    border-radius: 0.625rem;
+    box-shadow: 4px 4px 0px var(--sl-color-accent);
+    background: var(--sl-color-gray-6);
     padding: 2rem;
     text-align: center;
 }
 .pk-cta-title {
     margin: 0;
     font-size: 1.5rem;
-    font-weight: 800;
+    font-weight: 850;
     color: var(--sl-color-white);
 }
 .pk-cta-sub {
-    margin: 0.75rem auto 0;
+    margin: 0.5rem auto 0;
     max-width: 36rem;
     color: var(--sl-color-gray-2);
 }
 .pk-cta-actions {
-    margin-top: 1.5rem;
+    margin-top: 1.25rem;
     display: flex;
     flex-wrap: wrap;
     align-items: center;
@@ -900,30 +942,52 @@ starlight-toc a[aria-current="true"] {
     gap: 0.75rem;
 }
 .pk-btn-primary {
-    border-radius: 0.75rem;
-    background: #0ea5e9;
-    padding: 0.75rem 1.5rem;
-    font-weight: 600;
-    color: #fff;
+    border-radius: 0.5rem;
+    background: var(--sl-color-accent);
+    border: 2px solid #000;
+    box-shadow: 4px 4px 0px #000;
+    padding: 0.65rem 1.4rem;
+    font-weight: 800;
+    color: #000;
     text-decoration: none;
-    box-shadow: 0 10px 15px -3px rgba(14, 165, 233, 0.25);
+    transform: translate(0, 0);
 }
+
+/* Hover: Animasi Neobrutalism terbenam */
 .pk-btn-primary:hover {
-    background: #38bdf8;
-    color: #fff;
+    transform: translate(2px, 2px) !important;
+    box-shadow: 2px 2px 0px #000 !important;
 }
+
+.pk-btn-primary:active {
+    transform: translate(4px, 4px) !important;
+    box-shadow: 0px 0px 0px #000 !important;
+}
+
 .pk-btn-ghost {
-    border: 1px solid var(--sl-color-hairline);
-    border-radius: 0.75rem;
-    padding: 0.75rem 1.5rem;
-    font-weight: 600;
+    border: 2px solid var(--sl-color-hairline);
+    border-radius: 0.5rem;
+    box-shadow: 4px 4px 0px var(--pk-shadow);
+    padding: 0.65rem 1.4rem;
+    font-weight: 750;
     color: var(--sl-color-white);
     text-decoration: none;
+    background: var(--sl-color-gray-6);
+    transform: translate(0, 0);
 }
+
+/* Hover: Animasi Neobrutalism terbenam */
 .pk-btn-ghost:hover {
-    border-color: rgba(56, 189, 248, 0.5);
-    color: var(--sl-color-white);
+    transform: translate(2px, 2px) !important;
+    box-shadow: 2px 2px 0px var(--pk-shadow) !important;
+    border-color: var(--sl-color-accent);
 }
+
+.pk-btn-ghost:active {
+    transform: translate(4px, 4px) !important;
+    box-shadow: 0px 0px 0px var(--pk-shadow) !important;
+}
+
 @media (min-width: 64rem) {
     .pk-stats {
         grid-template-columns: repeat(4, 1fr);
@@ -931,13 +995,10 @@ starlight-toc a[aria-current="true"] {
     .pk-cta-title {
         font-size: 1.875rem;
     }
-    .pk-cta {
-        padding: 2.5rem;
-    }
 }
 
 /* --------------------------------------------------------------------------
-   STABILITAS LAYOUT HEADER, KONTEN & FOOTER
+   STABILITAS LAYOUT & STICKY FOOTER
    -------------------------------------------------------------------------- */
 .main-frame,
 .main-pane,
@@ -952,9 +1013,6 @@ starlight-toc a[aria-current="true"] {
     max-width: 100%;
 }
 
-/* Sticky footer: pastikan footer selalu berada paling bawah, bahkan pada
-   halaman pendek — dorong dengan margin otomatis dalam kolom flex setinggi
-   viewport (dikurangi tinggi header navigasi). */
 .main-pane > main {
     display: flex;
     flex-direction: column;
@@ -976,17 +1034,17 @@ starlight-toc a[aria-current="true"] {
 }
 
 /* --------------------------------------------------------------------------
-   12. PAGINATION & ARTIKEL META (PAGES NAV & LAST UPDATED)
+   12. PAGINATION & ARTIKEL META (NEOBRUTALISM SINKING NAV LINKS)
    -------------------------------------------------------------------------- */
 .meta {
     display: flex !important;
     align-items: center !important;
     justify-content: space-between !important;
     flex-wrap: wrap !important;
-    gap: 1rem !important;
-    padding-top: 1.5rem !important;
-    margin-top: 2.5rem !important;
-    border-top: 1px solid var(--sl-color-hairline) !important;
+    gap: 0.75rem !important;
+    padding-top: 1.25rem !important;
+    margin-top: 2rem !important;
+    border-top: 2px solid var(--sl-color-hairline) !important;
     font-size: 0.825rem !important;
     color: var(--sl-color-gray-3) !important;
 }
@@ -1000,7 +1058,7 @@ starlight-toc a[aria-current="true"] {
 
 .meta time {
     color: var(--sl-color-white) !important;
-    font-weight: 600 !important;
+    font-weight: 700 !important;
 }
 
 .pagination-links {
@@ -1009,28 +1067,37 @@ starlight-toc a[aria-current="true"] {
         auto-fit,
         minmax(min(100%, 15rem), 1fr)
     ) !important;
-    gap: 1rem !important;
+    gap: 0.85rem !important;
     margin-top: 0.75rem !important;
 }
 
 .pagination-links a {
     display: flex !important;
     align-items: center !important;
-    gap: 1rem !important;
-    padding: 1rem 1.25rem !important;
-    border-radius: 0.85rem !important;
-    border: 1px solid var(--sl-color-hairline) !important;
+    gap: 0.85rem !important;
+    padding: 0.85rem 1.15rem !important;
+    border-radius: 0.5rem !important;
+    border: 2px solid var(--sl-color-hairline) !important;
     background: var(--sl-color-gray-6) !important;
+    box-shadow: 4px 4px 0px var(--pk-shadow) !important;
     text-decoration: none !important;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
+    transform: translate(0, 0) !important;
     transition:
-        border-color 0.15s ease,
-        background-color 0.15s ease !important;
+        transform 120ms cubic-bezier(0.16, 1, 0.3, 1),
+        box-shadow 120ms cubic-bezier(0.16, 1, 0.3, 1),
+        border-color 120ms ease !important;
 }
 
+/* Hover: Animasi Neobrutalism seolah terbenam */
 .pagination-links a:hover {
+    transform: translate(2px, 2px) !important;
+    box-shadow: 2px 2px 0px var(--pk-shadow) !important;
     border-color: var(--sl-color-accent) !important;
-    background-color: var(--sl-color-accent-low) !important;
+}
+
+.pagination-links a:active {
+    transform: translate(4px, 4px) !important;
+    box-shadow: 0px 0px 0px var(--pk-shadow) !important;
 }
 
 .pagination-links a[rel="next"] {
@@ -1041,10 +1108,10 @@ starlight-toc a[aria-current="true"] {
 .pagination-links .link-title {
     display: block !important;
     font-size: 0.95rem !important;
-    font-weight: 700 !important;
+    font-weight: 800 !important;
     color: var(--sl-color-white) !important;
     letter-spacing: -0.015em !important;
-    margin-top: 0.15rem !important;
+    margin-top: 0.1rem !important;
 }
 
 .pagination-links a:hover .link-title {
@@ -1053,19 +1120,14 @@ starlight-toc a[aria-current="true"] {
 
 .pagination-links svg {
     flex-shrink: 0 !important;
-    color: var(--sl-color-gray-4) !important;
-    transition: color 0.15s ease !important;
-}
-
-.pagination-links a:hover svg {
     color: var(--sl-color-accent) !important;
 }
 
 /* --------------------------------------------------------------------------
-   13. AKSESIBILITAS & SCROLLBAR HALUS
+   13. AKSESIBILITAS & SCROLLBAR
    -------------------------------------------------------------------------- */
 :focus-visible {
-    outline: 2px solid var(--sl-color-accent) !important;
+    outline: 3px solid var(--sl-color-accent) !important;
     outline-offset: 2px !important;
 }
 
@@ -1080,7 +1142,7 @@ starlight-toc a[aria-current="true"] {
 
 ::-webkit-scrollbar-thumb {
     background: var(--sl-color-gray-5);
-    border-radius: 4px;
+    border-radius: 2px;
 }
 
 ::-webkit-scrollbar-thumb:hover {

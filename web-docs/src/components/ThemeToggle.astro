@@ -1,0 +1,181 @@
+---
+// Komponen Toggle Mode Gelap / Terang (Neobrutalism Button)
+// Menggantikan dropdown ThemeSelect standar dengan tombol toggle satu-klik.
+// Tema default adalah 'light'.
+---
+
+<div class="pk-theme-toggle-wrapper">
+    <button
+        type="button"
+        class="pk-theme-toggle"
+        aria-label="Alihkan tema gelap / terang"
+        title="Alihkan tema gelap / terang"
+    >
+        {/* Ikon Bulan: tampil saat mode terang default (klik untuk beralih ke gelap) */}
+        <svg
+            class="pk-theme-icon moon-icon"
+            width="17"
+            height="17"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+        >
+            <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path>
+        </svg>
+
+        {/* Ikon Matahari: tampil saat mode gelap (klik untuk beralih ke terang) */}
+        <svg
+            class="pk-theme-icon sun-icon"
+            width="17"
+            height="17"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+        >
+            <circle cx="12" cy="12" r="4"></circle>
+            <path d="M12 2v2"></path>
+            <path d="M12 20v2"></path>
+            <path d="m4.93 4.93 1.41 1.41"></path>
+            <path d="m17.66 17.66 1.41 1.41"></path>
+            <path d="M2 12h2"></path>
+            <path d="M20 12h2"></path>
+            <path d="m6.34 17.66-1.41 1.41"></path>
+            <path d="m19.07 4.93-1.41 1.41"></path>
+        </svg>
+    </button>
+</div>
+
+<script>
+    const storageKey = "starlight-theme";
+
+    const getStoredTheme = () => {
+        if (typeof localStorage !== "undefined") {
+            return localStorage.getItem(storageKey);
+        }
+        return null;
+    };
+
+    const getCurrentTheme = () => {
+        return document.documentElement.dataset.theme === "dark"
+            ? "dark"
+            : "light";
+    };
+
+    const applyTheme = (theme: "dark" | "light") => {
+        document.documentElement.dataset.theme = theme;
+        if (typeof localStorage !== "undefined") {
+            localStorage.setItem(storageKey, theme);
+        }
+        // Update picker jika StarlightThemeProvider tersedia secara global
+        // @ts-ignore
+        if (
+            typeof StarlightThemeProvider !== "undefined" &&
+            StarlightThemeProvider.updatePickers
+        ) {
+            // @ts-ignore
+            StarlightThemeProvider.updatePickers(theme);
+        }
+    };
+
+    const setupThemeToggles = () => {
+        const toggleButtons =
+            document.querySelectorAll<HTMLButtonElement>(".pk-theme-toggle");
+        toggleButtons.forEach((btn) => {
+            btn.onclick = () => {
+                const current = getCurrentTheme();
+                const next = current === "light" ? "dark" : "light";
+                applyTheme(next);
+            };
+        });
+    };
+
+    // Jalankan inisialisasi saat load dan navigasi Astro prefetch
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", setupThemeToggles);
+    } else {
+        setupThemeToggles();
+    }
+    document.addEventListener("astro:page-load", setupThemeToggles);
+</script>
+
+<style>
+    .pk-theme-toggle-wrapper {
+        display: inline-flex;
+        align-items: center;
+    }
+
+    .pk-theme-toggle {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 2.15rem;
+        height: 2.15rem;
+        padding: 0;
+        border-radius: 0.375rem;
+        border: 2px solid var(--sl-color-hairline);
+        background: #ffffff;
+        box-shadow: 3px 3px 0px var(--pk-shadow);
+        color: #0f172a;
+        cursor: pointer;
+        transform: translate(0, 0);
+        transition:
+            transform 120ms cubic-bezier(0.16, 1, 0.3, 1),
+            box-shadow 120ms cubic-bezier(0.16, 1, 0.3, 1),
+            border-color 120ms ease,
+            color 120ms ease,
+            background-color 120ms ease !important;
+    }
+
+    /* Hover: Animasi Neobrutalism seolah terbenam (sink-in) ke dalam bayangan */
+    .pk-theme-toggle:hover {
+        transform: translate(2px, 2px) !important;
+        box-shadow: 1px 1px 0px var(--pk-shadow) !important;
+        border-color: var(--sl-color-accent);
+        color: var(--sl-color-accent);
+    }
+
+    /* Active: Terbenam penuh (bottomed out) saat diklik */
+    .pk-theme-toggle:active {
+        transform: translate(3px, 3px) !important;
+        box-shadow: 0px 0px 0px var(--pk-shadow) !important;
+    }
+
+    .pk-theme-icon {
+        flex-shrink: 0;
+        pointer-events: none;
+    }
+
+    /* Saat Default (Light Mode): tampilkan Moon icon (biru/slate pekat), sembunyikan Sun */
+    .moon-icon {
+        display: block;
+        color: #0284c7;
+    }
+
+    .sun-icon {
+        display: none;
+        color: #fbbf24;
+    }
+
+    /* Saat Dark Mode: tampilkan Sun icon (kuning/emas aksen), sembunyikan Moon */
+    :global(:root[data-theme="dark"]) .moon-icon {
+        display: none !important;
+    }
+
+    :global(:root[data-theme="dark"]) .sun-icon {
+        display: block !important;
+    }
+
+    :global(:root[data-theme="dark"]) .pk-theme-toggle {
+        background: var(--sl-color-gray-6);
+        color: var(--sl-color-white);
+        border-color: var(--sl-color-hairline);
+    }
+</style>
