@@ -328,7 +328,7 @@ class SecurityInstallCommand extends Command
             $doc('security-modules/server-security-and-webshells'),
         ];
         $steps[] = [
-            $this->t('Uji cepat: buka satu URL normal (harus 200) lalu simulasi probe aman (harus 403 + tercatat):', 'Quick test: open a normal URL (expect 200) then simulate a safe probe (expect 403 + logged):'),
+            $this->t('Uji cepat (dari IP yang TIDAK di-whitelist — localhost bawaan dikecualikan via PASAK_IP_WHITELIST):', 'Quick test (from a NON-whitelisted IP — localhost is excluded by default via PASAK_IP_WHITELIST):'),
             'curl -I https://domain-anda.test/                                  # 200',
             "curl -I 'https://domain-anda.test/?q=%7B%7B7*7%7D%7D'               # 403",
             $doc('core-architecture/threat-detection-engine'),
@@ -648,8 +648,19 @@ class SecurityInstallCommand extends Command
             }
         }
 
-        File::put($userPath, (string) $content);
+        File::put($userPath, $this->normalizeHostPhpFile((string) $content));
         $this->info("  ✓ Trait HasSecurityRelations berhasil disematkan ke model User ({$userPath}).");
+    }
+
+    /**
+     * Normalisasi berkas PHP host: maksimal satu baris kosong antar blok
+     * dan tepat satu newline di EOF (ramah Pint).
+     */
+    protected function normalizeHostPhpFile(string $content): string
+    {
+        $content = (string) preg_replace("/\n{3,}/", "\n\n", $content);
+
+        return rtrim($content)."\n";
     }
 
     /**
@@ -690,7 +701,7 @@ class SecurityInstallCommand extends Command
                     $content = substr_replace($content, "\n".$snippet, $matchEnd, 0);
                 }
 
-                File::put($bootstrapAppPath, $content);
+                File::put($bootstrapAppPath, $this->normalizeHostPhpFile($content));
                 $this->info('  ✓ Middleware WAF berhasil didaftarkan di bootstrap/app.php.');
 
                 return;
@@ -716,7 +727,7 @@ class SecurityInstallCommand extends Command
             if (preg_match('/protected\s+\$middleware\s*=\s*\[/i', $content, $matches, PREG_OFFSET_CAPTURE)) {
                 $pos = $matches[0][1] + strlen($matches[0][0]);
                 $content = substr_replace($content, "\n".$middlewareSnippet, $pos, 0);
-                File::put($kernelPath, $content);
+                File::put($kernelPath, $this->normalizeHostPhpFile($content));
                 $this->info('  ✓ Middleware WAF berhasil didaftarkan di app/Http/Kernel.php.');
 
                 return;
@@ -796,7 +807,7 @@ PHP
                         $insertPos,
                         0
                     );
-                    File::put($bootstrapAppPath, $bootstrapContent);
+                    File::put($bootstrapAppPath, $this->normalizeHostPhpFile($bootstrapContent));
                     $this->info('  ✓ Konfigurasi rute API didaftarkan ke bootstrap/app.php.');
                 }
             }

@@ -133,7 +133,7 @@ class PasakUninstallCommand extends Command
             $cleaned = str_replace($requireLines, '', $cleaned);
 
             if ($cleaned !== $content) {
-                File::put($path, $cleaned);
+                File::put($path, $this->normalizePhpFile($cleaned));
                 $this->info("  ✓ Referensi Pasak di {$relative} dibersihkan.");
             }
         }
@@ -176,7 +176,7 @@ class PasakUninstallCommand extends Command
             );
 
             if ($content !== null && $content !== File::get($path)) {
-                File::put($path, $content);
+                File::put($path, $this->normalizePhpFile($content));
                 $this->info('  ✓ Middleware Pasak dihapus dari '.basename((string) $path).'.');
             }
         }
@@ -191,6 +191,17 @@ class PasakUninstallCommand extends Command
         }
 
         return false;
+    }
+
+    /**
+     * Normalisasi akhir berkas PHP host: maksimal satu baris kosong
+     * antar blok dan tepat satu newline di EOF (ramah Pint).
+     */
+    protected function normalizePhpFile(string $content): string
+    {
+        $content = (string) preg_replace("/\n{3,}/", "\n\n", $content);
+
+        return rtrim($content)."\n";
     }
 
     /**
@@ -238,7 +249,7 @@ class PasakUninstallCommand extends Command
             );
 
             if ($content !== $original) {
-                File::put($path, $content);
+                File::put($path, $this->normalizePhpFile($content));
                 $this->info('  ✓ Trait HasSecurityRelations dilepas dari model User.');
             }
         }
@@ -292,7 +303,7 @@ class PasakUninstallCommand extends Command
             }
 
             $cleaned = preg_replace("/\n{3,}/", "\n\n", implode("\n", $kept));
-            File::put($path, $cleaned ?? implode("\n", $kept));
+            File::put($path, rtrim($cleaned ?? implode("\n", $kept))."\n");
             $this->info("  ✓ Variabel PASAK_* dihapus dari {$envFile}.");
         }
     }

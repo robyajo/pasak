@@ -292,6 +292,25 @@ else
 fi
 echo ""
 
+# 0c. Selaraskan konstanta VERSION paket dengan tag yang akan dibuat,
+#     agar VersionCheckService tidak pernah melaporkan versi basi.
+PENDING_TAG=""
+if [ "$TAG_NAME" != "auto" ] && [ -n "$TAG_NAME" ]; then
+    PENDING_TAG="$TAG_NAME"
+elif [ "$BUMP_TYPE" != "none" ]; then
+    PENDING_TAG="$RECOMMENDED_TAG"
+fi
+if [ -n "$PENDING_TAG" ] && [ -f "src/Services/PasakService.php" ]; then
+    PENDING_VERSION="${PENDING_TAG#v}"
+    if grep -q "public const VERSION = '${PENDING_VERSION}';" src/Services/PasakService.php 2>/dev/null; then
+        print_info "Konstanta VERSION sudah selaras (${PENDING_VERSION})."
+    else
+        sed -i '' "s/public const VERSION = '[^']*';/public const VERSION = '${PENDING_VERSION}';/" src/Services/PasakService.php 2>/dev/null \
+        || sed -i "s/public const VERSION = '[^']*';/public const VERSION = '${PENDING_VERSION}';/" src/Services/PasakService.php
+        print_success "Konstanta VERSION diselaraskan ke ${PENDING_VERSION}."
+    fi
+fi
+
 # 1. Periksa Status Perubahan File
 STATUS_OUTPUT=$(git status --porcelain)
 

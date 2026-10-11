@@ -5,6 +5,7 @@
         "paparan",
         "documents",
         "DOCS",
-        "stubs"
+        "stubs",
+        "laravel-test"
     ]
 }
