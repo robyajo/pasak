@@ -241,7 +241,7 @@ Panel dapat diakses pada `/security`.
 
 > ℹ️ Halaman di-render **server-side** oleh controller Inertia bawaan paket (`Internal\Pasak\Http\Controllers\Dashboard\*`). Mutasi (blokir IP, hapus log, approve tiket) dikirim sebagai permintaan Inertia biasa, sehingga **tidak** memerlukan token API terpisah dan tidak bergantung pada REST API `/api/security/*`.
 
-> 🔒 **Wajib Login**: Rute dashboard memakai middleware `web` + `auth`, dan secara bawaan juga `security.admin` (Gate `manage-security-monitor`). Untuk mengizinkan semua pengguna yang sudah login (tanpa syarat admin), kosongkan `security.dashboard.admin_middleware` pada `config/pasak.php`.
+> 🔒 **Wajib Login**: Rute dashboard memakai middleware `web` + `auth`, dan secara bawaan juga `pasak.admin` (Gate `manage-pasak`). Untuk mengizinkan semua pengguna yang sudah login (tanpa syarat admin), kosongkan `pasak.dashboard.admin_middleware` pada `config/pasak.php`.
 
 ### Desain Sistem Pure Vanilla CSS (Zero External UI Dependencies)
 

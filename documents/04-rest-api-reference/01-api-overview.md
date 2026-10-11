@@ -73,13 +73,13 @@ Endpoint API dibagi menjadi 3 tingkat akses:
 | :--------------------------- | :------------------------ | :------------------------------------------------------------------------- |
 | **Publik (Public)**          | `api`                     | Dapat diakses oleh siapa saja tanpa autentikasi (Pengajuan Tiket Banding). |
 | **Pengguna (Authenticated)** | `auth`                    | Memerlukan login pengguna sah (misal menyimpan IP terpercaya sendiri).     |
-| **Administrator (Admin)**    | `auth` + `security.admin` | Hanya dapat diakses oleh user berwewenang administrator.                   |
+| **Administrator (Admin)**    | `auth` + `pasak.admin` | Hanya dapat diakses oleh user berwewenang administrator.                   |
 
 ### Evaluasi Hak Akses Administrator (`EnsureSecurityAdmin`)
 
 Middleware `EnsureSecurityAdmin` mengevaluasi hak akses dengan urutan sebagai berikut:
 
-1. Memeriksa Gate Laravel: `Gate::allows('manage-security-monitor')`.
+1. Memeriksa Gate Laravel: `Gate::allows('manage-pasak')`.
 2. Jika gate belum didefinisikan secara kustom, memeriksa metode `$user->isAdmin()`.
 3. Memeriksa apakah kolom peran `$user->role` bernilai `'admin'` atau `'superadmin'`.
 4. Memeriksa apakah kolom boolean `$user->is_admin === true`.

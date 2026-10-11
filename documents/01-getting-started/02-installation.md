@@ -232,9 +232,9 @@ Paket menyediakan 4 middleware terisolasi:
 
 | Alias               | Kelas Middleware                                                 | Peran                                                                                                       |
 | :------------------ | :--------------------------------------------------------------- | :---------------------------------------------------------------------------------------------------------- |
-| `security.block`    | `Internal\Pasak\Http\Middleware\BlockIpAddress`        | Menolak request dari IP/perangkat yang sedang terblokir aktif (HTTP 403).                                   |
-| `security.detect`   | `Internal\Pasak\Http\Middleware\DetectSecurityThreats` | Menginspeksi payload request terhadap tanda-tanda serangan siber dan mengaktifkan auto-block/instant block. |
-| `security.admin`    | `Internal\Pasak\Http\Middleware\EnsureSecurityAdmin`   | Memastikan hanya user dengan wewenang admin yang dapat mengakses REST API admin.                            |
+| `pasak.block`    | `Internal\Pasak\Http\Middleware\BlockIpAddress`        | Menolak request dari IP/perangkat yang sedang terblokir aktif (HTTP 403).                                   |
+| `pasak.detect`   | `Internal\Pasak\Http\Middleware\DetectSecurityThreats` | Menginspeksi payload request terhadap tanda-tanda serangan siber dan mengaktifkan auto-block/instant block. |
+| `pasak.admin`    | `Internal\Pasak\Http\Middleware\EnsureSecurityAdmin`   | Memastikan hanya user dengan wewenang admin yang dapat mengakses REST API admin.                            |
 | `security.activity` | `Internal\Pasak\Http\Middleware\TrackUserActivity`     | Memperbarui heartbeat aktivitas login pengguna di database (ter-throttle 45 detik).                         |
 
 ### Pendaftaran pada Laravel 11 / 12 / 13 (`bootstrap/app.php`)
@@ -319,8 +319,8 @@ Panel tersedia di `/security` dan berisi enam modul: **Overview**, **Security Lo
 
 ### Keamanan & Kontrol Akses
 
-- Rute hanya didaftarkan ketika `security.dashboard.enabled=true` **dan** stack frontend yang sesuai (`driver`) terpasang (Livewire atau Inertia).
-- Seluruh rute memakai middleware `web` + `auth` (wajib login) dan, secara bawaan, `security.admin` (Gate `manage-security-monitor`).
+- Rute hanya didaftarkan ketika `pasak.dashboard.enabled=true` **dan** stack frontend yang sesuai (`driver`) terpasang (Livewire atau Inertia).
+- Seluruh rute memakai middleware `web` + `auth` (wajib login) dan, secara bawaan, `pasak.admin` (Gate `manage-pasak`).
 - Kustomisasi melalui `config/pasak.php`:
     ```php
     'dashboard' => [

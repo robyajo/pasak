@@ -1,6 +1,6 @@
 # 04. Endpoint Administrator REST API
 
-Seluruh endpoint pada dokumen ini dilindungi oleh middleware ganda: **`auth`** (pengguna harus login) dan **`security.admin`** (`EnsureSecurityAdmin`).
+Seluruh endpoint pada dokumen ini dilindungi oleh middleware ganda: **`auth`** (pengguna harus login) dan **`pasak.admin`** (`EnsureSecurityAdmin`).
 
 ---
 
