@@ -169,6 +169,13 @@ test('published route variants expose only their own detail routes', function ()
         ->and($reactVariant)->not->toContain('Route::livewire');
 });
 
+test('livewire overview converts attacker models to arrays without warnings', function () {
+    $stub = File::get(__DIR__.'/../../stubs/livewire/pages/pasak/overview.blade.php');
+
+    expect($stub)->toContain('->toArray()')
+        ->and($stub)->not->toContain('=> (array) $row');
+});
+
 test('dashboard layouts ship the dark mode toggle and detail styles', function () {
     $bladeLayout = File::get(__DIR__.'/../../stubs/blade/pages/pasak/layout.blade.php');
     $livewireLayout = File::get(__DIR__.'/../../stubs/livewire/pages/pasak/layout.blade.php');

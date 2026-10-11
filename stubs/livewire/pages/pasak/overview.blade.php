@@ -37,7 +37,7 @@ new #[Title('Security Overview')] class extends Component {
         $this->levels = $security->levelBreakdown();
         $this->trend = $security->attackTrend($this->range);
         $this->attackers = $security->topAttackers(5)
-            ->map(fn ($row) => (array) $row)
+            ->map(fn ($row) => $row instanceof \Illuminate\Database\Eloquent\Model ? $row->toArray() : (array) $row)
             ->all();
     }
 
