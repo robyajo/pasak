@@ -9,7 +9,8 @@
 #   - Versi direkomendasi: kenaikan otomatis (major/minor/patch) dihitung dari
 #                          commit & perubahan yang belum di-tag
 #
-# Gunakan "-t auto" untuk langsung memakai versi rekomendasi sebagai tag rilis.
+# Gunakan "-t <tag>" untuk memakai tag rilis tertentu, atau "--no-tag"
+# untuk melewatkan pembuatan tag. Tanpa -t, versi rekomendasi dipakai otomatis.
 # ==============================================================================
 
 set -e
@@ -167,7 +168,9 @@ show_help() {
     echo -e "${BOLD}OPSI:${NC}"
     echo -e "  -m, --message <msg>   Pesan commit git"
     echo -e "  -t, --tag <tag>       Nama tag rilis (opsional, misal: v1.0.0)"
-    echo -e "                        Gunakan 'auto' untuk memakai versi rekomendasi"
+    echo -e "                        Tanpa opsi ini, versi rekomendasi dipakai otomatis"
+    echo -e "                        sehingga setiap push selalu menaikkan versi"
+    echo -e "  --no-tag              Lewatkan pembuatan tag rilis"
     echo -e "  -b, --branch <name>   Nama branch target (default: branch aktif)"
     echo -e "  -r, --remote <name>   Nama remote git (default: origin)"
     echo -e "  -h, --help            Tampilkan bantuan ini"
@@ -176,7 +179,7 @@ show_help() {
     echo -e "  ./push.sh"
     echo -e "  ./push.sh -m \"docs: update installation guide\""
     echo -e "  ./push.sh -m \"release: launch v1.0.0\" -t \"v1.0.0\""
-    echo -e "  ./push.sh -m \"fix: patch bug\" -t auto"
+    echo -e "  ./push.sh -m \"fix: patch bug\" --no-tag"
     echo ""
     echo -e "${BOLD}CATATAN:${NC}"
     echo -e "  Pengecekan versi (sekarang vs rekomendasi) SELALU dijalankan."
@@ -186,6 +189,7 @@ show_help() {
 # Parsing Argumen
 COMMIT_MSG=""
 TAG_NAME=""
+NO_TAG=0
 REMOTE_NAME="origin"
 TARGET_BRANCH=""
 
@@ -198,6 +202,10 @@ while [[ $# -gt 0 ]]; do
         -t|--tag)
             TAG_NAME="$2"
             shift 2
+            ;;
+        --no-tag)
+            NO_TAG=1
+            shift
             ;;
         -b|--branch)
             TARGET_BRANCH="$2"
@@ -283,79 +291,45 @@ print_info "Mendorong commit ke ${REMOTE_NAME}/${TARGET_BRANCH}..."
 git push "$REMOTE_NAME" "$TARGET_BRANCH"
 print_success "Commit berhasil di-push ke ${REMOTE_NAME}/${TARGET_BRANCH}!"
 
-# 3. Penanganan Tag (Opsional)
+# 3. Penanganan Tag (OTOMATIS: setiap push menaikkan versi)
 echo ""
 
-# Resolusi kata kunci 'auto' menjadi versi rekomendasi.
+# Kata kunci lama 'auto' tetap didukung dan sama dengan perilaku default.
 if [ "$TAG_NAME" = "auto" ]; then
-    TAG_NAME="$RECOMMENDED_TAG"
-    print_info "Mode 'auto': memakai versi rekomendasi ${BOLD}${TAG_NAME}${NC}."
+    TAG_NAME=""
 fi
 
-if [ -z "$TAG_NAME" ]; then
-    if [ -t 0 ]; then
-        echo -ne "${BOLD}Apakah Anda ingin membuat Git Tag rilis baru sekarang? (y/N): ${NC}"
-        read -r WANT_TAG
-        if [[ "$WANT_TAG" =~ ^[yY]([eE][sS])?$ ]]; then
-            echo -ne "${BOLD}Masukkan nama tag${NC} (contoh: v1.0.0) [default: ${RECOMMENDED_TAG}]: "
-            read -r INPUT_TAG
-            if [ -n "$INPUT_TAG" ]; then
-                TAG_NAME="$INPUT_TAG"
-            else
-                TAG_NAME="$RECOMMENDED_TAG"
-            fi
-        fi
-    fi
-fi
-
-if [ -n "$TAG_NAME" ]; then
-    # Peringatan bila tag sama dengan versi sekarang (tidak menaikkan versi)
-    if [ -n "$CURRENT_TAG" ] && [ "$TAG_NAME" = "$CURRENT_TAG" ]; then
-        print_warning "Tag '${TAG_NAME}' sama dengan tag terakhir. Naikkan versi (rekomendasi: ${RECOMMENDED_TAG})."
-    fi
-
-    # Validasi apakah tag sudah pernah ada sebelumnya
-    if git rev-parse "$TAG_NAME" >/dev/null 2>&1; then
-        print_warning "Tag '${TAG_NAME}' sudah ada di repositori lokal."
-        OVERWRITE_TAG="n"
-        if [ -t 0 ]; then
-            echo -ne "Apakah Anda ingin menimpa (force update) tag ini? (y/N): "
-            read -r OVERWRITE_TAG
-        fi
-        if [[ "$OVERWRITE_TAG" =~ ^[yY]([eE][sS])?$ ]]; then
-            git tag -d "$TAG_NAME" > /dev/null 2>&1 || true
-            git push "$REMOTE_NAME" --delete "$TAG_NAME" > /dev/null 2>&1 || true
-            git tag -a "$TAG_NAME" -m "Release $TAG_NAME"
-            print_info "Mendorong tag baru ke remote..."
-            git push "$REMOTE_NAME" "$TAG_NAME"
-            print_success "Tag '${TAG_NAME}' berhasil diperbarui dan di-push!"
-        else
-            print_info "Pembuatan tag dibatalkan."
-        fi
+if [ "$NO_TAG" -eq 1 ]; then
+    print_info "Melewatkan pembuatan tag (--no-tag)."
+elif [ -z "$TAG_NAME" ]; then
+    if [ "$BUMP_TYPE" = "none" ]; then
+        print_info "Tidak ada perubahan baru sejak ${CURRENT_TAG:-v0.0.0}; tag versi tidak dibuat."
     else
-        TAG_COMMENT=""
-        if [ -t 0 ]; then
-            echo -ne "${BOLD}Masukkan keterangan rilis untuk tag ${TAG_NAME}${NC} (default: 'Release ${TAG_NAME}'): "
-            read -r TAG_COMMENT
-        fi
-        if [ -z "$TAG_COMMENT" ]; then
-            TAG_COMMENT="Release $TAG_NAME"
-        fi
-
-        print_info "Membuat annotated tag: ${TAG_NAME}..."
-        git tag -a "$TAG_NAME" -m "$TAG_COMMENT"
-
-        print_info "Mendorong tag ${TAG_NAME} ke ${REMOTE_NAME}..."
-        git push "$REMOTE_NAME" "$TAG_NAME"
-        print_success "Tag '${TAG_NAME}' berhasil dibuat dan di-push ke ${REMOTE_NAME}!"
-
-        echo ""
-        print_info "🚀 Paket versi ${TAG_NAME} kini siap dideteksi secara otomatis oleh Packagist!"
-        echo -e "   Periksa katalog rilis di: ${BLUE}https://packagist.org/packages/robyajo/pasak${NC}"
+        TAG_NAME="$RECOMMENDED_TAG"
+        print_info "Otomatis menaikkan versi: ${BOLD}${GREEN}${TAG_NAME}${NC} (${BUMP_TYPE} bump)."
     fi
-else
-    print_info "Melewatkan pembuatan tag (tidak ada tag yang ditentukan)."
-    echo -e "   ${BOLD}Rekomendasi tag:${NC} ${GREEN}${RECOMMENDED_TAG}${NC} — jalankan: ./push.sh -t auto"
+fi
+
+if [ -n "$TAG_NAME" ] && [ "$NO_TAG" -eq 0 ]; then
+    # Jika tag sudah dipakai (lokal maupun remote), naikkan patch
+    # terus sampai menemukan nomor versi yang bebas.
+    while git rev-parse "$TAG_NAME" >/dev/null 2>&1 \
+        || git ls-remote --tags "$REMOTE_NAME" "refs/tags/${TAG_NAME}" 2>/dev/null | grep -q .; do
+        print_warning "Tag '${TAG_NAME}' sudah ada; menaikkan patch..."
+        RECOMMENDED_VERSION=$(bump_version "${TAG_NAME#v}" "patch")
+        TAG_NAME="v${RECOMMENDED_VERSION}"
+    done
+
+    print_info "Membuat annotated tag: ${TAG_NAME}..."
+    git tag -a "$TAG_NAME" -m "Release $TAG_NAME"
+
+    print_info "Mendorong tag ${TAG_NAME} ke ${REMOTE_NAME}..."
+    git push "$REMOTE_NAME" "$TAG_NAME"
+    print_success "Tag '${TAG_NAME}' berhasil dibuat dan di-push ke ${REMOTE_NAME}!"
+
+    echo ""
+    print_info "🚀 Paket versi ${TAG_NAME} kini siap dideteksi secara otomatis oleh Packagist!"
+    echo -e "   Periksa katalog rilis di: ${BLUE}https://packagist.org/packages/robyajo/pasak${NC}"
 fi
 
 echo ""
