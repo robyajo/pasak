@@ -6,4 +6,4 @@ composer.lock
 *.log
 
 # Situs dokumentasi (repo terpisah: robyajo/web-laravel-security)
-/web
+/laravel-test
