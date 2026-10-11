@@ -81,8 +81,8 @@ flowchart TD
         Inspect -->|Tidak Ada Ancaman / Lolos| AppController[Controller Aplikasi Host]
     end
 
-    Ret403 --> Appeal[Form Tiket Banding<br/>/api/security/unblock-tickets/submit]
-    Appeal --> Admin[Admin Review & Unblock API<br/>/api/security/unblock-tickets/{id}/respond]
+    Ret403 --> Appeal[Form Tiket Banding<br/>/api/pasak/unblock-tickets/submit]
+    Appeal --> Admin[Admin Review & Unblock API<br/>/api/pasak/unblock-tickets/{id}/respond]
     Admin -->|Disetujui| LiftBlock[Buka Blokir Otomatis]
 ```
 

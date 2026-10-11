@@ -86,7 +86,7 @@ export const AppealTicketModal: React.FC<{
 
         try {
             const res = await axios.post(
-                "/api/security/unblock-tickets/submit",
+                "/api/pasak/unblock-tickets/submit",
                 {
                     ...form,
                     reason: `[Ref: ${data.reference_id}] ${form.reason}`,

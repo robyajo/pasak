@@ -37,10 +37,10 @@ Sama seperti paket Spatie terpopuler, paket ini menyatu secara elegan ke dalam t
 graph TD
     Composer[composer require robyajo/pasak] --> Discovery[1. Laravel Package Auto-Discovery<br/>PasakServiceProvider + Facade]
 
-    Discovery --> Hook1[2. Core Eloquent: HasSecurityRelations Trait<br/>User::logins(), User::trustedIps()]
+    Discovery --> Hook1["2. Core Eloquent: HasSecurityRelations Trait<br/>User::logins(), User::trustedIps()"]
     Discovery --> Hook2[3. Core Auth Events: Event::listen<br/>Failed & Login Events Otomatis Diawasi]
     Discovery --> Hook3[4. Core HTTP Kernel: Middleware Aliases<br/>pasak.block, pasak.detect, pasak.admin]
-    Discovery --> Hook4[5. Core Authorization: Gate<br/>Gate::define('manage-pasak')]
+    Discovery --> Hook4["5. Core Authorization: Gate<br/>Gate::define('manage-pasak')"]
     Discovery --> Hook5[6. Core Artisan CLI: Console Commands<br/>pasak:install, pasak:scan-logs, dll]
     Discovery --> Hook6[7. Core Scheduler: Schedule Runner<br/>Prune log harian & liveness heartbeat]
     Discovery --> Hook7[8. Core Validation: ValidationRule<br/>SafeImageFile, SafeAssetPath]

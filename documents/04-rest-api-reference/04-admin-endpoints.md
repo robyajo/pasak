@@ -180,11 +180,11 @@ Mengambil data log terpaginasi lengkap dengan rincian statistik, level breakdown
 
 ### A. Daftar Tiket Banding
 - **Metode**: `GET`
-- **URI**: `/api/security/unblock-tickets?status=pending`
+- **URI**: `/api/pasak/unblock-tickets?status=pending`
 
 ### B. Tanggapi Tiket (Approve / Reject)
 - **Metode**: `POST`
-- **URI**: `/api/security/unblock-tickets/{id}/respond`
+- **URI**: `/api/pasak/unblock-tickets/{id}/respond`
 - **Body JSON**:
   ```json
   {
@@ -196,4 +196,4 @@ Mengambil data log terpaginasi lengkap dengan rincian statistik, level breakdown
 
 ### C. Hapus Arsip Tiket
 - **Metode**: `DELETE`
-- **URI**: `/api/security/unblock-tickets/{id}`
+- **URI**: `/api/pasak/unblock-tickets/{id}`

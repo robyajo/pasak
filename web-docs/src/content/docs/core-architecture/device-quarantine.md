@@ -87,4 +87,4 @@ graph TD
 
 Ketika seorang pengguna yang terisolasi mengajukan tiket permohonan buka blokir, tiket tersebut secara otomatis mencatat `device_id` dan `local_ip` miliknya. 
 
-Saat administrator menyetujui tiket melalui REST API `/api/security/unblock-tickets/{id}/respond`, fungsi `PasakService::unblockIp($ip, $deviceId)` hanya akan mencabut status blokir milik perangkat tersebut, menjaga status keamanan perangkat lain jika ada.
+Saat administrator menyetujui tiket melalui REST API `/api/pasak/unblock-tickets/{id}/respond`, fungsi `PasakService::unblockIp($ip, $deviceId)` hanya akan mencabut status blokir milik perangkat tersebut, menjaga status keamanan perangkat lain jika ada.

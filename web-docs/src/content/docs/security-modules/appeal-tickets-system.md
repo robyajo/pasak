@@ -23,14 +23,14 @@ sequenceDiagram
 
     User->>WAF: Mengakses Aplikasi
     WAF-->>User: HTTP 403 (Menyertakan Reference ID & Link Banding)
-    User->>API: POST /api/security/unblock-tickets/submit (Nama, Email, Alasan)
+    User->>API: POST /api/pasak/unblock-tickets/submit (Nama, Email, Alasan)
     API-->>User: HTTP 201 (Nomor Tiket: TKT-XXXXXXXX)
     Note over User,API: Rate-limit: 1 tiket per IP per 30 menit
-    User->>API: GET /api/security/unblock-tickets/check/TKT-XXXXXXXX
+    User->>API: GET /api/pasak/unblock-tickets/check/TKT-XXXXXXXX
     API-->>User: Status: "pending"
-    Admin->>API: POST /api/security/unblock-tickets/{id}/respond (Action: approve)
+    Admin->>API: POST /api/pasak/unblock-tickets/{id}/respond (Action: approve)
     API->>WAF: Panggil unblockIp(ip, device_id)
-    User->>API: GET /api/security/unblock-tickets/check/TKT-XXXXXXXX
+    User->>API: GET /api/pasak/unblock-tickets/check/TKT-XXXXXXXX
     API-->>User: Status: "approved"
     User->>WAF: Mengakses Aplikasi Kembali (Sukses 200 OK)
 ```
@@ -55,9 +55,9 @@ Untuk mencegah formulir banding dijadikan sasaran spam atau DoS oleh bot penyera
 Administrator dapat mengelola tiket melalui panel admin atau API REST:
 
 1. **Melihat Antrean Tiket**:
-   `GET /api/security/unblock-tickets?status=pending`
+   `GET /api/pasak/unblock-tickets?status=pending`
 2. **Menyetujui Permohonan (Approve)**:
-   `POST /api/security/unblock-tickets/{id}/respond` dengan body:
+   `POST /api/pasak/unblock-tickets/{id}/respond` dengan body:
    ```json
    {
        "action": "approve",

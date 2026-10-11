@@ -9,7 +9,7 @@ Endpoint berikut dapat diakses oleh publik tanpa memerlukan token autentikasi. E
 Memungkinkan klien yang terblokir mengajukan permohonan banding kepada administrator.
 
 - **Metode**: `POST`
-- **URI**: `/api/security/unblock-tickets/submit`
+- **URI**: `/api/pasak/unblock-tickets/submit`
 - **Headers**:
     - `Content-Type: application/json`
     - `Accept: application/json`
@@ -68,14 +68,14 @@ Memungkinkan klien yang terblokir mengajukan permohonan banding kepada administr
 Melihat status permohonan banding menggunakan nomor tiket unik.
 
 - **Metode**: `GET`
-- **URI**: `/api/security/unblock-tickets/check/{ticketNumber}`
+- **URI**: `/api/pasak/unblock-tickets/check/{ticketNumber}`
 - **Headers**:
     - `Accept: application/json`
 
 ### Contoh Request:
 
 ```bash
-curl -X GET "https://domain-anda.com/api/security/unblock-tickets/check/TKT-AB82C71E"
+curl -X GET "https://domain-anda.com/api/pasak/unblock-tickets/check/TKT-AB82C71E"
 ```
 
 ### Contoh Respons Berhasil (HTTP 200):
