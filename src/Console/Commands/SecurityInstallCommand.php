@@ -722,7 +722,7 @@ PHP
         if (File::exists($webRouteFile)) {
             $webContent = File::get($webRouteFile);
             if (! str_contains($webContent, 'security.php')) {
-                File::append($webRouteFile, "\nrequire __DIR__.'/security.php';\n");
+                File::append($webRouteFile, "\nrequire __DIR__.'/pasak.php';\n");
                 $this->info('  ✓ Berkas routes/web.php menyertakan routes/pasak.php.');
             }
         }
@@ -732,7 +732,7 @@ PHP
         if (File::exists($apiRouteFile)) {
             $apiContent = File::get($apiRouteFile);
             if (! str_contains($apiContent, 'security-api.php')) {
-                File::append($apiRouteFile, "\nrequire __DIR__.'/security-api.php';\n");
+                File::append($apiRouteFile, "\nrequire __DIR__.'/pasak-api.php';\n");
                 $this->info('  ✓ Berkas routes/api.php menyertakan routes/pasak-api.php.');
             }
         }

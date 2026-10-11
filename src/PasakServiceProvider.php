@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Inertia\Inertia;
 use Internal\Pasak\Console\Commands\PruneSecurityLogs;
+use Internal\Pasak\Console\Commands\PasakUninstallCommand;
 use Internal\Pasak\Console\Commands\PurgeInjectedData;
 use Internal\Pasak\Console\Commands\SecurityBaselineCommand;
 use Internal\Pasak\Console\Commands\SecurityInstallCommand;
@@ -333,6 +334,7 @@ class PasakServiceProvider extends ServiceProvider
 
         $this->commands([
             SecurityInstallCommand::class,
+            PasakUninstallCommand::class,
             SecurityUpgradeCommand::class,
             PruneSecurityLogs::class,
             UnblockIpAddress::class,
