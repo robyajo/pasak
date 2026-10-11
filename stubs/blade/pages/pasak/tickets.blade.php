@@ -56,6 +56,7 @@
                             </span>
                         </td>
                         <td style="text-align: right; white-space: nowrap;">
+                            <a href="{{ route('pasak.dashboard.tickets.show', $ticket->id) }}" class="sec-btn sec-btn-ghost sec-btn-sm">{{ __('Detail') }}</a>
                             @if ($ticket->status === 'pending')
                                 <form method="POST" action="{{ route('pasak.dashboard.tickets.respond', $ticket->id) }}" style="display: inline;">
                                     @csrf

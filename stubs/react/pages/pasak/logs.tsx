@@ -1,4 +1,4 @@
-import { Head, router } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 import { useState } from 'react';
 import '@/components/pasak/pasak.css';
 import { Pagination } from '@/components/pasak/pagination';
@@ -29,7 +29,7 @@ type LogsProps = {
     levels: string[];
     eventTypes: string[];
     filters: { search: string; level: string; event_type: string };
-    urls: { index: string; clear: string; destroy: string };
+    urls: { index: string; show: string; clear: string; destroy: string };
 };
 
 const levelLabels: Record<string, string> = {
@@ -206,6 +206,13 @@ export default function SecurityLogs({
                                             {new Date(log.created_at).toLocaleString()}
                                         </td>
                                         <td style={{ textAlign: 'right', whiteSpace: 'nowrap' }}>
+                                            <Link
+                                                href={urls.show.replace('__ID__', String(log.id))}
+                                                className="sec-btn sec-btn-ghost sec-btn-sm"
+                                                style={{ marginRight: '6px' }}
+                                            >
+                                                Detail
+                                            </Link>
                                             <Button
                                                 size="sm"
                                                 variant="ghost"

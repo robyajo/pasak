@@ -262,6 +262,13 @@ new #[Title('Blocked IPs')] class extends Component {
                                     {{ number_format((int) $block->hit_count) }}
                                 </td>
                                 <td style="text-align: right; white-space: nowrap;">
+                                    <a
+                                        href="{{ route('pasak.dashboard.blocked-ips.show', $block->id) }}"
+                                        class="sec-btn sec-btn-ghost sec-btn-sm"
+                                        wire:navigate
+                                    >
+                                        {{ __('Detail') }}
+                                    </a>
                                     <button
                                         type="button"
                                         class="sec-btn sec-btn-ghost sec-btn-sm"

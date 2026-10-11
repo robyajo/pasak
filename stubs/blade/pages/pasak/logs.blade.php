@@ -58,8 +58,9 @@
                         <td><span class="sec-badge {{ $DV::levelClass($log->threat_level) }}">{{ $DV::levelLabel($log->threat_level) }}</span></td>
                         <td class="sec-font-mono" style="font-size: 12px; max-width: 260px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="{{ $log->path }}">{{ $log->path }}</td>
                         <td>{{ $log->was_blocked ? __('Yes') : __('No') }}</td>
-                        <td style="text-align: right;">
-                            <form method="POST" action="{{ route('pasak.dashboard.logs.destroy', $log->id) }}" onsubmit="return confirm({{ json_encode(__('Delete this log entry?')) }})">
+                        <td style="text-align: right; white-space: nowrap;">
+                            <a href="{{ route('pasak.dashboard.logs.show', $log->id) }}" class="sec-btn sec-btn-ghost sec-btn-sm">{{ __('Detail') }}</a>
+                            <form method="POST" action="{{ route('pasak.dashboard.logs.destroy', $log->id) }}" onsubmit="return confirm({{ json_encode(__('Delete this log entry?')) }})" style="display: inline;">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="sec-btn sec-btn-ghost sec-btn-sm">🗑️</button>

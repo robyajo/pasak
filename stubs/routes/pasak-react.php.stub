@@ -25,9 +25,11 @@ Route::middleware(array_merge($middleware, $adminMiddleware))
         // Rute controller Inertia + React (render komponen di resources/js/pages/pasak)
         Route::get('/', \Internal\Pasak\Http\Controllers\Dashboard\OverviewController::class)->name('overview');
         Route::get('logs', [\Internal\Pasak\Http\Controllers\Dashboard\LogController::class, 'index'])->name('logs');
+        Route::get('logs/{id}', [\Internal\Pasak\Http\Controllers\Dashboard\LogController::class, 'show'])->whereNumber('id')->name('logs.show');
         Route::delete('logs', [\Internal\Pasak\Http\Controllers\Dashboard\LogController::class, 'clear'])->name('logs.clear');
         Route::delete('logs/{id}', [\Internal\Pasak\Http\Controllers\Dashboard\LogController::class, 'destroy'])->whereNumber('id')->name('logs.destroy');
         Route::get('blocked-ips', [\Internal\Pasak\Http\Controllers\Dashboard\BlockedIpController::class, 'index'])->name('blocked-ips');
+        Route::get('blocked-ips/{id}', [\Internal\Pasak\Http\Controllers\Dashboard\BlockedIpController::class, 'show'])->whereNumber('id')->name('blocked-ips.show');
         Route::post('blocked-ips', [\Internal\Pasak\Http\Controllers\Dashboard\BlockedIpController::class, 'store'])->name('blocked-ips.store');
         Route::patch('blocked-ips/{id}/toggle', [\Internal\Pasak\Http\Controllers\Dashboard\BlockedIpController::class, 'toggle'])->whereNumber('id')->name('blocked-ips.toggle');
         Route::delete('blocked-ips/{id}', [\Internal\Pasak\Http\Controllers\Dashboard\BlockedIpController::class, 'destroy'])->whereNumber('id')->name('blocked-ips.destroy');
@@ -42,6 +44,7 @@ Route::middleware(array_merge($middleware, $adminMiddleware))
         Route::delete('trusted-ips/{id}', [\Internal\Pasak\Http\Controllers\Dashboard\SessionController::class, 'destroyTrusted'])->whereNumber('id')->name('trusted-ips.destroy');
         Route::post('trusted-ips/my-ip', [\Internal\Pasak\Http\Controllers\Dashboard\SessionController::class, 'storeMyIp'])->name('trusted-ips.store-my-ip');
         Route::get('tickets', [\Internal\Pasak\Http\Controllers\Dashboard\TicketController::class, 'index'])->name('tickets');
+        Route::get('tickets/{id}', [\Internal\Pasak\Http\Controllers\Dashboard\TicketController::class, 'show'])->whereNumber('id')->name('tickets.show');
         Route::post('tickets/{id}/respond', [\Internal\Pasak\Http\Controllers\Dashboard\TicketController::class, 'respond'])->whereNumber('id')->name('tickets.respond');
         Route::delete('tickets/{id}', [\Internal\Pasak\Http\Controllers\Dashboard\TicketController::class, 'destroy'])->whereNumber('id')->name('tickets.destroy');
         Route::get('settings', [\Internal\Pasak\Http\Controllers\Dashboard\SettingController::class, 'index'])->name('settings');

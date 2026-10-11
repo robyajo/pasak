@@ -10,6 +10,8 @@ use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
 use Internal\Pasak\Models\BlockedIp;
+use Internal\Pasak\Models\IpUnblockRequest;
+use Internal\Pasak\Models\SecurityLog;
 use Internal\Pasak\Services\PasakService;
 
 /**
@@ -60,9 +62,45 @@ class BlockedIpController extends Controller
                 ],
                 'urls' => [
                     'index' => route('pasak.dashboard.blocked-ips'),
+                    'show' => route('pasak.dashboard.blocked-ips.show', ['id' => '__ID__']),
                     'store' => route('pasak.dashboard.blocked-ips.store'),
                     'toggle' => route('pasak.dashboard.blocked-ips.toggle', ['id' => '__ID__']),
                     'destroy' => route('pasak.dashboard.blocked-ips.destroy', ['id' => '__ID__']),
+                ],
+            ]
+        );
+    }
+
+    public function show(int $id): View|Response
+    {
+        $block = BlockedIp::query()->find($id);
+
+        if (! $block) {
+            abort(404);
+        }
+
+        return $this->dashboardResponse(
+            'pages.pasak.blocked-ip-detail',
+            'pasak/blocked-ip-detail',
+            [
+                'block' => $block,
+                'relatedLogs' => SecurityLog::query()
+                    ->where('ip_address', $block->ip_address)
+                    ->latest('id')
+                    ->limit(20)
+                    ->get(),
+                'relatedTickets' => IpUnblockRequest::query()
+                    ->where('ip_address', $block->ip_address)
+                    ->latest('id')
+                    ->limit(10)
+                    ->get(),
+                'urls' => [
+                    'index' => route('pasak.dashboard.blocked-ips'),
+                    'show' => route('pasak.dashboard.blocked-ips.show', ['id' => '__ID__']),
+                    'logShow' => route('pasak.dashboard.logs.show', ['id' => '__ID__']),
+                    'ticketShow' => route('pasak.dashboard.tickets.show', ['id' => '__ID__']),
+                    'toggle' => route('pasak.dashboard.blocked-ips.toggle', ['id' => $block->getKey()]),
+                    'destroy' => route('pasak.dashboard.blocked-ips.destroy', ['id' => $block->getKey()]),
                 ],
             ]
         );

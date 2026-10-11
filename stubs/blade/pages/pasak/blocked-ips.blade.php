@@ -88,6 +88,7 @@
                             </span>
                         </td>
                         <td style="text-align: right; white-space: nowrap;">
+                            <a href="{{ route('pasak.dashboard.blocked-ips.show', $block->id) }}" class="sec-btn sec-btn-ghost sec-btn-sm">{{ __('Detail') }}</a>
                             <form method="POST" action="{{ route('pasak.dashboard.blocked-ips.toggle', $block->id) }}" style="display: inline;">
                                 @csrf
                                 @method('PATCH')

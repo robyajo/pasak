@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Inertia\Inertia;
 use Inertia\Response;
+use Internal\Pasak\Models\BlockedIp;
 use Internal\Pasak\Models\SecurityLog;
 
 /**
@@ -62,6 +63,7 @@ class LogController extends Controller
                 ],
                 'urls' => [
                     'index' => route('pasak.dashboard.logs'),
+                    'show' => route('pasak.dashboard.logs.show', ['id' => '__ID__']),
                     'clear' => route('pasak.dashboard.logs.clear'),
                     'destroy' => route('pasak.dashboard.logs.destroy', ['id' => '__ID__']),
                 ],
@@ -78,6 +80,39 @@ class LogController extends Controller
             'type' => 'success',
             'message' => __(':count log entries cleared.', ['count' => $count]),
         ]);
+    }
+
+    public function show(int $id): View|Response
+    {
+        $log = SecurityLog::query()->find($id);
+
+        if (! $log) {
+            abort(404);
+        }
+
+        return $this->dashboardResponse(
+            'pages.pasak.log-detail',
+            'pasak/log-detail',
+            [
+                'log' => $log,
+                'relatedLogs' => SecurityLog::query()
+                    ->where('ip_address', $log->ip_address)
+                    ->whereKeyNot($log->getKey())
+                    ->latest('id')
+                    ->limit(10)
+                    ->get(),
+                'block' => BlockedIp::query()
+                    ->where('ip_address', $log->ip_address)
+                    ->latest('id')
+                    ->first(),
+                'urls' => [
+                    'index' => route('pasak.dashboard.logs'),
+                    'show' => route('pasak.dashboard.logs.show', ['id' => '__ID__']),
+                    'blockShow' => route('pasak.dashboard.blocked-ips.show', ['id' => '__ID__']),
+                    'destroy' => route('pasak.dashboard.logs.destroy', ['id' => $log->getKey()]),
+                ],
+            ]
+        );
     }
 
     public function destroy(int $id): RedirectResponse

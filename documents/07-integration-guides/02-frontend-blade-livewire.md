@@ -92,10 +92,13 @@ Perintah tersebut menyalin berkas berikut ke aplikasi Anda:
 | :----------------------------------------------------- | :---------------------------------------------------------- |
 | `resources/views/pages/pasak/overview.blade.php`    | Statistik, tren serangan, dan top attacker.                 |
 | `resources/views/pages/pasak/logs.blade.php`        | Tabel log keamanan dengan filter dan aksi bersihkan/hapus.  |
+| `resources/views/pages/pasak/log-detail.blade.php`  | Detail satu entri log: evidence, konteks request, dan log terkait. |
 | `resources/views/pages/pasak/blocked-ips.blade.php` | Manajemen karantina IP (blokir manual, toggle, unblock).    |
+| `resources/views/pages/pasak/blocked-ip-detail.blade.php` | Detail satu blokir: alasan, log pemicu, dan tiket banding terkait. |
 | `resources/views/pages/pasak/server.blade.php`      | Audit integritas, pemindai webshell, baseline, dan lockout. |
 | `resources/views/pages/pasak/sessions.blade.php`    | Sesi pengguna aktif, riwayat login, dan IP terpercaya.      |
 | `resources/views/pages/pasak/tickets.blade.php`     | Review tiket banding (approve/reject + auto-unblock).       |
+| `resources/views/pages/pasak/ticket-detail.blade.php` | Detail satu tiket: alasan pemohon, blokir terkait, dan formulir respon. |
 | `resources/views/pages/pasak/layout.blade.php`      | Sub-layout navigasi antar modul keamanan.                   |
 
 Setelah dipublikasikan, aktifkan dashboard melalui `.env`:
@@ -114,7 +117,7 @@ Panel dapat diakses pada `/security`. Halaman-halaman tersebut merupakan **singl
 Stubs Livewire dibangun menggunakan **Pure Vanilla CSS**:
 - **Tidak mewajibkan Livewire Flux UI** ataupun UI kit eksternal lainnya.
 - Menanamkan CSS custom properties terisolasi (`--sec-*`) di dalam sub-layout (`layout.blade.php`) sehingga konsisten, ringan, dan kompatibel dengan tata letak apa pun.
-- Dilengkapi dukungan **Dark Mode** otomatis via media query `@media (prefers-color-scheme: dark)` dan kelas `.dark`.
+- Dilengkapi dukungan **Dark Mode** otomatis via media query `@media (prefers-color-scheme: dark)` dan kelas `.dark`, plus tombol toggle manual (Auto → Terang → Gelap) yang tersimpan di `localStorage`.
 - Sepenuhnya **responsif** dengan tabel scroll horizontal di layar sempit/mobile serta grid fleksibel.
 
 ### Menambahkan Tautan di Sidebar Starter Kit

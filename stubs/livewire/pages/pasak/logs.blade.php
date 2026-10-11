@@ -190,6 +190,13 @@ new #[Title('Security Logs')] class extends Component {
                                     {{ $log->created_at?->diffForHumans() }}
                                 </td>
                                 <td style="text-align: right; white-space: nowrap;">
+                                    <a
+                                        href="{{ route('pasak.dashboard.logs.show', $log->id) }}"
+                                        class="sec-btn sec-btn-ghost sec-btn-sm"
+                                        wire:navigate
+                                    >
+                                        {{ __('Detail') }}
+                                    </a>
                                     <button
                                         type="button"
                                         class="sec-btn sec-btn-ghost sec-btn-sm"

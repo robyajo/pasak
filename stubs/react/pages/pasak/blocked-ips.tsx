@@ -1,4 +1,4 @@
-import { Head, router, useForm } from '@inertiajs/react';
+import { Head, Link, router, useForm } from '@inertiajs/react';
 import { useState } from 'react';
 import '@/components/pasak/pasak.css';
 import { Pagination } from '@/components/pasak/pagination';
@@ -27,6 +27,7 @@ type BlockedIpsProps = {
     filters: { search: string; status: string };
     urls: {
         index: string;
+        show: string;
         store: string;
         toggle: string;
         destroy: string;
@@ -325,6 +326,13 @@ export default function BlockedIps({
                                                 {block.hit_count}
                                             </td>
                                             <td style={{ textAlign: 'right', whiteSpace: 'nowrap' }}>
+                                                <Link
+                                                    href={urls.show.replace('__ID__', String(block.id))}
+                                                    className="sec-btn sec-btn-ghost sec-btn-sm"
+                                                    style={{ marginRight: '6px' }}
+                                                >
+                                                    Detail
+                                                </Link>
                                                 <Button
                                                     size="sm"
                                                     variant="ghost"

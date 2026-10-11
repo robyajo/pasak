@@ -33,11 +33,13 @@ Route::middleware(array_merge($middleware, $adminMiddleware))
 
         // Security logs
         Route::get('logs', [LogController::class, 'index'])->name('logs');
+        Route::get('logs/{id}', [LogController::class, 'show'])->whereNumber('id')->name('logs.show');
         Route::delete('logs', [LogController::class, 'clear'])->name('logs.clear');
         Route::delete('logs/{id}', [LogController::class, 'destroy'])->whereNumber('id')->name('logs.destroy');
 
         // Blocked IPs
         Route::get('blocked-ips', [BlockedIpController::class, 'index'])->name('blocked-ips');
+        Route::get('blocked-ips/{id}', [BlockedIpController::class, 'show'])->whereNumber('id')->name('blocked-ips.show');
         Route::post('blocked-ips', [BlockedIpController::class, 'store'])->name('blocked-ips.store');
         Route::patch('blocked-ips/{id}/toggle', [BlockedIpController::class, 'toggle'])->whereNumber('id')->name('blocked-ips.toggle');
         Route::delete('blocked-ips/{id}', [BlockedIpController::class, 'destroy'])->whereNumber('id')->name('blocked-ips.destroy');
@@ -58,6 +60,7 @@ Route::middleware(array_merge($middleware, $adminMiddleware))
 
         // Unblock appeal tickets
         Route::get('tickets', [TicketController::class, 'index'])->name('tickets');
+        Route::get('tickets/{id}', [TicketController::class, 'show'])->whereNumber('id')->name('tickets.show');
         Route::post('tickets/{id}/respond', [TicketController::class, 'respond'])->whereNumber('id')->name('tickets.respond');
         Route::delete('tickets/{id}', [TicketController::class, 'destroy'])->whereNumber('id')->name('tickets.destroy');
 

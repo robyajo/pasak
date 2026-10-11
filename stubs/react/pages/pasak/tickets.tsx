@@ -1,4 +1,4 @@
-import { Head, router } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 import { useState } from 'react';
 import '@/components/pasak/pasak.css';
 import { Pagination } from '@/components/pasak/pagination';
@@ -25,7 +25,7 @@ type TicketsProps = {
     tickets: Paginator<Ticket>;
     stats: { pending: number; approved: number; rejected: number };
     filters: { search: string; status: string };
-    urls: { index: string; respond: string; destroy: string };
+    urls: { index: string; show: string; respond: string; destroy: string };
 };
 
 function statusBadgeVariant(status: string): 'critical' | 'high' | 'success' | 'low' {
@@ -214,6 +214,13 @@ export default function UnblockAppeals({
                                             {new Date(ticket.created_at).toLocaleString()}
                                         </td>
                                         <td style={{ textAlign: 'right', whiteSpace: 'nowrap' }}>
+                                            <Link
+                                                href={urls.show.replace('__ID__', String(ticket.id))}
+                                                className="sec-btn sec-btn-ghost sec-btn-sm"
+                                                style={{ marginRight: '6px' }}
+                                            >
+                                                Detail
+                                            </Link>
                                             {ticket.status === 'pending' ? (
                                                 <div style={{ display: 'inline-flex', gap: '6px' }}>
                                                     <Button

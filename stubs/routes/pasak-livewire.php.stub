@@ -25,9 +25,12 @@ Route::middleware(array_merge($middleware, $adminMiddleware))
         // Rute Livewire Single-File Pages (render view di resources/views/pages/pasak)
         Route::livewire('/', 'pages::pasak.overview')->name('overview');
         Route::livewire('logs', 'pages::pasak.logs')->name('logs');
+        Route::livewire('logs/{id}', 'pages::pasak.log-detail')->name('logs.show');
         Route::livewire('blocked-ips', 'pages::pasak.blocked-ips')->name('blocked-ips');
+        Route::livewire('blocked-ips/{id}', 'pages::pasak.blocked-ip-detail')->name('blocked-ips.show');
         Route::livewire('server', 'pages::pasak.server')->name('server');
         Route::livewire('sessions', 'pages::pasak.sessions')->name('sessions');
         Route::livewire('tickets', 'pages::pasak.tickets')->name('tickets');
+        Route::livewire('tickets/{id}', 'pages::pasak.ticket-detail')->name('tickets.show');
         Route::livewire('settings', 'pages::pasak.settings')->name('settings');
     });

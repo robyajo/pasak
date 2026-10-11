@@ -30,9 +30,11 @@ Route::middleware(array_merge($middleware, $adminMiddleware))
     ->group(function () {
         Route::get('/', OverviewController::class)->name('overview');
         Route::get('logs', [LogController::class, 'index'])->name('logs');
+        Route::get('logs/{id}', [LogController::class, 'show'])->whereNumber('id')->name('logs.show');
         Route::delete('logs', [LogController::class, 'clear'])->name('logs.clear');
         Route::delete('logs/{id}', [LogController::class, 'destroy'])->whereNumber('id')->name('logs.destroy');
         Route::get('blocked-ips', [BlockedIpController::class, 'index'])->name('blocked-ips');
+        Route::get('blocked-ips/{id}', [BlockedIpController::class, 'show'])->whereNumber('id')->name('blocked-ips.show');
         Route::post('blocked-ips', [BlockedIpController::class, 'store'])->name('blocked-ips.store');
         Route::patch('blocked-ips/{id}/toggle', [BlockedIpController::class, 'toggle'])->whereNumber('id')->name('blocked-ips.toggle');
         Route::delete('blocked-ips/{id}', [BlockedIpController::class, 'destroy'])->whereNumber('id')->name('blocked-ips.destroy');
@@ -47,6 +49,7 @@ Route::middleware(array_merge($middleware, $adminMiddleware))
         Route::delete('trusted-ips/{id}', [SessionController::class, 'destroyTrusted'])->whereNumber('id')->name('trusted-ips.destroy');
         Route::post('trusted-ips/my-ip', [SessionController::class, 'storeMyIp'])->name('trusted-ips.store-my-ip');
         Route::get('tickets', [TicketController::class, 'index'])->name('tickets');
+        Route::get('tickets/{id}', [TicketController::class, 'show'])->whereNumber('id')->name('tickets.show');
         Route::post('tickets/{id}/respond', [TicketController::class, 'respond'])->whereNumber('id')->name('tickets.respond');
         Route::delete('tickets/{id}', [TicketController::class, 'destroy'])->whereNumber('id')->name('tickets.destroy');
         Route::get('settings', [SettingController::class, 'index'])->name('settings');

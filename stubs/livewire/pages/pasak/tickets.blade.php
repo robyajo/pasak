@@ -208,6 +208,13 @@ new #[Title('Unblock Appeals')] class extends Component {
                                     {{ $ticket->created_at?->diffForHumans() }}
                                 </td>
                                 <td style="text-align: right; white-space: nowrap;">
+                                    <a
+                                        href="{{ route('pasak.dashboard.tickets.show', $ticket->id) }}"
+                                        class="sec-btn sec-btn-ghost sec-btn-sm"
+                                        wire:navigate
+                                    >
+                                        {{ __('Detail') }}
+                                    </a>
                                     @if ($ticket->isPending())
                                         <button
                                             type="button"

@@ -1,4 +1,5 @@
 import { Link, usePage } from '@inertiajs/react';
+import { useEffect, useState } from 'react';
 
 function NavIcon({ paths }: { paths: string }) {
     return (
@@ -68,7 +69,7 @@ export function SecurityNav({ base }: { base?: string }) {
             {items.map((item) => {
                 const href =
                     item.path === '' ? resolvedBase : `${resolvedBase}/${item.path}`;
-                const active = current === href;
+                const active = current === href || current.startsWith(`${href}/`);
 
                 return (
                     <Link
@@ -82,6 +83,79 @@ export function SecurityNav({ base }: { base?: string }) {
                     </Link>
                 );
             })}
+            <ThemeToggle />
         </nav>
+    );
+}
+
+type ThemeMode = 'auto' | 'light' | 'dark';
+
+function storedTheme(): ThemeMode {
+    try {
+        const saved = window.localStorage.getItem('pasak-theme');
+        return saved === 'light' || saved === 'dark' ? saved : 'auto';
+    } catch {
+        return 'auto';
+    }
+}
+
+function isDarkMode(mode: ThemeMode): boolean {
+    if (mode === 'dark') {
+        return true;
+    }
+    if (mode === 'light') {
+        return false;
+    }
+    return window.matchMedia('(prefers-color-scheme: dark)').matches;
+}
+
+export function ThemeToggle() {
+    const [mode, setMode] = useState<ThemeMode>('auto');
+
+    useEffect(() => {
+        setMode(storedTheme());
+        const media = window.matchMedia('(prefers-color-scheme: dark)');
+        const onChange = () => setMode((m) => (m === 'auto' ? 'auto' : m));
+        media.addEventListener('change', onChange);
+        return () => media.removeEventListener('change', onChange);
+    }, []);
+
+    useEffect(() => {
+        const root = document.documentElement;
+        if (mode === 'auto') {
+            root.removeAttribute('data-theme');
+        } else {
+            root.setAttribute('data-theme', mode);
+        }
+    }, [mode]);
+
+    const dark = isDarkMode(mode);
+    const cycle = () => {
+        const order: ThemeMode[] = ['auto', 'light', 'dark'];
+        const next = order[(order.indexOf(mode) + 1) % order.length];
+        try {
+            window.localStorage.setItem('pasak-theme', next);
+        } catch {
+            /* abaikan */
+        }
+        setMode(next);
+    };
+
+    return (
+        <button
+            type="button"
+            onClick={cycle}
+            className="sec-btn sec-btn-secondary sec-btn-sm"
+            style={{ marginLeft: 'auto' }}
+            aria-label="Toggle dark mode"
+            title={mode === 'auto' ? 'Auto' : mode === 'dark' ? 'Dark' : 'Light'}
+        >
+            {dark ? (
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+            ) : (
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+            )}
+            <span>{mode === 'auto' ? 'Auto' : mode === 'dark' ? 'Dark' : 'Light'}</span>
+        </button>
     );
 }

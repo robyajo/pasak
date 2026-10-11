@@ -1,0 +1,196 @@
+<?php
+
+use Illuminate\Contracts\View\View;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Route;
+use Internal\Pasak\Http\Controllers\Dashboard\BlockedIpController;
+use Internal\Pasak\Http\Controllers\Dashboard\LogController;
+use Internal\Pasak\Http\Controllers\Dashboard\TicketController;
+use Internal\Pasak\Models\BlockedIp;
+use Internal\Pasak\Models\IpUnblockRequest;
+use Internal\Pasak\Models\SecurityLog;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+
+function publishBladeDashboard(): string
+{
+    $target = resource_path('views/pages/pasak');
+    if (! File::isDirectory($target)) {
+        File::copyDirectory(
+            dirname(__DIR__, 2).'/stubs/blade/pages/pasak',
+            $target
+        );
+    }
+
+    return $target;
+}
+
+function registerDashboardDummyRoutes(): void
+{
+    foreach ([
+        'overview', 'logs', 'logs.show', 'logs.clear', 'logs.destroy',
+        'blocked-ips', 'blocked-ips.show', 'blocked-ips.store', 'blocked-ips.toggle', 'blocked-ips.destroy',
+        'server', 'sessions', 'tickets', 'tickets.show', 'tickets.respond', 'tickets.destroy', 'settings',
+    ] as $name) {
+        Route::get('/__pasak_detail_'.$name, fn () => 'ok')->name('pasak.dashboard.'.$name);
+    }
+}
+
+beforeEach(function () {
+    config()->set('pasak.dashboard.driver', 'blade');
+    publishBladeDashboard();
+    registerDashboardDummyRoutes();
+});
+
+afterEach(function () {
+    File::deleteDirectory(resource_path('views/pages/pasak'));
+});
+
+test('log detail renders evidence, context, and dark mode toggle', function () {
+    $log = SecurityLog::create([
+        'ip_address' => '203.0.113.10',
+        'event_type' => 'sql_injection',
+        'threat_level' => 'critical',
+        'method' => 'GET',
+        'path' => '/search?q=1',
+        'full_url' => 'https://app.test/search?q=1',
+        'rule_label' => 'SQLi payload',
+        'evidence' => "' OR '1'='1",
+        'user_agent' => 'EvilBot/1.0',
+        'was_blocked' => true,
+    ]);
+
+    $response = app(LogController::class)->show($log->id);
+
+    expect($response)->toBeInstanceOf(View::class)
+        ->and($response->getName())->toBe('pages.pasak.log-detail');
+
+    $html = $response->render();
+
+    expect($html)->toContain('Log entry #')
+        ->and($html)->toContain(htmlspecialchars("' OR '1'='1", ENT_QUOTES))
+        ->and($html)->toContain('EvilBot/1.0')
+        ->and($html)->toContain('Back to logs')
+        ->and($html)->toContain('data-sec-theme-toggle')
+        ->and($html)->toContain('pasak-theme');
+});
+
+test('log detail aborts with 404 for missing entries', function () {
+    expect(fn () => app(LogController::class)->show(999999))
+        ->toThrow(NotFoundHttpException::class);
+});
+
+test('blocked ip detail renders reason, related logs, and actions', function () {
+    $block = BlockedIp::create([
+        'ip_address' => '198.51.100.77',
+        'reason' => 'Brute force login',
+        'notes' => 'Repeated attempts',
+        'is_active' => true,
+    ]);
+    SecurityLog::create([
+        'ip_address' => '198.51.100.77',
+        'event_type' => 'login_throttle',
+        'threat_level' => 'high',
+        'path' => '/login',
+    ]);
+
+    $response = app(BlockedIpController::class)->show($block->id);
+
+    expect($response)->toBeInstanceOf(View::class)
+        ->and($response->getName())->toBe('pages.pasak.blocked-ip-detail');
+
+    $html = $response->render();
+
+    expect($html)->toContain('Brute force login')
+        ->and($html)->toContain('Repeated attempts')
+        ->and($html)->toContain('Triggering logs')
+        ->and($html)->toContain('Disable block');
+});
+
+test('blocked ip detail aborts with 404 for missing entries', function () {
+    expect(fn () => app(BlockedIpController::class)->show(999999))
+        ->toThrow(NotFoundHttpException::class);
+});
+
+test('ticket detail renders pending appeal with respond form', function () {
+    $ticket = IpUnblockRequest::create([
+        'ticket_number' => 'TKT-D1',
+        'ip_address' => '203.0.113.20',
+        'name' => 'Jane',
+        'email' => 'jane@example.com',
+        'reason' => 'Please unblock my office IP.',
+        'status' => 'pending',
+    ]);
+
+    $response = app(TicketController::class)->show($ticket->id);
+
+    expect($response)->toBeInstanceOf(View::class)
+        ->and($response->getName())->toBe('pages.pasak.ticket-detail');
+
+    $html = $response->render();
+
+    expect($html)->toContain('TKT-D1')
+        ->and($html)->toContain('Please unblock my office IP.')
+        ->and($html)->toContain('Approve &amp; unblock')
+        ->and($html)->toContain('name="action" value="approve"')
+        ->and($html)->toContain('name="action" value="reject"');
+});
+
+test('ticket detail aborts with 404 for missing entries', function () {
+    expect(fn () => app(TicketController::class)->show(999999))
+        ->toThrow(NotFoundHttpException::class);
+});
+
+test('internal dashboard route files expose the detail routes', function () {
+    $blade = File::get(__DIR__.'/../../routes/pasak-dashboard-blade.php');
+    $react = File::get(__DIR__.'/../../routes/pasak-dashboard-react.php');
+    $livewire = File::get(__DIR__.'/../../routes/pasak-dashboard.php');
+
+    expect($blade)->toContain("->name('logs.show')")
+        ->and($blade)->toContain("->name('blocked-ips.show')")
+        ->and($blade)->toContain("->name('tickets.show')")
+        ->and($react)->toContain("->name('logs.show')")
+        ->and($react)->toContain("->name('blocked-ips.show')")
+        ->and($react)->toContain("->name('tickets.show')")
+        ->and($livewire)->toContain("'pages::pasak.log-detail'")
+        ->and($livewire)->toContain("'pages::pasak.blocked-ip-detail'")
+        ->and($livewire)->toContain("'pages::pasak.ticket-detail'");
+});
+
+test('published route variants expose only their own detail routes', function () {
+    $bladeVariant = File::get(__DIR__.'/../../stubs/routes/pasak-blade.php.stub');
+    $livewireVariant = File::get(__DIR__.'/../../stubs/routes/pasak-livewire.php.stub');
+    $reactVariant = File::get(__DIR__.'/../../stubs/routes/pasak-react.php.stub');
+
+    expect($bladeVariant)->toContain("->name('logs.show')")
+        ->and($bladeVariant)->not->toContain('Route::livewire')
+        ->and($livewireVariant)->toContain("'pages::pasak.log-detail'")
+        ->and($livewireVariant)->not->toContain('OverviewController::class')
+        ->and($reactVariant)->toContain("->name('tickets.show')")
+        ->and($reactVariant)->not->toContain('Route::livewire');
+});
+
+test('dashboard layouts ship the dark mode toggle and detail styles', function () {
+    $bladeLayout = File::get(__DIR__.'/../../stubs/blade/pages/pasak/layout.blade.php');
+    $livewireLayout = File::get(__DIR__.'/../../stubs/livewire/pages/pasak/layout.blade.php');
+    $reactCss = File::get(__DIR__.'/../../stubs/react/components/pasak/pasak.css');
+    $reactNav = File::get(__DIR__.'/../../stubs/react/components/pasak/pasak-nav.tsx');
+
+    expect($bladeLayout)->toContain('data-sec-theme-toggle')
+        ->and($bladeLayout)->toContain('sec-code-block')
+        ->and($bladeLayout)->toContain('color-scheme')
+        ->and($livewireLayout)->toContain('data-sec-theme-toggle')
+        ->and($livewireLayout)->toContain('sec-detail-grid')
+        ->and($reactCss)->toContain('.sec-detail-grid')
+        ->and($reactCss)->toContain('.sec-code-block')
+        ->and($reactNav)->toContain('ThemeToggle')
+        ->and($reactNav)->toContain('pasak-theme');
+});
+
+test('react detail pages exist for logs, blocks, and tickets', function () {
+    foreach (['log-detail.tsx', 'blocked-ip-detail.tsx', 'ticket-detail.tsx'] as $page) {
+        expect(File::exists(__DIR__.'/../../stubs/react/pages/pasak/'.$page))->toBeTrue();
+    }
+
+    expect(File::get(__DIR__.'/../../stubs/react/pages/pasak/log-detail.tsx'))->toContain('sec-code-block')
+        ->and(File::get(__DIR__.'/../../stubs/react/pages/pasak/ticket-detail.tsx'))->toContain('Approve & unblock');
+});

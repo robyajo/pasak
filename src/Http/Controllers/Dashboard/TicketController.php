@@ -9,6 +9,7 @@ use Illuminate\Routing\Controller;
 use Inertia\Inertia;
 use Inertia\Response;
 use Internal\Pasak\Models\IpUnblockRequest;
+use Internal\Pasak\Models\SecurityLog;
 use Internal\Pasak\Services\PasakService;
 
 /**
@@ -54,8 +55,39 @@ class TicketController extends Controller
                 ],
                 'urls' => [
                     'index' => route('pasak.dashboard.tickets'),
+                    'show' => route('pasak.dashboard.tickets.show', ['id' => '__ID__']),
                     'respond' => route('pasak.dashboard.tickets.respond', ['id' => '__ID__']),
                     'destroy' => route('pasak.dashboard.tickets.destroy', ['id' => '__ID__']),
+                ],
+            ]
+        );
+    }
+
+    public function show(int $id): View|Response
+    {
+        $ticket = IpUnblockRequest::query()->find($id);
+
+        if (! $ticket) {
+            abort(404);
+        }
+
+        return $this->dashboardResponse(
+            'pages.pasak.ticket-detail',
+            'pasak/ticket-detail',
+            [
+                'ticket' => $ticket->loadMissing(['blockedIp', 'resolver']),
+                'relatedLogs' => SecurityLog::query()
+                    ->where('ip_address', $ticket->ip_address)
+                    ->latest('id')
+                    ->limit(10)
+                    ->get(),
+                'urls' => [
+                    'index' => route('pasak.dashboard.tickets'),
+                    'show' => route('pasak.dashboard.tickets.show', ['id' => '__ID__']),
+                    'logShow' => route('pasak.dashboard.logs.show', ['id' => '__ID__']),
+                    'blockShow' => route('pasak.dashboard.blocked-ips.show', ['id' => '__ID__']),
+                    'respond' => route('pasak.dashboard.tickets.respond', ['id' => $ticket->getKey()]),
+                    'destroy' => route('pasak.dashboard.tickets.destroy', ['id' => $ticket->getKey()]),
                 ],
             ]
         );
