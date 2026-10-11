@@ -126,7 +126,7 @@ Menyediakan aturan validasi form Laravel murni:
 1. **Headless Only (Pure REST API)**:
    Tidak ada template HTML/CSS bawaan yang dipaksakan. Seluruh respon dikembalikan dalam JSON REST API murni atau fallback view Blade standar jika diinginkan.
 2. **Loose Coupling & Decoupled Models**:
-   Nama tabel dan model `User` 100% dinamis melalui `config/security.php`.
+   Nama tabel dan model `User` 100% dinamis melalui `config/pasak.php`.
 3. **Kekebalan Mutlak ReDoS (ReDoS Immunity)**:
    Pola regex linear yang lolos uji beban 100KB+ adversarial string dengan eksekusi sub-milidetik.
 4. **Isolasi Perangkat Granular (Device-Level Quarantine)**:

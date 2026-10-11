@@ -75,7 +75,7 @@ All notable changes to `robyajo/pasak` will be documented in this file.
 ### Added
 
 - **Interactive Security Settings Page & Dynamic Configuration (Livewire, React, & REST API)**:
-  - Added dedicated Security Settings dashboard page accessible via `/security/settings` in both Livewire (`pages/security/settings.blade.php`) and React (`pages/security/settings.tsx`).
+  - Added dedicated Security Settings dashboard page accessible via `/security/settings` in both Livewire (`pages/pasak/settings.blade.php`) and React (`pages/pasak/settings.tsx`).
   - Added Settings link (⚙️) to the sidebar navigation in both Blade and React dashboard layouts.
   - Interactive radio cards allowing administrators to configure blocking scope with clear visual guidance:
     - **Isolasi Perangkat Saja (`device`)** *(Default / Rekomendasi)*: Only quarantines the offending device based on Device ID / Fingerprint / LAN IP, keeping innocent users sharing the same WiFi or NAT router completely safe.
@@ -101,7 +101,7 @@ All notable changes to `robyajo/pasak` will be documented in this file.
 - **Device-Scoped Automatic & Instant Blocking (WiFi & NAT Router Isolation)**:
   - Enforced device-level isolation for both threshold-based automatic blocking (`autoBlockIfNeeded`) and zero-tolerance instant blocking (`blockImmediately`), ensuring that only the specific attacking device is quarantined rather than blocking the entire public router IP or office/cafe WiFi network.
   - Innocent users and colleagues sharing the same NAT public IP address can continue accessing the application without being affected or receiving HTTP 403 Forbidden.
-  - Added configurable blocking scopes in `config/security.php` and `stubs/env.stub`:
+  - Added configurable blocking scopes in `config/pasak.php` and `stubs/env.stub`:
     - `SECURITY_AUTO_BLOCK_SCOPE=device` (options: `device` or `ip`, default: `device`).
     - `SECURITY_INSTANT_BLOCK_SCOPE=device` (options: `device` or `ip`, default: `device`).
   - Deterministic client device fingerprinting (`generateDeviceFingerprint()`): automatically synthesizes client identifiers (`dev_*`) from User-Agent, language, and client platform hints when custom headers (`X-Device-Id`, `X-Client-Id`) are not explicitly sent.
@@ -117,7 +117,7 @@ All notable changes to `robyajo/pasak` will be documented in this file.
   - Automatically checks and executes `php artisan install:api` during `pasak:install` if API routes are not yet initialized in Laravel 11/12/13 host applications.
   - Generates `routes/security-api.php` for headless REST API endpoints and wires it into `routes/api.php` (`require __DIR__.'/security-api.php';`).
   - Generates `routes/security.php` for web dashboard routes and wires it into `routes/web.php` (`require __DIR__.'/security.php';`).
-  - Web routes in `routes/security.php` render directly to views (`pages::security.*` / `resources/views/pages/security/*` for Livewire/Blade or Inertia controllers for React) so developers have full control to customize URL prefixes, middleware, layout wrappers, and custom pages.
+  - Web routes in `routes/security.php` render directly to views (`pages::security.*` / `resources/views/pages/pasak/*` for Livewire/Blade or Inertia controllers for React) so developers have full control to customize URL prefixes, middleware, layout wrappers, and custom pages.
   - Added `security-routes`, `security-routes-web`, and `security-routes-api` publication tags to `php artisan vendor:publish`.
   - Added `--without-routes` and `--without-api` flags to `php artisan pasak:install`.
   - Smart route loading in `PasakServiceProvider`: prioritized host route files if customized and prevents route duplication with host `routes/web.php` and `routes/api.php`.
@@ -233,7 +233,7 @@ All notable changes to `robyajo/pasak` will be documented in this file.
   server-rendered Inertia + React pages and shared components with
   `php artisan vendor:publish --tag=starterkit-react`. Backed by the new
   `Internal\Pasak\Http\Controllers\Dashboard\*` controllers, so no
-  separate API token is required. Enable with `SECURITY_DASHBOARD_DRIVER=react`.
+  separate API token is required. Enable with `PASAK_DASHBOARD_DRIVER=react`.
 - `--with-dashboard` and `--with-react-dashboard` options on
   `php artisan pasak:install`.
 - `documents/generate.php`: regenerates the `documents/index.html` portal
@@ -242,7 +242,7 @@ All notable changes to `robyajo/pasak` will be documented in this file.
 ### Changed
 
 - The `dashboard` configuration block gained a `driver` option
-  (`livewire` | `react`) and the new `SECURITY_DASHBOARD_DRIVER` environment
+  (`livewire` | `react`) and the new `PASAK_DASHBOARD_DRIVER` environment
   variable. Both starter-kit dashboards share the same route prefix and
   authorization middleware.
 - The documentation portal `documents/index.html` now uses the Tailwind CSS
@@ -253,8 +253,8 @@ All notable changes to `robyajo/pasak` will be documented in this file.
 
 - Documented the Livewire and React dashboards in the README, the installation
   guide, and the frontend integration guides, including the new `.env`
-  variables (`SECURITY_DASHBOARD_ENABLED`, `SECURITY_DASHBOARD_DRIVER`,
-  `SECURITY_DASHBOARD_PREFIX`).
+  variables (`PASAK_DASHBOARD_ENABLED`, `PASAK_DASHBOARD_DRIVER`,
+  `PASAK_DASHBOARD_PREFIX`).
 
 ## [1.0.12] - 2026-10-02
 

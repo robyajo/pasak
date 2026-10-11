@@ -52,7 +52,7 @@ php artisan pasak:scan-logs [options]
 - `--top=20`: Jumlah IP penyerang teratas yang ditampilkan di tabel ringkasan.
 - `--samples`: Menampilkan contoh URI request yang mencurigakan untuk setiap IP.
 - `--json`: Mengeluarkan hasil analisis dalam format JSON murni (cocok untuk pipeline SIEM / alerting).
-- `--import`: Menyimpan temuan ke tabel database `security_logs`.
+- `--import`: Menyimpan temuan ke tabel database `pasak_logs`.
 - `--block`: Memblokir otomatis IP yang memicu signature zero-tolerance.
 - `--dry-run`: Mode simulasi: menampilkan apa saja yang akan diblokir/diimpor tanpa mengubah data apa pun di database.
 
@@ -134,7 +134,7 @@ php artisan pasak:prune-logs [options]
 
 ### Opsi:
 
-- `--days=`: Mengesampingkan konfigurasi retensi hari (default: `SECURITY_LOG_RETENTION_DAYS`, biasanya 90 hari).
+- `--days=`: Mengesampingkan konfigurasi retensi hari (default: `PASAK_LOG_RETENTION_DAYS`, biasanya 90 hari).
 
 ### Contoh:
 

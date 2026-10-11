@@ -6,7 +6,7 @@ Salah satu prinsip desain fundamental dari **`robyajo/pasak`** adalah **Loose Co
 
 ## 1. Konvensi Nama Tabel Dinamis
 
-Semua model Eloquent paket meng-override metode `getTable()` untuk membaca nama tabel dari konfigurasi `config/security.php`:
+Semua model Eloquent paket meng-override metode `getTable()` untuk membaca nama tabel dari konfigurasi `config/pasak.php`:
 
 ```php
 public function getTable(): string
@@ -19,7 +19,7 @@ Hal ini memungkinkan Anda mengubah nama tabel di berkas `.env` jika terdapat ben
 
 ```dotenv
 SECURITY_BLOCKED_IPS_TABLE=waf_blocked_ips
-SECURITY_LOGS_TABLE=waf_audit_logs
+PASAK_LOGS_TABLE=waf_audit_logs
 SECURITY_LOGIN_ATTEMPTS_TABLE=auth_lockouts
 SECURITY_IP_UNBLOCK_REQUESTS_TABLE=waf_appeal_tickets
 SECURITY_USER_LOGINS_TABLE=auth_user_sessions

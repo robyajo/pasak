@@ -10,7 +10,7 @@ Jika `SECURITY_SCHEDULE_ENABLED=true` (default), tugas berikut otomatis aktif:
 
 ### A. Pembersihan Log Kedaluwarsa Harian (`pasak:prune-logs`)
 - **Jadwal**: Harian pada jam yang ditentukan oleh `SECURITY_PRUNE_SCHEDULE` (default: **02:30 pagi**).
-- **Aksi**: Menghapus entri `security_logs` yang lebih tua dari `SECURITY_LOG_RETENTION_DAYS` (default: 90 hari) agar ukuran database tidak membengkak seiring waktu.
+- **Aksi**: Menghapus entri `pasak_logs` yang lebih tua dari `PASAK_LOG_RETENTION_DAYS` (default: 90 hari) agar ukuran database tidak membengkak seiring waktu.
 
 ### B. Scheduler Heartbeat (`security-heartbeat`)
 - **Jadwal**: Setiap menit (`everyMinute()`).

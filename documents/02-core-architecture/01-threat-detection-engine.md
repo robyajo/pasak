@@ -55,7 +55,7 @@ Sebagian payload serangan **tidak pernah muncul dalam lalu lintas manusia normal
 Serangan lain seperti dugaan SQL Injection samar (`' or 1=1--`), pola XSS (`<script>`), atau path scanning biasa bisa saja terjadi akibat kesalahan ketik atau input data pengguna yang valid.
 
 Oleh karena itu, pola-pola ini dimasukkan ke dalam mekanisme **Progressive Sliding Window**:
-1. Setiap kali terjadi ancaman berlevel `high` atau `critical`, catatan disimpan di tabel `security_logs`.
+1. Setiap kali terjadi ancaman berlevel `high` atau `critical`, catatan disimpan di tabel `pasak_logs`.
 2. Sistem memeriksa berapa kali IP/perangkat tersebut memicu ancaman dalam kurun waktu `window_minutes` (default: 10 menit).
 3. Jika jumlah kejadian mencapai `threshold` (default: 3 kali), IP/perangkat secara otomatis diblokir selama `duration_hours` (default: 24 jam).
 

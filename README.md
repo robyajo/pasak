@@ -9,7 +9,7 @@
 
 **Pasak** (Bulwark) adalah paket keamanan komprehensif (_Self-Hosted WAF & Threat Engine_) berbasis **Headless REST API** untuk ekosistem Laravel. Paket ini murni PHP Composer library (Zero-NPM / standar Spatie) yang dirancang khusus untuk memproteksi aplikasi web internal dari serangan siber tingkat lanjut, injeksi payload pentest, eksploitasi webshell, dan brute force tanpa mengikat aplikasi ke template frontend tertentu.
 
-> 📚 **Portal Dokumentasi Resmi Lengkap**: Tersedia 25 bab dokumentasi mendalam di direktori [`documents/`](./documents/README.md) serta portal interaktif offline [`documents/index.html`](./documents/index.html).
+> 📚 **Portal Dokumentasi Resmi Lengkap**: Tersedia 24 bab dokumentasi mendalam di direktori [`documents/`](./documents/README.md) serta portal interaktif offline [`documents/index.html`](./documents/index.html).
 
 ---
 
@@ -43,7 +43,7 @@
 
 7. **Headless & Arsitektur Terkopel Longgar**:
     - 100% REST API JSON murni.
-    - Model `User` dan nama tabel database sepenuhnya dapat dikonfigurasi melalui `config/security.php`.
+    - Model `User` dan nama tabel database sepenuhnya dapat dikonfigurasi melalui `config/pasak.php`.
     - Trait `HasSecurityRelations` untuk kemudahan integrasi relasi Eloquent.
 
 ---
@@ -60,13 +60,13 @@
 ### 1. Pasang Paket via Composer
 
 ```bash
-composer require robyajo/pasak:^1.1
+composer require robyajo/pasak:^1.0
 ```
 
 > **Penting — jangan pakai `@dev` di produksi.** Menulis
 > `composer require robyajo/pasak:@dev` memaksa Composer
 > mengambil branch default `dev-main` (kode yang belum dirilis), bukan tag rilis
-> stabil. Selalu pakai constraint rilis (mis. `^1.1`) atau tanpa constraint sama
+> stabil. Selalu pakai constraint rilis (mis. `^1.0`) atau tanpa constraint sama
 > sekali. Flag `@dev` hanya diperlukan saat mengembangkan paket ini lewat
 > _path repository_ lokal.
 
@@ -80,14 +80,14 @@ php artisan pasak:install
 
 #### Aset yang Didapat Pengguna Setelah Menjalankan Perintah Ini:
 
-1. 📄 **`config/security.php`**: Konfigurasi lengkap WAF, ambang batas blokir, IP whitelist, stepped login lockout, dan log scanner.
-2. 🗄️ **`database/migrations/` (6 tabel)**: Menyiapkan tabel `blocked_ips`, `security_logs`, `login_attempts`, `ip_unblock_requests`, `user_logins`, dan `trusted_ips`.
+1. 📄 **`config/pasak.php`**: Konfigurasi lengkap WAF, ambang batas blokir, IP whitelist, stepped login lockout, dan log scanner.
+2. 🗄️ **`database/migrations/` (1 file, 7 tabel)**: Migrasi tunggal `create_pasak_tables` menyiapkan tabel `blocked_ips`, `pasak_logs`, `login_attempts`, `ip_unblock_requests`, `user_logins`, `trusted_ips`, dan `settings` (otomatis memindahkan data dari tabel lama `security_logs`/`security_settings` bila ada).
 3. 🌐 **`nginx.conf`**: Konfigurasi produksi Nginx Hardened WAF (Dual-zone rate limit, single-PHP execution `/index.php`, storage sandboxing).
 4. 🛡️ **`public/.htaccess`**: Hardening web server Apache & LiteSpeed (Blokir dotfiles, double extension `.php.jpg`, file backup dump `.sql`, dan matikan directory listing).
     > _Catatan Keamanan_: Jika `public/.htaccess` lama sudah ada, installer otomatis membuat cadangan `public/.htaccess.backup-YYYYMMDD_HHMMSS` dan menyisipkan aturan keamanan di bawah tanpa merusak rewrite rules aplikasi Anda.
 5. 🚫 **`resources/views/errors/blocked.blade.php`**: Halaman 403 default yang menampilkan alasan blokir, kode referensi, dan **formulir banding** yang terhubung langsung ke endpoint publik tiket banding. Dapat disesuaikan sesuai branding aplikasi Anda.
-6. ⚙️ **Penyematan Variabel ke `.env` & `.env.example`**: Installer secara otomatis menambahkan blok konfigurasi lengkap disertai **penjelasan fungsi berbahasa Indonesia** untuk setiap variabel (`SECURITY_*`) langsung ke berkas `.env` dan `.env.example` aplikasi Anda.
-7. 📊 **(Opsional) Dashboard monitoring Starter Kit**: Tampilan monitoring Livewire (`resources/views/pages/security/`) atau React (`resources/js/pages/security/`), wajib login. Dipublikasikan bila Anda menambahkan opsi `--with-dashboard` atau `--with-react-dashboard`.
+6. ⚙️ **Penyematan Variabel ke `.env` & `.env.example`**: Installer secara otomatis menambahkan blok konfigurasi lengkap disertai **penjelasan fungsi berbahasa Indonesia** untuk setiap variabel (`PASAK_*`) langsung ke berkas `.env` dan `.env.example` aplikasi Anda.
+7. 📊 **(Opsional) Dashboard monitoring Starter Kit**: Tampilan monitoring Livewire (`resources/views/pages/pasak/`) atau React (`resources/js/pages/pasak/`), wajib login. Dipublikasikan bila Anda menambahkan opsi `--with-blade` / `--with-dashboard` atau `--with-tsx` / `--with-react-dashboard` (atau `--with-both` untuk keduanya).
 
 #### Opsi Perintah `pasak:install`:
 
@@ -95,12 +95,21 @@ php artisan pasak:install
 | :----------------------- | :------------------------------------------------------------------------------------------------- |
 | `--force`                | Menimpa seluruh berkas konfigurasi, migrasi, `nginx.conf`, `public/.htaccess`, dan halaman blokir. |
 | `--without-nginx`        | Melewatkan pembuatan berkas `nginx.conf`.                                                          |
+| `--without-apache`       | Melewatkan pembuatan berkas `apache2.conf`.                                                        |
 | `--without-htaccess`     | Melewatkan pembaruan berkas `public/.htaccess`.                                                    |
 | `--without-views`        | Melewatkan publikasi halaman blokir `errors/blocked.blade.php`.                                    |
-| `--with-dashboard`       | Mempublikasikan tampilan dashboard monitoring Livewire (wajib login).                              |
-| `--with-react-dashboard` | Mempublikasikan tampilan dashboard monitoring React/Inertia (wajib login).                         |
-| `--with-htaccess`        | Memaksa pembaruan berkas `public/.htaccess`.                                                       |
 | `--without-env`          | Melewatkan penyematan variabel konfigurasi ke berkas `.env` dan `.env.example`.                    |
+| `--without-user-trait`   | Melewatkan penyematan trait `HasSecurityRelations` ke model User.                                  |
+| `--without-middleware`   | Melewatkan pendaftaran middleware WAF ke `bootstrap/app.php` / Kernel.                             |
+| `--without-routes`       | Melewatkan publikasi berkas `routes/pasak.php` dan `routes/pasak-api.php`.                          |
+| `--without-api`          | Melewatkan pemeriksaan/pemasangan rute API (`install:api`).                                        |
+| `--with-dashboard`       | Mempublikasikan tampilan dashboard monitoring Livewire / Blade (wajib login).                      |
+| `--with-blade`           | Alias dari `--with-dashboard`.                                                                     |
+| `--with-react-dashboard` | Mempublikasikan tampilan dashboard monitoring React / TSX (wajib login).                           |
+| `--with-tsx`             | Alias dari `--with-react-dashboard`.                                                               |
+| `--with-both`            | Mempublikasikan kedua tampilan dashboard (Blade & TSX).                                            |
+| `--stack=`               | Tentukan stack dashboard: `blade`, `tsx`, `both`, atau `none`.                                     |
+| `--with-htaccess`        | Memaksa pembaruan berkas `public/.htaccess`.                                                       |
 
 #### Publikasi Aset Secara Parsial (Manual):
 
@@ -141,7 +150,7 @@ php artisan migrate
 
 ### 3. Dashboard Monitoring Starter Kit (Blade & TSX)
 
-Paket ini menyediakan panel monitoring siap pakai untuk **starter kit resmi Laravel (Blade & React/TSX)** yang dapat dipublikasikan langsung ke dalam aplikasi host di prefix **`/security`**.
+Paket ini menyediakan panel monitoring siap pakai untuk **starter kit resmi Laravel (Blade & React/TSX)** yang dapat dipublikasikan langsung ke dalam aplikasi host di prefix **`/pasak`**.
 
 Tersedia opsi instalasi fleksibel lewat `php artisan pasak:install`:
 - **Blade / Livewire**: `php artisan pasak:install --with-blade` (atau `--tag=starterkit-blade`)
@@ -154,7 +163,7 @@ Tersedia opsi instalasi fleksibel lewat `php artisan pasak:install`:
 php artisan vendor:publish --tag=starterkit-blade
 ```
 
-Perintah tersebut menyalin **`resources/views/pages/security/*.blade.php`** (enam halaman Livewire single-file component) beserta konfigurasi `dashboard` pada `config/security.php`.
+Perintah tersebut menyalin **`resources/views/pages/pasak/*.blade.php`** (tujuh halaman Livewire single-file component + layout) beserta konfigurasi `dashboard` pada `config/pasak.php`.
 
 #### b. React / TSX Starter Kit (Inertia + React + shadcn/ui)
 
@@ -164,9 +173,9 @@ php artisan vendor:publish --tag=starterkit-tsx
 
 Perintah tersebut menyalin:
 
-1. **`resources/js/pages/security/*.tsx`** — enam halaman Inertia/React: _Overview_, _Security Logs_, _Blocked IPs_, _Server Audit_, _User Sessions_, dan _Unblock Appeals_.
-2. **`resources/js/components/security/*.tsx`** — komponen pendukung (navigasi & paginasi).
-3. **`config/security.php`** — menyertakan konfigurasi `dashboard`.
+1. **`resources/js/pages/pasak/*.tsx`** — tujuh halaman Inertia/React: _Overview_, _Security Logs_, _Blocked IPs_, _Server Audit_, _User Sessions_, _Unblock Appeals_, dan _Settings_.
+2. **`resources/js/components/pasak/*.tsx`** — komponen pendukung (navigasi & paginasi).
+3. **`config/pasak.php`** — menyertakan konfigurasi `dashboard`.
 
 > ℹ️ Halaman React/TSX di-render server-side oleh controller Inertia bawaan paket. Setelah publikasi, jalankan `npm run build` (atau `npm run dev`).
 
@@ -175,16 +184,16 @@ Perintah tersebut menyalin:
 Konfigurasi di `.env`:
 
 ```dotenv
-SECURITY_DASHBOARD_ENABLED=true
-SECURITY_DASHBOARD_DRIVER=blade      # atau "react" / "both"
-SECURITY_DASHBOARD_PREFIX=security
+PASAK_DASHBOARD_ENABLED=true
+PASAK_DASHBOARD_DRIVER=livewire     # atau "react" / "both"
+PASAK_DASHBOARD_PREFIX=pasak
 # Batasi hanya role admin (default: false, cukup login pengguna)
-SECURITY_DASHBOARD_ADMIN_ONLY=false
+PASAK_DASHBOARD_ADMIN_ONLY=false
 ```
 
-Setelah diaktifkan, panel dapat diakses pada **`/security`**.
+Setelah diaktifkan, panel dapat diakses pada **`/pasak`**.
 
-> 🔒 **Wajib Login**: Seluruh halaman dashboard di prefix `/security` dilindungi oleh middleware `web` + `auth`. Pengguna yang belum login otomatis diarahkan ke halaman login. Jika Anda ingin membatasi dashboard khusus untuk administrator, set `SECURITY_DASHBOARD_ADMIN_ONLY=true` di berkas `.env`.
+> 🔒 **Wajib Login**: Seluruh halaman dashboard di prefix `/pasak` dilindungi oleh middleware `web` + `auth`. Pengguna yang belum login otomatis diarahkan ke halaman login. Jika Anda ingin membatasi dashboard khusus untuk administrator, set `PASAK_DASHBOARD_ADMIN_ONLY=true` di berkas `.env`.
 
 ---
 
@@ -242,10 +251,10 @@ return Application::configure(basePath: dirname(__DIR__))
 
         // Alias middleware keamanan
         $middleware->alias([
-            'security.block' => \Internal\Pasak\Http\Middleware\BlockIpAddress::class,
-            'security.detect' => \Internal\Pasak\Http\Middleware\DetectSecurityThreats::class,
-            'security.admin' => \Internal\Pasak\Http\Middleware\EnsureSecurityAdmin::class,
-            'security.activity' => \Internal\Pasak\Http\Middleware\TrackUserActivity::class,
+            'pasak.block' => \Internal\Pasak\Http\Middleware\BlockIpAddress::class,
+            'pasak.detect' => \Internal\Pasak\Http\Middleware\DetectSecurityThreats::class,
+            'pasak.admin' => \Internal\Pasak\Http\Middleware\EnsureSecurityAdmin::class,
+            'pasak.activity' => \Internal\Pasak\Http\Middleware\TrackUserActivity::class,
         ]);
     })
     ->create();
@@ -268,10 +277,10 @@ protected $middlewareGroups = [
 ];
 
 protected $middlewareAliases = [
-    'security.block' => \Internal\Pasak\Http\Middleware\BlockIpAddress::class,
-    'security.detect' => \Internal\Pasak\Http\Middleware\DetectSecurityThreats::class,
-    'security.admin' => \Internal\Pasak\Http\Middleware\EnsureSecurityAdmin::class,
-    'security.activity' => \Internal\Pasak\Http\Middleware\TrackUserActivity::class,
+    'pasak.block' => \Internal\Pasak\Http\Middleware\BlockIpAddress::class,
+    'pasak.detect' => \Internal\Pasak\Http\Middleware\DetectSecurityThreats::class,
+    'pasak.admin' => \Internal\Pasak\Http\Middleware\EnsureSecurityAdmin::class,
+    'pasak.activity' => \Internal\Pasak\Http\Middleware\TrackUserActivity::class,
 ];
 ```
 
@@ -279,19 +288,19 @@ protected $middlewareAliases = [
 
 ## 📡 Headless REST API Reference
 
-Semua rute REST API didaftarkan secara default dengan prefix `/api/security` (dapat diubah melalui `config('security.routes.prefix')`).
+Semua rute REST API didaftarkan secara default dengan prefix `/api/pasak` (dapat diubah melalui `config('pasak.routes.prefix')`).
 
 ### 1. Endpoint Publik
 
 | Metode | URI                                                  | Deskripsi                                                                                   |
 | :----- | :--------------------------------------------------- | :------------------------------------------------------------------------------------------ |
-| `POST` | `/api/security/unblock-tickets/submit`               | Mengirim permohonan banding pembukaan blokir IP/perangkat                                   |
-| `GET`  | `/api/security/unblock-tickets/check/{ticketNumber}` | Memeriksa status tiket permohonan banding                                                   |
+| `POST` | `/api/pasak/unblock-tickets/submit`               | Mengirim permohonan banding pembukaan blokir IP/perangkat                                   |
+| `GET`  | `/api/pasak/unblock-tickets/check/{ticketNumber}` | Memeriksa status tiket permohonan banding                                                   |
 
 #### Contoh Payload Pengajuan Tiket:
 
 ```json
-POST /api/security/unblock-tickets/submit
+POST /api/pasak/unblock-tickets/submit
 {
   "name": "Budi Santoso",
   "email": "budi@example.com",
@@ -306,55 +315,55 @@ POST /api/security/unblock-tickets/submit
 
 | Metode | URI                                    | Deskripsi                                                   |
 | :----- | :------------------------------------- | :---------------------------------------------------------- |
-| `POST` | `/api/security/trusted-ips/save-my-ip` | Menyimpan alamat IP saat ini sebagai IP terpercaya pengguna |
+| `POST` | `/api/pasak/trusted-ips/save-my-ip` | Menyimpan alamat IP saat ini sebagai IP terpercaya pengguna |
 
-### 3. Endpoint Manajemen Admin (`auth` + `security.admin`)
+### 3. Endpoint Manajemen Admin (`auth` + `pasak.admin`)
 
 #### Log Keamanan & Analitik Serangan
 
 | Metode   | URI                        | Deskripsi                                                                                     |
 | :------- | :------------------------- | :-------------------------------------------------------------------------------------------- |
-| `GET`    | `/api/security/logs`       | Mendapatkan log ancaman (paginasi, filter event/level/tanggal, statistik, tren 24 jam/7 hari) |
-| `DELETE` | `/api/security/logs/clear` | Mengosongkan seluruh log audit keamanan                                                       |
-| `DELETE` | `/api/security/logs/{id}`  | Menghapus satu entri log keamanan tertentu                                                    |
+| `GET`    | `/api/pasak/logs`       | Mendapatkan log ancaman (paginasi, filter event/level/tanggal, statistik, tren 24 jam/7 hari) |
+| `DELETE` | `/api/pasak/logs/clear` | Mengosongkan seluruh log audit keamanan                                                       |
+| `DELETE` | `/api/pasak/logs/{id}`  | Menghapus satu entri log keamanan tertentu                                                    |
 
 #### Daftar Blokir IP & Perangkat
 
 | Metode   | URI                                     | Deskripsi                                                 |
 | :------- | :-------------------------------------- | :-------------------------------------------------------- |
-| `GET`    | `/api/security/blocked-ips`             | Mendapatkan daftar IP yang diblokir (aktif & kedaluwarsa) |
-| `POST`   | `/api/security/blocked-ips`             | Memblokir IP atau perangkat secara manual                 |
-| `GET`    | `/api/security/blocked-ips/{id}`        | Melihat detail data pemblokiran                           |
-| `PATCH`  | `/api/security/blocked-ips/{id}/toggle` | Mengaktifkan / menonaktifkan status blokir                |
-| `DELETE` | `/api/security/blocked-ips/{id}`        | Mencabut blokir dan menghapus entri                       |
+| `GET`    | `/api/pasak/blocked-ips`             | Mendapatkan daftar IP yang diblokir (aktif & kedaluwarsa) |
+| `POST`   | `/api/pasak/blocked-ips`             | Memblokir IP atau perangkat secara manual                 |
+| `GET`    | `/api/pasak/blocked-ips/{id}`        | Melihat detail data pemblokiran                           |
+| `PATCH`  | `/api/pasak/blocked-ips/{id}/toggle` | Mengaktifkan / menonaktifkan status blokir                |
+| `DELETE` | `/api/pasak/blocked-ips/{id}`        | Mencabut blokir dan menghapus entri                       |
 
 #### Audit Server & Integritas Berkas
 
 | Metode   | URI                                     | Deskripsi                                                      |
 | :------- | :-------------------------------------- | :------------------------------------------------------------- |
-| `GET`    | `/api/security/server`                  | Laporan komprehensif audit keamanan server & integritas berkas |
-| `POST`   | `/api/security/server/baseline`         | Membuat baseline hash SHA-256 berkas aplikasi baru             |
-| `DELETE` | `/api/security/server/baseline`         | Menghapus baseline integritas                                  |
-| `DELETE` | `/api/security/server/suspicious-files` | Menghapus berkas mencurigakan/webshell yang terdeteksi         |
-| `DELETE` | `/api/security/lockouts/{id}`           | Membuka kunci akun yang terkena lockout login berjenjang       |
+| `GET`    | `/api/pasak/server`                  | Laporan komprehensif audit keamanan server & integritas berkas |
+| `POST`   | `/api/pasak/server/baseline`         | Membuat baseline hash SHA-256 berkas aplikasi baru             |
+| `DELETE` | `/api/pasak/server/baseline`         | Menghapus baseline integritas                                  |
+| `DELETE` | `/api/pasak/server/suspicious-files` | Menghapus berkas mencurigakan/webshell yang terdeteksi         |
+| `DELETE` | `/api/pasak/lockouts/{id}`           | Membuka kunci akun yang terkena lockout login berjenjang       |
 
 #### Sesi Pengguna & IP Terpercaya
 
 | Metode   | URI                                               | Deskripsi                                       |
 | :------- | :------------------------------------------------ | :---------------------------------------------- |
-| `GET`    | `/api/security/user-sessions`                     | Riwayat sesi login seluruh pengguna             |
-| `GET`    | `/api/security/user-sessions/realtime`            | Daftar pengguna yang aktif secara real-time     |
-| `DELETE` | `/api/security/user-sessions/{id}`                | Menghapus log sesi pengguna                     |
-| `DELETE` | `/api/security/user-sessions/session/{sessionId}` | Memutus sesi pengguna tertentu (_force logout_) |
-| `DELETE` | `/api/security/trusted-ips/{id}`                  | Menghapus IP dari daftar terpercaya             |
+| `GET`    | `/api/pasak/user-sessions`                     | Riwayat sesi login seluruh pengguna             |
+| `GET`    | `/api/pasak/user-sessions/realtime`            | Daftar pengguna yang aktif secara real-time     |
+| `DELETE` | `/api/pasak/user-sessions/{id}`                | Menghapus log sesi pengguna                     |
+| `DELETE` | `/api/pasak/user-sessions/session/{sessionId}` | Memutus sesi pengguna tertentu (_force logout_) |
+| `DELETE` | `/api/pasak/trusted-ips/{id}`                  | Menghapus IP dari daftar terpercaya             |
 
 #### Pengelolaan Tiket Banding
 
 | Metode   | URI                                          | Deskripsi                                               |
 | :------- | :------------------------------------------- | :------------------------------------------------------ |
-| `GET`    | `/api/security/unblock-tickets`              | Daftar seluruh tiket permohonan banding                 |
-| `POST`   | `/api/security/unblock-tickets/{id}/respond` | Menyetujui atau menolak tiket (buka blokir & whitelist) |
-| `DELETE` | `/api/security/unblock-tickets/{id}`         | Menghapus arsip tiket                                   |
+| `GET`    | `/api/pasak/unblock-tickets`              | Daftar seluruh tiket permohonan banding                 |
+| `POST`   | `/api/pasak/unblock-tickets/{id}/respond` | Menyetujui atau menolak tiket (buka blokir & whitelist) |
+| `DELETE` | `/api/pasak/unblock-tickets/{id}`         | Menghapus arsip tiket                                   |
 
 ---
 
@@ -513,7 +522,7 @@ Paket ini dilengkapi dengan pengujian menyeluruh menggunakan **Pest PHP** dan **
 ./vendor/bin/pest
 ```
 
-Hasil uji: **82 passed (333 assertions)** 100% Passed mencakup:
+Hasil uji: **115 passed (478 assertions)** 100% Passed mencakup:
 
 - `DetectorTuningTest`: Verifikasi akurasi pola deteksi dan ketahanan ReDoS.
 - `InstantBlockTest`: Verifikasi zero-tolerance instant blocking pada percobaan pertama.

@@ -60,7 +60,7 @@ php artisan pasak:install
 
 Perintah ini akan secara otomatis:
 
-1. Mempublikasikan berkas konfigurasi `config/security.php`.
+1. Mempublikasikan berkas konfigurasi `config/pasak.php`.
 2. Mempublikasikan berkas migrasi database ke `database/migrations/`.
 3. Mempublikasikan template virtual host `nginx.conf` di root proyek.
 4. **Memperbarui berkas `public/.htaccess`**:
@@ -112,7 +112,7 @@ Jika Anda ingin mempublikasikan aset secara bertahap atau terpisah:
 php artisan vendor:publish --tag=pasak-config
 ```
 
-Berkas akan ditempatkan di: `config/security.php`.
+Berkas akan ditempatkan di: `config/pasak.php`.
 
 ### 2. Publikasikan Migrasi Saja
 
@@ -172,7 +172,7 @@ php artisan vendor:publish --tag=starterkit-tsx
 php artisan vendor:publish --tag=starterkit-all
 ```
 
-Perintah Blade menyalin enam halaman Livewire (single-file component) ke `resources/views/pages/security/`. Perintah TSX menyalin enam halaman Inertia/React ke `resources/js/pages/security/` beserta komponen pendukung di `resources/js/components/security/`. Keduanya juga menyertakan konfigurasi `dashboard` pada `config/security.php`. Dashboard diakses di prefix `/security` dan **wajib login** (lihat bagian [Dashboard Monitoring Starter Kit](#8-dashboard-monitoring-starter-kit-opsional)).
+Perintah Blade menyalin enam halaman Livewire (single-file component) ke `resources/views/pages/pasak/`. Perintah TSX menyalin enam halaman Inertia/React ke `resources/js/pages/pasak/` beserta komponen pendukung di `resources/js/components/pasak/`. Keduanya juga menyertakan konfigurasi `dashboard` pada `config/pasak.php`. Dashboard diakses di prefix `/security` dan **wajib login** (lihat bagian [Dashboard Monitoring Starter Kit](#8-dashboard-monitoring-starter-kit-opsional)).
 
 ---
 
@@ -184,14 +184,17 @@ Jalankan perintah migrasi Laravel untuk membuat tabel-tabel pendukung paket:
 php artisan migrate
 ```
 
-Tabel-tabel yang dibuat secara default:
+Tabel-tabel yang dibuat secara default (satu migrasi `create_pasak_tables`):
 
 1. `blocked_ips`: Menyimpan daftar karantina IP dan perangkat aktif/kedaluwarsa beserta hit counter.
-2. `security_logs`: Log audit ancaman keamanan, pola yang terdeteksi, bukti payload, dan aksi mitigasi.
+2. `pasak_logs`: Log audit ancaman keamanan, pola yang terdeteksi, bukti payload, dan aksi mitigasi.
 3. `login_attempts`: Pelacakan kegagalan login bertingkat (_stepped lockout_) per kombinasi email & IP.
 4. `ip_unblock_requests`: Tiket banding pembukaan blokir yang diajukan oleh pengguna publik.
 5. `user_logins`: Rekam jejak riwayat login pengguna, detail perangkat/browser, sesi aktif, dan waktu aktivitas terakhir.
 6. `trusted_ips`: Daftar alamat IP terpercaya per pengguna untuk otorisasi akses khusus.
+7. `settings`: Penyimpanan key-value pengaturan dinamis paket.
+
+> Data dari tabel lama `security_logs` / `security_settings` otomatis dipindahkan bila migrasi menemukan keduanya.
 
 ---
 
@@ -304,9 +307,9 @@ npm run build
 
 ```bash
 # Aktifkan di .env
-#    SECURITY_DASHBOARD_ENABLED=true
-#    SECURITY_DASHBOARD_DRIVER=livewire   # atau "react"
-#    SECURITY_DASHBOARD_PREFIX=security
+#    PASAK_DASHBOARD_ENABLED=true
+#    PASAK_DASHBOARD_DRIVER=livewire   # atau "react"
+#    PASAK_DASHBOARD_PREFIX=pasak
 
 # Bersihkan cache
 php artisan optimize:clear
@@ -318,12 +321,12 @@ Panel tersedia di `/security` dan berisi enam modul: **Overview**, **Security Lo
 
 - Rute hanya didaftarkan ketika `security.dashboard.enabled=true` **dan** stack frontend yang sesuai (`driver`) terpasang (Livewire atau Inertia).
 - Seluruh rute memakai middleware `web` + `auth` (wajib login) dan, secara bawaan, `security.admin` (Gate `manage-security-monitor`).
-- Kustomisasi melalui `config/security.php`:
+- Kustomisasi melalui `config/pasak.php`:
     ```php
     'dashboard' => [
-        'enabled' => (bool) env('SECURITY_DASHBOARD_ENABLED', false),
-        'driver' => env('SECURITY_DASHBOARD_DRIVER', 'livewire'),
-        'prefix' => env('SECURITY_DASHBOARD_PREFIX', 'security'),
+        'enabled' => (bool) env('PASAK_DASHBOARD_ENABLED', false),
+        'driver' => env('PASAK_DASHBOARD_DRIVER', 'livewire'),
+        'prefix' => env('PASAK_DASHBOARD_PREFIX', 'security'),
         'middleware' => ['web', 'auth'],
         'admin_middleware' => ['Internal\\Pasak\\Http\\Middleware\\EnsureSecurityAdmin'],
     ],

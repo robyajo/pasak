@@ -16,7 +16,7 @@ Dokumentasi ini disusun secara modular ke dalam 7 bagian utama:
 
 - [01. Pengenalan & Filosofi Arsitektur](./01-getting-started/01-introduction.md) — Mengapa paket ini dibuat, filosofi headless WAF, ReDoS safety, dan perbandingan dengan paket lain.
 - [02. Panduan Instalasi & Migrasi](./01-getting-started/02-installation.md) — Langkah instalasi Composer, publikasi aset otomatis (`pasak:install`), konfigurasi tag, dan migrasi database.
-- [03. Konfigurasi Lengkap & Environment Variable](./01-getting-started/03-configuration.md) — Penjelasan baris-per-baris seluruh kunci pada `config/security.php` dan 30+ variabel `.env`.
+- [03. Konfigurasi Lengkap & Environment Variable](./01-getting-started/03-configuration.md) — Penjelasan baris-per-baris seluruh kunci pada `config/pasak.php` dan 30+ variabel `.env`.
 
 ### 2. [Arsitektur Inti (Core Architecture)](./02-core-architecture/)
 

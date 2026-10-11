@@ -260,8 +260,8 @@ Daftar lengkap variabel `.env` yang dapat disetel di aplikasi host:
 
 | Variabel `.env`                   |        Default         | Deskripsi                                     |
 | :-------------------------------- | :--------------------: | :-------------------------------------------- |
-| `SECURITY_MONITOR_ENABLED`        |         `true`         | Sakelar utama WAF                             |
-| `SECURITY_BLOCK_ENFORCEMENT`      |         `true`         | Penolakan HTTP 403 untuk IP terblokir         |
+| `PASAK_MONITOR_ENABLED`        |         `true`         | Sakelar utama WAF                             |
+| `PASAK_BLOCK_ENFORCEMENT`      |         `true`         | Penolakan HTTP 403 untuk IP terblokir         |
 | `SECURITY_AUTO_BLOCK_ENABLED`     |         `true`         | Auto-block akumulasi ancaman berulang         |
 | `SECURITY_AUTO_BLOCK_THRESHOLD`   |          `3`           | Ambang batas kejadian (default: 3 kali)       |
 | `SECURITY_AUTO_BLOCK_WINDOW`      |          `10`          | Jendela evaluasi waktu (menit)                |
@@ -269,6 +269,6 @@ Daftar lengkap variabel `.env` yang dapat disetel di aplikasi host:
 | `SECURITY_INSTANT_BLOCK_ENABLED`  |         `true`         | Blokir instan pada percobaan pertama untuk ZT |
 | `SECURITY_INSTANT_BLOCK_DURATION` |         `720`          | Durasi blokir instan (jam; 720 jam = 30 hari) |
 | `SECURITY_LOGIN_LOCKOUT_ENABLED`  |         `true`         | Proteksi brute force bertingkat (1m - 24h)    |
-| `SECURITY_LOG_RETENTION_DAYS`     |          `90`          | Masa retensi log (hari)                       |
+| `PASAK_LOG_RETENTION_DAYS`     |          `90`          | Masa retensi log (hari)                       |
 | `SECURITY_SCHEDULE_ENABLED`       |         `true`         | Otomasi tugas scheduler (prune & heartbeat)   |
-| `SECURITY_SUPPORT_EMAIL`          | `security@example.com` | Email helpdesk di halaman penolakan 403       |
+| `PASAK_SUPPORT_EMAIL`          | `security@example.com` | Email helpdesk di halaman penolakan 403       |

@@ -9,11 +9,11 @@ Gunakan daftar periksa (*checklist*) ini sebelum meluncurkan aplikasi ke lingkun
 - [ ] `APP_DEBUG=false`: Wajib dimatikan agar pesan stack trace dan kredensial database tidak bocor saat terjadi error.
 - [ ] `APP_ENV=production`.
 - [ ] `SESSION_SECURE_COOKIE=true`: Memastikan cookie sesi hanya dikirim melalui koneksi terenkripsi HTTPS.
-- [ ] `SECURITY_MONITOR_ENABLED=true`: Sakelar WAF aktif.
-- [ ] `SECURITY_BLOCK_ENFORCEMENT=true`: Penolakan HTTP 403 aktif untuk IP yang terblokir.
+- [ ] `PASAK_MONITOR_ENABLED=true`: Sakelar WAF aktif.
+- [ ] `PASAK_BLOCK_ENFORCEMENT=true`: Penolakan HTTP 403 aktif untuk IP yang terblokir.
 - [ ] `SECURITY_INSTANT_BLOCK_ENABLED=true`: Blokir langsung 30 hari untuk zero-tolerance attack.
 - [ ] `SECURITY_LOGIN_LOCKOUT_ENABLED=true`: Proteksi stepped brute force aktif.
-- [ ] `SECURITY_SUPPORT_EMAIL`: Diisi alamat email resmi helpdesk/keamanan instansi Anda.
+- [ ] `PASAK_SUPPORT_EMAIL`: Diisi alamat email resmi helpdesk/keamanan instansi Anda.
 
 ---
 

@@ -219,23 +219,23 @@ Perintah tersebut menyalin berkas berikut ke aplikasi Anda:
 
 | Berkas yang Dipublikasikan                          | Deskripsi                                                   |
 | :-------------------------------------------------- | :---------------------------------------------------------- |
-| `resources/js/pages/security/overview.tsx`          | Statistik, tren serangan, dan top attacker.                 |
-| `resources/js/pages/security/logs.tsx`              | Tabel log keamanan dengan filter dan aksi bersihkan/hapus.  |
-| `resources/js/pages/security/blocked-ips.tsx`       | Manajemen karantina IP (blokir manual, toggle, unblock).    |
-| `resources/js/pages/security/server.tsx`            | Audit integritas, pemindai webshell, baseline, dan lockout. |
-| `resources/js/pages/security/sessions.tsx`          | Sesi pengguna aktif, riwayat login, dan IP terpercaya.      |
-| `resources/js/pages/security/tickets.tsx`           | Review tiket banding (approve/reject + auto-unblock).       |
-| `resources/js/components/security/security-nav.tsx` | Navigasi antar modul keamanan.                              |
-| `resources/js/components/security/pagination.tsx`   | Komponen paginasi tabel.                                    |
-| `resources/js/components/security/ui.tsx`           | Komponen UI dasar (Card, Badge, Button, Input, Modal, dll). |
-| `resources/js/components/security/security.css`     | Desain sistem Pure Vanilla CSS responsif + dark mode.       |
+| `resources/js/pages/pasak/overview.tsx`          | Statistik, tren serangan, dan top attacker.                 |
+| `resources/js/pages/pasak/logs.tsx`              | Tabel log keamanan dengan filter dan aksi bersihkan/hapus.  |
+| `resources/js/pages/pasak/blocked-ips.tsx`       | Manajemen karantina IP (blokir manual, toggle, unblock).    |
+| `resources/js/pages/pasak/server.tsx`            | Audit integritas, pemindai webshell, baseline, dan lockout. |
+| `resources/js/pages/pasak/sessions.tsx`          | Sesi pengguna aktif, riwayat login, dan IP terpercaya.      |
+| `resources/js/pages/pasak/tickets.tsx`           | Review tiket banding (approve/reject + auto-unblock).       |
+| `resources/js/components/pasak/security-nav.tsx` | Navigasi antar modul keamanan.                              |
+| `resources/js/components/pasak/pagination.tsx`   | Komponen paginasi tabel.                                    |
+| `resources/js/components/pasak/ui.tsx`           | Komponen UI dasar (Card, Badge, Button, Input, Modal, dll). |
+| `resources/js/components/pasak/security.css`     | Desain sistem Pure Vanilla CSS responsif + dark mode.       |
 
 Aktifkan melalui `.env`, lalu bangun ulang aset:
 
 ```dotenv
-SECURITY_DASHBOARD_ENABLED=true
-SECURITY_DASHBOARD_DRIVER=react
-SECURITY_DASHBOARD_PREFIX=security
+PASAK_DASHBOARD_ENABLED=true
+PASAK_DASHBOARD_DRIVER=react
+PASAK_DASHBOARD_PREFIX=pasak
 ```
 
 ```bash
@@ -246,14 +246,14 @@ Panel dapat diakses pada `/security`.
 
 > ℹ️ Halaman di-render **server-side** oleh controller Inertia bawaan paket (`Internal\Pasak\Http\Controllers\Dashboard\*`). Mutasi (blokir IP, hapus log, approve tiket) dikirim sebagai permintaan Inertia biasa, sehingga **tidak** memerlukan token API terpisah dan tidak bergantung pada REST API `/api/security/*`.
 
-> 🔒 **Wajib Login**: Rute dashboard memakai middleware `web` + `auth`, dan secara bawaan juga `security.admin` (Gate `manage-security-monitor`). Untuk mengizinkan semua pengguna yang sudah login (tanpa syarat admin), kosongkan `security.dashboard.admin_middleware` pada `config/security.php`.
+> 🔒 **Wajib Login**: Rute dashboard memakai middleware `web` + `auth`, dan secara bawaan juga `security.admin` (Gate `manage-security-monitor`). Untuk mengizinkan semua pengguna yang sudah login (tanpa syarat admin), kosongkan `security.dashboard.admin_middleware` pada `config/pasak.php`.
 
 ### Desain Sistem Pure Vanilla CSS (Zero External UI Dependencies)
 
 Stubs React dibuat mandiri sepenuhnya (**Zero external UI dependencies**):
 - **Tidak butuh Shadcn UI** (`@/components/ui/*`), `@/lib/utils`, ataupun library eksternal `sonner`.
 - Menggunakan `security.css` dengan CSS custom properties (`--sec-*`) yang rapi, responsif, dan otomatis mendukung dark mode (`.dark` / `@media (prefers-color-scheme: dark)`).
-- Anda bebas memodifikasi warna, ukuran, atau integrasi komponen di `resources/js/components/security/` kapan saja.
+- Anda bebas memodifikasi warna, ukuran, atau integrasi komponen di `resources/js/components/pasak/` kapan saja.
 
 ### Menambahkan Tautan di Sidebar Starter Kit
 

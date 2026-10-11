@@ -7,7 +7,7 @@ sidebar:
 
 Sebagian besar serangan siber (seperti scanning direktori WordPress, probing `phpmyadmin`, pemindaian berkas `.git`, dan brute force HTTP dasar) ditolak langsung oleh web server (Nginx/Apache) dengan status HTTP 404 atau 403 **sebelum request sempat diteruskan ke proses PHP Laravel**.
 
-Akibatnya, request tersebut tidak pernah melewati middleware Laravel dan tidak tercatat di tabel `security_logs`.
+Akibatnya, request tersebut tidak pernah melewati middleware Laravel dan tidak tercatat di tabel `pasak_logs`.
 
 Layanan `AccessLogScannerService` memecahkan masalah ini dengan membaca dan menganalisis berkas log akses mentah (*raw access logs*) web server secara streaming.
 
@@ -43,7 +43,7 @@ Anda dapat menjalankan pemindai sewaktu-waktu menggunakan perintah:
 php artisan pasak:scan-logs --file=/var/log/nginx/access.log --dry-run
 ```
 
-### B. Memindai dan Mengimpor ke Tabel `security_logs`
+### B. Memindai dan Mengimpor ke Tabel `pasak_logs`
 ```bash
 php artisan pasak:scan-logs --file=/var/log/nginx/access.log --import
 ```

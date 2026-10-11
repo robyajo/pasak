@@ -74,4 +74,4 @@ Untuk memastikan fitur ini tidak dapat disalahgunakan oleh penyerang (*Defensive
    - `composer.json`
    - `bootstrap/app.php`
 4. **Audit Trail**:
-   Setiap aksi penghapusan berkas secara otomatis dicatat ke dalam tabel `security_logs` lengkap dengan ID user admin yang mengeksekusi dan stempel waktu.
+   Setiap aksi penghapusan berkas secara otomatis dicatat ke dalam tabel `pasak_logs` lengkap dengan ID user admin yang mengeksekusi dan stempel waktu.

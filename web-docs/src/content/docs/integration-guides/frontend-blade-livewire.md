@@ -95,24 +95,24 @@ Perintah tersebut menyalin berkas berikut ke aplikasi Anda:
 
 | Berkas yang Dipublikasikan                             | Deskripsi                                                   |
 | :----------------------------------------------------- | :---------------------------------------------------------- |
-| `resources/views/pages/security/overview.blade.php`    | Statistik, tren serangan, dan top attacker.                 |
-| `resources/views/pages/security/logs.blade.php`        | Tabel log keamanan dengan filter dan aksi bersihkan/hapus.  |
-| `resources/views/pages/security/blocked-ips.blade.php` | Manajemen karantina IP (blokir manual, toggle, unblock).    |
-| `resources/views/pages/security/server.blade.php`      | Audit integritas, pemindai webshell, baseline, dan lockout. |
-| `resources/views/pages/security/sessions.blade.php`    | Sesi pengguna aktif, riwayat login, dan IP terpercaya.      |
-| `resources/views/pages/security/tickets.blade.php`     | Review tiket banding (approve/reject + auto-unblock).       |
-| `resources/views/pages/security/layout.blade.php`      | Sub-layout navigasi antar modul keamanan.                   |
+| `resources/views/pages/pasak/overview.blade.php`    | Statistik, tren serangan, dan top attacker.                 |
+| `resources/views/pages/pasak/logs.blade.php`        | Tabel log keamanan dengan filter dan aksi bersihkan/hapus.  |
+| `resources/views/pages/pasak/blocked-ips.blade.php` | Manajemen karantina IP (blokir manual, toggle, unblock).    |
+| `resources/views/pages/pasak/server.blade.php`      | Audit integritas, pemindai webshell, baseline, dan lockout. |
+| `resources/views/pages/pasak/sessions.blade.php`    | Sesi pengguna aktif, riwayat login, dan IP terpercaya.      |
+| `resources/views/pages/pasak/tickets.blade.php`     | Review tiket banding (approve/reject + auto-unblock).       |
+| `resources/views/pages/pasak/layout.blade.php`      | Sub-layout navigasi antar modul keamanan.                   |
 
 Setelah dipublikasikan, aktifkan dashboard melalui `.env`:
 
 ```dotenv
-SECURITY_DASHBOARD_ENABLED=true
-SECURITY_DASHBOARD_PREFIX=security
+PASAK_DASHBOARD_ENABLED=true
+PASAK_DASHBOARD_PREFIX=pasak
 ```
 
 Panel dapat diakses pada `/security`. Halaman-halaman tersebut merupakan **single-file Livewire component** (`pages::security.*`) sehingga otomatis memakai layout starter kit (`layouts::app`).
 
-> 🔒 **Wajib Login**: Rute dashboard memakai middleware `web` + `auth`, dan secara bawaan juga `security.admin` (Gate `manage-security-monitor`). Untuk mengizinkan semua pengguna yang sudah login (tanpa syarat admin), kosongkan `security.dashboard.admin_middleware` pada `config/security.php`.
+> 🔒 **Wajib Login**: Rute dashboard memakai middleware `web` + `auth`, dan secara bawaan juga `security.admin` (Gate `manage-security-monitor`). Untuk mengizinkan semua pengguna yang sudah login (tanpa syarat admin), kosongkan `security.dashboard.admin_middleware` pada `config/pasak.php`.
 
 ### Desain Sistem Pure Vanilla CSS (Zero External UI Dependencies)
 

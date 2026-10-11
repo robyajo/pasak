@@ -33,7 +33,7 @@ Paket secara otomatis mendaftarkan listener pada event otentikasi Laravel:
 1. **`LogFailedLoginAttempt`** (mendengarkan `\Illuminate\Auth\Events\Failed`):
    - Memanggil `LoginThrottleService::registerFailure($email, $ip)`.
    - Mengakumulasikan hitungan kegagalan dan memperbarui `locked_until` jika mencapai batas tier.
-   - Mencatat log audit ke tabel `security_logs`.
+   - Mencatat log audit ke tabel `pasak_logs`.
 2. **`ResetLoginAttempts`** (mendengarkan `\Illuminate\Auth\Events\Login`):
    - Ketika pengguna berhasil login, listener ini langsung memanggil `LoginThrottleService::registerSuccess($email, $ip)`.
    - Menghapus riwayat kegagalan dan mereset status penguncian untuk email & IP tersebut.

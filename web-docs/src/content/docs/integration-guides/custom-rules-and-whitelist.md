@@ -5,13 +5,13 @@ sidebar:
   order: 3
 ---
 
-Setiap aplikasi memiliki karakteristik lalu lintas data dan kebutuhan bisnis yang unik. Anda dapat memperluas aturan deteksi WAF bawaan dan mengonfigurasi pengecualian subnet (CIDR) secara fleksibel melalui `config/security.php`.
+Setiap aplikasi memiliki karakteristik lalu lintas data dan kebutuhan bisnis yang unik. Anda dapat memperluas aturan deteksi WAF bawaan dan mengonfigurasi pengecualian subnet (CIDR) secara fleksibel melalui `config/pasak.php`.
 
 ---
 
 ## 1. Mendaftarkan Signature Zero-Tolerance Kustom
 
-Jika aplikasi Anda memiliki endpoint khusus yang kerap diserang atau Anda ingin langsung memblokir percobaan pencarian berkas tertentu (misalnya probe terhadap `/wp-login.php` atau `/actuator/health`), tambahkan ke array `instant_block.signatures` di `config/security.php`:
+Jika aplikasi Anda memiliki endpoint khusus yang kerap diserang atau Anda ingin langsung memblokir percobaan pencarian berkas tertentu (misalnya probe terhadap `/wp-login.php` atau `/actuator/health`), tambahkan ke array `instant_block.signatures` di `config/pasak.php`:
 
 ```php
 'instant_block' => [
