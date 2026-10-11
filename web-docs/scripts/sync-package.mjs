@@ -11,7 +11,7 @@
  * Jalankan: node scripts/sync-package.mjs
  */
 import { execFileSync } from 'node:child_process';
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { copyFileSync, existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -177,6 +177,28 @@ async function main() {
 		}
 	} else {
 		console.warn('! changelog.md tidak diperbarui (sumber tidak tersedia).');
+	}
+
+	// --- paparan (.pptx) ---
+	// Salin deck presentasi ke public/downloads agar bisa diunduh pengunjung.
+	// Dijalankan setiap build supaya berkas unduhan selalu semutakhir generate.php.
+	const deckSource = join(pkgRoot, 'paparan', 'Pasak-Bulwark.pptx');
+	const deckTarget = join(webRoot, 'public', 'downloads', 'Pasak-Bulwark.pptx');
+	try {
+		if (existsSync(deckSource)) {
+			const fresh =
+				!existsSync(deckTarget) ||
+				statSync(deckSource).mtimeMs > statSync(deckTarget).mtimeMs;
+			if (fresh) {
+				mkdirSync(join(webRoot, 'public', 'downloads'), { recursive: true });
+				copyFileSync(deckSource, deckTarget);
+				console.log('✓ public/downloads/Pasak-Bulwark.pptx');
+			}
+		} else {
+			console.warn('! paparan/Pasak-Bulwark.pptx tidak ditemukan; unduhan dilewati.');
+		}
+	} catch (error) {
+		console.warn(`! sinkronisasi paparan dilewati: ${error.message}`);
 	}
 }
 
