@@ -9,6 +9,7 @@ All notable changes to `robyajo/pasak` will be documented in this file.
 - **Halaman detail dashboard (Logs, Blocked IPs, Appeals)**: rute `logs/{id}`, `blocked-ips/{id}`, `tickets/{id}` (`*.show`) di semua varian (Blade, Livewire, React, gabungan) dengan tampilan evidence/konteks request, log pemicu, tiket terkait, dan aksi langsung (hapus, toggle/unblock, approve/reject). Kolom **Detail** ditambahkan di ketiga tabel index.
 - **Toggle dark mode manual** di semua stack dashboard (Blade, Livewire, React): tombol Auto → Terang → Gelap di navigasi, tersimpan di `localStorage` (`pasak-theme`), tanpa flicker (tema diterapkan sebelum paint). Layout Blade kini memakai `color-scheme` dan background body mengikuti tema (sebelumnya body terkunci terang).
 - **Ringkasan akhir `pasak:install` mencantumkan URL akses dashboard** (overview, logs, blocked-ips, server, sessions, tickets, settings) berdasarkan `APP_URL` + prefix terkonfigurasi, plus langkah khusus untuk pilihan Livewire saja.
+- **`syncDashboardChoice` ditulis ulang tanpa pola `&&` yang selalu benar** (CI PHPStan `booleanAnd.leftAlwaysTrue` pada `SecurityInstallCommand.php:527`); perilaku strict-by-choice tidak berubah.
 - **Varian stub rute per-driver** (`stubs/routes/pasak-blade/livewire/react.php.stub`): `pasak:install` kini menulis `routes/pasak.php` hanya berisi rute stack terpilih (varian gabungan untuk `both`; file dilewati untuk `none`/`--api-only`). Stub gabungan `pasak.php.stub` tetap dipakai untuk `both` dan sinkronisasi `pasak:upgrade --sync-routes`.
 
 ### Fixed

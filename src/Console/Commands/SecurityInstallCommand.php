@@ -504,27 +504,14 @@ class SecurityInstallCommand extends Command
      */
     protected function syncDashboardChoice(bool $withDashboard, bool $withPlainDashboard, bool $withReactDashboard, bool $withBoth, bool $apiOnly): void
     {
-        $wantBladeViews = $withDashboard || $withPlainDashboard || $withBoth;
-        $wantTsx = $withReactDashboard || $withBoth;
+        $wantBladeViews = ($withDashboard || $withPlainDashboard || $withBoth) && ! $apiOnly;
+        $wantTsx = ($withReactDashboard || $withBoth) && ! $apiOnly;
 
-        if ($apiOnly) {
-            $wantBladeViews = false;
-            $wantTsx = false;
-        }
-
-        if (! $wantBladeViews && ! $wantTsx) {
-            foreach (['views/pages/pasak', 'js/pages/pasak', 'js/components/pasak'] as $relative) {
-                $path = resource_path($relative);
-                if (File::isDirectory($path)) {
-                    File::deleteDirectory($path);
-                    $this->line("  ✓ Direktori resources/{$relative} dari stack lain dibersihkan (pilihan: none).");
-                }
-            }
-
+        if ($wantBladeViews && $wantTsx) {
             return;
         }
 
-        if ($wantBladeViews && ! $wantTsx) {
+        if ($wantBladeViews) {
             foreach (['js/pages/pasak', 'js/components/pasak'] as $relative) {
                 $path = resource_path($relative);
                 if (File::isDirectory($path)) {
@@ -536,11 +523,21 @@ class SecurityInstallCommand extends Command
             return;
         }
 
-        if ($wantTsx && ! $wantBladeViews) {
+        if ($wantTsx) {
             $path = resource_path('views/pages/pasak');
             if (File::isDirectory($path)) {
                 File::deleteDirectory($path);
                 $this->line('  ✓ Direktori resources/views/pages/pasak (Blade) dibersihkan (pilihan: React).');
+            }
+
+            return;
+        }
+
+        foreach (['views/pages/pasak', 'js/pages/pasak', 'js/components/pasak'] as $relative) {
+            $path = resource_path($relative);
+            if (File::isDirectory($path)) {
+                File::deleteDirectory($path);
+                $this->line("  ✓ Direktori resources/{$relative} dari stack lain dibersihkan (pilihan: none).");
             }
         }
     }
