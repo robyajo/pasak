@@ -352,3 +352,75 @@ test(
         expect(File::exists($tsxDir.'/overview.tsx'))->toBeTrue();
     },
 );
+
+test(
+    'install with plain choice removes react leftovers so only the chosen stack exists',
+    function () {
+        $bladeDir = resource_path('views/pages/pasak');
+        $tsxDir = resource_path('js/pages/pasak');
+        $componentsDir = resource_path('js/components/pasak');
+
+        File::makeDirectory($tsxDir, 0755, true, true);
+        File::makeDirectory($componentsDir, 0755, true, true);
+        File::put($tsxDir.'/stale.tsx', 'stale');
+        File::put($componentsDir.'/stale.tsx', 'stale');
+
+        $this->artisan('pasak:install', [
+            '--force' => true,
+            '--with-plain' => true,
+            '--without-nginx' => true,
+            '--without-htaccess' => true,
+            '--without-env' => true,
+        ])->assertSuccessful();
+
+        expect(File::exists($bladeDir.'/overview.blade.php'))->toBeTrue()
+            ->and(File::isDirectory($tsxDir))->toBeFalse()
+            ->and(File::isDirectory($componentsDir))->toBeFalse();
+    },
+);
+
+test(
+    'install with react choice removes blade dashboard leftovers so only tsx exists',
+    function () {
+        $bladeDir = resource_path('views/pages/pasak');
+        $tsxDir = resource_path('js/pages/pasak');
+
+        File::makeDirectory($bladeDir, 0755, true, true);
+        File::put($bladeDir.'/stale.blade.php', 'stale');
+
+        $this->artisan('pasak:install', [
+            '--force' => true,
+            '--with-react-dashboard' => true,
+            '--without-nginx' => true,
+            '--without-htaccess' => true,
+            '--without-env' => true,
+        ])->assertSuccessful();
+
+        expect(File::exists($tsxDir.'/overview.tsx'))->toBeTrue()
+            ->and(File::isDirectory($bladeDir))->toBeFalse();
+    },
+);
+
+test(
+    'install with api-only removes both dashboard stacks',
+    function () {
+        $bladeDir = resource_path('views/pages/pasak');
+        $tsxDir = resource_path('js/pages/pasak');
+
+        File::makeDirectory($bladeDir, 0755, true, true);
+        File::makeDirectory($tsxDir, 0755, true, true);
+        File::put($bladeDir.'/stale.blade.php', 'stale');
+        File::put($tsxDir.'/stale.tsx', 'stale');
+
+        $this->artisan('pasak:install', [
+            '--force' => true,
+            '--api-only' => true,
+            '--without-nginx' => true,
+            '--without-htaccess' => true,
+            '--without-env' => true,
+        ])->assertSuccessful();
+
+        expect(File::isDirectory($bladeDir))->toBeFalse()
+            ->and(File::isDirectory($tsxDir))->toBeFalse();
+    },
+);

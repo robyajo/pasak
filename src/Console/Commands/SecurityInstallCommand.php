@@ -215,6 +215,10 @@ class SecurityInstallCommand extends Command
             ]);
         }
 
+        // 6. Sinkronkan direktori dashboard dengan pilihan (strict by choice):
+        //    hapus stack yang TIDAK dipilih agar hanya pilihan user yang ada.
+        $this->syncDashboardChoice($withDashboard, $withPlainDashboard, $withReactDashboard, $withBoth, $apiOnly);
+
         // 6. Publish Livewire Starter Kit monitoring dashboard
         if ($withDashboard) {
             $this->comment(
@@ -380,7 +384,6 @@ class SecurityInstallCommand extends Command
             ];
         } elseif ($withPlainDashboard) {
             $steps[] = [$this->t("Dashboard Blade murni: siap diakses pada prefix {$dashboardPrefix} (wajib login, tanpa Livewire).", "Plain Blade dashboard: ready at the {$dashboardPrefix} prefix (login required, no Livewire needed)."), $doc('integration-guides/frontend-blade-livewire')];
-            $steps[] = [$this->t("Dashboard Blade: siap diakses pada prefix {$dashboardPrefix} (wajib login).", "Blade dashboard: ready at the {$dashboardPrefix} prefix (login required)."), $doc('integration-guides/frontend-blade-livewire')];
         } elseif ($withReactDashboard) {
             $steps[] = [
                 $this->t("Dashboard TSX: siap diakses pada prefix {$dashboardPrefix} (wajib login).", "TSX dashboard: ready at the {$dashboardPrefix} prefix (login required)."),
@@ -446,6 +449,56 @@ class SecurityInstallCommand extends Command
 
         $this->line('  📖 '.$this->docs('getting-started/installation'));
         $this->newLine();
+    }
+
+    /**
+     * Hapus direktori dashboard dari stack yang TIDAK dipilih sehingga hasil
+     * instalasi strict mengikuti pilihan user (plain/livewire/react/both/none).
+     *
+     * Direktori resources/views/pages/pasak dipakai bersama oleh Livewire dan
+     * plain Blade, sedangkan resources/js/pages+components/pasak milik React.
+     */
+    protected function syncDashboardChoice(bool $withDashboard, bool $withPlainDashboard, bool $withReactDashboard, bool $withBoth, bool $apiOnly): void
+    {
+        $wantBladeViews = $withDashboard || $withPlainDashboard || $withBoth;
+        $wantTsx = $withReactDashboard || $withBoth;
+
+        if ($apiOnly) {
+            $wantBladeViews = false;
+            $wantTsx = false;
+        }
+
+        if (! $wantBladeViews && ! $wantTsx) {
+            foreach (['views/pages/pasak', 'js/pages/pasak', 'js/components/pasak'] as $relative) {
+                $path = resource_path($relative);
+                if (File::isDirectory($path)) {
+                    File::deleteDirectory($path);
+                    $this->line("  ✓ Direktori resources/{$relative} dari stack lain dibersihkan (pilihan: none).");
+                }
+            }
+
+            return;
+        }
+
+        if ($wantBladeViews && ! $wantTsx) {
+            foreach (['js/pages/pasak', 'js/components/pasak'] as $relative) {
+                $path = resource_path($relative);
+                if (File::isDirectory($path)) {
+                    File::deleteDirectory($path);
+                    $this->line("  ✓ Direktori resources/{$relative} (React) dibersihkan (pilihan: Blade).");
+                }
+            }
+
+            return;
+        }
+
+        if ($wantTsx && ! $wantBladeViews) {
+            $path = resource_path('views/pages/pasak');
+            if (File::isDirectory($path)) {
+                File::deleteDirectory($path);
+                $this->line('  ✓ Direktori resources/views/pages/pasak (Blade) dibersihkan (pilihan: React).');
+            }
+        }
     }
 
     /**

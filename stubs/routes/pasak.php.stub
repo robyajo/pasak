@@ -47,7 +47,7 @@ Route::middleware(array_merge($middleware, $adminMiddleware))
             Route::delete('tickets/{id}', [\Internal\Pasak\Http\Controllers\Dashboard\TicketController::class, 'destroy'])->whereNumber('id')->name('tickets.destroy');
             Route::get('settings', [\Internal\Pasak\Http\Controllers\Dashboard\SettingController::class, 'index'])->name('settings');
             Route::post('settings', [\Internal\Pasak\Http\Controllers\Dashboard\SettingController::class, 'update'])->name('settings.update');
-        } elseif (class_exists(\Livewire\Livewire::class)) {
+        } elseif (in_array($driver, ['livewire', 'all', 'both'], true) && class_exists(\Livewire\Livewire::class)) {
             // Rute Livewire Single-File Pages (render view di resources/views/pages/pasak)
             Route::livewire('/', 'pages::pasak.overview')->name('overview');
             Route::livewire('logs', 'pages::pasak.logs')->name('logs');

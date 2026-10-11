@@ -83,6 +83,7 @@ test('pasak uninstall removes all traces without touching host files', function 
         ->and(File::get($uninstallDir.'/routes/web.php'))->toContain('<?php')
         ->and(File::get($uninstallDir.'/bootstrap/app.php'))->not->toContain('BlockIpAddress')
         ->and(File::get($uninstallDir.'/bootstrap/app.php'))->toContain('withMiddleware')
+        ->and(File::get($uninstallDir.'/bootstrap/app.php'))->not->toContain('->append')
         ->and(File::get($uninstallDir.'/app/Models/User.php'))->not->toContain('HasSecurityRelations')
         ->and(File::get($uninstallDir.'/app/Models/User.php'))->toContain('class User')
         ->and(File::get($uninstallDir.'/.env'))->not->toContain('PASAK_')

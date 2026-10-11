@@ -193,9 +193,9 @@ class PasakUninstallCommand extends Command
                 fn ($line) => ! $this->lineReferences($line, $markers)
             ));
 
-            // Bersihkan blok append yang kini kosong: "->append([\n]);"
+            // Bersihkan blok append yang kini kosong: "$middleware->append([\n]);"
             $content = preg_replace(
-                '/->[a-zA-Z_]+->append\\(\\[\\s*\\]\\);\\n?/',
+                '/(?:->[a-zA-Z_]+)?->append\(\[\s*\]\);\n?/',
                 '',
                 implode("\n", $filtered)
             );

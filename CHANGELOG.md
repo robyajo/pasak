@@ -2,6 +2,19 @@
 
 All notable changes to `robyajo/pasak` will be documented in this file.
 
+## [Unreleased]
+
+### Fixed
+
+- **`pasak:install` strict by choice**: installer kini menghapus direktori dashboard dari stack yang TIDAK dipilih (`syncDashboardChoice`), sehingga hasil instalasi hanya berisi pilihan user — `plain`/`livewire` hanya menyisakan `resources/views/pages/pasak`, `react` hanya `resources/js/pages+components/pasak`, `none`/`--api-only` menghapus keduanya.
+- **Stub `routes/pasak.php` menghormati `dashboard.driver`**: cabang Livewire kini mensyaratkan `driver` bernilai `livewire`/`all`/`both` (sebelumnya hanya `class_exists(Livewire)`, sehingga app Blade yang kebetulan memasang Livewire jatuh ke rute Livewire walau memilih plain).
+- **Ringkasan akhir instalasi ganda untuk plain**: baris duplikat "Dashboard Blade: ..." dihapus, tersisa satu baris "Dashboard Blade murni: ...".
+- **`pasak:uninstall` membersihkan blok `$middleware->append([])` yang kosong** di `bootstrap/app.php` (regex lama hanya cocok pola panah ganda).
+
+### Verified
+
+- Suite **136 passed (577 assertions)** termasuk 3 test baru strict-by-choice (plain menghapus sisa React, react menghapus sisa Blade, api-only menghapus keduanya) + asersi uninstall tanpa sisa `->append`.
+
 ## [1.1.5] - 2026-10-11
 
 ### Added
