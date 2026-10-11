@@ -1,9 +1,9 @@
 ---
 title: "Changelog"
-description: "Riwayat lengkap perubahan paket robyajo/pasak. Versi terbaru: v1.0.3."
+description: "Riwayat lengkap perubahan paket robyajo/pasak. Versi terbaru: v1.0.4."
 ---
 
-Versi terbaru: **v1.0.3** · [Packagist](https://packagist.org/packages/robyajo/pasak) · [Repositori GitHub](https://github.com/robyajo/pasak)
+Versi terbaru: **v1.0.4** · [Packagist](https://packagist.org/packages/robyajo/pasak) · [Repositori GitHub](https://github.com/robyajo/pasak)
 
 All notable changes to `robyajo/pasak` will be documented in this file.
 
