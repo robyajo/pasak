@@ -94,7 +94,7 @@ Paket mendaftarkan 4 alias middleware resmi:
 - `'pasak.block'` ➔ `BlockIpAddress`
 - `'pasak.detect'` ➔ `DetectSecurityThreats`
 - `'pasak.admin'` ➔ `EnsureSecurityAdmin`
-- `'security.activity'` ➔ `TrackUserActivity`
+- `'pasak.activity'` ➔ `TrackUserActivity`
 
 Pengembang dapat memasangnya di mana saja: sebagai middleware global, di grup `web`, grup `api`, atau pada rute individual.
 
