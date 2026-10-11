@@ -79,7 +79,7 @@ Perintah ini akan secara otomatis:
 8. **Menyiapkan Dukungan API & Berkas Rute Kustom (`routes/`)**:
     - Memeriksa apakah berkas `routes/api.php` sudah tersedia. Jika belum (pada Laravel 11+), otomatis menjalankan `php artisan install:api` agar dukungan API aktif.
     - Menghasilkan berkas `routes/pasak-api.php` untuk endpoint headless REST API dan menyertakannya di `routes/api.php` (`require __DIR__.'/pasak-api.php';`).
-    - Menghasilkan berkas `routes/pasak.php` untuk rute web dashboard yang langsung me-render ke view dan menyertakannya di `routes/web.php` (`require __DIR__.'/pasak.php';`).
+    - Menghasilkan berkas `routes/pasak.php` untuk rute web dashboard yang langsung me-render ke view dan menyertakannya di `routes/web.php` (`require __DIR__.'/pasak.php';`). Isinya strict mengikuti pilihan dashboard — hanya rute stack terpilih (`plain`, `livewire`, atau `react`; varian gabungan untuk `both`, dilewati untuk `none`/`--api-only`).
     - Memberikan kebebasan penuh kepada developer untuk mengkustomisasi prefix URL, middleware, otorisasi, dan tampilan tanpa terkunci pada rute internal paket.
 
 ### Opsi Perintah:
@@ -288,6 +288,8 @@ protected $middleware = [
 ## 8. Dashboard Monitoring (Opsional)
 
 Paket tetap 100% headless secara default. Bila membutuhkan panel monitoring siap pakai, pilih salah satu stack.
+
+> ℹ️ Instalasi strict mengikuti pilihan: hanya view dan rute (`routes/pasak.php`) dari stack terpilih yang dipasang — sisa stack lain otomatis dibersihkan.
 
 ### A. Blade Murni (semua aplikasi Laravel, tanpa Livewire/Inertia)
 

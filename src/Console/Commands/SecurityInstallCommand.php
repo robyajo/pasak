@@ -155,6 +155,8 @@ class SecurityInstallCommand extends Command
             $withReactDashboard = true;
         }
 
+        $dashboardChoice = $this->dashboardChoice($withDashboard, $withPlainDashboard, $withReactDashboard, $withBoth, $apiOnly);
+
         // 3. Cek kelengkapan lingkungan sebelum memasang apa pun.
         $this->runReadinessCheck();
 
@@ -275,7 +277,7 @@ class SecurityInstallCommand extends Command
                     ? 'Menyiapkan rute mandiri API-only (routes/pasak-api.php)...'
                     : 'Menyiapkan rute mandiri (routes/pasak.php & routes/pasak-api.php)...',
             );
-            $this->publishSecurityRoutes($force, $withoutApi, $apiOnly);
+            $this->publishSecurityRoutes($force, $withoutApi, $apiOnly, $dashboardChoice);
         }
 
         // 11. Append / Update Environment Variables with rich comments to .env & .env.example
@@ -331,7 +333,7 @@ class SecurityInstallCommand extends Command
             ];
         }
         if (! $withoutRoutes) {
-            $steps[] = [$apiOnly
+            $steps[] = [($apiOnly || $dashboardChoice === 'none')
                 ? $this->t('Rute kustom API: berkas routes/pasak-api.php siap dikustomisasi.', 'Custom API routes: routes/pasak-api.php is ready to customize.')
                 : $this->t('Rute kustom: berkas routes/pasak.php (web) dan routes/pasak-api.php (API) siap dikustomisasi.', 'Custom routes: routes/pasak.php (web) and routes/pasak-api.php (API) are ready to customize.'),
                 $doc('api-reference/api-overview')];
@@ -449,6 +451,36 @@ class SecurityInstallCommand extends Command
 
         $this->line('  📖 '.$this->docs('getting-started/installation'));
         $this->newLine();
+    }
+
+    /**
+     * Tentukan satu pilihan dashboard final dari kombinasi flag wizard.
+     *
+     * @return string livewire|plain|react|both|none
+     */
+    protected function dashboardChoice(bool $withDashboard, bool $withPlainDashboard, bool $withReactDashboard, bool $withBoth, bool $apiOnly): string
+    {
+        if ($apiOnly) {
+            return 'none';
+        }
+
+        if ($withBoth || ($withReactDashboard && ($withDashboard || $withPlainDashboard))) {
+            return 'both';
+        }
+
+        if ($withReactDashboard) {
+            return 'react';
+        }
+
+        if ($withDashboard && ! $withPlainDashboard) {
+            return 'livewire';
+        }
+
+        if ($withDashboard || $withPlainDashboard) {
+            return 'plain';
+        }
+
+        return 'none';
     }
 
     /**
@@ -901,8 +933,12 @@ PHP
 
     /**
      * Publikasikan berkas rute pasak.php dan pasak-api.php ke direktori routes/ host application.
+     *
+     * Berkas routes/pasak.php ditulis dari varian stub sesuai pilihan dashboard
+     * (blade/livewire/react) agar hanya stack terpilih yang terpasang; varian
+     * gabungan dipakai untuk pilihan both.
      */
-    protected function publishSecurityRoutes(bool $force, bool $withoutApi = false, bool $apiOnly = false): void
+    protected function publishSecurityRoutes(bool $force, bool $withoutApi = false, bool $apiOnly = false, string $dashboardChoice = 'none'): void
     {
         if (! $withoutApi) {
             $this->ensureApiRoutesInstalled();
@@ -929,9 +965,21 @@ PHP
             }
         }
 
-        // 2. Publikasikan routes/pasak.php (dilewati pada mode API-only).
-        if (! $apiOnly) {
-            $webStubPath = __DIR__.'/../../../stubs/routes/pasak.php.stub';
+        // 2. Publikasikan routes/pasak.php (dilewati pada mode API-only dan pilihan none).
+        if (! $apiOnly && $dashboardChoice !== 'none') {
+            $variantFile = match ($dashboardChoice) {
+                'plain' => 'pasak-blade.php.stub',
+                'livewire' => 'pasak-livewire.php.stub',
+                'react' => 'pasak-react.php.stub',
+                default => 'pasak.php.stub',
+            };
+            $webStubPath = __DIR__.'/../../../stubs/routes/'.$variantFile;
+            if (! File::exists($webStubPath)) {
+                $webStubPath = dirname(__DIR__, 2).'/stubs/routes/'.$variantFile;
+            }
+            if (! File::exists($webStubPath)) {
+                $webStubPath = __DIR__.'/../../../stubs/routes/pasak.php.stub';
+            }
             if (! File::exists($webStubPath)) {
                 $webStubPath = dirname(__DIR__, 2).'/stubs/routes/pasak.php.stub';
             }
@@ -940,7 +988,7 @@ PHP
             if (File::exists($webStubPath)) {
                 if (! File::exists($targetWebPath) || $force) {
                     File::copy($webStubPath, $targetWebPath);
-                    $this->info('  ✓ Berkas routes/pasak.php berhasil dibuat (render view langsung).');
+                    $this->info("  ✓ Berkas routes/pasak.php berhasil dibuat (khusus {$dashboardChoice}).");
                 } else {
                     $this->line('  ✓ Berkas routes/pasak.php sudah ada.');
                 }

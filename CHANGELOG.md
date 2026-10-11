@@ -4,6 +4,10 @@ All notable changes to `robyajo/pasak` will be documented in this file.
 
 ## [Unreleased]
 
+### Added
+
+- **Varian stub rute per-driver** (`stubs/routes/pasak-blade/livewire/react.php.stub`): `pasak:install` kini menulis `routes/pasak.php` hanya berisi rute stack terpilih (varian gabungan untuk `both`; file dilewati untuk `none`/`--api-only`). Stub gabungan `pasak.php.stub` tetap dipakai untuk `both` dan sinkronisasi `pasak:upgrade --sync-routes`.
+
 ### Fixed
 
 - **`pasak:install` strict by choice**: installer kini menghapus direktori dashboard dari stack yang TIDAK dipilih (`syncDashboardChoice`), sehingga hasil instalasi hanya berisi pilihan user — `plain`/`livewire` hanya menyisakan `resources/views/pages/pasak`, `react` hanya `resources/js/pages+components/pasak`, `none`/`--api-only` menghapus keduanya.

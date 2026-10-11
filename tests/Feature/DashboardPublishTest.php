@@ -424,3 +424,136 @@ test(
             ->and(File::isDirectory($tsxDir))->toBeFalse();
     },
 );
+
+test(
+    'install with plain publishes blade-only web routes without inertia or livewire',
+    function () {
+        $webRouteFile = base_path('routes/pasak.php');
+        @unlink($webRouteFile);
+
+        try {
+            $this->artisan('pasak:install', [
+                '--force' => true,
+                '--with-plain' => true,
+                '--without-nginx' => true,
+                '--without-htaccess' => true,
+                '--without-env' => true,
+            ])->assertSuccessful();
+
+            $routes = File::get($webRouteFile);
+
+            expect($routes)->toContain('OverviewController::class')
+                ->and($routes)->toContain('resources/views/pages/pasak')
+                ->and($routes)->not->toContain('Inertia\Inertia::class')
+                ->and($routes)->not->toContain('Livewire\Livewire::class')
+                ->and($routes)->not->toContain('Route::livewire');
+        } finally {
+            @unlink($webRouteFile);
+        }
+    },
+);
+
+test(
+    'install with livewire publishes livewire-only web routes',
+    function () {
+        $webRouteFile = base_path('routes/pasak.php');
+        @unlink($webRouteFile);
+
+        try {
+            $this->artisan('pasak:install', [
+                '--force' => true,
+                '--with-dashboard' => true,
+                '--without-nginx' => true,
+                '--without-htaccess' => true,
+                '--without-env' => true,
+            ])->assertSuccessful();
+
+            $routes = File::get($webRouteFile);
+
+            expect($routes)->toContain('Route::livewire')
+                ->and($routes)->toContain('pages::pasak')
+                ->and($routes)->not->toContain('Inertia\Inertia::class')
+                ->and($routes)->not->toContain('OverviewController::class');
+        } finally {
+            @unlink($webRouteFile);
+        }
+    },
+);
+
+test(
+    'install with react publishes react-only web routes without livewire',
+    function () {
+        $webRouteFile = base_path('routes/pasak.php');
+        @unlink($webRouteFile);
+
+        try {
+            $this->artisan('pasak:install', [
+                '--force' => true,
+                '--with-react-dashboard' => true,
+                '--without-nginx' => true,
+                '--without-htaccess' => true,
+                '--without-env' => true,
+            ])->assertSuccessful();
+
+            $routes = File::get($webRouteFile);
+
+            expect($routes)->toContain('Inertia')
+                ->and($routes)->toContain('resources/js/pages/pasak')
+                ->and($routes)->not->toContain('Livewire\Livewire::class')
+                ->and($routes)->not->toContain('Route::livewire');
+        } finally {
+            @unlink($webRouteFile);
+        }
+    },
+);
+
+test(
+    'install with both publishes the combined web routes',
+    function () {
+        $webRouteFile = base_path('routes/pasak.php');
+        @unlink($webRouteFile);
+
+        try {
+            $this->artisan('pasak:install', [
+                '--force' => true,
+                '--with-both' => true,
+                '--without-nginx' => true,
+                '--without-htaccess' => true,
+                '--without-env' => true,
+            ])->assertSuccessful();
+
+            $routes = File::get($webRouteFile);
+
+            expect($routes)->toContain('Inertia')
+                ->and($routes)->toContain('Livewire');
+        } finally {
+            @unlink($webRouteFile);
+        }
+    },
+);
+
+test(
+    'install with stack none skips the web dashboard routes file',
+    function () {
+        $webRouteFile = base_path('routes/pasak.php');
+        $apiRouteFile = base_path('routes/pasak-api.php');
+        @unlink($webRouteFile);
+        @unlink($apiRouteFile);
+
+        try {
+            $this->artisan('pasak:install', [
+                '--force' => true,
+                '--stack' => 'none',
+                '--without-nginx' => true,
+                '--without-htaccess' => true,
+                '--without-env' => true,
+            ])->assertSuccessful();
+
+            expect(File::exists($apiRouteFile))->toBeTrue()
+                ->and(File::exists($webRouteFile))->toBeFalse();
+        } finally {
+            @unlink($webRouteFile);
+            @unlink($apiRouteFile);
+        }
+    },
+);

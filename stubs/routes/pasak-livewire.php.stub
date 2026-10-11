@@ -1,0 +1,33 @@
+<?php
+
+use Illuminate\Support\Facades\Route;
+
+/*
+|--------------------------------------------------------------------------
+| Pasak Web Dashboard Routes (Livewire)
+|--------------------------------------------------------------------------
+|
+| Rute dashboard Livewire — HANYA untuk stack yang dipilih saat instalasi
+| (--with-livewire / --with-dashboard / --stack=livewire). Me-render
+| Single-File Pages di resources/views/pages/pasak sehingga Anda bebas
+| menyesuaikan tampilan, prefix URL, middleware, atau menambah halaman sendiri.
+|
+*/
+
+$prefix = config('pasak.dashboard.prefix', 'pasak');
+$middleware = array_filter((array) config('pasak.dashboard.middleware', ['web', 'auth']));
+$adminMiddleware = array_filter((array) config('pasak.dashboard.admin_middleware', []));
+
+Route::middleware(array_merge($middleware, $adminMiddleware))
+    ->prefix($prefix)
+    ->name('pasak.dashboard.')
+    ->group(function () {
+        // Rute Livewire Single-File Pages (render view di resources/views/pages/pasak)
+        Route::livewire('/', 'pages::pasak.overview')->name('overview');
+        Route::livewire('logs', 'pages::pasak.logs')->name('logs');
+        Route::livewire('blocked-ips', 'pages::pasak.blocked-ips')->name('blocked-ips');
+        Route::livewire('server', 'pages::pasak.server')->name('server');
+        Route::livewire('sessions', 'pages::pasak.sessions')->name('sessions');
+        Route::livewire('tickets', 'pages::pasak.tickets')->name('tickets');
+        Route::livewire('settings', 'pages::pasak.settings')->name('settings');
+    });
