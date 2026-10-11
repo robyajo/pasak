@@ -65,7 +65,12 @@ _version_part() {
     echo "${part:-0}"
 }
 
-# Naikkan versi sesuai tipe bump: major | minor | patch.
+# Naikkan versi sesuai tipe bump: minor | patch.
+# Aturan proyek:
+#   - patch hanya sampai .10 (v1.0.9 -> v1.0.10), selebihnya rollover
+#     ke minor berikutnya (v1.0.10 -> v1.1.0, v1.1.10 -> v1.2.0).
+#   - major (v2.0.0, v3.0.0, ...) TIDAK PERNAH otomatis; hanya bila
+#     pemilik memintanya eksplisit via "-t vX.0.0".
 bump_version() {
     local version="$1"
     local type="$2"
@@ -76,15 +81,21 @@ bump_version() {
     patch=$(_version_part "$version" 3)
 
     case "$type" in
-        major) major=$((major + 1)); minor=0; patch=0 ;;
         minor) minor=$((minor + 1)); patch=0 ;;
-        *)     patch=$((patch + 1)) ;;
+        *)
+            patch=$((patch + 1))
+            if [ "$patch" -gt 10 ]; then
+                minor=$((minor + 1)); patch=0
+            fi
+            ;;
     esac
 
     echo "${major}.${minor}.${patch}"
 }
 
 # Tentukan tipe bump dari Conventional Commits antara tag terakhir dan HEAD.
+# Major TIDAK PERNAH otomatis (hanya via "-t vX.0.0" eksplisit): commit
+# BREAKING CHANGE / "feat!:" diperlakukan sebagai minor.
 detect_bump_type() {
     local range="$1"
     local log
@@ -96,7 +107,7 @@ detect_bump_type() {
     fi
 
     if printf '%s' "$log" | grep -qE 'BREAKING[ _-]?CHANGE|[[:alnum:]]+(\([^)]+\))?!: '; then
-        echo "major"
+        echo "minor"
         return
     fi
 
