@@ -106,12 +106,12 @@ detect_bump_type() {
         log=$(git log --pretty=format:'%s%n%b' 2>/dev/null || true)
     fi
 
-    if printf '%s' "$log" | grep -qE 'BREAKING[ _-]?CHANGE|[[:alnum:]]+(\([^)]+\))?!: '; then
+    if printf '%s' "$log" | grep -qE 'BREAKING[ _-]?CHANGE|[[:alnum:]]+(\([^)]+\))?!:'; then
         echo "minor"
         return
     fi
 
-    if printf '%s' "$log" | grep -qE '^feat(\([^)]+\))?!?: '; then
+    if printf '%s' "$log" | grep -qE '^feat(\([^)]+\))?!?:'; then
         echo "minor"
         return
     fi
@@ -182,6 +182,8 @@ show_help() {
     echo -e "                        Tanpa opsi ini, versi rekomendasi dipakai otomatis"
     echo -e "                        sehingga setiap push selalu menaikkan versi"
     echo -e "  --no-tag              Lewatkan pembuatan tag rilis"
+echo -e "  --no-verify           Lewatkan gerbang kualitas pre-push (Pest/PHPStan)"
+echo -e "                        Hanya untuk keadaan darurat; CI tetap berjalan"
     echo -e "  --no-docs-build       Lewatkan build dokumentasi web (finis.sh)"
     echo -e "  -b, --branch <name>   Nama branch target (default: branch aktif)"
     echo -e "  -r, --remote <name>   Nama remote git (default: origin)"
@@ -192,6 +194,7 @@ show_help() {
     echo -e "  ./push.sh -m \"docs: update installation guide\""
     echo -e "  ./push.sh -m \"release: launch v1.0.0\" -t \"v1.0.0\""
     echo -e "  ./push.sh -m \"fix: patch bug\" --no-tag"
+echo -e "  ./push.sh -m \"fix: darurat\" --no-verify --no-tag"
     echo ""
     echo -e "${BOLD}CATATAN:${NC}"
     echo -e "  Pengecekan versi (sekarang vs rekomendasi) SELALU dijalankan."
@@ -202,6 +205,7 @@ show_help() {
 COMMIT_MSG=""
 TAG_NAME=""
 NO_TAG=0
+NO_VERIFY=0
 NO_DOCS_BUILD=0
 REMOTE_NAME="origin"
 TARGET_BRANCH=""
@@ -218,6 +222,10 @@ while [[ $# -gt 0 ]]; do
             ;;
         --no-tag)
             NO_TAG=1
+            shift
+            ;;
+        --no-verify)
+            NO_VERIFY=1
             shift
             ;;
         --no-docs-build)
@@ -311,6 +319,43 @@ if [ -n "$PENDING_TAG" ] && [ -f "src/Services/PasakService.php" ]; then
     fi
 fi
 
+# 0d. Gerbang kualitas pre-push (Pest wajib hijau; PHPStan bila tersedia).
+#     Gagal = push dibatalkan. Lewati hanya untuk darurat via --no-verify.
+echo -e "${BOLD}${CYAN}----------------------------------------------------------------------${NC}"
+echo -e "${BOLD}  ✅ Gerbang Kualitas Pre-Push${NC}"
+echo -e "${BOLD}${CYAN}----------------------------------------------------------------------${NC}"
+if [ "$NO_VERIFY" -eq 1 ]; then
+    print_warning "Gerbang kualitas dilewati (--no-verify). CI tetap berjalan di remote."
+else
+    if [ -x "vendor/bin/pest" ]; then
+        print_info "Menjalankan Pest..."
+        PEST_OUT=$(./vendor/bin/pest 2>&1)
+        PEST_CODE=$?
+        printf '%s\n' "$PEST_OUT" | tail -5
+        if [ "$PEST_CODE" -ne 0 ]; then
+            print_error "Pest gagal; push dibatalkan. Perbaiki dulu atau gunakan --no-verify untuk darurat."
+            exit 1
+        fi
+        print_success "Pest hijau."
+    else
+        print_warning "vendor/bin/pest tidak ditemukan; gerbang Pest dilewati (jalankan composer install dulu)."
+    fi
+    if [ -x "vendor/bin/phpstan" ]; then
+        print_info "Menjalankan PHPStan..."
+        PHPSTAN_OUT=$(./vendor/bin/phpstan analyse --no-progress 2>&1)
+        PHPSTAN_CODE=$?
+        printf '%s\n' "$PHPSTAN_OUT" | tail -5
+        if [ "$PHPSTAN_CODE" -ne 0 ]; then
+            print_error "PHPStan gagal; push dibatalkan. Perbaiki dulu atau gunakan --no-verify untuk darurat."
+            exit 1
+        fi
+        print_success "PHPStan hijau."
+    else
+        print_info "PHPStan tidak terpasang; gerbang PHPStan dilewati (CI tetap memeriksanya)."
+    fi
+fi
+echo ""
+
 # 1. Periksa Status Perubahan File
 STATUS_OUTPUT=$(git status --porcelain)
 
@@ -372,6 +417,13 @@ elif [ -z "$TAG_NAME" ]; then
 fi
 
 if [ -n "$TAG_NAME" ] && [ "$NO_TAG" -eq 0 ]; then
+    # Kebijakan CHANGELOG-first: peringatkan bila tidak ada entri baru sejak tag terakhir.
+    if [ -n "$CURRENT_TAG" ] && [ -f "CHANGELOG.md" ]; then
+        if git diff --quiet "${CURRENT_TAG}..HEAD" -- CHANGELOG.md 2>/dev/null \
+            && git diff --quiet -- CHANGELOG.md 2>/dev/null; then
+            print_warning "CHANGELOG.md tidak berubah sejak ${CURRENT_TAG}; pertimbangkan mencatat perubahan sebelum merilis ${TAG_NAME}."
+        fi
+    fi
     # Jika tag sudah dipakai (lokal maupun remote), naikkan patch
     # terus sampai menemukan nomor versi yang bebas.
     while git rev-parse "$TAG_NAME" >/dev/null 2>&1 \
