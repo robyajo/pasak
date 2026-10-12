@@ -12,6 +12,9 @@ rilis** (tidak ikut ke Packagist; tidak ada ketergantungan Composer).
 - **Manajer paket**: `pnpm` (lockfile: `pnpm-lock.yaml`). Jangan memakai `npm install`
   (akan membuat `package-lock.json` yang konflik). Build esbuild harus diizinkan
   via `pnpm-workspace.yaml` (`allowBuilds: esbuild`, `@tailwindcss/oxide`).
+- **TypeScript strict**: seluruh `src/` adalah `.ts`/`.tsx` (`tsconfig.json` + alias
+  `@/*` → `./src/*`). `pnpm build` = `tsc --noEmit && vite build`; `pnpm typecheck`
+  untuk cek tipe saja. `server/proxy.js` tetap JS (Node, di luar `tsconfig`).
 
 ## 2. Running
 
@@ -33,16 +36,28 @@ app-waf/
 ├── vite.config.js              # plugin React + Tailwind + proxy /api/proxy
 ├── server/proxy.js             # proxy sisi server (POST /api/proxy)
 └── src/
-    ├── App.jsx                 # tipis: susun komponen + analisis surface sekali
-    ├── hooks/useWafConsole.js  # SELURUH state + logika jaringan (klien hanya UI)
+    ├── App.tsx                 # tipis: susun komponen + analisis surface sekali
+    ├── hooks/useWafConsole.ts  # SELURUH state + logika jaringan (klien hanya UI)
     ├── components/             # RequestForm, ResultPanel, HistoryTable, ...
-    │   └── attack/             # tab Pengujian Serangan (tidak menyentuh result tab 1)
+    │   └── attack/             # tab Pengujian Serangan + NoPasakTab (audit 4 tahap, tidak menyentuh result tab 1)
     └── lib/
-        ├── vectors.js          # KATALOG SERANGAN (14 grup, ~91 vektor) + UA presets
-        ├── surface.js          # analyzeSurface: body respons → temuan serang
-        ├── ip.js               # generator IP publik acak
-        └── http.js             # statusTone: status → warna badge
+        ├── vectors.ts          # KATALOG SERANGAN (14 grup, ~91 vektor) + UA presets
+        ├── noPasak.ts          # rekomendasi 9 vektor + 4 tahap audit tanpa-Pasak
+        ├── surface.ts          # analyzeSurface: body respons → temuan serang
+        ├── ip.ts               # generator IP publik acak
+        └── http.ts             # statusTone: status → warna badge
 ```
+
+> **UI shadcn**: seluruh tampilan memakai komponen `@/components/ui`
+> (base-ui + `components.json`, ikon `lucide-react`). Jangan tulis ulang
+> dengan `div` mentah bila komponen tersedia: `Button`, `Card`, `Badge`,
+> `Input`, `Tabs`, `Table`, `Alert`, `Dialog`, `Field`, `ToggleGroup`,
+> `Separator`, `Skeleton`, `Spinner`. Ikuti `.agents/skills/shadcn/SKILL.md`.
+>
+> ⚠️ Setiap `shadcn add` yang menyentuh `ui/button.tsx` / `ui/badge.tsx`
+> akan menghapus varian lokal (`outline/ghost/destructive/link/secondary`).
+> Setelah add: kembalikan blok varian (ditandai `AWAS` di file), lalu
+> `pnpm build` wajib hijau.
 
 ### 3.1. Kenapa proxy sisi server (`server/proxy.js`)
 

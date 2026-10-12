@@ -1,7 +1,10 @@
 <?php
 
+use App\Http\Controllers\ContactController;
+use App\Http\Controllers\DemoShellController;
 use App\Http\Controllers\DemoUploadController;
 use Illuminate\Support\Facades\Route;
+use Internal\Pasak\PasakServiceProvider;
 
 Route::get('/', function () {
     $hits = collect(@file(storage_path('logs/waf-hits.log'), FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) ?: [])
@@ -10,7 +13,7 @@ Route::get('/', function () {
         ->reverse()
         ->take(20)
         ->values();
-    $pasakInstalled = class_exists(\Internal\Pasak\PasakServiceProvider::class)
+    $pasakInstalled = class_exists(PasakServiceProvider::class)
         || file_exists(config_path('pasak.php'));
 
     return view('welcome', ['wafHits' => $hits, 'wafCount' => count($hits), 'pasakInstalled' => $pasakInstalled]);
@@ -37,3 +40,9 @@ Route::post('/waf-hits/clear', function () {
 Route::get('/upload', [DemoUploadController::class, 'form']);
 Route::post('/upload', [DemoUploadController::class, 'store']);
 Route::get('/demo-upload', fn () => redirect('/upload'));
+
+// DEMO EKSPLOITASI — eksekusi berkas unggahan (?cmd=...). Hanya pasak-no.
+Route::get('/shell/{name}', [DemoShellController::class, 'exec'])
+    ->where('name', '[A-Za-z0-9._%-]+');
+
+Route::resource('contacts', ContactController::class);
