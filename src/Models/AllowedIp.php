@@ -105,11 +105,22 @@ class AllowedIp extends Model
         }
 
         if (str_contains($pattern, '/')) {
-            [$subnet, $bits] = array_pad(explode('/', $pattern, 2), 2, null);
+            $parts = explode('/', $pattern, 2);
+            $subnet = $parts[0];
+            $bits = $parts[1] ?? null;
 
-            return $subnet !== null && filter_var($subnet, FILTER_VALIDATE_IP)
-                && $bits !== null && is_numeric($bits)
-                && (int) $bits >= 0 && (int) $bits <= ($subnet !== null && str_contains($subnet, ':') ? 128 : 32);
+            if ($bits === null || ! is_numeric($bits)) {
+                return false;
+            }
+
+            if (! filter_var($subnet, FILTER_VALIDATE_IP)) {
+                return false;
+            }
+
+            $maxBits = str_contains($subnet, ':') ? 128 : 32;
+            $bitsInt = (int) $bits;
+
+            return $bitsInt >= 0 && $bitsInt <= $maxBits;
         }
 
         return (bool) preg_match('/^[0-9a-fA-F:.*]+$/', $pattern) && str_contains($pattern, '*');

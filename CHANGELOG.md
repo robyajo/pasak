@@ -4,6 +4,10 @@ All notable changes to `robyajo/pasak` will be documented in this file.
 
 ## [Unreleased]
 
+### Fixed
+
+- **PHPStan level 5 hijau kembali (CI merah sejak v1.3.x)**: `AllowedIp::isValidPattern()` ditulis ulang tanpa perbandingan `!== null` yang selalu benar (terdeteksi sebagai `notIdentical.alwaysTrue`) — validasi CIDR kini memakai early-return yang setara perilakunya. Seluruh 12 kombinasi matriks pest + Pint sudah hijau; hanya job PHPStan yang gagal.
+
 ### Added
 
 - **Pilihan cakupan API dan Web saat instalasi (bawaan: keduanya)**: wizard `pasak:install` kini menanyakan dua hal — "Pasang dukungan API?" dan "Pasang dashboard web Blade murni?" — masing-masing bawaan Ya. Flag baru `--without-web` (pasangan `--without-api`); `--api-only` tetap sebagai jalan pintas "API ya, Web tidak". Menolak keduanya menghasilkan instalasi inti saja (kelola via Artisan). Kombinasi baru dicakup test (`--without-web` hanya menerbitkan rute API, `--without-api` hanya halaman web).
