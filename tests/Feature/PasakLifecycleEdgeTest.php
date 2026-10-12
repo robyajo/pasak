@@ -147,6 +147,24 @@ test('uninstall with missing tables and files does not error', function () use (
     $this->artisan('pasak:uninstall', ['--force' => true])->assertSuccessful();
 });
 
+test('upgrade migrates legacy env values and warns on mismatched driver', function () use (&$edgeDir) {
+    $this->app->setBasePath($edgeDir);
+
+    File::put($edgeDir.'/.env', "APP_NAME=Demo\nSECURITY_AUTO_BLOCK_SCOPE=ip\nSECURITY_DASHBOARD_DRIVER=livewire\n");
+    File::makeDirectory($edgeDir.'/public', 0755, true, true);
+
+    $this->artisan('pasak:upgrade', [
+        '--force' => true,
+        '--no-composer' => true,
+        '--no-migrate' => true,
+    ])->assertSuccessful();
+
+    $env = File::get($edgeDir.'/.env');
+    expect($env)->toContain('SECURITY_AUTO_BLOCK_SCOPE=ip')
+        ->and($env)->toContain('PASAK_AUTO_BLOCK_SCOPE=ip')
+        ->and(File::exists($edgeDir.'/public/.htaccess.pasak'))->toBeTrue();
+});
+
 test('upgrade migrates legacy security-named host files to pasak names', function () use (&$edgeDir) {
     $this->app->setBasePath($edgeDir);
 

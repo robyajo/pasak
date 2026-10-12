@@ -5,6 +5,7 @@ namespace Internal\Pasak\Console\Commands;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\File;
+use Inertia\Inertia;
 use Internal\Pasak\Services\VersionCheckService;
 use Livewire\Livewire;
 use Symfony\Component\Process\Process;
@@ -112,6 +113,7 @@ class SecurityUpgradeCommand extends Command
         // 3. Synchronize routes (tanpa menimpa kustomisasi host kecuali diminta).
         $this->comment('3/5. Menyinkronkan berkas rute kustom...');
         $this->migrateLegacyHostFiles();
+        $this->migrateLegacyEnvAndConfig();
         $hasWebRoutes = File::exists(base_path('routes/pasak.php'));
         $hasApiRoutes = File::exists(base_path('routes/pasak-api.php'));
 
@@ -248,6 +250,105 @@ class SecurityUpgradeCommand extends Command
             File::copy($legacyConfig, $currentConfig);
             $this->info('  ✓ config/security.php disalin ke config/pasak.php (asli dibiarkan sebagai cadangan).');
         }
+
+        $this->line('  ✓ Kunci config baru dicakup bawaan paket (tidak ada kustomisasi yang ditimpa).');
+    }
+
+    /**
+     * Sesuaikan instalasi lama ke standar baru tanpa menimpa kustomisasi:
+     * salin nilai SECURITY_* ke PASAK_*, sediakan sidecar .htaccess.pasak,
+     * dan peringatkan driver dashboard yang tidak cocok dengan stack host.
+     *
+     * Kunci config baru otomatis diisi dari bawaan paket saat runtime via
+     * mergeConfigFrom, jadi tidak ada berkas config yang perlu ditulis.
+     */
+    protected function migrateLegacyEnvAndConfig(): void
+    {
+        // 1. .env: SECURITY_* lama -> PASAK_* baru (hanya kunci yang user sudah set).
+        $stubKeys = $this->stubEnvKeys();
+
+        foreach (['.env', '.env.example'] as $envFile) {
+            $path = base_path($envFile);
+
+            if (! File::exists($path)) {
+                continue;
+            }
+
+            $content = File::get($path);
+            $append = '';
+
+            foreach ($stubKeys as $pasakKey) {
+                if (preg_match('/^'.preg_quote($pasakKey, '/').'=.*/m', $content)) {
+                    continue;
+                }
+
+                $legacyKey = preg_replace('/^PASAK_/', 'SECURITY_', $pasakKey);
+
+                if ($legacyKey !== $pasakKey
+                    && preg_match('/^'.preg_quote($legacyKey, '/').'=(.*)$/m', $content, $m)
+                ) {
+                    $append .= "\n{$pasakKey}=".trim($m[1]);
+                }
+            }
+
+            if ($append !== '') {
+                File::append($path, "\n".$append."\n");
+                $this->info("  ✓ Nilai lama SECURITY_* disalin ke kunci PASAK_* di {$envFile} (asli dipertahankan).");
+            }
+        }
+
+        // 2. config/pasak.php host versi lama: kunci baru (mis. table_names.allowed_ips,
+        //    dashboard driver blade) otomatis diisi dari bawaan paket saat runtime
+        //    via mergeConfigFrom, jadi tidak ada yang perlu ditulis.
+        $this->line('  ✓ Kunci config baru dicakup bawaan paket (tidak ada kustomisasi yang ditimpa).');
+
+        // 3. Sidecar .htaccess.pasak untuk standar baru (tidak menyentuh milik user).
+        $sidecar = public_path('.htaccess.pasak');
+
+        if (! File::exists($sidecar)) {
+            foreach ([
+                __DIR__.'/../../../stubs/htaccess.stub',
+                dirname(__DIR__, 2).'/stubs/htaccess.stub',
+            ] as $stubPath) {
+                if (File::exists($stubPath)) {
+                    File::copy($stubPath, $sidecar);
+                    $this->info('  ✓ Berkas tinjauan public/.htaccess.pasak dibuat (milik Anda tidak diubah).');
+                    break;
+                }
+            }
+        }
+
+        // 4. Peringatan driver dashboard yang tidak cocok dengan stack host.
+        $driver = strtolower((string) config('pasak.dashboard.driver', 'blade'));
+
+        if ($driver === 'livewire' && ! class_exists(Livewire::class)) {
+            $this->warn("  ⚠ Driver dashboard 'livewire' aktif tetapi paket Livewire tidak terpasang. Ganti ke 'blade' (PASAK_DASHBOARD_DRIVER=blade) atau pasang Livewire.");
+        }
+
+        if (in_array($driver, ['react', 'tsx'], true) && ! class_exists(Inertia::class)) {
+            $this->warn("  ⚠ Driver dashboard '{$driver}' aktif tetapi Inertia tidak terpasang. Ganti ke 'blade' (PASAK_DASHBOARD_DRIVER=blade) atau pasang Inertia.");
+        }
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    protected function stubEnvKeys(): array
+    {
+        foreach ([
+            __DIR__.'/../../../stubs/env.stub',
+            dirname(__DIR__, 2).'/stubs/env.stub',
+        ] as $stubPath) {
+            if (! File::exists($stubPath)) {
+                continue;
+            }
+
+            preg_match_all('/^(PASAK_[A-Z0-9_]+)=/m', File::get($stubPath), $m);
+
+            return $m[1];
+        }
+
+        return [];
     }
 
     /**
