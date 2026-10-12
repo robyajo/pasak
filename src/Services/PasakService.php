@@ -35,7 +35,7 @@ class PasakService
     /**
      * Versi paket Pasak (Bulwark).
      */
-    public const VERSION = '1.3.1';
+    public const VERSION = '1.3.2';
 
     /**
      * Rentang waktu yang didukung grafik tren serangan.
@@ -158,12 +158,12 @@ class PasakService
         return [
             'auto_block_scope' => (string) $this->getSetting('auto_block.scope', config('pasak.auto_block.scope', 'device')),
             'instant_block_scope' => (string) $this->getSetting('instant_block.scope', config('pasak.instant_block.scope', 'device')),
-            'auto_block_enabled' => (bool) $this->getSetting('auto_block.enabled', config('pasak.auto_block.enabled', true)),
+            'auto_block_enabled' => (bool) $this->getSetting('auto_block.enabled', config('pasak.auto_block.enabled', false)),
             'auto_block_threshold' => (int) $this->getSetting('auto_block.threshold', config('pasak.auto_block.threshold', 3)),
             'auto_block_window' => (int) $this->getSetting('auto_block.window_minutes', config('pasak.auto_block.window_minutes', 10)),
             'auto_block_duration' => (int) $this->getSetting('auto_block.duration_hours', config('pasak.auto_block.duration_hours', 24)),
             'auto_block_levels' => $this->autoBlockLevels(),
-            'instant_block_enabled' => (bool) $this->getSetting('instant_block.enabled', config('pasak.instant_block.enabled', true)),
+            'instant_block_enabled' => (bool) $this->getSetting('instant_block.enabled', config('pasak.instant_block.enabled', false)),
             'instant_block_duration' => (int) $this->getSetting('instant_block.duration_hours', config('pasak.instant_block.duration_hours', 720)),
             'block_enforcement' => (bool) $this->getSetting('block_enforcement', config('pasak.block_enforcement', true)),
         ];
@@ -870,7 +870,7 @@ class PasakService
     public function instantBlockEnabled(): bool
     {
         return $this->enabled()
-            && (bool) $this->getSetting('instant_block.enabled', config('pasak.instant_block.enabled', true))
+            && (bool) $this->getSetting('instant_block.enabled', config('pasak.instant_block.enabled', false))
             && config('pasak.instant_block.signatures', []) !== [];
     }
 

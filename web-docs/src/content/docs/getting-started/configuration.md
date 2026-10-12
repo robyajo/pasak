@@ -18,11 +18,11 @@ Berikut adalah daftar lengkap seluruh variabel lingkungan yang didukung:
 | `PASAK_MONITOR_ENABLED`             |  bool  |         `true`         | Sakelar utama untuk pemindaian ancaman di middleware. Jika `false`, inspeksi ditiadakan.                  |
 | `PASAK_BLOCK_ENFORCEMENT`           |  bool  |         `true`         | Penegakan blokir aktif. Jika `false`, IP terblokir tetap dicatat tetapi request tidak ditolak.            |
 | `PASAK_BLOCKED_LOG_INTERVAL`        |  int   |          `10`          | Jeda waktu (detik) pencatatan log untuk IP yang terus-menerus mencoba mengakses saat terblokir.           |
-| `PASAK_AUTO_BLOCK_ENABLED`          |  bool  |         `true`         | Mengaktifkan pemblokiran otomatis berbasis akumulasi skor ancaman berulang.                               |
+| `PASAK_AUTO_BLOCK_ENABLED`          |  bool  |         `false`        | Opt-in pemblokiran otomatis. Default monitoring saja (deteksi + catat, tanpa blokir).                               |
 | `PASAK_AUTO_BLOCK_THRESHOLD`        |  int   |          `3`           | Jumlah kejadian ancaman yang harus dicapai dalam kurun waktu sebelum IP diblokir.                         |
 | `PASAK_AUTO_BLOCK_WINDOW`           |  int   |          `10`          | Rentang jendela waktu evaluasi auto-block (dalam menit).                                                  |
 | `PASAK_AUTO_BLOCK_DURATION`         |  int   |          `24`          | Durasi pemblokiran otomatis (dalam jam). Masukkan `0` jika ingin memblokir permanen.                      |
-| `PASAK_INSTANT_BLOCK_ENABLED`       |  bool  |         `true`         | Mengaktifkan blokir langsung pada percobaan pertama untuk signature berbahaya zero-tolerance.             |
+| `PASAK_INSTANT_BLOCK_ENABLED`       |  bool  |         `false`        | Opt-in blokir instan. Default monitoring saja; aktifkan bila siap karantina otomatis.             |
 | `PASAK_INSTANT_BLOCK_DURATION`      |  int   |         `720`          | Durasi blokir instan (dalam jam; bawaan: 720 jam = 30 hari). Masukkan `0` untuk permanen.                 |
 | `PASAK_MAX_INSPECT_LENGTH`          |  int   |         `4000`         | Batas maksimum panjang karakter string payload yang diinspeksi untuk mencegah ReDoS pada payload raksasa. |
 | `PASAK_BLOCK_SUSPICIOUS`            |  bool  |        `false`         | Tolak langsung (HTTP 403) request yang memicu ancaman berlevel `critical` tanpa menunggu akumulasi.       |
@@ -80,7 +80,7 @@ Menentukan pola serangan mutlak yang langsung memblokir pelaku pada request pert
 
 ```php
 'instant_block' => [
-    'enabled' => (bool) env('PASAK_INSTANT_BLOCK_ENABLED', true),
+    'enabled' => (bool) env('PASAK_INSTANT_BLOCK_ENABLED', false),
     'duration_hours' => (int) env('PASAK_INSTANT_BLOCK_DURATION', 720), // 30 hari
     'skip_whitelisted' => true,
     'signatures' => [
@@ -142,11 +142,11 @@ Di server produksi, seluruh perlindungan diaktifkan penuh dengan pembersihan log
 ```dotenv
 PASAK_MONITOR_ENABLED=true
 PASAK_BLOCK_ENFORCEMENT=true
-PASAK_AUTO_BLOCK_ENABLED=true
+PASAK_AUTO_BLOCK_ENABLED=false
 PASAK_AUTO_BLOCK_THRESHOLD=3
 PASAK_AUTO_BLOCK_WINDOW=10
 PASAK_AUTO_BLOCK_DURATION=24
-PASAK_INSTANT_BLOCK_ENABLED=true
+PASAK_INSTANT_BLOCK_ENABLED=false
 PASAK_INSTANT_BLOCK_DURATION=720
 PASAK_BLOCK_SUSPICIOUS=false
 PASAK_LOG_RETENTION_DAYS=90

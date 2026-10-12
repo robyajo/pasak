@@ -7,11 +7,11 @@ use Livewire\Component;
 new #[Title('Security Settings')] class extends Component {
     public string $auto_block_scope = 'device';
     public string $instant_block_scope = 'device';
-    public bool $auto_block_enabled = true;
+    public bool $auto_block_enabled = false;
     public int $auto_block_threshold = 3;
     public int $auto_block_window = 10;
     public int $auto_block_duration = 24;
-    public bool $instant_block_enabled = true;
+    public bool $instant_block_enabled = false;
     public int $instant_block_duration = 720;
     public bool $block_enforcement = true;
 
@@ -26,11 +26,11 @@ new #[Title('Security Settings')] class extends Component {
 
         $this->auto_block_scope = (string) ($settings['auto_block_scope'] ?? 'device');
         $this->instant_block_scope = (string) ($settings['instant_block_scope'] ?? 'device');
-        $this->auto_block_enabled = (bool) ($settings['auto_block_enabled'] ?? true);
+        $this->auto_block_enabled = (bool) ($settings['auto_block_enabled'] ?? false);
         $this->auto_block_threshold = (int) ($settings['auto_block_threshold'] ?? 3);
         $this->auto_block_window = (int) ($settings['auto_block_window'] ?? 10);
         $this->auto_block_duration = (int) ($settings['auto_block_duration'] ?? 24);
-        $this->instant_block_enabled = (bool) ($settings['instant_block_enabled'] ?? true);
+        $this->instant_block_enabled = (bool) ($settings['instant_block_enabled'] ?? false);
         $this->instant_block_duration = (int) ($settings['instant_block_duration'] ?? 720);
         $this->block_enforcement = (bool) ($settings['block_enforcement'] ?? true);
 

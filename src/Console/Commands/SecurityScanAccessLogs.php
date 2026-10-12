@@ -69,6 +69,12 @@ class SecurityScanAccessLogs extends Command
 
         $this->info('Memindai '.count($files).' berkas access log...');
 
+        // Flag --block adalah opt-in eksplisit per eksekusi: aktifkan evaluasi
+        // zero-tolerance selama pemindaian meskipun instalasi monitoring-only.
+        if ($this->option('block')) {
+            config()->set('pasak.instant_block.enabled', true);
+        }
+
         $result = $scanner->scan($files, [
             'min_level' => $this->option('min-level'),
             'since' => $since,

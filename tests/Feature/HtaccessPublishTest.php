@@ -117,7 +117,7 @@ test('security install command appends environment variables to env and env exam
     $exampleContent = File::get($envExamplePath);
 
     expect($envContent)->toContain('PASAK_MONITOR_ENABLED=true')
-        ->and($envContent)->toContain('PASAK_INSTANT_BLOCK_ENABLED=true')
+        ->and($envContent)->toContain('PASAK_INSTANT_BLOCK_ENABLED=false')
         ->and($envContent)->toContain('Sakelar utama WAF')
         ->and($exampleContent)->toContain('PASAK_MONITOR_ENABLED=true');
 });

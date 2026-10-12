@@ -171,6 +171,9 @@ test('konten admin sehari-hari tidak terdeteksi sama sekali', function () {
 });
 
 test('pola serangan tetap terdeteksi setelah pola dirapatkan', function () {
+    // Opt-in eksplisit: default instalasi adalah monitoring saja.
+    config()->set('pasak.instant_block.enabled', true);
+
     $service = app(PasakService::class);
 
     foreach (detectorAttackCases() as $label => [$haystacks, $expectsInstant]) {
@@ -219,6 +222,8 @@ test('pola deteksi tidak rawan ReDoS', function () {
 });
 
 test('blokir instan aktif pada percobaan pertama lewat request sungguhan', function () {
+    // Opt-in eksplisit: default instalasi adalah monitoring saja.
+    config()->set('pasak.instant_block.enabled', true);
     config()->set('pasak.whitelist', []);
 
     $this->withServerVariables(['REMOTE_ADDR' => '198.51.100.70']);

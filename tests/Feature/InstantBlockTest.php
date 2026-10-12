@@ -14,6 +14,22 @@ beforeEach(function () {
     config()->set('pasak.whitelist', []);
 });
 
+test('default installation is monitoring-only: no automatic blocks without opt-in', function () {
+    // Kembalikan ke bawaan paket (monitoring saja).
+    config()->set('pasak.instant_block.enabled', false);
+    config()->set('pasak.auto_block.enabled', false);
+
+    $service = app(\Internal\Pasak\Services\PasakService::class);
+
+    expect($service->instantBlockEnabled())->toBeFalse();
+
+    $this->withServerVariables(['REMOTE_ADDR' => '198.51.100.70'])
+        ->get('/?q=%7B%7B7*7%7D%7D')
+        ->assertOk();
+
+    expect(BlockedIp::query()->count())->toBe(0);
+});
+
 test('null byte and double extension upload filename triggers an instant block', function () {
     $this->withServerVariables(['REMOTE_ADDR' => '198.51.100.50']);
 

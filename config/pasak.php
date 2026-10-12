@@ -53,7 +53,7 @@ return [
     */
 
     'auto_block' => [
-        'enabled' => (bool) env('PASAK_AUTO_BLOCK_ENABLED', env('SECURITY_AUTO_BLOCK_ENABLED', true)),
+        'enabled' => (bool) env('PASAK_AUTO_BLOCK_ENABLED', env('SECURITY_AUTO_BLOCK_ENABLED', false)),
         'threshold' => (int) env('PASAK_AUTO_BLOCK_THRESHOLD', env('SECURITY_AUTO_BLOCK_THRESHOLD', 3)),
         'window_minutes' => (int) env('PASAK_AUTO_BLOCK_WINDOW', env('SECURITY_AUTO_BLOCK_WINDOW', 10)),
         'duration_hours' => (int) env('PASAK_AUTO_BLOCK_DURATION', env('SECURITY_AUTO_BLOCK_DURATION', 24)),
@@ -87,7 +87,7 @@ return [
     */
 
     'instant_block' => [
-        'enabled' => (bool) env('PASAK_INSTANT_BLOCK_ENABLED', env('SECURITY_INSTANT_BLOCK_ENABLED', true)),
+        'enabled' => (bool) env('PASAK_INSTANT_BLOCK_ENABLED', env('SECURITY_INSTANT_BLOCK_ENABLED', false)),
         'duration_hours' => (int) env('PASAK_INSTANT_BLOCK_DURATION', env('SECURITY_INSTANT_BLOCK_DURATION', 720)),
         'scope' => env('PASAK_INSTANT_BLOCK_SCOPE', env('SECURITY_INSTANT_BLOCK_SCOPE', 'device')),
         'skip_whitelisted' => true,
