@@ -4,6 +4,7 @@ use Illuminate\Http\UploadedFile;
 use Internal\Pasak\Models\BlockedIp;
 use Internal\Pasak\Models\SecurityLog;
 use Internal\Pasak\Rules\SafeAssetPath;
+use Internal\Pasak\Services\PasakService;
 use Internal\Pasak\Tests\TestUser;
 
 beforeEach(function () {
@@ -19,7 +20,7 @@ test('default installation is monitoring-only: no automatic blocks without opt-i
     config()->set('pasak.instant_block.enabled', false);
     config()->set('pasak.auto_block.enabled', false);
 
-    $service = app(\Internal\Pasak\Services\PasakService::class);
+    $service = app(PasakService::class);
 
     expect($service->instantBlockEnabled())->toBeFalse();
 
