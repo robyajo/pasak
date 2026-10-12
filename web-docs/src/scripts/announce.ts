@@ -6,10 +6,14 @@
  * pengumuman atau saat tombol "Info & Upgrade" diklik.
  */
 
+import pkg from "../data/package.json";
+
+const version = pkg?.packagist?.version ?? pkg?.version ?? "1.4.1";
+
 const BANNER_ID = "psk-docs-announce-bar";
 const MODAL_ID = "psk-docs-announce-modal";
-const BANNER_KEY = "pasak-docs-banner-dismissed";
-const MODAL_KEY = "pasak-docs-announce-v1.3.8";
+const BANNER_KEY = `pasak-docs-banner-dismissed-v${version}`;
+const MODAL_KEY = `pasak-docs-announce-v${version}`;
 
 const CSS_ID = "psk-docs-announce-css";
 const CSS = `#${BANNER_ID}{position:fixed;top:0;left:0;right:0;width:100%;box-sizing:border-box;display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;background:linear-gradient(90deg,#1e40af,#2563eb);color:#fff;font:500 13px/1.5 "Plus Jakarta Sans",system-ui,sans-serif;padding:8px 44px 8px 16px;z-index:60;border-bottom:1px solid rgba(255,255,255,.2);}#${BANNER_ID} a{color:#fff;text-decoration:underline;font-weight:600;}#${BANNER_ID} button{cursor:pointer;}#${MODAL_ID}{position:fixed;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;z-index:100;padding:16px;}#${MODAL_ID}[hidden]{display:none!important;}`;
@@ -51,7 +55,10 @@ function updateBannerHeight(bar: HTMLElement | null): void {
       `${height}px`,
     );
   } else {
-    document.documentElement.style.setProperty("--psk-banner-height", "0px");
+    document.documentElement.style.setProperty(
+      "--psk-banner-height",
+      "0px",
+    );
   }
 }
 
@@ -59,7 +66,7 @@ function buildBanner(): HTMLElement {
   const bar = document.createElement("div");
   bar.id = BANNER_ID;
   bar.innerHTML =
-    "<span>🛡️ <strong>Pasak v1.3.8</strong> — WAF mandiri untuk Laravel. Lihat pembaruan &amp; panduan upgrade.</span>" +
+    `<span>🛡️ <strong>Pasak v${version}</strong> — WAF mandiri untuk Laravel. Lihat pembaruan &amp; panduan upgrade.</span>` +
     '<button type="button" data-info style="background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.4);color:#fff;border-radius:6px;padding:2px 10px;font:600 12px/1.6 inherit;">Info &amp; Upgrade</button>' +
     '<a href="/cli-automation/upgrade-guide/">Panduan CLI</a>' +
     '<button type="button" data-close aria-label="Tutup" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:transparent;border:none;color:#fff;font-size:16px;line-height:1;">✕</button>';
@@ -95,7 +102,7 @@ function buildModal(): HTMLElement {
   wrap.innerHTML =
     '<div role="dialog" aria-modal="true" aria-labelledby="psk-docs-announce-title" style="background:#fff;color:#0f172a;border-radius:10px;box-shadow:0 10px 30px rgba(0,0,0,.25);max-width:540px;width:100%;overflow:hidden;font:400 14px/1.6 system-ui,sans-serif;">' +
     '<div style="padding:16px 20px;border-bottom:1px solid #e2e8f0;display:flex;align-items:center;justify-content:space-between;">' +
-    '<h3 id="psk-docs-announce-title" style="margin:0;font-size:16px;font-weight:750;color:#0f172a;">🛡️ Pasak v1.3.8 — Informasi Terkini</h3>' +
+    `<h3 id="psk-docs-announce-title" style="margin:0;font-size:16px;font-weight:750;color:#0f172a;">🛡️ Pasak v${version} — Informasi Terkini</h3>` +
     '<button type="button" data-close aria-label="Tutup" style="background:transparent;border:none;color:#64748b;font-size:18px;cursor:pointer;line-height:1;padding:4px;">✕</button>' +
     "</div>" +
     '<div style="padding:20px;display:flex;flex-direction:column;gap:12px;color:#334155;max-height:75vh;overflow-y:auto;">' +
@@ -133,7 +140,8 @@ function buildModal(): HTMLElement {
 }
 
 function mount(): void {
-  if (typeof document === "undefined" || typeof window === "undefined") return;
+  if (typeof document === "undefined" || typeof window === "undefined")
+    return;
 
   ensureCss();
 
