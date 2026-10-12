@@ -111,6 +111,7 @@ class SecurityUpgradeCommand extends Command
 
         // 3. Synchronize routes (tanpa menimpa kustomisasi host kecuali diminta).
         $this->comment('3/5. Menyinkronkan berkas rute kustom...');
+        $this->migrateLegacyHostFiles();
         $hasWebRoutes = File::exists(base_path('routes/pasak.php'));
         $hasApiRoutes = File::exists(base_path('routes/pasak-api.php'));
 
@@ -186,6 +187,67 @@ class SecurityUpgradeCommand extends Command
         $this->newLine();
 
         return 0;
+    }
+
+    /**
+     * Migrasikan jejak instalasi lama (era penamaan `security`) ke `pasak`
+     * agar instalasi lama otomatis menyesuaikan: isi kustom user dipertahankan,
+     * hanya nama berkas/direktori yang dipindahkan bila target baru belum ada.
+     */
+    protected function migrateLegacyHostFiles(): void
+    {
+        // Berkas rute era lama -> nama baru (beserta require di web.php/api.php).
+        foreach ([
+            ['routes/security.php', 'routes/pasak.php', 'routes/web.php'],
+            ['routes/security-api.php', 'routes/pasak-api.php', 'routes/api.php'],
+        ] as [$legacy, $current, $wiring]) {
+            $legacyPath = base_path($legacy);
+            $currentPath = base_path($current);
+
+            if (File::exists($legacyPath) && ! File::exists($currentPath)) {
+                File::move($legacyPath, $currentPath);
+                $this->info("  ✓ Berkas {$legacy} dipindahkan ke {$current} (kustomisasi dipertahankan).");
+            }
+
+            $wiringPath = base_path($wiring);
+            if (File::exists($wiringPath)) {
+                $content = File::get($wiringPath);
+                $updated = str_replace(
+                    ["require __DIR__.'/".basename($legacy)."';"],
+                    ["require __DIR__.'/".basename($current)."';"],
+                    $content
+                );
+
+                if ($updated !== $content) {
+                    File::put($wiringPath, $updated);
+                    $this->info("  ✓ Referensi rute di {$wiring} diperbarui ke {$current}.");
+                }
+            }
+        }
+
+        // Direktori dashboard era lama -> lokasi baru (bila target belum ada).
+        foreach ([
+            'views/pages/security' => 'views/pages/pasak',
+            'js/pages/security' => 'js/pages/pasak',
+            'js/components/security' => 'js/components/pasak',
+        ] as $legacy => $current) {
+            $legacyPath = resource_path($legacy);
+            $currentPath = resource_path($current);
+
+            if (File::isDirectory($legacyPath) && ! File::isDirectory($currentPath)) {
+                File::moveDirectory($legacyPath, $currentPath);
+                $this->info("  ✓ Direktori resources/{$legacy} dipindahkan ke resources/{$current}.");
+            }
+        }
+
+        // Konfigurasi era lama -> nama baru (bila target belum ada).
+        $legacyConfig = config_path('security.php');
+        $currentConfig = config_path('pasak.php');
+
+        if (File::exists($legacyConfig) && ! File::exists($currentConfig)) {
+            File::copy($legacyConfig, $currentConfig);
+            $this->info('  ✓ config/security.php disalin ke config/pasak.php (asli dibiarkan sebagai cadangan).');
+        }
     }
 
     /**

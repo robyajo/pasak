@@ -147,6 +147,38 @@ test('uninstall with missing tables and files does not error', function () use (
     $this->artisan('pasak:uninstall', ['--force' => true])->assertSuccessful();
 });
 
+test('upgrade migrates legacy security-named host files to pasak names', function () use (&$edgeDir) {
+    $this->app->setBasePath($edgeDir);
+
+    File::put($edgeDir.'/routes/security.php', "<?php // KUSTOM RUTE LAMA\n");
+    File::put($edgeDir.'/routes/security-api.php', "<?php // KUSTOM API LAMA\n");
+    File::put($edgeDir.'/routes/web.php', "<?php\n\nrequire __DIR__.'/security.php';\n");
+    File::put($edgeDir.'/routes/api.php', "<?php\n\nrequire __DIR__.'/security-api.php';\n");
+    File::makeDirectory($edgeDir.'/resources/views/pages/security', 0755, true, true);
+    File::put($edgeDir.'/resources/views/pages/security/overview.blade.php', 'kustom lama');
+    File::makeDirectory($edgeDir.'/config', 0755, true, true);
+    File::put($edgeDir.'/config/security.php', "<?php // config lama\n");
+    // Simulasi host era lama murni: target baru belum ada.
+    File::deleteDirectory($edgeDir.'/resources/views/pages/pasak');
+
+    $this->artisan('pasak:upgrade', [
+        '--force' => true,
+        '--no-composer' => true,
+        '--no-migrate' => true,
+    ])->assertSuccessful();
+
+    expect(File::exists($edgeDir.'/routes/security.php'))->toBeFalse()
+        ->and(File::get($edgeDir.'/routes/pasak.php'))->toContain('KUSTOM RUTE LAMA')
+        ->and(File::exists($edgeDir.'/routes/security-api.php'))->toBeFalse()
+        ->and(File::get($edgeDir.'/routes/pasak-api.php'))->toContain('KUSTOM API LAMA')
+        ->and(File::get($edgeDir.'/routes/web.php'))->toContain("require __DIR__.'/pasak.php';")
+        ->and(File::get($edgeDir.'/routes/api.php'))->toContain("require __DIR__.'/pasak-api.php';")
+        ->and(File::isDirectory($edgeDir.'/resources/views/pages/security'))->toBeFalse()
+        ->and(File::get($edgeDir.'/resources/views/pages/pasak/overview.blade.php'))->toBe('kustom lama')
+        ->and(File::exists($edgeDir.'/config/pasak.php'))->toBeTrue()
+        ->and(File::exists($edgeDir.'/config/security.php'))->toBeTrue();
+});
+
 test('upgrade preserves customized host routes by default', function () {
     $routeFile = base_path('routes/pasak.php');
     File::put($routeFile, "<?php // KUSTOMISASI HOST JANGAN TIMPA\n");

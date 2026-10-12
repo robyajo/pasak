@@ -69,6 +69,11 @@ test('install does not duplicate route require lines on re-run', function () {
     $hadApiRoutes = File::exists($apiRoutesFile);
     $original = $hadApiRoutes ? File::get($apiRoutesFile) : null;
 
+    // Normalisasi: buang sisa require dari test lain agar mandiri.
+    if ($hadApiRoutes) {
+        File::put($apiRoutesFile, str_replace("\nrequire __DIR__.'/pasak-api.php';", '', $original));
+    }
+
     try {
         $this->artisan('pasak:install', ['--force' => true])->assertSuccessful();
         $this->artisan('pasak:install', ['--force' => true])->assertSuccessful();
