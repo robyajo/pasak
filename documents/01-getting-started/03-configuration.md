@@ -65,7 +65,7 @@ Konfigurasi `whitelist` memastikan IP internal, proxy terpercaya, dan subnet kan
 ```php
 'whitelist' => array_values(array_filter(array_map(
     'trim',
-    explode(',', (string) env('PASAK_WHITELIST', '127.0.0.1,::1'))
+    explode(',', (string) env('PASAK_IP_WHITELIST', '127.0.0.1,::1'))
 ))),
 ```
 

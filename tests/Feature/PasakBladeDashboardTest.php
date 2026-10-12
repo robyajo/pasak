@@ -42,7 +42,8 @@ test('dashboard overview renders plain blade views when driver is blade', functi
 
         expect($html)->toContain('Security Overview')
             ->and($html)->toContain('sec-stat-card')
-            ->and($html)->toContain('<!DOCTYPE html>');
+            ->and($html)->toContain('<!DOCTYPE html>')
+            ->and($html)->toContain('pasakAnnounce');
     } finally {
         File::deleteDirectory($target);
     }

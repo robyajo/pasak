@@ -1,5 +1,6 @@
 import { Link, usePage } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 function NavIcon({ paths }: { paths: string }) {
     return (
@@ -69,7 +70,31 @@ export function SecurityNav({ base }: { base?: string }) {
     const resolvedBase =
         base ?? `/${current.split('/').filter(Boolean)[0] ?? 'pasak'}`;
 
+    // Pengumuman kunjungan pertama (sekali per browser).
+    const [showAnnounce, setShowAnnounce] = useState(false);
+
+    useEffect(() => {
+        try {
+            if (!window.localStorage.getItem('pasak-announce-v1')) {
+                setShowAnnounce(true);
+            }
+        } catch {
+            setShowAnnounce(true);
+        }
+    }, []);
+
+    const dismissAnnounce = () => {
+        setShowAnnounce(false);
+
+        try {
+            window.localStorage.setItem('pasak-announce-v1', '1');
+        } catch {
+            // Abaikan bila storage tidak tersedia.
+        }
+    };
+
     return (
+        <>
         <nav className="sec-nav-bar" aria-label="Pasak Navigation">
             {items.map((item) => {
                 const href =
@@ -90,6 +115,51 @@ export function SecurityNav({ base }: { base?: string }) {
             })}
             <ThemeToggle />
         </nav>
+
+        {showAnnounce && (
+            <div className="sec-modal-backdrop" role="presentation">
+                <div
+                    className="sec-modal-box"
+                    role="dialog"
+                    aria-modal="true"
+                    aria-labelledby="pasak-announce-title"
+                >
+                    <div className="sec-modal-header">
+                        <h3 className="sec-card-title" id="pasak-announce-title">
+                            👋 Selamat datang di dashboard Pasak
+                        </h3>
+                    </div>
+                    <div
+                        className="sec-modal-body"
+                        style={{ fontSize: 14, color: 'var(--sec-text-muted)', lineHeight: 1.6 }}
+                    >
+                        <div>🛡️ Bawaan instalasi adalah monitoring saja: ancaman dideteksi dan dicatat tanpa blokir otomatis.</div>
+                        <div>⚙️ Siap karantina otomatis? Atur di halaman Settings atau via API.</div>
+                        <div>
+                            📖 Panduan lengkap:{' '}
+                            <a
+                                href="https://security-dev.pekanbaru.go.id/"
+                                target="_blank"
+                                rel="noopener"
+                                style={{ color: 'var(--sec-primary)' }}
+                            >
+                                security-dev.pekanbaru.go.id
+                            </a>
+                        </div>
+                    </div>
+                    <div className="sec-modal-footer">
+                        <button
+                            type="button"
+                            className="sec-btn sec-btn-primary"
+                            onClick={dismissAnnounce}
+                        >
+                            Mengerti
+                        </button>
+                    </div>
+                </div>
+            </div>
+        )}
+        </>
     );
 }
 

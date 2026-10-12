@@ -27,7 +27,7 @@ This repository is **`robyajo/pasak`** (Bulwark), an enterprise-grade, standalon
 
 ## 2. Comprehensive Documentation Suite (`documents/`)
 
-The repository contains an authoritative, 24-chapter documentation suite located in `documents/`. Agents MUST consult these documents for architectural details, schema specs, API payload contracts, and integration recipes:
+The repository contains an authoritative, 25-chapter documentation suite located in `documents/`. Agents MUST consult these documents for architectural details, schema specs, API payload contracts, and integration recipes:
 
 - **Master Table of Contents**: [`documents/README.md`](./documents/README.md)
 - **Interactive Documentation Portal**: [`documents/index.html`](./documents/index.html) (Tailwind CSS Play CDN + marked.js + Mermaid.js single-page app with full-text search, dark/light theme, and copy-to-clipboard code snippets). Regenerate it from the markdown chapters after editing any `documents/**/*.md` file by running `php documents/generate.php`.
@@ -138,7 +138,7 @@ When working in this repository, you MUST activate the relevant skills located i
 ## 6. Directory Structure & Conventions
 
 ```text
-documents/                 # Authoritative 24-chapter documentation suite + index.html
+documents/                 # Authoritative 25-chapter documentation suite + index.html
 src/
 ├── Concerns/              # Reusable Eloquent traits (HasSecurityRelations)
 ├── Console/Commands/      # Artisan commands (pasak:install with bilingual wizard, pasak:upgrade, pasak:uninstall, etc.)

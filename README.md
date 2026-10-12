@@ -9,7 +9,7 @@
 
 **Pasak** (Bulwark) adalah paket keamanan komprehensif (_Self-Hosted WAF & Threat Engine_) berbasis **Headless REST API** untuk ekosistem Laravel. Paket ini murni PHP Composer library (Zero-NPM / standar Spatie) yang dirancang khusus untuk memproteksi aplikasi web internal dari serangan siber tingkat lanjut, injeksi payload pentest, eksploitasi webshell, dan brute force tanpa mengikat aplikasi ke template frontend tertentu.
 
-> 📚 **Portal Dokumentasi Resmi Lengkap**: Tersedia 24 bab dokumentasi mendalam di direktori [`documents/`](./documents/README.md) serta portal interaktif offline [`documents/index.html`](./documents/index.html).
+> 📚 **Portal Dokumentasi Resmi Lengkap**: Tersedia 25 bab dokumentasi mendalam di direktori [`documents/`](./documents/README.md) serta portal interaktif offline [`documents/index.html`](./documents/index.html).
 
 ---
 
@@ -81,7 +81,7 @@ php artisan pasak:install
 #### Aset yang Didapat Pengguna Setelah Menjalankan Perintah Ini:
 
 1. 📄 **`config/pasak.php`**: Konfigurasi lengkap WAF, ambang batas blokir, IP whitelist, stepped login lockout, dan log scanner.
-2. 🗄️ **`database/migrations/` (1 file, 7 tabel)**: Migrasi tunggal `create_pasak_tables` menyiapkan tabel `blocked_ips`, `pasak_logs`, `login_attempts`, `ip_unblock_requests`, `user_logins`, `trusted_ips`, dan `settings` (otomatis memindahkan data dari tabel lama `security_logs`/`security_settings` bila ada).
+2. 🗄️ **`database/migrations/` (migrasi konsolidasi + tambahan)**: Menyiapkan tabel `blocked_ips`, `pasak_logs`, `login_attempts`, `ip_unblock_requests`, `user_logins`, `trusted_ips`, `settings`, dan `allowed_ips` (otomatis memindahkan data dari tabel lama `security_logs`/`security_settings` bila ada).
 3. 🌐 **`nginx.conf`**: Konfigurasi produksi Nginx Hardened WAF (Dual-zone rate limit, single-PHP execution `/index.php`, storage sandboxing).
 4. 🛡️ **`public/.htaccess`**: Hardening web server Apache & LiteSpeed (Blokir dotfiles, double extension `.php.jpg`, file backup dump `.sql`, dan matikan directory listing).
     > _Catatan Keamanan_: Jika `public/.htaccess` lama sudah ada, installer otomatis membuat cadangan `public/.htaccess.backup-YYYYMMDD_HHMMSS` dan menyisipkan aturan keamanan di bawah tanpa merusak rewrite rules aplikasi Anda.

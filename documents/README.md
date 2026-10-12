@@ -42,8 +42,10 @@ Dokumentasi ini disusun secara modular ke dalam 7 bagian utama:
 
 ### 5. [CLI & Otomasi (Artisan & Automation)](./05-cli-and-automation/)
 
-- [01. Referensi Perintah Artisan CLI](./05-cli-and-automation/01-artisan-commands.md) — `pasak:install`, `pasak:scan-logs`, `pasak:baseline`, `pasak:unblock-ip`, `pasak:prune-logs`, `pasak:purge-injected-data`.
+- [01. Referensi Perintah Artisan CLI](./05-cli-and-automation/01-artisan-commands.md) — `pasak:install`, `pasak:scan-logs`, `pasak:baseline`, `pasak:unblock-ip`, `pasak:prune-logs`, `pasak:purge-injected-data`, `pasak:upgrade`, `pasak:uninstall`.
 - [02. Tugas Terjadwal (Cron & Scheduler)](./05-cli-and-automation/02-scheduled-tasks.md) — Pembersihan log berkala, liveness heartbeat, auto-scan log akses web server, dan konfigurasi crontab.
+- [03. Panduan Upgrade & Uninstall](./05-cli-and-automation/03-upgrade-and-uninstall.md) — Tahapan upgrade instalasi lama, membaca perubahan versi, dan pencopotan bersih.
+- [03. Panduan Upgrade & Uninstall](./05-cli-and-automation/03-upgrade-and-uninstall.md) — Tahapan upgrade instalasi lama, membaca perubahan versi, dan pencopotan bersih.
 
 ### 6. [Hardening Web Server (Web Server Hardening)](./06-webserver-hardening/)
 

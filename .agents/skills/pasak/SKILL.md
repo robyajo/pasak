@@ -10,7 +10,7 @@ metadata:
 
 `robyajo/pasak` (Bulwark) is an enterprise-grade, headless self-hosted Web Application Firewall (WAF), threat detection engine, and security auditing toolkit for Laravel applications.
 
-> **Authoritative Documentation**: Complete 24-chapter guides and an interactive offline portal are located in [`documents/`](../../documents/) and [`documents/index.html`](../../documents/index.html).
+> **Authoritative Documentation**: Complete 25-chapter guides and an interactive offline portal are located in [`documents/`](../../documents/) and [`documents/index.html`](../../documents/index.html).
 
 ---
 

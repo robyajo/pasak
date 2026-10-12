@@ -202,6 +202,7 @@ Tabel-tabel yang dibuat secara default (satu migrasi `create_pasak_tables`):
 5. `user_logins`: Rekam jejak riwayat login pengguna, detail perangkat/browser, sesi aktif, dan waktu aktivitas terakhir.
 6. `trusted_ips`: Daftar alamat IP terpercaya per pengguna untuk otorisasi akses khusus.
 7. `settings`: Penyimpanan key-value pengaturan dinamis paket.
+8. `allowed_ips`: Allowlist global (IP/wildcard/CIDR) yang tidak pernah diblokir.
 
 > Data dari tabel lama `security_logs` / `security_settings` otomatis dipindahkan bila migrasi menemukan keduanya.
 

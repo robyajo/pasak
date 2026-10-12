@@ -553,6 +553,10 @@
         }
 
         /* Modal Styles */
+        .sec-modal-backdrop[hidden] {
+            display: none !important;
+        }
+
         .sec-modal-backdrop {
             position: fixed;
             inset: 0;
@@ -894,6 +898,39 @@
             </div>
         </main>
     </div>
+
+            <!-- Pengumuman kunjungan pertama -->
+            <div class="sec-modal-backdrop" id="pasakAnnounce" hidden>
+                <div class="sec-modal-box" role="dialog" aria-modal="true" aria-labelledby="pasakAnnounceTitle">
+                    <div class="sec-modal-header">
+                        <h3 class="sec-card-title" id="pasakAnnounceTitle">👋 {{ __('Selamat datang di dashboard Pasak') }}</h3>
+                    </div>
+                    <div class="sec-modal-body" style="font-size: 14px; color: var(--sec-text-muted); line-height: 1.6;">
+                        <div>🛡️ {{ __('Bawaan instalasi adalah monitoring saja: ancaman dideteksi dan dicatat tanpa blokir otomatis.') }}</div>
+                        <div>⚙️ {{ __('Siap karantina otomatis? Atur di halaman Settings atau via API.') }}</div>
+                        <div>📖 {{ __('Panduan lengkap:') }} <a href="https://security-dev.pekanbaru.go.id/" target="_blank" rel="noopener" style="color: var(--sec-primary);">security-dev.pekanbaru.go.id</a></div>
+                    </div>
+                    <div class="sec-modal-footer">
+                        <button type="button" class="sec-btn sec-btn-primary" data-pasak-announce-close>{{ __('Mengerti') }}</button>
+                    </div>
+                </div>
+            </div>
+            <script>
+            (function () {
+                try {
+                    var key = 'pasak-announce-{{ str_replace('.', '-', \Internal\Pasak\Services\PasakService::VERSION) }}';
+                    if (window.localStorage && localStorage.getItem(key)) return;
+                    var el = document.getElementById('pasakAnnounce');
+                    if (!el) return;
+                    el.hidden = false;
+                    var btn = el.querySelector('[data-pasak-announce-close]');
+                    if (btn) btn.addEventListener('click', function () {
+                        el.hidden = true;
+                        try { localStorage.setItem(key, '1'); } catch (e) {}
+                    });
+                } catch (e) {}
+            })();
+            </script>
 </div>
 
 <script>

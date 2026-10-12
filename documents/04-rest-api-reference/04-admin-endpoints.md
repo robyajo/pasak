@@ -10,7 +10,7 @@ Seluruh endpoint pada dokumen ini dilindungi oleh middleware ganda: **`auth`** (
 Mengambil data log terpaginasi lengkap dengan rincian statistik, level breakdown, top attacker, dan tren ancaman.
 
 - **Metode**: `GET`
-- **URI**: `/api/security/logs`
+- **URI**: `/api/pasak/logs`
 - **Query Parameters**:
   - `page` *(int)*: Nomor halaman (default: 1).
   - `per_page` *(int)*: Jumlah per halaman (default: 25, maks: 100).
@@ -69,7 +69,7 @@ Mengambil data log terpaginasi lengkap dengan rincian statistik, level breakdown
 
 ### B. Bersihkan Seluruh Log (Clear All Logs)
 - **Metode**: `DELETE`
-- **URI**: `/api/security/logs/clear`
+- **URI**: `/api/pasak/logs/clear`
 
 ---
 
@@ -77,7 +77,7 @@ Mengambil data log terpaginasi lengkap dengan rincian statistik, level breakdown
 
 ### A. Ambil Daftar IP yang Diblokir
 - **Metode**: `GET`
-- **URI**: `/api/security/blocked-ips`
+- **URI**: `/api/pasak/blocked-ips`
 - **Query Parameters**:
   - `search` *(string)*: Cari IP, device ID, catatan, atau alasan.
   - `status` *(string)*: `active`, `expired`, atau `permanent`.
@@ -85,7 +85,7 @@ Mengambil data log terpaginasi lengkap dengan rincian statistik, level breakdown
 
 ### B. Blokir IP / Perangkat Baru Secara Manual
 - **Metode**: `POST`
-- **URI**: `/api/security/blocked-ips`
+- **URI**: `/api/pasak/blocked-ips`
 - **Body JSON**:
   ```json
   {
@@ -105,24 +105,67 @@ Mengambil data log terpaginasi lengkap dengan rincian statistik, level breakdown
 
 ### C. Detail Blokir IP Beserta Log Terkait
 - **Metode**: `GET`
-- **URI**: `/api/security/blocked-ips/{id}`
+- **URI**: `/api/pasak/blocked-ips/{id}`
 - Mengembalikan entri `BlockedIp` beserta 20 entri `SecurityLog` terakhir dari IP tersebut.
 
 ### D. Beralih Status Aktif/Nonaktif (Toggle)
 - **Metode**: `PATCH`
-- **URI**: `/api/security/blocked-ips/{id}/toggle`
+- **URI**: `/api/pasak/blocked-ips/{id}/toggle`
 
 ### E. Hapus Blokir (Unblock)
 - **Metode**: `DELETE`
-- **URI**: `/api/security/blocked-ips/{id}`
+- **URI**: `/api/pasak/blocked-ips/{id}`
 
 ---
 
-## 3. Audit Server & Baseline Integritas
+## 3. Daftar Izin IP (Allowed IPs)
+
+Allowlist global yang dikelola admin: IP, wildcard (`192.168.1.*`), atau CIDR (`10.0.0.0/8`) yang terdaftar tidak pernah dicatat maupun diblokir — di atas whitelist config dan trusted IP per pengguna.
+
+### A. Ambil Daftar Izin
+- **Metode**: `GET`
+- **URI**: `/api/pasak/allowed-ips`
+- **Query Parameters**:
+  - `search` *(string)*: Cari IP, label, atau catatan.
+  - `status` *(string)*: `active`, `expired`, atau `permanent`.
+  - `per_page` *(int)*: Jumlah per halaman (maks: 100).
+
+### B. Tambah Izin Baru
+- **Metode**: `POST`
+- **URI**: `/api/pasak/allowed-ips`
+- **Body JSON**:
+  ```json
+  {
+      "ip_address": "10.20.0.0/16",
+      "label": "Jaringan kantor cabang",
+      "notes": "Tiket insiden #SEC-8812",
+      "duration_hours": 0,
+      "is_permanent": true
+  }
+  ```
+- **Validasi Khusus**:
+  - Menerima IP tunggal, wildcard (`192.168.1.*`), atau CIDR (`10.0.0.0/8`); format lain ditolak (422).
+  - Duplikat pola yang sama diperbarui (idempoten), bukan digandakan.
+
+### C. Detail Entri Izin
+- **Metode**: `GET`
+- **URI**: `/api/pasak/allowed-ips/{id}`
+
+### D. Beralih Status Aktif/Nonaktif (Toggle)
+- **Metode**: `PATCH`
+- **URI**: `/api/pasak/allowed-ips/{id}/toggle`
+
+### E. Hapus Entri Izin
+- **Metode**: `DELETE`
+- **URI**: `/api/pasak/allowed-ips/{id}`
+
+---
+
+## 4. Audit Server & Baseline Integritas
 
 ### A. Ambil Laporan Audit Server
 - **Metode**: `GET`
-- **URI**: `/api/security/server?refresh=true`
+- **URI**: `/api/pasak/server?refresh=true`
 - **Informasi yang Dikembalikan**:
   - `environment`: Status `APP_DEBUG`, HTTPS enforcement, session secure cookie, disk free space %.
   - `integrity`: Laporan baseline SHA-256 (berkas dimodifikasi, hilang, atau baru).
@@ -132,15 +175,15 @@ Mengambil data log terpaginasi lengkap dengan rincian statistik, level breakdown
 
 ### B. Buat Baseline Integritas Baru (SHA-256)
 - **Metode**: `POST`
-- **URI**: `/api/security/server/baseline`
+- **URI**: `/api/pasak/server/baseline`
 
 ### C. Hapus Baseline Integritas
 - **Metode**: `DELETE`
-- **URI**: `/api/security/server/baseline`
+- **URI**: `/api/pasak/server/baseline`
 
 ### D. Hapus Berkas Mencurigakan (Safe Deletion)
 - **Metode**: `DELETE`
-- **URI**: `/api/security/server/suspicious-files`
+- **URI**: `/api/pasak/server/suspicious-files`
 - **Body JSON**:
   ```json
   {
@@ -151,32 +194,32 @@ Mengambil data log terpaginasi lengkap dengan rincian statistik, level breakdown
 
 ### E. Lepaskan Lockout Login Pengguna
 - **Metode**: `DELETE`
-- **URI**: `/api/security/lockouts/{id}`
+- **URI**: `/api/pasak/lockouts/{id}`
 
 ---
 
-## 4. Sesi Pengguna & IP Terpercaya (User Sessions)
+## 5. Sesi Pengguna & IP Terpercaya (User Sessions)
 
 ### A. Daftar Sesi Pengguna & Online Count
 - **Metode**: `GET`
-- **URI**: `/api/security/user-sessions`
+- **URI**: `/api/pasak/user-sessions`
 - Mengembalikan riwayat login pengguna (`logins`), daftar `trusted_ips`, dan jumlah pengguna aktif saat ini (`online_count`).
 
 ### B. Pemantauan Realtime Pengguna Aktif
 - **Metode**: `GET`
-- **URI**: `/api/security/user-sessions/realtime`
+- **URI**: `/api/pasak/user-sessions/realtime`
 
 ### C. Putus Paksa Sesi Pengguna (Force Logout)
 - **Metode**: `DELETE`
-- **URI**: `/api/security/user-sessions/session/{sessionId}`
+- **URI**: `/api/pasak/user-sessions/session/{sessionId}`
 
 ### D. Hapus IP Terpercaya
 - **Metode**: `DELETE`
-- **URI**: `/api/security/trusted-ips/{id}`
+- **URI**: `/api/pasak/trusted-ips/{id}`
 
 ---
 
-## 5. Manajemen Tiket Banding (Appeal Tickets)
+## 6. Manajemen Tiket Banding (Appeal Tickets)
 
 ### A. Daftar Tiket Banding
 - **Metode**: `GET`
