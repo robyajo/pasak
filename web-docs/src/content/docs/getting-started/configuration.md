@@ -58,6 +58,7 @@ Berikut adalah daftar lengkap seluruh variabel lingkungan yang didukung:
 | `PASAK_PRUNE_SCHEDULE`              | string |        `02:30`         | Jam eksekusi harian pembersihan log usang (format `HH:mm`).                                               |
 | `PASAK_SUPPORT_EMAIL`               | string | `security@example.com` | Alamat email dukungan yang ditampilkan pada layar respon blokir.                                          |
 | `PASAK_AUTO_REGISTER_MIDDLEWARE`    |  bool  |        `false`         | Mendaftarkan middleware global secara otomatis saat boot aplikasi.                                        |
+| `PASAK_ANNOUNCEMENT_ENABLED`        |  bool  |         `true`         | Banner + dialog pengumuman otomatis di halaman utama (`/`).                                               |
 
 ---
 

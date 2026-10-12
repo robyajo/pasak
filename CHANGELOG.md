@@ -6,6 +6,8 @@ All notable changes to `robyajo/pasak` will be documented in this file.
 
 ### Added
 
+- **Banner + dialog pengumuman otomatis di halaman utama**: middleware baru `InjectAnnouncementBanner` (alias `pasak.announce`) menyuntikkan banner atas + dialog sambutan pada respons HTML `GET /` tanpa mengubah view host — mandiri (tanpa dependensi), banner tampil sampai ditutup, dialog sekali per versi paket, nonaktif via `PASAK_ANNOUNCEMENT_ENABLED=false`. Terdaftar otomatis saat `auto_register_middleware` aktif dan disematkan installer ke grup global.
+
 - **CRUD Allowed IPs (global allowlist)**: model `AllowedIp` + tabel `allowed_ips` (migrasi baru untuk instalasi lama, plus masuk migrasi konsolidasi), pola IP tunggal/wildcard/CIDR yang ikut diperiksa `isWhitelisted()`, endpoint API `allowed-ips.*` (index/store/show/toggle/destroy, admin-only), halaman dashboard Blade murni + Livewire + React/TSX, entri navigasi, dan relasi `$user->allowedIps()`. Uninstall ikut menghapus tabelnya.
 
 - **Halaman detail dashboard (Logs, Blocked IPs, Appeals)**: rute `logs/{id}`, `blocked-ips/{id}`, `tickets/{id}` (`*.show`) di semua varian (Blade, Livewire, React, gabungan) dengan tampilan evidence/konteks request, log pemicu, tiket terkait, dan aksi langsung (hapus, toggle/unblock, approve/reject). Kolom **Detail** ditambahkan di ketiga tabel index.

@@ -178,6 +178,7 @@ class PasakUninstallCommand extends Command
         $markers = [
             'Internal\\Pasak\\Http\\Middleware\\BlockIpAddress::class',
             'Internal\\Pasak\\Http\\Middleware\\DetectSecurityThreats::class',
+            'Internal\\Pasak\\Http\\Middleware\\InjectAnnouncementBanner::class',
             // Varian lama (pra-rename namespace).
             'Internal\\SecurityMonitor\\Http\\Middleware\\BlockIpAddress::class',
             'Internal\\SecurityMonitor\\Http\\Middleware\\DetectSecurityThreats::class',

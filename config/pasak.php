@@ -746,6 +746,22 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Announcement Banner & Dialog
+    |--------------------------------------------------------------------------
+    |
+    | Banner + dialog pengumuman yang disuntikkan otomatis pada halaman
+    | yang dikonfigurasi (bawaan: `/`) tanpa mengubah view aplikasi host.
+    | Banner tampil sampai ditutup; dialog tampil sekali per versi paket.
+    | Nonaktifkan dengan PASAK_ANNOUNCEMENT_ENABLED=false.
+    |
+    */
+    'announcement' => [
+        'enabled' => (bool) env('PASAK_ANNOUNCEMENT_ENABLED', true),
+        'paths' => ['/'],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Automatic Schedule Configuration
     |--------------------------------------------------------------------------
     |

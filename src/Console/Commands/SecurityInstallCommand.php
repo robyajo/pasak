@@ -805,6 +805,7 @@ class SecurityInstallCommand extends Command
                 $snippet = "        \${$varName}->append([\n"
                     ."            \\Internal\\Pasak\\Http\\Middleware\\BlockIpAddress::class,\n"
                     ."            \\Internal\\Pasak\\Http\\Middleware\\DetectSecurityThreats::class,\n"
+                    ."            \\Internal\\Pasak\\Http\\Middleware\\InjectAnnouncementBanner::class,\n"
                     ."        ]);\n";
 
                 $matchEnd = $matches[0][1] + strlen($matches[0][0]);
@@ -837,7 +838,8 @@ class SecurityInstallCommand extends Command
             }
 
             $middlewareSnippet = "        \\Internal\\Pasak\\Http\\Middleware\\BlockIpAddress::class,\n"
-                ."        \\Internal\\Pasak\\Http\\Middleware\\DetectSecurityThreats::class,\n";
+                ."        \\Internal\\Pasak\\Http\\Middleware\\DetectSecurityThreats::class,\n"
+                ."        \\Internal\\Pasak\\Http\\Middleware\\InjectAnnouncementBanner::class,\n";
 
             if (preg_match('/protected\s+\$middleware\s*=\s*\[/i', $content, $matches, PREG_OFFSET_CAPTURE)) {
                 $pos = $matches[0][1] + strlen($matches[0][0]);

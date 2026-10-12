@@ -26,6 +26,7 @@ use Internal\Pasak\Console\Commands\UnblockIpAddress;
 use Internal\Pasak\Http\Middleware\BlockIpAddress;
 use Internal\Pasak\Http\Middleware\DetectSecurityThreats;
 use Internal\Pasak\Http\Middleware\EnsureSecurityAdmin;
+use Internal\Pasak\Http\Middleware\InjectAnnouncementBanner;
 use Internal\Pasak\Http\Middleware\TrackUserActivity;
 use Internal\Pasak\Listeners\LogFailedLoginAttempt;
 use Internal\Pasak\Listeners\RecordUserLogin;
@@ -551,6 +552,7 @@ class PasakServiceProvider extends ServiceProvider
             DetectSecurityThreats::class,
         );
         $router->aliasMiddleware('pasak.activity', TrackUserActivity::class);
+        $router->aliasMiddleware('pasak.announce', InjectAnnouncementBanner::class);
 
         if (config('pasak.auto_register_middleware', false)) {
             $this->app->booted(function (): void {
@@ -559,6 +561,7 @@ class PasakServiceProvider extends ServiceProvider
                 if ($kernel instanceof HttpKernel) {
                     $kernel->pushMiddleware(BlockIpAddress::class);
                     $kernel->pushMiddleware(DetectSecurityThreats::class);
+                    $kernel->pushMiddleware(InjectAnnouncementBanner::class);
                 }
             });
         }
