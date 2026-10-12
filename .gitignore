@@ -5,5 +5,5 @@ composer.lock
 .env
 *.log
 
-# Situs dokumentasi (repo terpisah: robyajo/web-laravel-security)
+# Sandbox aplikasi Laravel uji (tidak ikut rilis paket)
 /laravel-test
