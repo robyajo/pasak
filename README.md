@@ -226,6 +226,7 @@ Trait ini menyediakan relasi Eloquent bawaan:
 - `$user->trustedIps()`: Daftar IP terpercaya pengguna (`TrustedIp`).
 - `$user->securityLogs()`: Riwayat event keamanan pengguna (`SecurityLog`).
 - `$user->blockedIps()`: Riwayat pemblokiran yang dilakukan oleh pengguna (`BlockedIp`).
+- `$user->allowedIps()`: Entri allowlist yang dibuat oleh pengguna (`AllowedIp`).
 - `$user->resolvedTickets()`: Tiket permohonan buka blokir yang diselesaikan admin (`IpUnblockRequest`).
 
 ### 2. Daftarkan Middleware

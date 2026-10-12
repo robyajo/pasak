@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Internal\Pasak\Http\Controllers\Dashboard\AllowedIpController;
 use Internal\Pasak\Http\Controllers\Dashboard\BlockedIpController;
 use Internal\Pasak\Http\Controllers\Dashboard\LogController;
 use Internal\Pasak\Http\Controllers\Dashboard\OverviewController;
@@ -43,6 +44,12 @@ Route::middleware(array_merge($middleware, $adminMiddleware))
         Route::post('blocked-ips', [BlockedIpController::class, 'store'])->name('blocked-ips.store');
         Route::patch('blocked-ips/{id}/toggle', [BlockedIpController::class, 'toggle'])->whereNumber('id')->name('blocked-ips.toggle');
         Route::delete('blocked-ips/{id}', [BlockedIpController::class, 'destroy'])->whereNumber('id')->name('blocked-ips.destroy');
+
+        // Allowed IPs
+        Route::get('allowed-ips', [AllowedIpController::class, 'index'])->name('allowed-ips');
+        Route::post('allowed-ips', [AllowedIpController::class, 'store'])->name('allowed-ips.store');
+        Route::patch('allowed-ips/{id}/toggle', [AllowedIpController::class, 'toggle'])->whereNumber('id')->name('allowed-ips.toggle');
+        Route::delete('allowed-ips/{id}', [AllowedIpController::class, 'destroy'])->whereNumber('id')->name('allowed-ips.destroy');
 
         // Server audit
         Route::get('server', [ServerController::class, 'index'])->name('server');

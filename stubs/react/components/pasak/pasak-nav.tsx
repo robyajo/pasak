@@ -35,6 +35,11 @@ const items = [
         icon: '<circle cx="12" cy="12" r="10"/><path d="m4.9 4.9 14.2 14.2"/>',
     },
     {
+        title: 'Allowed IPs',
+        path: 'allowed-ips',
+        icon: '<path d="M20 6 9 17l-5-5"/>',
+    },
+    {
         title: 'Server Audit',
         path: 'server',
         icon: '<rect width="20" height="8" x="2" y="2" rx="2"/><rect width="20" height="8" x="2" y="14" rx="2"/><path d="M6 6h.01"/><path d="M6 18h.01"/>',

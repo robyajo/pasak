@@ -68,6 +68,7 @@ class PasakUninstallCommand extends Command
 
         $tables = [
             config('pasak.table_names.settings', 'pasak_settings'),
+            config('pasak.table_names.allowed_ips', 'allowed_ips'),
             config('pasak.table_names.trusted_ips', 'trusted_ips'),
             config('pasak.table_names.user_logins', 'user_logins'),
             config('pasak.table_names.ip_unblock_requests', 'ip_unblock_requests'),

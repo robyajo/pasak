@@ -19,6 +19,7 @@ return new class extends Migration
         $userLoginsTable = config('pasak.table_names.user_logins', 'user_logins');
         $trustedIpsTable = config('pasak.table_names.trusted_ips', 'trusted_ips');
         $settingsTable = config('pasak.table_names.settings', 'pasak_settings');
+        $allowedIpsTable = config('pasak.table_names.allowed_ips', 'allowed_ips');
 
         // Seamless upgrade from robyajo/pasak installs predating the rename:
         // carry existing data over instead of starting from empty tables.
@@ -174,12 +175,28 @@ return new class extends Migration
                 $blueprint->timestamps();
             });
         }
+
+        if (! Schema::hasTable($allowedIpsTable)) {
+            Schema::create($allowedIpsTable, function (Blueprint $blueprint) use ($usersTable) {
+                $blueprint->id();
+                $blueprint->string('ip_address', 45)->index();
+                $blueprint->string('label', 150)->nullable();
+                $blueprint->text('notes')->nullable();
+                $blueprint->foreignId('allowed_by')->nullable()->constrained($usersTable)->nullOnDelete();
+                $blueprint->boolean('is_active')->default(true);
+                $blueprint->timestamp('expires_at')->nullable()->index();
+                $blueprint->timestamps();
+
+                $blueprint->index(['is_active', 'ip_address']);
+            });
+        }
     }
 
     public function down(): void
     {
         $tables = [
             config('pasak.table_names.settings', 'pasak_settings'),
+            config('pasak.table_names.allowed_ips', 'allowed_ips'),
             config('pasak.table_names.trusted_ips', 'trusted_ips'),
             config('pasak.table_names.user_logins', 'user_logins'),
             config('pasak.table_names.ip_unblock_requests', 'ip_unblock_requests'),

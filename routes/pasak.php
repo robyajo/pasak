@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Internal\Pasak\Http\Controllers\Api\AllowedIpApiController;
 use Internal\Pasak\Http\Controllers\Api\BlockedIpApiController;
 use Internal\Pasak\Http\Controllers\Api\IpUnblockRequestApiController;
 use Internal\Pasak\Http\Controllers\Api\SecurityLogApiController;
@@ -44,6 +45,13 @@ Route::prefix($prefix)->middleware($middleware)->name('pasak.')->group(function 
         Route::get('blocked-ips/{id}', [BlockedIpApiController::class, 'show'])->name('blocked-ips.show');
         Route::patch('blocked-ips/{id}/toggle', [BlockedIpApiController::class, 'toggle'])->name('blocked-ips.toggle');
         Route::delete('blocked-ips/{id}', [BlockedIpApiController::class, 'destroy'])->name('blocked-ips.destroy');
+
+        // Allowed IPs (global whitelist)
+        Route::get('allowed-ips', [AllowedIpApiController::class, 'index'])->name('allowed-ips.index');
+        Route::post('allowed-ips', [AllowedIpApiController::class, 'store'])->name('allowed-ips.store');
+        Route::get('allowed-ips/{id}', [AllowedIpApiController::class, 'show'])->name('allowed-ips.show');
+        Route::patch('allowed-ips/{id}/toggle', [AllowedIpApiController::class, 'toggle'])->name('allowed-ips.toggle');
+        Route::delete('allowed-ips/{id}', [AllowedIpApiController::class, 'destroy'])->name('allowed-ips.destroy');
 
         // Server Security & Audit
         Route::get('server', [ServerSecurityApiController::class, 'index'])->name('server.index');

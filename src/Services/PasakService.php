@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
+use Internal\Pasak\Models\AllowedIp;
 use Internal\Pasak\Models\BlockedIp;
 use Internal\Pasak\Models\SecurityLog;
 use Internal\Pasak\Models\SecuritySetting;
@@ -34,7 +35,7 @@ class PasakService
     /**
      * Versi paket Pasak (Bulwark).
      */
-    public const VERSION = '1.3.0';
+    public const VERSION = '1.3.1';
 
     /**
      * Rentang waktu yang didukung grafik tren serangan.
@@ -399,6 +400,27 @@ class PasakService
             if (self::ipMatches($ip, (string) $pattern)) {
                 return true;
             }
+        }
+
+        try {
+            $allowedTable = (new AllowedIp)->getTable();
+
+            if (Schema::hasTable($allowedTable)) {
+                $entry = AllowedIp::query()
+                    ->where('is_active', true)
+                    ->where(function ($query) {
+                        $query->whereNull('expires_at')->orWhere('expires_at', '>', now());
+                    })
+                    ->orderBy('id')
+                    ->cursor()
+                    ->first(fn ($row) => self::ipMatches($ip, (string) $row->ip_address));
+
+                if ($entry !== null) {
+                    return true;
+                }
+            }
+        } catch (Throwable) {
+            // Silently fallback if table query fails
         }
 
         try {

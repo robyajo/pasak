@@ -683,6 +683,7 @@ return [
         'ip_unblock_requests' => env('PASAK_IP_UNBLOCK_REQUESTS_TABLE', env('SECURITY_IP_UNBLOCK_REQUESTS_TABLE', 'ip_unblock_requests')),
         'user_logins' => env('PASAK_USER_LOGINS_TABLE', env('SECURITY_USER_LOGINS_TABLE', 'user_logins')),
         'trusted_ips' => env('PASAK_TRUSTED_IPS_TABLE', env('SECURITY_TRUSTED_IPS_TABLE', 'trusted_ips')),
+        'allowed_ips' => env('PASAK_ALLOWED_IPS_TABLE', 'allowed_ips'),
         'settings' => env('PASAK_SETTINGS_TABLE', 'pasak_settings'),
     ],
 

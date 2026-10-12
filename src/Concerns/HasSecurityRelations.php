@@ -3,6 +3,7 @@
 namespace Internal\Pasak\Concerns;
 
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Internal\Pasak\Models\AllowedIp;
 use Internal\Pasak\Models\BlockedIp;
 use Internal\Pasak\Models\IpUnblockRequest;
 use Internal\Pasak\Models\SecurityLog;
@@ -29,6 +30,11 @@ trait HasSecurityRelations
     public function blockedIps(): HasMany
     {
         return $this->hasMany(BlockedIp::class, 'blocked_by');
+    }
+
+    public function allowedIps(): HasMany
+    {
+        return $this->hasMany(AllowedIp::class, 'allowed_by');
     }
 
     public function resolvedTickets(): HasMany

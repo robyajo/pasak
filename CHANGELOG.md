@@ -6,6 +6,8 @@ All notable changes to `robyajo/pasak` will be documented in this file.
 
 ### Added
 
+- **CRUD Allowed IPs (global allowlist)**: model `AllowedIp` + tabel `allowed_ips` (migrasi baru untuk instalasi lama, plus masuk migrasi konsolidasi), pola IP tunggal/wildcard/CIDR yang ikut diperiksa `isWhitelisted()`, endpoint API `allowed-ips.*` (index/store/show/toggle/destroy, admin-only), halaman dashboard Blade murni + Livewire + React/TSX, entri navigasi, dan relasi `$user->allowedIps()`. Uninstall ikut menghapus tabelnya.
+
 - **Halaman detail dashboard (Logs, Blocked IPs, Appeals)**: rute `logs/{id}`, `blocked-ips/{id}`, `tickets/{id}` (`*.show`) di semua varian (Blade, Livewire, React, gabungan) dengan tampilan evidence/konteks request, log pemicu, tiket terkait, dan aksi langsung (hapus, toggle/unblock, approve/reject). Kolom **Detail** ditambahkan di ketiga tabel index.
 - **Toggle dark mode manual** di semua stack dashboard (Blade, Livewire, React): tombol Auto → Terang → Gelap di navigasi, tersimpan di `localStorage` (`pasak-theme`), tanpa flicker (tema diterapkan sebelum paint). Layout Blade kini memakai `color-scheme` dan background body mengikuti tema (sebelumnya body terkunci terang).
 - **Ringkasan akhir `pasak:install` mencantumkan URL akses dashboard** (overview, logs, blocked-ips, server, sessions, tickets, settings) berdasarkan `APP_URL` + prefix terkonfigurasi, plus langkah khusus untuk pilihan Livewire saja.
