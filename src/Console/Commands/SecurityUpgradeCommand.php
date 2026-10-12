@@ -323,7 +323,7 @@ class SecurityUpgradeCommand extends Command
                         File::ensureDirectoryExists(dirname($sidecar));
                         File::copy($stubPath, $sidecar);
                         $this->info('  ✓ Berkas tinjauan public/.htaccess.pasak dibuat (milik Anda tidak diubah).');
-                    } catch (\Throwable $e) {
+                    } catch (Throwable $e) {
                         $this->warn('  ⚠ Gagal membuat public/.htaccess.pasak: '.$e->getMessage());
                     }
                     break;
