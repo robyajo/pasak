@@ -6,6 +6,7 @@
         "documents",
         "DOCS",
         "stubs",
-        "laravel-test"
+        "laravel-test",
+        "ring"
     ]
 }
