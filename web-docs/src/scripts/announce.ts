@@ -109,9 +109,9 @@ function mount(): void {
         document.body.appendChild(modal);
     }
 
-    if (!storeGet(MODAL_KEY) && !storeGet(BANNER_KEY)) {
-        (modal as HTMLElement).hidden = false;
-    }
+    // Dialog TIDAK dibuka otomatis agar tidak menutupi header/konten;
+    // user membukanya lewat tombol Info di banner. Status "sekali"
+    // tetap dicatat saat dialog ditutup via tombol Mengerti.
 }
 
 export function initSiteAnnouncement(): void {
