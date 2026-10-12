@@ -5,9 +5,7 @@ namespace Internal\Pasak\Console\Commands;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\File;
-use Inertia\Inertia;
 use Internal\Pasak\Services\VersionCheckService;
-use Livewire\Livewire;
 use Symfony\Component\Process\Process;
 use Throwable;
 
@@ -19,7 +17,7 @@ class SecurityUpgradeCommand extends Command
                             {--no-composer : Lewati pembaruan package via Composer (hanya sinkronkan aset lokal)}
                             {--no-migrate : Lewati eksekusi migrasi database}
                             {--sync-routes : Paksa sinkronkan ulang berkas routes/pasak.php dan routes/pasak-api.php}
-                            {--sync-views : Paksa sinkronkan ulang berkas tampilan dashboard (Blade / React)}';
+                            {--sync-views : Paksa sinkronkan ulang berkas tampilan dashboard Blade}';
 
     protected $description = 'Periksa dan perbarui package Pasak (Bulwark) ke versi terbaru serta sinkronkan migrasi, rute, dan tampilan dashboard';
 
@@ -137,38 +135,19 @@ class SecurityUpgradeCommand extends Command
         // 4. Synchronize dashboard views (tanpa menimpa kustomisasi host kecuali diminta).
         $this->comment('4/5. Menyinkronkan tampilan dashboard monitoring...');
         $hasBladeViews = File::isDirectory(resource_path('views/pages/pasak'));
-        $hasReactViews = File::isDirectory(resource_path('js/pages/pasak'));
 
         if ($hasBladeViews || $this->option('sync-views')) {
             if ($this->option('sync-views')) {
                 $this->backupHostFiles([resource_path('views/pages/pasak')]);
             }
-            // Livewire single-file vs Blade murni: samakan dengan stack host.
             $this->call('vendor:publish', [
-                '--tag' => class_exists(Livewire::class)
-                    ? 'pasak-dashboard-blade-views'
-                    : 'plain-views',
+                '--tag' => 'plain-views',
                 '--force' => (bool) $this->option('sync-views'),
             ]);
-            $this->info('  ✓ Tampilan dashboard Blade/Livewire telah disinkronkan.');
+            $this->info('  ✓ Tampilan dashboard Blade murni telah disinkronkan.');
             $this->warnIfViewsOutdated(
                 resource_path('views/pages/pasak/layout.blade.php'),
                 'pasakAnnounce'
-            );
-        }
-
-        if ($hasReactViews) {
-            if ($this->option('sync-views')) {
-                $this->backupHostFiles([resource_path('js/pages/pasak')]);
-            }
-            $this->call('vendor:publish', [
-                '--tag' => 'pasak-dashboard-react-views',
-                '--force' => (bool) $this->option('sync-views'),
-            ]);
-            $this->info('  ✓ Tampilan dashboard React/Inertia telah disinkronkan.');
-            $this->warnIfViewsOutdated(
-                resource_path('js/components/pasak/pasak-nav.tsx'),
-                'showAnnounce'
             );
         }
 
@@ -331,15 +310,11 @@ class SecurityUpgradeCommand extends Command
             }
         }
 
-        // 4. Peringatan driver dashboard yang tidak cocok dengan stack host.
+        // 4. Normalisasi driver dashboard warisan ke 'blade' (satu-satunya driver).
         $driver = strtolower((string) config('pasak.dashboard.driver', 'blade'));
 
-        if ($driver === 'livewire' && ! class_exists(Livewire::class)) {
-            $this->warn("  ⚠ Driver dashboard 'livewire' aktif tetapi paket Livewire tidak terpasang. Ganti ke 'blade' (PASAK_DASHBOARD_DRIVER=blade) atau pasang Livewire.");
-        }
-
-        if (in_array($driver, ['react', 'tsx'], true) && ! class_exists(Inertia::class)) {
-            $this->warn("  ⚠ Driver dashboard '{$driver}' aktif tetapi Inertia tidak terpasang. Ganti ke 'blade' (PASAK_DASHBOARD_DRIVER=blade) atau pasang Inertia.");
+        if (! in_array($driver, ['blade', 'plain'], true)) {
+            $this->warn("  ⚠ Driver dashboard '{$driver}' tidak lagi didukung (dashboard kini Blade murni). Gunakan PASAK_DASHBOARD_DRIVER=blade.");
         }
     }
 

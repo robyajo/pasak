@@ -142,11 +142,11 @@ documents/                 # Authoritative 25-chapter documentation suite + inde
 src/
 ├── Concerns/              # Reusable Eloquent traits (HasSecurityRelations)
 ├── Console/Commands/      # Artisan commands (pasak:install with bilingual wizard, pasak:upgrade, pasak:uninstall, etc.)
-├── Controllers/           # (under Http/) Api + Dashboard (dual-render Blade/Inertia) controllers
+├── Controllers/           # (under Http/) Api + Dashboard (Blade-only) controllers
 ├── Facades/               # Static facade accessors (Pasak)
 ├── Http/
 │   ├── Controllers/Api/   # Headless JSON REST API controllers
-│   ├── Controllers/Dashboard/ # Blade + Inertia dashboard controllers (RespondsWithDashboard)
+│   ├── Controllers/Dashboard/ # Blade dashboard controllers (RespondsWithDashboard)
 │   └── Middleware/        # WAF & session tracking middleware
 ├── Listeners/             # Auth event listeners (LogFailedLoginAttempt, RecordUserLogin, ResetLoginAttempts)
 ├── Models/                # Eloquent models with dynamic table names
@@ -163,9 +163,7 @@ database/migrations/       # Single consolidated migration (create_pasak_tables)
 
 routes/
 ├── pasak.php             # Headless REST API routes
-├── pasak-dashboard.php   # Livewire dashboard routes (auth + pasak.admin)
-├── pasak-dashboard-react.php # Inertia + React dashboard routes (auth + pasak.admin)
-└── pasak-dashboard-blade.php # Plain-Blade dashboard routes (auth + pasak.admin)
+└── pasak-dashboard-blade.php # Blade dashboard routes (auth + pasak.admin)
 
 stubs/
 ├── nginx.conf.stub        # Hardened Nginx WAF configuration template
@@ -173,9 +171,8 @@ stubs/
 ├── htaccess.stub          # Hardened Apache .htaccess template
 ├── blocked.blade.php      # Default 403 "blocked" page
 ├── env.stub               # Documented PASAK_* environment block
-├── blade/pages/pasak/     # Plain-Blade monitoring dashboard (tag: plain-views)
-├── livewire/pages/pasak/  # Livewire Starter Kit monitoring dashboard (tag: starterkit-livewire)
-└── react/                 # React Starter Kit monitoring dashboard (tag: starterkit-react)
+├── routes/               # Publishable route stubs (pasak-blade, pasak, pasak-api)
+└── blade/pages/pasak/     # Dashboard monitoring Blade murni (tag: plain-views)
 
 push.sh                    # Commit + auto-tag helper (patch caps at .10, majors manual-only)
 finis.sh                   # Root wrapper for web-docs VPS build & deploy

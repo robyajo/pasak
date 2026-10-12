@@ -1,6 +1,6 @@
 ---
 title: "Tugas Terjadwal (Cron & Scheduler)"
-description: "PasakServiceProvider menyertakan registrasi otomatis ke sistem scheduler bawaan Laravel (Illuminate\\Console\\Scheduling\\Schedule). Tugas-tugas..."
+description: "PasakServiceProvider menyertakan registrasi otomatis ke sistem scheduler bawaan Laravel (Illuminate\\Console\\Scheduling\\Schedule). Tugas-tugas ini..."
 sidebar:
   order: 2
 ---

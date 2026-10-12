@@ -94,7 +94,7 @@ test('dashboard allowed-ips page renders with entries', function () {
     }
 });
 
-test('dashboard overview falls back to blade views when inertia is unavailable', function () {
+test('dashboard overview always renders blade views regardless of legacy driver value', function () {
     config()->set('pasak.dashboard.driver', 'react');
 
     $target = resource_path('views/pages/pasak');
@@ -118,9 +118,8 @@ test('dashboard overview falls back to blade views when inertia is unavailable',
             app(PasakService::class)
         );
 
-        // inertia/inertia-laravel tidak terpasang di testbench: harus fallback ke Blade.
-        expect(class_exists(Inertia\Inertia::class))->toBeFalse()
-            ->and($response)->toBeInstanceOf(View::class);
+        // Dashboard kini Blade murni: nilai driver warisan diabaikan.
+        expect($response)->toBeInstanceOf(View::class);
     } finally {
         File::deleteDirectory($target);
     }

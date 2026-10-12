@@ -4,107 +4,49 @@ use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
-| Security Monitor Web Dashboard Routes
+| Pasak Web Dashboard Routes (Plain Blade)
 |--------------------------------------------------------------------------
 |
-| Rute web untuk antarmuka dashboard Security Monitor. Berkas ini me-render
-| tampilan view secara langsung sehingga Anda bebas menyesuaikan tampilan,
-| prefix URL, middleware, atau menambahkan custom halaman sendiri.
+| Rute dashboard Blade murni — satu-satunya dashboard Pasak (100% Pure PHP).
+| Me-render tampilan di resources/views/pages/pasak tanpa dependensi
+| frontend sehingga Anda bebas menyesuaikan tampilan, prefix URL,
+| middleware, atau menambah halaman sendiri.
 |
 */
 
 $prefix = config('pasak.dashboard.prefix', 'pasak');
 $middleware = array_filter((array) config('pasak.dashboard.middleware', ['web', 'auth']));
 $adminMiddleware = array_filter((array) config('pasak.dashboard.admin_middleware', []));
-$driver = strtolower((string) config('pasak.dashboard.driver', 'blade'));
 
 Route::middleware(array_merge($middleware, $adminMiddleware))
     ->prefix($prefix)
     ->name('pasak.dashboard.')
-    ->group(function () use ($driver) {
-        if (in_array($driver, ['react', 'tsx'], true) && class_exists(\Inertia\Inertia::class)) {
-            // Rute controller Inertia + React (render komponen di resources/js/pages/pasak)
-            Route::get('/', \Internal\Pasak\Http\Controllers\Dashboard\OverviewController::class)->name('overview');
-            Route::get('logs', [\Internal\Pasak\Http\Controllers\Dashboard\LogController::class, 'index'])->name('logs');
-            Route::get('logs/{id}', [\Internal\Pasak\Http\Controllers\Dashboard\LogController::class, 'show'])->whereNumber('id')->name('logs.show');
-            Route::delete('logs', [\Internal\Pasak\Http\Controllers\Dashboard\LogController::class, 'clear'])->name('logs.clear');
-            Route::delete('logs/{id}', [\Internal\Pasak\Http\Controllers\Dashboard\LogController::class, 'destroy'])->whereNumber('id')->name('logs.destroy');
-            Route::get('blocked-ips', [\Internal\Pasak\Http\Controllers\Dashboard\BlockedIpController::class, 'index'])->name('blocked-ips');
-            Route::get('blocked-ips/{id}', [\Internal\Pasak\Http\Controllers\Dashboard\BlockedIpController::class, 'show'])->whereNumber('id')->name('blocked-ips.show');
-            Route::post('blocked-ips', [\Internal\Pasak\Http\Controllers\Dashboard\BlockedIpController::class, 'store'])->name('blocked-ips.store');
-            Route::patch('blocked-ips/{id}/toggle', [\Internal\Pasak\Http\Controllers\Dashboard\BlockedIpController::class, 'toggle'])->whereNumber('id')->name('blocked-ips.toggle');
-            Route::delete('blocked-ips/{id}', [\Internal\Pasak\Http\Controllers\Dashboard\BlockedIpController::class, 'destroy'])->whereNumber('id')->name('blocked-ips.destroy');
-            Route::get('allowed-ips', [\Internal\Pasak\Http\Controllers\Dashboard\AllowedIpController::class, 'index'])->name('allowed-ips');
-            Route::post('allowed-ips', [\Internal\Pasak\Http\Controllers\Dashboard\AllowedIpController::class, 'store'])->name('allowed-ips.store');
-            Route::patch('allowed-ips/{id}/toggle', [\Internal\Pasak\Http\Controllers\Dashboard\AllowedIpController::class, 'toggle'])->whereNumber('id')->name('allowed-ips.toggle');
-            Route::delete('allowed-ips/{id}', [\Internal\Pasak\Http\Controllers\Dashboard\AllowedIpController::class, 'destroy'])->whereNumber('id')->name('allowed-ips.destroy');
-            Route::get('allowed-ips', [\Internal\Pasak\Http\Controllers\Dashboard\AllowedIpController::class, 'index'])->name('allowed-ips');
-            Route::post('allowed-ips', [\Internal\Pasak\Http\Controllers\Dashboard\AllowedIpController::class, 'store'])->name('allowed-ips.store');
-            Route::patch('allowed-ips/{id}/toggle', [\Internal\Pasak\Http\Controllers\Dashboard\AllowedIpController::class, 'toggle'])->whereNumber('id')->name('allowed-ips.toggle');
-            Route::delete('allowed-ips/{id}', [\Internal\Pasak\Http\Controllers\Dashboard\AllowedIpController::class, 'destroy'])->whereNumber('id')->name('allowed-ips.destroy');
-            Route::get('server', [\Internal\Pasak\Http\Controllers\Dashboard\ServerController::class, 'index'])->name('server');
-            Route::post('server/baseline', [\Internal\Pasak\Http\Controllers\Dashboard\ServerController::class, 'createBaseline'])->name('server.baseline');
-            Route::delete('server/baseline', [\Internal\Pasak\Http\Controllers\Dashboard\ServerController::class, 'deleteBaseline'])->name('server.baseline.destroy');
-            Route::delete('server/suspicious-files', [\Internal\Pasak\Http\Controllers\Dashboard\ServerController::class, 'deleteSuspiciousFile'])->name('server.suspicious-files.destroy');
-            Route::delete('lockouts/{id}', [\Internal\Pasak\Http\Controllers\Dashboard\ServerController::class, 'releaseLockout'])->whereNumber('id')->name('lockouts.destroy');
-            Route::get('sessions', [\Internal\Pasak\Http\Controllers\Dashboard\SessionController::class, 'index'])->name('sessions');
-            Route::delete('user-sessions/{id}', [\Internal\Pasak\Http\Controllers\Dashboard\SessionController::class, 'destroyLogin'])->whereNumber('id')->name('user-sessions.destroy');
-            Route::delete('sessions/{sessionId}', [\Internal\Pasak\Http\Controllers\Dashboard\SessionController::class, 'destroySession'])->name('sessions.destroy');
-            Route::delete('trusted-ips/{id}', [\Internal\Pasak\Http\Controllers\Dashboard\SessionController::class, 'destroyTrusted'])->whereNumber('id')->name('trusted-ips.destroy');
-            Route::post('trusted-ips/my-ip', [\Internal\Pasak\Http\Controllers\Dashboard\SessionController::class, 'storeMyIp'])->name('trusted-ips.store-my-ip');
-            Route::get('tickets', [\Internal\Pasak\Http\Controllers\Dashboard\TicketController::class, 'index'])->name('tickets');
-            Route::get('tickets/{id}', [\Internal\Pasak\Http\Controllers\Dashboard\TicketController::class, 'show'])->whereNumber('id')->name('tickets.show');
-            Route::post('tickets/{id}/respond', [\Internal\Pasak\Http\Controllers\Dashboard\TicketController::class, 'respond'])->whereNumber('id')->name('tickets.respond');
-            Route::delete('tickets/{id}', [\Internal\Pasak\Http\Controllers\Dashboard\TicketController::class, 'destroy'])->whereNumber('id')->name('tickets.destroy');
-            Route::get('settings', [\Internal\Pasak\Http\Controllers\Dashboard\SettingController::class, 'index'])->name('settings');
-            Route::post('settings', [\Internal\Pasak\Http\Controllers\Dashboard\SettingController::class, 'update'])->name('settings.update');
-        } elseif (in_array($driver, ['livewire', 'all', 'both'], true) && class_exists(\Livewire\Livewire::class)) {
-            // Rute Livewire Single-File Pages (render view di resources/views/pages/pasak)
-            Route::livewire('/', 'pages::pasak.overview')->name('overview');
-            Route::livewire('logs', 'pages::pasak.logs')->name('logs');
-            Route::livewire('logs/{id}', 'pages::pasak.log-detail')->name('logs.show');
-            Route::livewire('blocked-ips', 'pages::pasak.blocked-ips')->name('blocked-ips');
-            Route::livewire('blocked-ips/{id}', 'pages::pasak.blocked-ip-detail')->name('blocked-ips.show');
-            Route::livewire('server', 'pages::pasak.server')->name('server');
-            Route::livewire('sessions', 'pages::pasak.sessions')->name('sessions');
-            Route::livewire('tickets', 'pages::pasak.tickets')->name('tickets');
-            Route::livewire('tickets/{id}', 'pages::pasak.ticket-detail')->name('tickets.show');
-            Route::livewire('settings', 'pages::pasak.settings')->name('settings');
-        } else {
-            // Dashboard Blade murni via controller (resources/views/pages/pasak, tanpa Livewire/Inertia)
-            Route::get('/', \Internal\Pasak\Http\Controllers\Dashboard\OverviewController::class)->name('overview');
-            Route::get('logs', [\Internal\Pasak\Http\Controllers\Dashboard\LogController::class, 'index'])->name('logs');
-            Route::get('logs/{id}', [\Internal\Pasak\Http\Controllers\Dashboard\LogController::class, 'show'])->whereNumber('id')->name('logs.show');
-            Route::delete('logs', [\Internal\Pasak\Http\Controllers\Dashboard\LogController::class, 'clear'])->name('logs.clear');
-            Route::delete('logs/{id}', [\Internal\Pasak\Http\Controllers\Dashboard\LogController::class, 'destroy'])->whereNumber('id')->name('logs.destroy');
-            Route::get('blocked-ips', [\Internal\Pasak\Http\Controllers\Dashboard\BlockedIpController::class, 'index'])->name('blocked-ips');
-            Route::get('blocked-ips/{id}', [\Internal\Pasak\Http\Controllers\Dashboard\BlockedIpController::class, 'show'])->whereNumber('id')->name('blocked-ips.show');
-            Route::post('blocked-ips', [\Internal\Pasak\Http\Controllers\Dashboard\BlockedIpController::class, 'store'])->name('blocked-ips.store');
-            Route::patch('blocked-ips/{id}/toggle', [\Internal\Pasak\Http\Controllers\Dashboard\BlockedIpController::class, 'toggle'])->whereNumber('id')->name('blocked-ips.toggle');
-            Route::delete('blocked-ips/{id}', [\Internal\Pasak\Http\Controllers\Dashboard\BlockedIpController::class, 'destroy'])->whereNumber('id')->name('blocked-ips.destroy');
-            Route::get('allowed-ips', [\Internal\Pasak\Http\Controllers\Dashboard\AllowedIpController::class, 'index'])->name('allowed-ips');
-            Route::post('allowed-ips', [\Internal\Pasak\Http\Controllers\Dashboard\AllowedIpController::class, 'store'])->name('allowed-ips.store');
-            Route::patch('allowed-ips/{id}/toggle', [\Internal\Pasak\Http\Controllers\Dashboard\AllowedIpController::class, 'toggle'])->whereNumber('id')->name('allowed-ips.toggle');
-            Route::delete('allowed-ips/{id}', [\Internal\Pasak\Http\Controllers\Dashboard\AllowedIpController::class, 'destroy'])->whereNumber('id')->name('allowed-ips.destroy');
-            Route::get('allowed-ips', [\Internal\Pasak\Http\Controllers\Dashboard\AllowedIpController::class, 'index'])->name('allowed-ips');
-            Route::post('allowed-ips', [\Internal\Pasak\Http\Controllers\Dashboard\AllowedIpController::class, 'store'])->name('allowed-ips.store');
-            Route::patch('allowed-ips/{id}/toggle', [\Internal\Pasak\Http\Controllers\Dashboard\AllowedIpController::class, 'toggle'])->whereNumber('id')->name('allowed-ips.toggle');
-            Route::delete('allowed-ips/{id}', [\Internal\Pasak\Http\Controllers\Dashboard\AllowedIpController::class, 'destroy'])->whereNumber('id')->name('allowed-ips.destroy');
-            Route::get('server', [\Internal\Pasak\Http\Controllers\Dashboard\ServerController::class, 'index'])->name('server');
-            Route::post('server/baseline', [\Internal\Pasak\Http\Controllers\Dashboard\ServerController::class, 'createBaseline'])->name('server.baseline');
-            Route::delete('server/baseline', [\Internal\Pasak\Http\Controllers\Dashboard\ServerController::class, 'deleteBaseline'])->name('server.baseline.destroy');
-            Route::delete('server/suspicious-files', [\Internal\Pasak\Http\Controllers\Dashboard\ServerController::class, 'deleteSuspiciousFile'])->name('server.suspicious-files.destroy');
-            Route::delete('lockouts/{id}', [\Internal\Pasak\Http\Controllers\Dashboard\ServerController::class, 'releaseLockout'])->whereNumber('id')->name('lockouts.destroy');
-            Route::get('sessions', [\Internal\Pasak\Http\Controllers\Dashboard\SessionController::class, 'index'])->name('sessions');
-            Route::delete('user-sessions/{id}', [\Internal\Pasak\Http\Controllers\Dashboard\SessionController::class, 'destroyLogin'])->whereNumber('id')->name('user-sessions.destroy');
-            Route::delete('sessions/{sessionId}', [\Internal\Pasak\Http\Controllers\Dashboard\SessionController::class, 'destroySession'])->name('sessions.destroy');
-            Route::delete('trusted-ips/{id}', [\Internal\Pasak\Http\Controllers\Dashboard\SessionController::class, 'destroyTrusted'])->whereNumber('id')->name('trusted-ips.destroy');
-            Route::post('trusted-ips/my-ip', [\Internal\Pasak\Http\Controllers\Dashboard\SessionController::class, 'storeMyIp'])->name('trusted-ips.store-my-ip');
-            Route::get('tickets', [\Internal\Pasak\Http\Controllers\Dashboard\TicketController::class, 'index'])->name('tickets');
-            Route::get('tickets/{id}', [\Internal\Pasak\Http\Controllers\Dashboard\TicketController::class, 'show'])->whereNumber('id')->name('tickets.show');
-            Route::post('tickets/{id}/respond', [\Internal\Pasak\Http\Controllers\Dashboard\TicketController::class, 'respond'])->whereNumber('id')->name('tickets.respond');
-            Route::delete('tickets/{id}', [\Internal\Pasak\Http\Controllers\Dashboard\TicketController::class, 'destroy'])->whereNumber('id')->name('tickets.destroy');
-            Route::get('settings', [\Internal\Pasak\Http\Controllers\Dashboard\SettingController::class, 'index'])->name('settings');
-            Route::post('settings', [\Internal\Pasak\Http\Controllers\Dashboard\SettingController::class, 'update'])->name('settings.update');
-        }
+    ->group(function () {
+        // Dashboard Blade murni via controller (resources/views/pages/pasak).
+        Route::get('/', \Internal\Pasak\Http\Controllers\Dashboard\OverviewController::class)->name('overview');
+        Route::get('logs', [\Internal\Pasak\Http\Controllers\Dashboard\LogController::class, 'index'])->name('logs');
+        Route::get('logs/{id}', [\Internal\Pasak\Http\Controllers\Dashboard\LogController::class, 'show'])->whereNumber('id')->name('logs.show');
+        Route::delete('logs', [\Internal\Pasak\Http\Controllers\Dashboard\LogController::class, 'clear'])->name('logs.clear');
+        Route::delete('logs/{id}', [\Internal\Pasak\Http\Controllers\Dashboard\LogController::class, 'destroy'])->whereNumber('id')->name('logs.destroy');
+        Route::get('blocked-ips', [\Internal\Pasak\Http\Controllers\Dashboard\BlockedIpController::class, 'index'])->name('blocked-ips');
+        Route::get('blocked-ips/{id}', [\Internal\Pasak\Http\Controllers\Dashboard\BlockedIpController::class, 'show'])->whereNumber('id')->name('blocked-ips.show');
+        Route::post('blocked-ips', [\Internal\Pasak\Http\Controllers\Dashboard\BlockedIpController::class, 'store'])->name('blocked-ips.store');
+        Route::patch('blocked-ips/{id}/toggle', [\Internal\Pasak\Http\Controllers\Dashboard\BlockedIpController::class, 'toggle'])->whereNumber('id')->name('blocked-ips.toggle');
+        Route::delete('blocked-ips/{id}', [\Internal\Pasak\Http\Controllers\Dashboard\BlockedIpController::class, 'destroy'])->whereNumber('id')->name('blocked-ips.destroy');
+        Route::get('server', [\Internal\Pasak\Http\Controllers\Dashboard\ServerController::class, 'index'])->name('server');
+        Route::post('server/baseline', [\Internal\Pasak\Http\Controllers\Dashboard\ServerController::class, 'createBaseline'])->name('server.baseline');
+        Route::delete('server/baseline', [\Internal\Pasak\Http\Controllers\Dashboard\ServerController::class, 'deleteBaseline'])->name('server.baseline.destroy');
+        Route::delete('server/suspicious-files', [\Internal\Pasak\Http\Controllers\Dashboard\ServerController::class, 'deleteSuspiciousFile'])->name('server.suspicious-files.destroy');
+        Route::delete('lockouts/{id}', [\Internal\Pasak\Http\Controllers\Dashboard\ServerController::class, 'releaseLockout'])->whereNumber('id')->name('lockouts.destroy');
+        Route::get('sessions', [\Internal\Pasak\Http\Controllers\Dashboard\SessionController::class, 'index'])->name('sessions');
+        Route::delete('user-sessions/{id}', [\Internal\Pasak\Http\Controllers\Dashboard\SessionController::class, 'destroyLogin'])->whereNumber('id')->name('user-sessions.destroy');
+        Route::delete('sessions/{sessionId}', [\Internal\Pasak\Http\Controllers\Dashboard\SessionController::class, 'destroySession'])->name('sessions.destroy');
+        Route::delete('trusted-ips/{id}', [\Internal\Pasak\Http\Controllers\Dashboard\SessionController::class, 'destroyTrusted'])->whereNumber('id')->name('trusted-ips.destroy');
+        Route::post('trusted-ips/my-ip', [\Internal\Pasak\Http\Controllers\Dashboard\SessionController::class, 'storeMyIp'])->name('trusted-ips.store-my-ip');
+        Route::get('tickets', [\Internal\Pasak\Http\Controllers\Dashboard\TicketController::class, 'index'])->name('tickets');
+        Route::get('tickets/{id}', [\Internal\Pasak\Http\Controllers\Dashboard\TicketController::class, 'show'])->whereNumber('id')->name('tickets.show');
+        Route::post('tickets/{id}/respond', [\Internal\Pasak\Http\Controllers\Dashboard\TicketController::class, 'respond'])->whereNumber('id')->name('tickets.respond');
+        Route::delete('tickets/{id}', [\Internal\Pasak\Http\Controllers\Dashboard\TicketController::class, 'destroy'])->whereNumber('id')->name('tickets.destroy');
+        Route::get('settings', [\Internal\Pasak\Http\Controllers\Dashboard\SettingController::class, 'index'])->name('settings');
+        Route::post('settings', [\Internal\Pasak\Http\Controllers\Dashboard\SettingController::class, 'update'])->name('settings.update');
     });

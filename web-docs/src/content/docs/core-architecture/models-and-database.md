@@ -1,6 +1,6 @@
 ---
 title: "Model Database & Dynamic Decoupling"
-description: "Salah satu prinsip desain fundamental dari robyajo/pasak adalah Loose Coupling (keterikatan longgar). Paket ini tidak pernah..."
+description: "Salah satu prinsip desain fundamental dari robyajo/pasak adalah Loose Coupling (keterikatan longgar). Paket ini tidak pernah mengasumsikan model User..."
 sidebar:
   order: 4
 ---

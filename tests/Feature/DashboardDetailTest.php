@@ -140,64 +140,37 @@ test('ticket detail aborts with 404 for missing entries', function () {
         ->toThrow(NotFoundHttpException::class);
 });
 
-test('internal dashboard route files expose the detail routes', function () {
+test('internal dashboard route file exposes the detail routes', function () {
     $blade = File::get(__DIR__.'/../../routes/pasak-dashboard-blade.php');
-    $react = File::get(__DIR__.'/../../routes/pasak-dashboard-react.php');
-    $livewire = File::get(__DIR__.'/../../routes/pasak-dashboard.php');
 
     expect($blade)->toContain("->name('logs.show')")
         ->and($blade)->toContain("->name('blocked-ips.show')")
-        ->and($blade)->toContain("->name('tickets.show')")
-        ->and($react)->toContain("->name('logs.show')")
-        ->and($react)->toContain("->name('blocked-ips.show')")
-        ->and($react)->toContain("->name('tickets.show')")
-        ->and($livewire)->toContain("'pages::pasak.log-detail'")
-        ->and($livewire)->toContain("'pages::pasak.blocked-ip-detail'")
-        ->and($livewire)->toContain("'pages::pasak.ticket-detail'");
+        ->and($blade)->toContain("->name('tickets.show')");
 });
 
-test('published route variants expose only their own detail routes', function () {
+test('published blade route variant exposes the detail routes', function () {
     $bladeVariant = File::get(__DIR__.'/../../stubs/routes/pasak-blade.php.stub');
-    $livewireVariant = File::get(__DIR__.'/../../stubs/routes/pasak-livewire.php.stub');
-    $reactVariant = File::get(__DIR__.'/../../stubs/routes/pasak-react.php.stub');
 
     expect($bladeVariant)->toContain("->name('logs.show')")
+        ->and($bladeVariant)->toContain("->name('tickets.show')")
         ->and($bladeVariant)->not->toContain('Route::livewire')
-        ->and($livewireVariant)->toContain("'pages::pasak.log-detail'")
-        ->and($livewireVariant)->not->toContain('OverviewController::class')
-        ->and($reactVariant)->toContain("->name('tickets.show')")
-        ->and($reactVariant)->not->toContain('Route::livewire');
+        ->and($bladeVariant)->not->toContain('Inertia');
 });
 
-test('livewire overview converts attacker models to arrays without warnings', function () {
-    $stub = File::get(__DIR__.'/../../stubs/livewire/pages/pasak/overview.blade.php');
-
-    expect($stub)->toContain('->toArray()')
-        ->and($stub)->not->toContain('=> (array) $row');
-});
-
-test('dashboard layouts ship the dark mode toggle and detail styles', function () {
+test('blade layout ships the dark mode toggle and detail styles', function () {
     $bladeLayout = File::get(__DIR__.'/../../stubs/blade/pages/pasak/layout.blade.php');
-    $livewireLayout = File::get(__DIR__.'/../../stubs/livewire/pages/pasak/layout.blade.php');
-    $reactCss = File::get(__DIR__.'/../../stubs/react/components/pasak/pasak.css');
-    $reactNav = File::get(__DIR__.'/../../stubs/react/components/pasak/pasak-nav.tsx');
 
     expect($bladeLayout)->toContain('data-sec-theme-toggle')
         ->and($bladeLayout)->toContain('sec-code-block')
         ->and($bladeLayout)->toContain('color-scheme')
-        ->and($livewireLayout)->toContain('data-sec-theme-toggle')
-        ->and($livewireLayout)->toContain('sec-detail-grid')
-        ->and($reactCss)->toContain('.sec-detail-grid')
-        ->and($reactCss)->toContain('.sec-code-block')
-        ->and($reactNav)->toContain('ThemeToggle')
-        ->and($reactNav)->toContain('pasak-theme');
+        ->and($bladeLayout)->toContain('sec-detail-grid');
 });
 
-test('react detail pages exist for logs, blocks, and tickets', function () {
-    foreach (['log-detail.tsx', 'blocked-ip-detail.tsx', 'ticket-detail.tsx'] as $page) {
-        expect(File::exists(__DIR__.'/../../stubs/react/pages/pasak/'.$page))->toBeTrue();
+test('blade detail pages exist for logs, blocks, and tickets', function () {
+    foreach (['log-detail.blade.php', 'blocked-ip-detail.blade.php', 'ticket-detail.blade.php'] as $page) {
+        expect(File::exists(__DIR__.'/../../stubs/blade/pages/pasak/'.$page))->toBeTrue();
     }
 
-    expect(File::get(__DIR__.'/../../stubs/react/pages/pasak/log-detail.tsx'))->toContain('sec-code-block')
-        ->and(File::get(__DIR__.'/../../stubs/react/pages/pasak/ticket-detail.tsx'))->toContain('Approve & unblock');
+    expect(File::get(__DIR__.'/../../stubs/blade/pages/pasak/log-detail.blade.php'))->toContain('sec-code-block')
+        ->and(File::get(__DIR__.'/../../stubs/blade/pages/pasak/ticket-detail.blade.php'))->toContain('Approve &');
 });

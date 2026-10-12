@@ -6,7 +6,6 @@ use Illuminate\Console\Command;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
-use Livewire\Livewire;
 
 class SecurityInstallCommand extends Command
 {
@@ -36,18 +35,14 @@ class SecurityInstallCommand extends Command
                             {--without-user-trait : Jangan tambahkan trait HasSecurityRelations ke model User}
                             {--without-middleware : Jangan daftarkan middleware WAF ke bootstrap/app.php atau Kernel.php}
                             {--without-routes : Jangan publikasikan berkas routes/pasak.php dan routes/pasak-api.php}
-                            {--without-api : Jangan periksa atau pasang rute API (install:api)}
-                            {--with-dashboard : Publikasikan tampilan dashboard monitoring Livewire Starter Kit}
-                            {--with-livewire : Alias --with-dashboard (Livewire Starter Kit)}
-                            {--with-plain : Publikasikan tampilan dashboard Blade murni (semua aplikasi Laravel)}
-                            {--with-blade : Alias --with-plain (Blade murni)}
-                            {--with-react-dashboard : Publikasikan tampilan dashboard monitoring React / TSX Starter Kit}
-                            {--with-tsx : Publikasikan tampilan dashboard monitoring React / TSX Starter Kit (alias)}
-                            {--with-both : Publikasikan kedua tampilan dashboard monitoring (Blade & TSX)}
-                            {--stack= : Tentukan stack tampilan dashboard (blade, livewire, tsx, both, none)}
+                            {--without-api : Jangan pasang dukungan API (tanpa rute API)}
+                            {--without-web : Jangan pasang dashboard web (tanpa halaman/dashboard)}
+                            {--with-dashboard : Publikasikan dashboard monitoring Blade murni (semua aplikasi Laravel)}
+                            {--with-plain : Alias --with-dashboard (Blade murni)}
+                            {--with-blade : Alias --with-dashboard (Blade murni)}
                             {--with-htaccess : Paksa perbarui berkas public/.htaccess dengan aturan hardening}';
 
-    protected $description = 'Instalasi dan publikasi aset Pasak (konfigurasi, migrasi, Nginx, Apache .htaccess, halaman blokir, tampilan Blade/TSX, trait User, middleware WAF, rute web & API kustom, dan .env)';
+    protected $description = 'Instalasi dan publikasi aset Pasak (konfigurasi, migrasi, Nginx, Apache .htaccess, halaman blokir, dashboard Blade, trait User, middleware WAF, rute web & API kustom, dan .env)';
 
     public function handle(): int
     {
@@ -61,11 +56,8 @@ class SecurityInstallCommand extends Command
         $withoutMiddleware = (bool) $this->option('without-middleware');
         $withoutRoutes = (bool) $this->option('without-routes');
         $withoutApi = (bool) $this->option('without-api');
-        $withDashboard = (bool) ($this->option('with-dashboard') || $this->option('with-livewire'));
-        $withReactDashboard = (bool) ($this->option('with-react-dashboard') || $this->option('with-tsx'));
-        $withBoth = (bool) $this->option('with-both');
-        $withPlainDashboard = (bool) ($this->option('with-plain') || $this->option('with-blade'));
-        $stack = $this->option('stack');
+        $withoutWeb = (bool) $this->option('without-web');
+        $withDashboard = (bool) ($this->option('with-dashboard') || $this->option('with-plain') || $this->option('with-blade'));
         $apiOnly = (bool) $this->option('api-only');
 
         $interactive = ! app()->runningUnitTests() && $this->input->isInteractive();
@@ -86,76 +78,53 @@ class SecurityInstallCommand extends Command
         $this->info($this->t('Memulai instalasi Pasak (Bulwark)...', 'Starting Pasak (Bulwark) installation...'));
         $this->newLine();
 
-        // 1. Mode API-only: inti + keamanan saja, tanpa halaman/dashboard.
-        $dashboardFlagsGiven = $withDashboard || $withReactDashboard || $withBoth || $withPlainDashboard || $stack;
-        if (! $apiOnly && ! $dashboardFlagsGiven && $interactive) {
-            $apiOnly = $this->confirm(
+        // 1. Pilihan cakupan: API dan/atau Web (bawaan: keduanya dipasang).
+        //    --api-only adalah jalan pintas untuk "API ya, Web tidak".
+        if ($apiOnly) {
+            $withoutWeb = true;
+        }
+
+        $apiChoiceGiven = $apiOnly || $withoutApi || $withoutRoutes;
+        $webChoiceGiven = $withDashboard || $withoutWeb || $withoutRoutes || $apiOnly;
+
+        $withApi = ! $withoutApi && ! $withoutRoutes;
+        if (! $apiChoiceGiven && $interactive) {
+            $withApi = $this->confirm(
                 $this->t(
-                    'Apakah ini instalasi API-only? (hanya inti + keamanan, TANPA halaman/dashboard)',
-                    'Is this an API-only installation? (core + security only, NO pages/dashboard)'
+                    'Pasang dukungan API? (headless REST API di /api/security/*)',
+                    'Install API support? (headless REST API at /api/security/*)'
                 ),
-                false
+                true
             );
         }
 
-        if ($apiOnly) {
+        if (! $withApi) {
+            $withoutApi = true;
+        }
+
+        // 2. Dashboard web Blade murni (bawaan: ya).
+        if (! $webChoiceGiven && $interactive) {
+            $withDashboard = $this->confirm(
+                $this->t(
+                    'Pasang dashboard web Blade murni? (prefix /pasak, wajib login)',
+                    'Install the plain Blade web dashboard? (/pasak prefix, login required)'
+                ),
+                true
+            );
+        }
+
+        if ($withoutWeb) {
             $withDashboard = false;
-            $withReactDashboard = false;
-            $withBoth = false;
-            $withPlainDashboard = false;
+        }
+
+        if ($apiOnly && $withApi && ! $withDashboard) {
             $this->comment($this->t(
                 'Mode API-only: halaman dashboard dilewati, yang dipasang hanya inti + keamanan.',
                 'API-only mode: dashboard pages skipped, only core + security will be installed.'
             ));
         }
 
-        // 2. Pilihan starterkit (hanya bila BUKAN api-only dan belum ditentukan via opsi).
-        if (! $apiOnly && ! $dashboardFlagsGiven && $interactive) {
-            $defaultChoice = class_exists(Livewire::class) ? 'livewire' : 'plain';
-            $choice = $this->choice(
-                $this->t(
-                    'Pasang dashboard monitoring apa?',
-                    'Which monitoring dashboard to install?'
-                ),
-                [
-                    'plain' => $this->t('Blade murni (semua aplikasi Laravel, tanpa Livewire)', 'Plain Blade (any Laravel app, no Livewire needed)'),
-                    'livewire' => 'Livewire (Flux UI Starter Kit)',
-                    'react' => 'React / TSX (Inertia + shadcn Starter Kit)',
-                    'both' => $this->t('Keduanya (Blade murni & TSX)', 'Both (plain Blade & TSX)'),
-                    'none' => $this->t('Tidak ada (Headless REST API saja)', 'None (Headless REST API only)'),
-                ],
-                $defaultChoice
-            );
-
-            if ($choice === 'plain') {
-                $withPlainDashboard = true;
-            } elseif ($choice === 'livewire') {
-                $withDashboard = true;
-            } elseif ($choice === 'react') {
-                $withReactDashboard = true;
-            } elseif ($choice === 'both') {
-                $withPlainDashboard = true;
-                $withReactDashboard = true;
-            }
-        }
-
-        if ($stack) {
-            match (strtolower((string) $stack)) {
-                'blade', 'plain' => $withPlainDashboard = true,
-                'livewire' => $withDashboard = true,
-                'react', 'tsx' => $withReactDashboard = true,
-                'both', 'all' => $withBoth = true,
-                'none' => [$withDashboard, $withReactDashboard, $withBoth, $withPlainDashboard] = [false, false, false, false],
-                default => null,
-            };
-        }
-
-        if ($withBoth) {
-            $withPlainDashboard = true;
-            $withReactDashboard = true;
-        }
-
-        $dashboardChoice = $this->dashboardChoice($withDashboard, $withPlainDashboard, $withReactDashboard, $withBoth, $apiOnly);
+        $dashboardChoice = $withDashboard ? 'plain' : 'none';
 
         // 3. Cek kelengkapan lingkungan sebelum memasang apa pun.
         $this->runReadinessCheck();
@@ -217,39 +186,16 @@ class SecurityInstallCommand extends Command
             ]);
         }
 
-        // 6. Sinkronkan direktori dashboard dengan pilihan (strict by choice):
-        //    hapus stack yang TIDAK dipilih agar hanya pilihan user yang ada.
-        $this->syncDashboardChoice($withDashboard, $withPlainDashboard, $withReactDashboard, $withBoth, $apiOnly);
+        // 6. Sinkronkan direktori dashboard: hapus sisa stack lain bila ada.
+        $this->syncDashboardChoice($withDashboard);
 
-        // 6. Publish Livewire Starter Kit monitoring dashboard
+        // 6b. Publish dashboard Blade murni (tanpa Livewire/Inertia).
         if ($withDashboard) {
-            $this->comment(
-                'Mempublikasikan dashboard monitoring Blade (resources/views/pages/pasak)...',
-            );
-            $this->call('vendor:publish', [
-                '--tag' => 'starterkit-blade',
-                '--force' => $force,
-            ]);
-        }
-
-        // 6b. Publish plain-Blade dashboard (tanpa Livewire/Inertia)
-        if ($withPlainDashboard) {
             $this->comment(
                 'Mempublikasikan dashboard Blade murni (resources/views/pages/pasak)...',
             );
             $this->call('vendor:publish', [
                 '--tag' => 'plain-views',
-                '--force' => $force,
-            ]);
-        }
-
-        // 7. Publish React / TSX Starter Kit monitoring dashboard
-        if ($withReactDashboard) {
-            $this->comment(
-                'Mempublikasikan dashboard monitoring TSX (resources/js/pages/pasak & components)...',
-            );
-            $this->call('vendor:publish', [
-                '--tag' => 'starterkit-tsx',
                 '--force' => $force,
             ]);
         }
@@ -271,13 +217,18 @@ class SecurityInstallCommand extends Command
         }
 
         // 10. Ensure API support & publish customizable route files (routes/pasak.php & routes/pasak-api.php)
-        if (! $withoutRoutes) {
+        $wantWebRoutes = ! $withoutRoutes && $dashboardChoice !== 'none';
+        $wantApiRoutes = ! $withoutRoutes && ! $withoutApi;
+
+        if ($wantWebRoutes || $wantApiRoutes) {
             $this->comment(
-                $apiOnly
-                    ? 'Menyiapkan rute mandiri API-only (routes/pasak-api.php)...'
-                    : 'Menyiapkan rute mandiri (routes/pasak.php & routes/pasak-api.php)...',
+                $wantWebRoutes && $wantApiRoutes
+                    ? 'Menyiapkan rute mandiri (routes/pasak.php & routes/pasak-api.php)...'
+                    : ($wantWebRoutes
+                        ? 'Menyiapkan rute mandiri web (routes/pasak.php)...'
+                        : 'Menyiapkan rute mandiri API (routes/pasak-api.php)...')
             );
-            $this->publishSecurityRoutes($force, $withoutApi, $apiOnly, $dashboardChoice);
+            $this->publishSecurityRoutes($force, ! $wantApiRoutes, ! $wantWebRoutes, $dashboardChoice);
         }
 
         // 11. Append / Update Environment Variables with rich comments to .env & .env.example
@@ -285,7 +236,7 @@ class SecurityInstallCommand extends Command
             $this->comment(
                 'Menyematkan variabel konfigurasi dan panduan ke berkas .env...',
             );
-            $this->appendEnvironmentVariables($withDashboard, $withReactDashboard, $withPlainDashboard);
+            $this->appendEnvironmentVariables($withDashboard);
         }
 
         $this->newLine();
@@ -337,10 +288,12 @@ class SecurityInstallCommand extends Command
                 $doc('getting-started/installation'),
             ];
         }
-        if (! $withoutRoutes) {
-            $steps[] = [($apiOnly || $dashboardChoice === 'none')
-                ? $this->t('Rute kustom API: berkas routes/pasak-api.php siap dikustomisasi.', 'Custom API routes: routes/pasak-api.php is ready to customize.')
-                : $this->t('Rute kustom: berkas routes/pasak.php (web) dan routes/pasak-api.php (API) siap dikustomisasi.', 'Custom routes: routes/pasak.php (web) and routes/pasak-api.php (API) are ready to customize.'),
+        if ($wantWebRoutes || $wantApiRoutes) {
+            $steps[] = [($wantWebRoutes && $wantApiRoutes)
+                ? $this->t('Rute kustom: berkas routes/pasak.php (web) dan routes/pasak-api.php (API) siap dikustomisasi.', 'Custom routes: routes/pasak.php (web) and routes/pasak-api.php (API) are ready to customize.')
+                : ($wantWebRoutes
+                    ? $this->t('Rute kustom web: berkas routes/pasak.php siap dikustomisasi.', 'Custom web routes: routes/pasak.php is ready to customize.')
+                    : $this->t('Rute kustom API: berkas routes/pasak-api.php siap dikustomisasi.', 'Custom API routes: routes/pasak-api.php is ready to customize.')),
                 $doc('api-reference/api-overview')];
         }
         $steps[] = [
@@ -379,37 +332,16 @@ class SecurityInstallCommand extends Command
         if (! $withoutViews) {
             $steps[] = [$this->t('Halaman blokir: sesuaikan resources/views/errors/blocked.blade.php dengan branding aplikasi Anda.', 'Blocked page: customize resources/views/errors/blocked.blade.php with your app branding.'), $doc('integration-guides/frontend-blade-livewire')];
         }
-        if ($withDashboard && $withReactDashboard) {
-            $steps[] = array_merge([
-                $this->t("Dashboard Blade & TSX: siap diakses pada prefix {$dashboardPrefix} (wajib login).", "Blade & TSX dashboard: ready at the {$dashboardPrefix} prefix (login required)."),
-                $this->t('Ganti driver aktif di .env (PASAK_DASHBOARD_DRIVER=livewire atau react).', 'Switch the active driver in .env (PASAK_DASHBOARD_DRIVER=livewire or react).'),
-            ], $dashboardUrls, [$doc('integration-guides/frontend-blade-livewire')]);
-        } elseif ($withPlainDashboard && $withReactDashboard) {
-            $steps[] = array_merge([
-                $this->t("Dashboard Blade murni & TSX: siap diakses pada prefix {$dashboardPrefix} (wajib login).", "Plain Blade & TSX dashboard: ready at the {$dashboardPrefix} prefix (login required)."),
-                $this->t('Ganti driver aktif di .env (PASAK_DASHBOARD_DRIVER=blade atau react).', 'Switch the active driver in .env (PASAK_DASHBOARD_DRIVER=blade or react).'),
-            ], $dashboardUrls, [$doc('integration-guides/frontend-blade-livewire')]);
-        } elseif ($withPlainDashboard) {
+        if ($withDashboard) {
             $steps[] = array_merge(
-                [$this->t("Dashboard Blade murni: siap diakses pada prefix {$dashboardPrefix} (wajib login, tanpa Livewire).", "Plain Blade dashboard: ready at the {$dashboardPrefix} prefix (login required, no Livewire needed).")],
+                [$this->t("Dashboard Blade murni: siap diakses pada prefix {$dashboardPrefix} (wajib login, tanpa Livewire/Inertia).", "Plain Blade dashboard: ready at the {$dashboardPrefix} prefix (login required, no Livewire/Inertia needed).")],
                 $dashboardUrls,
                 [$doc('integration-guides/frontend-blade-livewire')]
             );
-        } elseif ($withReactDashboard) {
-            $steps[] = array_merge([
-                $this->t("Dashboard TSX: siap diakses pada prefix {$dashboardPrefix} (wajib login).", "TSX dashboard: ready at the {$dashboardPrefix} prefix (login required)."),
-                $this->t('Jalankan npm run build untuk memproses aset TSX pada Vite.', 'Run npm run build to process the TSX assets with Vite.'),
-            ], $dashboardUrls, [$doc('integration-guides/frontend-react-inertia')]);
-        } elseif ($withDashboard) {
-            $steps[] = array_merge(
-                [$this->t("Dashboard Livewire: siap diakses pada prefix {$dashboardPrefix} (wajib login).", "Livewire dashboard: ready at the {$dashboardPrefix} prefix (login required).")],
-                $dashboardUrls,
-                [$doc('integration-guides/frontend-blade-livewire')]
-            );
-        } elseif (! $apiOnly) {
-            $steps[] = [$this->t('Dashboard monitoring (opsional): sediakan kapan saja dengan php artisan pasak:install --with-blade atau --with-tsx.', 'Monitoring dashboard (optional): provide anytime with php artisan pasak:install --with-blade or --with-tsx.'), $doc('integration-guides/frontend-blade-livewire')];
+        } elseif ($withApi) {
+            $steps[] = [$this->t('Dashboard monitoring (opsional): sediakan kapan saja dengan php artisan pasak:install --with-dashboard.', 'Monitoring dashboard (optional): provide anytime with php artisan pasak:install --with-dashboard.'), $doc('integration-guides/frontend-blade-livewire')];
         } else {
-            $steps[] = [$this->t('Mode API-only: kelola semuanya via headless REST API di /api/pasak/*.', 'API-only mode: manage everything via the headless REST API at /api/pasak/*.'), $doc('api-reference/api-overview')];
+            $steps[] = [$this->t('Mode inti saja: kelola via perintah Artisan (pasak:unblock-ip, pasak:scan-logs, ...). Tambahkan API/web kapan saja dengan php artisan pasak:install --force.', 'Core-only mode: manage via Artisan commands (pasak:unblock-ip, pasak:scan-logs, ...). Add API/web anytime with php artisan pasak:install --force.'), $doc('api-reference/api-overview')];
         }
         if (config('pasak.access_log.auto_scan_enabled', false) === false) {
             $steps[] = [
@@ -468,78 +400,24 @@ class SecurityInstallCommand extends Command
     }
 
     /**
-     * Tentukan satu pilihan dashboard final dari kombinasi flag wizard.
-     *
-     * @return string livewire|plain|react|both|none
+     * Hapus sisa direktori dashboard React bila ada (migrasi dari versi lama),
+     * sehingga instalasi selalu Blade murni.
      */
-    protected function dashboardChoice(bool $withDashboard, bool $withPlainDashboard, bool $withReactDashboard, bool $withBoth, bool $apiOnly): string
+    protected function syncDashboardChoice(bool $withDashboard): void
     {
-        if ($apiOnly) {
-            return 'none';
-        }
-
-        if ($withBoth || ($withReactDashboard && ($withDashboard || $withPlainDashboard))) {
-            return 'both';
-        }
-
-        if ($withReactDashboard) {
-            return 'react';
-        }
-
-        if ($withDashboard && ! $withPlainDashboard) {
-            return 'livewire';
-        }
-
-        if ($withDashboard || $withPlainDashboard) {
-            return 'plain';
-        }
-
-        return 'none';
-    }
-
-    /**
-     * Hapus direktori dashboard dari stack yang TIDAK dipilih sehingga hasil
-     * instalasi strict mengikuti pilihan user (plain/livewire/react/both/none).
-     *
-     * Direktori resources/views/pages/pasak dipakai bersama oleh Livewire dan
-     * plain Blade, sedangkan resources/js/pages+components/pasak milik React.
-     */
-    protected function syncDashboardChoice(bool $withDashboard, bool $withPlainDashboard, bool $withReactDashboard, bool $withBoth, bool $apiOnly): void
-    {
-        $wantBladeViews = ($withDashboard || $withPlainDashboard || $withBoth) && ! $apiOnly;
-        $wantTsx = ($withReactDashboard || $withBoth) && ! $apiOnly;
-
-        if ($wantBladeViews && $wantTsx) {
-            return;
-        }
-
-        if ($wantBladeViews) {
-            foreach (['js/pages/pasak', 'js/components/pasak'] as $relative) {
-                $path = resource_path($relative);
-                if (File::isDirectory($path)) {
-                    File::deleteDirectory($path);
-                    $this->line("  ✓ Direktori resources/{$relative} (React) dibersihkan (pilihan: Blade).");
-                }
-            }
-
-            return;
-        }
-
-        if ($wantTsx) {
-            $path = resource_path('views/pages/pasak');
-            if (File::isDirectory($path)) {
-                File::deleteDirectory($path);
-                $this->line('  ✓ Direktori resources/views/pages/pasak (Blade) dibersihkan (pilihan: React).');
-            }
-
-            return;
-        }
-
-        foreach (['views/pages/pasak', 'js/pages/pasak', 'js/components/pasak'] as $relative) {
+        foreach (['js/pages/pasak', 'js/components/pasak'] as $relative) {
             $path = resource_path($relative);
             if (File::isDirectory($path)) {
                 File::deleteDirectory($path);
-                $this->line("  ✓ Direktori resources/{$relative} dari stack lain dibersihkan (pilihan: none).");
+                $this->line("  ✓ Direktori resources/{$relative} (React, warisan) dibersihkan — dashboard kini Blade murni.");
+            }
+        }
+
+        if (! $withDashboard) {
+            $path = resource_path('views/pages/pasak');
+            if (File::isDirectory($path)) {
+                File::deleteDirectory($path);
+                $this->line('  ✓ Direktori resources/views/pages/pasak dibersihkan (tanpa dashboard).');
             }
         }
     }
@@ -611,7 +489,7 @@ class SecurityInstallCommand extends Command
     /**
      * Sematkan variabel konfigurasi lingkungan dan penjelasannya ke berkas .env & .env.example.
      */
-    protected function appendEnvironmentVariables(bool $withDashboard = false, bool $withReactDashboard = false, bool $withPlainDashboard = false): void
+    protected function appendEnvironmentVariables(bool $withDashboard = false): void
     {
         $stubPath = __DIR__.'/../../../stubs/env.stub';
         if (! File::exists($stubPath)) {
@@ -624,13 +502,10 @@ class SecurityInstallCommand extends Command
 
         $stubContent = File::get($stubPath);
 
-        if ($withDashboard || $withReactDashboard || $withPlainDashboard) {
-            $driver = ($withReactDashboard && ! $withDashboard && ! $withPlainDashboard)
-                ? 'react'
-                : ($withDashboard && ! $withPlainDashboard ? 'livewire' : 'blade');
+        if ($withDashboard) {
             $stubContent = str_replace(
-                ['PASAK_DASHBOARD_ENABLED=false', 'PASAK_DASHBOARD_DRIVER=livewire'],
-                ['PASAK_DASHBOARD_ENABLED=true', "PASAK_DASHBOARD_DRIVER={$driver}"],
+                'PASAK_DASHBOARD_ENABLED=false',
+                'PASAK_DASHBOARD_ENABLED=true',
                 $stubContent
             );
         }
@@ -652,10 +527,7 @@ class SecurityInstallCommand extends Command
 
             $currentContent = File::get($targetPath);
             if (str_contains($currentContent, 'PASAK_MONITOR_ENABLED')) {
-                if ($withDashboard || $withReactDashboard || $withPlainDashboard) {
-                    $driver = ($withReactDashboard && ! $withDashboard && ! $withPlainDashboard)
-                        ? 'react'
-                        : ($withDashboard && ! $withPlainDashboard ? 'livewire' : 'blade');
+                if ($withDashboard) {
                     $updated = preg_replace(
                         '/PASAK_DASHBOARD_ENABLED=(false|0)/',
                         'PASAK_DASHBOARD_ENABLED=true',
@@ -663,12 +535,12 @@ class SecurityInstallCommand extends Command
                     );
                     $updated = preg_replace(
                         '/PASAK_DASHBOARD_DRIVER=[^\r\n]+/',
-                        "PASAK_DASHBOARD_DRIVER={$driver}",
+                        'PASAK_DASHBOARD_DRIVER=blade',
                         (string) $updated
                     );
                     if ($updated !== null && $updated !== $currentContent) {
                         File::put($targetPath, $updated);
-                        $this->info("  ✓ Berkas {$envFile} diperbarui: PASAK_DASHBOARD_ENABLED=true ({$driver}).");
+                        $this->info("  ✓ Berkas {$envFile} diperbarui: PASAK_DASHBOARD_ENABLED=true (blade).");
                     }
                 }
                 $this->line(
@@ -934,11 +806,9 @@ PHP
     /**
      * Publikasikan berkas rute pasak.php dan pasak-api.php ke direktori routes/ host application.
      *
-     * Berkas routes/pasak.php ditulis dari varian stub sesuai pilihan dashboard
-     * (blade/livewire/react) agar hanya stack terpilih yang terpasang; varian
-     * gabungan dipakai untuk pilihan both.
+     * Berkas routes/pasak.php selalu varian Blade murni.
      */
-    protected function publishSecurityRoutes(bool $force, bool $withoutApi = false, bool $apiOnly = false, string $dashboardChoice = 'none'): void
+    protected function publishSecurityRoutes(bool $force, bool $withoutApi = false, bool $skipWeb = false, string $dashboardChoice = 'none'): void
     {
         if (! $withoutApi) {
             $this->ensureApiRoutesInstalled();
@@ -949,14 +819,14 @@ PHP
             File::makeDirectory($routesDir, 0755, true, true);
         }
 
-        // 1. Publikasikan routes/pasak-api.php
+        // 1. Publikasikan routes/pasak-api.php (dilewati bila dukungan API tidak dipasang).
         $apiStubPath = __DIR__.'/../../../stubs/routes/pasak-api.php.stub';
         if (! File::exists($apiStubPath)) {
             $apiStubPath = dirname(__DIR__, 2).'/stubs/routes/pasak-api.php.stub';
         }
         $targetApiPath = base_path('routes/pasak-api.php');
 
-        if (File::exists($apiStubPath)) {
+        if (! $withoutApi && File::exists($apiStubPath)) {
             if (! File::exists($targetApiPath) || $force) {
                 File::copy($apiStubPath, $targetApiPath);
                 $this->info('  ✓ Berkas routes/pasak-api.php berhasil dibuat.');
@@ -965,17 +835,11 @@ PHP
             }
         }
 
-        // 2. Publikasikan routes/pasak.php (dilewati pada mode API-only dan pilihan none).
-        if (! $apiOnly && $dashboardChoice !== 'none') {
-            $variantFile = match ($dashboardChoice) {
-                'plain' => 'pasak-blade.php.stub',
-                'livewire' => 'pasak-livewire.php.stub',
-                'react' => 'pasak-react.php.stub',
-                default => 'pasak.php.stub',
-            };
-            $webStubPath = __DIR__.'/../../../stubs/routes/'.$variantFile;
+        // 2. Publikasikan routes/pasak.php (dilewati bila dashboard web tidak dipasang).
+        if (! $skipWeb && $dashboardChoice !== 'none') {
+            $webStubPath = __DIR__.'/../../../stubs/routes/pasak-blade.php.stub';
             if (! File::exists($webStubPath)) {
-                $webStubPath = dirname(__DIR__, 2).'/stubs/routes/'.$variantFile;
+                $webStubPath = dirname(__DIR__, 2).'/stubs/routes/pasak-blade.php.stub';
             }
             if (! File::exists($webStubPath)) {
                 $webStubPath = __DIR__.'/../../../stubs/routes/pasak.php.stub';
@@ -988,7 +852,7 @@ PHP
             if (File::exists($webStubPath)) {
                 if (! File::exists($targetWebPath) || $force) {
                     File::copy($webStubPath, $targetWebPath);
-                    $this->info("  ✓ Berkas routes/pasak.php berhasil dibuat (khusus {$dashboardChoice}).");
+                    $this->info('  ✓ Berkas routes/pasak.php berhasil dibuat (Blade murni).');
                 } else {
                     $this->line('  ✓ Berkas routes/pasak.php sudah ada.');
                 }
@@ -1006,12 +870,14 @@ PHP
         }
 
         // 4. Sertakan routes/pasak-api.php di routes/api.php jika belum ada
-        $apiRouteFile = base_path('routes/api.php');
-        if (File::exists($apiRouteFile)) {
-            $apiContent = File::get($apiRouteFile);
-            if (! str_contains($apiContent, 'pasak-api.php')) {
-                File::append($apiRouteFile, "\nrequire __DIR__.'/pasak-api.php';\n");
-                $this->info('  ✓ Berkas routes/api.php menyertakan routes/pasak-api.php.');
+        if (! $withoutApi) {
+            $apiRouteFile = base_path('routes/api.php');
+            if (File::exists($apiRouteFile)) {
+                $apiContent = File::get($apiRouteFile);
+                if (! str_contains($apiContent, 'pasak-api.php')) {
+                    File::append($apiRouteFile, "\nrequire __DIR__.'/pasak-api.php';\n");
+                    $this->info('  ✓ Berkas routes/api.php menyertakan routes/pasak-api.php.');
+                }
             }
         }
     }

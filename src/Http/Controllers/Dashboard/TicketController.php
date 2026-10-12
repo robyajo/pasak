@@ -6,20 +6,18 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
-use Inertia\Inertia;
-use Inertia\Response;
 use Internal\Pasak\Models\IpUnblockRequest;
 use Internal\Pasak\Models\SecurityLog;
 use Internal\Pasak\Services\PasakService;
 
 /**
- * Unblock appeal tickets page for the Inertia + React dashboard.
+ * Unblock appeal tickets page for the Blade monitoring dashboard.
  */
 class TicketController extends Controller
 {
     use RespondsWithDashboard;
 
-    public function index(Request $request): View|Response
+    public function index(Request $request): View
     {
         $query = IpUnblockRequest::query()->latest('id');
 
@@ -41,7 +39,6 @@ class TicketController extends Controller
 
         return $this->dashboardResponse(
             'pages.pasak.tickets',
-            'pasak/tickets',
             [
                 'tickets' => $query->paginate(20)->withQueryString(),
                 'stats' => [
@@ -63,7 +60,7 @@ class TicketController extends Controller
         );
     }
 
-    public function show(int $id): View|Response
+    public function show(int $id): View
     {
         $ticket = IpUnblockRequest::query()->find($id);
 
@@ -73,7 +70,6 @@ class TicketController extends Controller
 
         return $this->dashboardResponse(
             'pages.pasak.ticket-detail',
-            'pasak/ticket-detail',
             [
                 'ticket' => $ticket->loadMissing(['blockedIp', 'resolver']),
                 'relatedLogs' => SecurityLog::query()

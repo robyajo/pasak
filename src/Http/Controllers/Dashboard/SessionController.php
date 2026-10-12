@@ -7,21 +7,19 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Str;
-use Inertia\Inertia;
-use Inertia\Response;
 use Internal\Pasak\Models\TrustedIp;
 use Internal\Pasak\Models\UserLogin;
 use Internal\Pasak\Services\PasakService;
 use Internal\Pasak\Services\UserLoginService;
 
 /**
- * User session tracking page for the Inertia + React dashboard.
+ * User session tracking page for the Blade monitoring dashboard.
  */
 class SessionController extends Controller
 {
     use RespondsWithDashboard;
 
-    public function index(Request $request): View|Response
+    public function index(Request $request): View
     {
         $query = UserLogin::query()->with('user')->latest('id');
 
@@ -42,7 +40,6 @@ class SessionController extends Controller
 
         return $this->dashboardResponse(
             'pages.pasak.sessions',
-            'pasak/sessions',
             [
                 'logins' => $query->paginate(20)->withQueryString(),
                 'trustedIps' => TrustedIp::query()->with('user')->latest('id')->get(),

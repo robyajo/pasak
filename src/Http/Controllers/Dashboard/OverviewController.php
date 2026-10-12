@@ -5,18 +5,16 @@ namespace Internal\Pasak\Http\Controllers\Dashboard;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
-use Inertia\Inertia;
-use Inertia\Response;
 use Internal\Pasak\Services\PasakService;
 
 /**
- * Overview page for the Inertia + React monitoring dashboard.
+ * Overview page for the Blade monitoring dashboard.
  */
 class OverviewController extends Controller
 {
     use RespondsWithDashboard;
 
-    public function __invoke(Request $request, PasakService $security): View|Response
+    public function __invoke(Request $request, PasakService $security): View
     {
         $range = (string) $request->query('range', 'week');
 
@@ -26,7 +24,6 @@ class OverviewController extends Controller
 
         return $this->dashboardResponse(
             'pages.pasak.overview',
-            'pasak/overview',
             [
                 'range' => $range,
                 'stats' => $security->stats(),

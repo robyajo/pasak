@@ -6,6 +6,14 @@ All notable changes to `robyajo/pasak` will be documented in this file.
 
 ### Added
 
+- **Pilihan cakupan API dan Web saat instalasi (bawaan: keduanya)**: wizard `pasak:install` kini menanyakan dua hal — "Pasang dukungan API?" dan "Pasang dashboard web Blade murni?" — masing-masing bawaan Ya. Flag baru `--without-web` (pasangan `--without-api`); `--api-only` tetap sebagai jalan pintas "API ya, Web tidak". Menolak keduanya menghasilkan instalasi inti saja (kelola via Artisan). Kombinasi baru dicakup test (`--without-web` hanya menerbitkan rute API, `--without-api` hanya halaman web).
+
+### Removed
+
+- **Dashboard kini Blade murni saja — pilihan starterkit Livewire/React/TSX dihapus**: `pasak:install` tidak lagi memiliki opsi `--with-livewire`, `--with-react-dashboard`, `--with-tsx`, `--with-both`, dan `--stack`; sebagai gantinya satu opsi `--with-dashboard` (alias: `--with-plain`, `--with-blade`) plus konfirmasi wizard ya/tidak. `PasakServiceProvider` selalu mendaftarkan rute Blade (`routes/pasak-dashboard-blade.php`) tanpa cabang driver; `RespondsWithDashboard` selalu me-render view Blade (parameter `$inertia` warisan diabaikan); controller dashboard tidak lagi bergantung pada `inertiajs/inertia-laravel` maupun `livewire/livewire`. Direktori `stubs/react/`, `stubs/livewire/`, rute `pasak-dashboard.php` / `pasak-dashboard-react.php`, stub rute `pasak-livewire` / `pasak-react`, dan tag publish `starterkit-*` / `staterkit-*` / `pasak-dashboard-{react,tsx,all}` dihapus. `pasak:install` dan `pasak:upgrade` otomatis membersihkan sisa `resources/js/pages/pasak` + `resources/js/components/pasak` dari instalasi lama; `pasak:upgrade` memperingatkan bila `PASAK_DASHBOARD_DRIVER` masih bernilai warisan (`livewire`/`react`/`tsx`). Kunci config `dashboard.driver` dipertahankan sebagai no-op kompatibilitas (selalu diperlakukan `blade`). Aplikasi React/Inertia yang butuh panel dalam stack-nya dapat membangun dashboard kustom via headless REST API `/api/security/*` (lihat panduan integrasi React/Inertia).
+
+### Added
+
 - **Banner + dialog pengumuman otomatis di halaman utama**: middleware baru `InjectAnnouncementBanner` (alias `pasak.announce`) menyuntikkan banner atas + dialog sambutan pada respons HTML `GET /` tanpa mengubah view host — mandiri (tanpa dependensi), banner tampil sampai ditutup, dialog sekali per versi paket, nonaktif via `PASAK_ANNOUNCEMENT_ENABLED=false`. Terdaftar otomatis saat `auto_register_middleware` aktif dan disematkan installer ke grup global.
 
 - **CRUD Allowed IPs (global allowlist)**: model `AllowedIp` + tabel `allowed_ips` (migrasi baru untuk instalasi lama, plus masuk migrasi konsolidasi), pola IP tunggal/wildcard/CIDR yang ikut diperiksa `isWhitelisted()`, endpoint API `allowed-ips.*` (index/store/show/toggle/destroy, admin-only), halaman dashboard Blade murni + Livewire + React/TSX, entri navigasi, dan relasi `$user->allowedIps()`. Uninstall ikut menghapus tabelnya.

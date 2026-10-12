@@ -8,12 +8,15 @@ test('install command registers wizard options', function () {
 
     expect($definition->hasOption('lang'))->toBeTrue()
         ->and($definition->hasOption('api-only'))->toBeTrue()
+        ->and($definition->hasOption('without-api'))->toBeTrue()
+        ->and($definition->hasOption('without-web'))->toBeTrue()
+        ->and($definition->hasOption('with-dashboard'))->toBeTrue()
         ->and($definition->hasOption('with-blade'))->toBeTrue()
         ->and($definition->hasOption('with-plain'))->toBeTrue()
-        ->and($definition->hasOption('with-livewire'))->toBeTrue()
-        ->and($definition->hasOption('with-tsx'))->toBeTrue()
-        ->and($definition->hasOption('with-both'))->toBeTrue()
-        ->and($definition->hasOption('stack'))->toBeTrue();
+        ->and($definition->hasOption('with-livewire'))->toBeFalse()
+        ->and($definition->hasOption('with-tsx'))->toBeFalse()
+        ->and($definition->hasOption('with-both'))->toBeFalse()
+        ->and($definition->hasOption('stack'))->toBeFalse();
 });
 
 test('install with api-only publishes api routes but no web pages', function () {
@@ -36,6 +39,46 @@ test('install with api-only publishes api routes but no web pages', function () 
     }
 });
 
+test('install with without-web publishes api routes but no web pages', function () {
+    $webRouteFile = base_path('routes/pasak.php');
+    $apiRouteFile = base_path('routes/pasak-api.php');
+    @unlink($webRouteFile);
+    @unlink($apiRouteFile);
+
+    try {
+        $this->artisan('pasak:install', [
+            '--without-web' => true,
+            '--force' => true,
+        ])->assertSuccessful();
+
+        expect(File::exists($apiRouteFile))->toBeTrue()
+            ->and(File::exists($webRouteFile))->toBeFalse();
+    } finally {
+        @unlink($webRouteFile);
+        @unlink($apiRouteFile);
+    }
+});
+
+test('install with without-api publishes web pages but no api routes', function () {
+    $webRouteFile = base_path('routes/pasak.php');
+    $apiRouteFile = base_path('routes/pasak-api.php');
+    @unlink($webRouteFile);
+    @unlink($apiRouteFile);
+
+    try {
+        $this->artisan('pasak:install', [
+            '--without-api' => true,
+            '--with-dashboard' => true,
+            '--force' => true,
+        ])->assertSuccessful();
+
+        expect(File::exists($webRouteFile))->toBeTrue()
+            ->and(File::exists($apiRouteFile))->toBeFalse();
+    } finally {
+        @unlink($webRouteFile);
+        @unlink($apiRouteFile);
+    }
+});
 test('install prints dashboard access urls after install', function () {
     $webRouteFile = base_path('routes/pasak.php');
     $apiRouteFile = base_path('routes/pasak-api.php');

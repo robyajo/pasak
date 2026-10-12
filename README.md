@@ -87,7 +87,7 @@ php artisan pasak:install
     > _Catatan Keamanan_: Jika `public/.htaccess` lama sudah ada, installer otomatis membuat cadangan `public/.htaccess.backup-YYYYMMDD_HHMMSS` dan menyisipkan aturan keamanan di bawah tanpa merusak rewrite rules aplikasi Anda.
 5. 🚫 **`resources/views/errors/blocked.blade.php`**: Halaman 403 default yang menampilkan alasan blokir, kode referensi, dan **formulir banding** yang terhubung langsung ke endpoint publik tiket banding. Dapat disesuaikan sesuai branding aplikasi Anda.
 6. ⚙️ **Penyematan Variabel ke `.env` & `.env.example`**: Installer secara otomatis menambahkan blok konfigurasi lengkap disertai **penjelasan fungsi berbahasa Indonesia** untuk setiap variabel (`PASAK_*`) langsung ke berkas `.env` dan `.env.example` aplikasi Anda.
-7. 📊 **(Opsional) Dashboard monitoring Starter Kit**: Tampilan monitoring Blade murni (`resources/views/pages/pasak/`, semua aplikasi Laravel), Livewire, atau React (`resources/js/pages/pasak/`), wajib login. Dipublikasikan bila Anda menambahkan opsi `--with-plain` / `--with-blade`, `--with-livewire` / `--with-dashboard`, atau `--with-tsx` / `--with-react-dashboard` (atau `--with-both` untuk Blade murni + TSX).
+7. 📊 **(Opsional) Dashboard monitoring Blade murni**: Tampilan monitoring `resources/views/pages/pasak/` (100% Pure PHP, jalan di semua aplikasi Laravel tanpa Livewire/Inertia/Vue), wajib login. Dipublikasikan bila Anda menambahkan opsi `--with-dashboard` (alias: `--with-plain`, `--with-blade`).
 
 #### Opsi Perintah `pasak:install`:
 
@@ -102,15 +102,12 @@ php artisan pasak:install
 | `--without-user-trait`   | Melewatkan penyematan trait `HasSecurityRelations` ke model User.                                  |
 | `--without-middleware`   | Melewatkan pendaftaran middleware WAF ke `bootstrap/app.php` / Kernel.                             |
 | `--without-routes`       | Melewatkan publikasi berkas `routes/pasak.php` dan `routes/pasak-api.php`.                          |
-| `--without-api`          | Melewatkan pemeriksaan/pemasangan rute API (`install:api`).                                        |
-| `--with-dashboard`       | Mempublikasikan tampilan dashboard monitoring Livewire Starter Kit (wajib login).                  |
-| `--with-livewire`        | Alias dari `--with-dashboard`.                                                                     |
-| `--with-plain`           | Mempublikasikan tampilan dashboard Blade murni, jalan di semua aplikasi Laravel (wajib login).     |
-| `--with-blade`           | Alias dari `--with-plain`.                                                                         |
-| `--with-react-dashboard` | Mempublikasikan tampilan dashboard monitoring React / TSX (wajib login).                           |
-| `--with-tsx`             | Alias dari `--with-react-dashboard`.                                                               |
-| `--with-both`            | Mempublikasikan kedua tampilan dashboard (Blade murni & TSX).                                      |
-| `--stack=`               | Tentukan stack dashboard: `blade`, `tsx`, `both`, atau `none`.                                     |
+| `--without-api`          | Melewatkan pemasangan dukungan API (tanpa rute API).                                               |
+| `--without-web`          | Melewatkan pemasangan dashboard web (tanpa halaman/dashboard).                                     |
+| `--api-only`             | Jalan pintas: API ya, Web tidak (inti + keamanan saja).                                            |
+| `--with-dashboard`       | Mempublikasikan dashboard monitoring Blade murni, jalan di semua aplikasi Laravel (wajib login).   |
+| `--with-plain`           | Alias dari `--with-dashboard`.                                                                     |
+| `--with-blade`           | Alias dari `--with-dashboard`.                                                                     |
 | `--with-htaccess`        | Memaksa pembaruan berkas `public/.htaccess`.                                                       |
 
 #### Publikasi Aset Secara Parsial (Manual):
@@ -131,16 +128,10 @@ php artisan vendor:publish --tag=pasak-htaccess --force
 # 5. Halaman blokir default saja
 php artisan vendor:publish --tag=pasak-views --force
 
-# 6. Dashboard monitoring Blade (Livewire Starter Kit)
-php artisan vendor:publish --tag=starterkit-blade --force
+# 6. Dashboard monitoring Blade murni
+php artisan vendor:publish --tag=plain-views --force
 
-# 7. Dashboard monitoring TSX (React Starter Kit)
-php artisan vendor:publish --tag=starterkit-tsx --force
-
-# 8. Keduanya (Blade & TSX)
-php artisan vendor:publish --tag=starterkit-all --force
-
-# 9. Seluruh aset sekaligus
+# 7. Seluruh aset sekaligus
 php artisan vendor:publish --tag=pasak-all --force
 ```
 
@@ -150,37 +141,16 @@ Jalankan migrasi database:
 php artisan migrate
 ```
 
-### 3. Dashboard Monitoring Starter Kit (Blade & TSX)
+### 3. Dashboard Monitoring Blade Murni
 
-Paket ini menyediakan panel monitoring siap pakai untuk **starter kit resmi Laravel (Blade & React/TSX)** yang dapat dipublikasikan langsung ke dalam aplikasi host di prefix **`/pasak`**.
-
-Tersedia opsi instalasi fleksibel lewat `php artisan pasak:install`:
-- **Blade murni (semua aplikasi)**: `php artisan pasak:install --with-plain` (atau `--tag=plain-views`)
-- **Livewire**: `php artisan pasak:install --with-livewire` (atau `--tag=starterkit-blade`)
-- **React / TSX**: `php artisan pasak:install --with-tsx` (atau `--tag=starterkit-tsx`)
-- **Keduanya**: `php artisan pasak:install --with-both` (atau `--tag=starterkit-all`)
-
-#### a. Blade Starter Kit (Livewire + Flux UI)
+Paket ini menyediakan panel monitoring siap pakai **Blade murni (100% Pure PHP, tanpa Livewire/Inertia/Vue)** yang dapat dipublikasikan langsung ke dalam aplikasi host di prefix **`/pasak`** — berjalan di semua aplikasi Laravel:
 
 ```bash
-php artisan vendor:publish --tag=starterkit-blade
+php artisan pasak:install --with-dashboard
+# atau: php artisan vendor:publish --tag=plain-views
 ```
 
-Perintah tersebut menyalin **`resources/views/pages/pasak/*.blade.php`** (tujuh halaman Livewire single-file component + layout) beserta konfigurasi `dashboard` pada `config/pasak.php`.
-
-#### b. React / TSX Starter Kit (Inertia + React + shadcn/ui)
-
-```bash
-php artisan vendor:publish --tag=starterkit-tsx
-```
-
-Perintah tersebut menyalin:
-
-1. **`resources/js/pages/pasak/*.tsx`** — tujuh halaman Inertia/React: _Overview_, _Security Logs_, _Blocked IPs_, _Server Audit_, _User Sessions_, _Unblock Appeals_, dan _Settings_.
-2. **`resources/js/components/pasak/*.tsx`** — komponen pendukung (navigasi & paginasi).
-3. **`config/pasak.php`** — menyertakan konfigurasi `dashboard`.
-
-> ℹ️ Halaman React/TSX di-render server-side oleh controller Inertia bawaan paket. Setelah publikasi, jalankan `npm run build` (atau `npm run dev`).
+Perintah tersebut menyalin **`resources/views/pages/pasak/*.blade.php`** (tujuh halaman + layout dengan CSS/JS mandiri, tanpa build step) beserta konfigurasi `dashboard` pada `config/pasak.php`.
 
 #### Mengaktifkan Dashboard & Wajib Login
 
@@ -188,7 +158,6 @@ Konfigurasi di `.env`:
 
 ```dotenv
 PASAK_DASHBOARD_ENABLED=true
-PASAK_DASHBOARD_DRIVER=livewire     # atau "react" / "both"
 PASAK_DASHBOARD_PREFIX=pasak
 # Batasi hanya role admin (default: false, cukup login pengguna)
 PASAK_DASHBOARD_ADMIN_ONLY=false

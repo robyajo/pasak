@@ -1,6 +1,6 @@
 ---
 title: "Konvensi & Spesifikasi Headless REST API"
-description: "Seluruh fungsionalitas manajemen paket robyajo/pasak diekspos melalui antarmuka REST API JSON standar tanpa keterikatan antarmuka..."
+description: "Seluruh fungsionalitas manajemen paket robyajo/pasak diekspos melalui antarmuka REST API JSON standar tanpa keterikatan antarmuka pengguna (headless). Hal..."
 sidebar:
   order: 1
 ---

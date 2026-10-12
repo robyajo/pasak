@@ -6,13 +6,11 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
-use Inertia\Inertia;
-use Inertia\Response;
 use Internal\Pasak\Models\LoginAttempt;
 use Internal\Pasak\Services\ServerSecurityService;
 
 /**
- * Server audit page for the Inertia + React dashboard.
+ * Server audit page for the Blade monitoring dashboard.
  */
 class ServerController extends Controller
 {
@@ -21,7 +19,7 @@ class ServerController extends Controller
     public function index(
         Request $request,
         ServerSecurityService $server,
-    ): View|Response {
+    ): View {
         $force = $request->boolean('refresh');
 
         if ($force) {
@@ -30,7 +28,6 @@ class ServerController extends Controller
 
         return $this->dashboardResponse(
             'pages.pasak.server',
-            'pasak/server',
             [
                 'report' => $server->scan($force),
                 'environment' => $server->environmentInfo(),

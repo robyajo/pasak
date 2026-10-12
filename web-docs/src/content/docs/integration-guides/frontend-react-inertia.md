@@ -1,6 +1,6 @@
 ---
 title: "Integrasi Frontend React / Inertia"
-description: "Karena robyajo/pasak dirancang secara Headless (Pure REST API), Anda dapat membangun antarmuka dashboard keamanan dan penanganan error..."
+description: "Karena robyajo/pasak dirancang secara Headless (Pure REST API), Anda dapat membangun antarmuka dashboard keamanan dan penanganan error pemblokiran..."
 sidebar:
   order: 1
 ---
@@ -207,68 +207,31 @@ export const AppealTicketModal: React.FC<{
 
 ---
 
-## 3. Dashboard Monitoring React Starter Kit Siap Pakai
+## 3. Membangun Dashboard React Kustom via Headless REST API
 
-Jika aplikasi host Anda dibangun di atas **Laravel React Starter Kit** (Inertia + React), Anda tidak perlu membangun panel monitoring dari nol. Paket menyediakan enam halaman Inertia/React siap pakai berbasis **Pure Vanilla CSS** yang dapat dipublikasikan dengan satu perintah:
+Dashboard bawaan Pasak adalah **Blade murni**. Bila aplikasi host Anda memakai React/Inertia dan membutuhkan panel monitoring dalam stack tersebut, bangun halaman kustom yang mengonsumsi **headless REST API** (`/api/security/*`) — seluruh operasi admin (logs, blocked-ips, server audit, sessions, tickets) tersedia sebagai endpoint JSON yang didokumentasikan di [REST API Reference](../../04-rest-api-reference/01-api-overview.md).
 
-```bash
-php artisan vendor:publish --tag=starterkit-react
+Contoh kerangka fetch (admin, memakai cookie sesi Laravel):
+
+```tsx
+const res = await fetch('/api/security/logs?per_page=15', {
+    headers: { Accept: 'application/json' },
+});
+const { data } = await res.json();
 ```
 
-Perintah tersebut menyalin berkas berikut ke aplikasi Anda:
+> 🔒 Endpoint admin dilindungi middleware `auth` + `pasak.admin` (Gate `manage-pasak`).
 
-| Berkas yang Dipublikasikan                          | Deskripsi                                                   |
-| :-------------------------------------------------- | :---------------------------------------------------------- |
-| `resources/js/pages/pasak/overview.tsx`          | Statistik, tren serangan, dan top attacker.                 |
-| `resources/js/pages/pasak/logs.tsx`              | Tabel log keamanan dengan filter dan aksi bersihkan/hapus.  |
-| `resources/js/pages/pasak/blocked-ips.tsx`       | Manajemen karantina IP (blokir manual, toggle, unblock).    |
-| `resources/js/pages/pasak/server.tsx`            | Audit integritas, pemindai webshell, baseline, dan lockout. |
-| `resources/js/pages/pasak/sessions.tsx`          | Sesi pengguna aktif, riwayat login, dan IP terpercaya.      |
-| `resources/js/pages/pasak/tickets.tsx`           | Review tiket banding (approve/reject + auto-unblock).       |
-| `resources/js/components/pasak/security-nav.tsx` | Navigasi antar modul keamanan.                              |
-| `resources/js/components/pasak/pagination.tsx`   | Komponen paginasi tabel.                                    |
-| `resources/js/components/pasak/ui.tsx`           | Komponen UI dasar (Card, Badge, Button, Input, Modal, dll). |
-| `resources/js/components/pasak/security.css`     | Desain sistem Pure Vanilla CSS responsif + dark mode.       |
+### Menambahkan Tautan di Sidebar
 
-Aktifkan melalui `.env`, lalu bangun ulang aset:
-
-```dotenv
-PASAK_DASHBOARD_ENABLED=true
-PASAK_DASHBOARD_DRIVER=react
-PASAK_DASHBOARD_PREFIX=pasak
-```
-
-```bash
-npm run build
-```
-
-Panel dapat diakses pada `/security`.
-
-> ℹ️ Halaman di-render **server-side** oleh controller Inertia bawaan paket (`Internal\Pasak\Http\Controllers\Dashboard\*`). Mutasi (blokir IP, hapus log, approve tiket) dikirim sebagai permintaan Inertia biasa, sehingga **tidak** memerlukan token API terpisah dan tidak bergantung pada REST API `/api/security/*`.
-
-> 🔒 **Wajib Login**: Rute dashboard memakai middleware `web` + `auth`, dan secara bawaan juga `pasak.admin` (Gate `manage-pasak`). Untuk mengizinkan semua pengguna yang sudah login (tanpa syarat admin), kosongkan `pasak.dashboard.admin_middleware` pada `config/pasak.php`.
-
-### Desain Sistem Pure Vanilla CSS (Zero External UI Dependencies)
-
-Stubs React dibuat mandiri sepenuhnya (**Zero external UI dependencies**):
-- **Tidak butuh Shadcn UI** (`@/components/ui/*`), `@/lib/utils`, ataupun library eksternal `sonner`.
-- Menggunakan `security.css` dengan CSS custom properties (`--sec-*`) yang rapi, responsif, dan otomatis mendukung dark mode (`.dark` / `@media (prefers-color-scheme: dark)`).
-- Anda bebas memodifikasi warna, ukuran, atau integrasi komponen di `resources/js/components/pasak/` kapan saja.
-
-### Menambahkan Tautan di Sidebar Starter Kit
-
-Untuk memunculkan tautan ke panel, tambahkan item berikut ke `mainNavItems` pada `resources/js/components/app-sidebar.tsx`:
+Untuk memunculkan tautan ke panel Blade bawaan (`/pasak`) atau dashboard React kustom Anda, tambahkan item berikut ke `mainNavItems` pada `resources/js/components/app-sidebar.tsx`:
 
 ```tsx
 import { ShieldCheck } from 'lucide-react';
 
 {
-    title: 'Pasak',
-    href: '/security',
+    title: 'Security Monitor',
+    href: '/pasak',
     icon: ShieldCheck,
 },
 ```
-
-### Catatan
-
-- Jalankan `npm run build` (atau `npm run dev`) setiap kali halaman dashboard baru dipublikasikan agar tercatat pada manifest Vite.

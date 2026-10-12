@@ -16,10 +16,6 @@ Dalam pengembangan aplikasi berbasis Laravel modern di lingkungan enterprise dan
 
 **`robyajo/pasak`** (Bulwark) dibangun dari pengalaman lapangan menangani insiden nyata tersebut, dikemas menjadi paket mandiri, modular, dan berperforma tinggi.
 
-## Perlindungan Laravel untuk Keamanan Aplikasi Pemerintah
-
-Aplikasi pemerintah dan layanan publik adalah target utama serangan siber: deface, pencurian data warga, penyusupan webshell, hingga penyalahgunaan layanan untuk *phishing*. **Pasak Security** menjawab kebutuhan **keamanan aplikasi** tersebut dengan pendekatan **Laravel security** menyeluruh — cara mengatasi serangan dimulai dari pintu masuk HTTP (WAF + auto-block), berlanjut ke proteksi akun (login lockout bertingkat anti brute force), lalu ke integritas server (baseline SHA-256 + pemindai webshell), dan ditutup dengan audit (access log streaming + tiket banding IP). Karena 100% murni PHP tanpa build step, paket ini dapat dipasang pada aplikasi pemerintah yang sudah berjalan tanpa mengubah arsitektur frontend yang ada.
-
 ---
 
 ## Standar Desain Spatie: 100% Pure PHP & Nol Ketergantungan NPM (Zero NPM)

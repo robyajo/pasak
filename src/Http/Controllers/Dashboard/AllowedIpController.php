@@ -6,14 +6,13 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
-use Inertia\Response;
 use Internal\Pasak\Models\AllowedIp;
 
 class AllowedIpController extends Controller
 {
     use RespondsWithDashboard;
 
-    public function index(Request $request): View|Response
+    public function index(Request $request): View
     {
         $query = AllowedIp::query()->latest('id');
 
@@ -38,7 +37,6 @@ class AllowedIpController extends Controller
 
         return $this->dashboardResponse(
             'pages.pasak.allowed-ips',
-            'pasak/allowed-ips',
             [
                 'entries' => $query->paginate(25)->withQueryString(),
                 'stats' => [

@@ -6,19 +6,17 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
-use Inertia\Inertia;
-use Inertia\Response;
 use Internal\Pasak\Models\BlockedIp;
 use Internal\Pasak\Models\SecurityLog;
 
 /**
- * Security log management page for the Inertia + React dashboard.
+ * Security log management page for the Blade monitoring dashboard.
  */
 class LogController extends Controller
 {
     use RespondsWithDashboard;
 
-    public function index(Request $request): View|Response
+    public function index(Request $request): View
     {
         $query = SecurityLog::query()->latest('id');
 
@@ -46,7 +44,6 @@ class LogController extends Controller
 
         return $this->dashboardResponse(
             'pages.pasak.logs',
-            'pasak/logs',
             [
                 'logs' => $query->paginate(25)->withQueryString(),
                 'levels' => SecurityLog::LEVELS,
@@ -82,7 +79,7 @@ class LogController extends Controller
         ]);
     }
 
-    public function show(int $id): View|Response
+    public function show(int $id): View
     {
         $log = SecurityLog::query()->find($id);
 
@@ -92,7 +89,6 @@ class LogController extends Controller
 
         return $this->dashboardResponse(
             'pages.pasak.log-detail',
-            'pasak/log-detail',
             [
                 'log' => $log,
                 'relatedLogs' => SecurityLog::query()

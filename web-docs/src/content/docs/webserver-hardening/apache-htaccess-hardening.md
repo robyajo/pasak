@@ -1,6 +1,6 @@
 ---
 title: "Hardening Apache Web Server (.htaccess)"
-description: "Halaman ini mendokumentasikan aturan keamanan berkas public/.htaccess yang disediakan oleh Pasak (Bulwark) untuk server yang..."
+description: "Halaman ini mendokumentasikan aturan keamanan berkas public/.htaccess yang disediakan oleh Pasak (Bulwark) untuk server yang menggunakan Apache HTTP..."
 sidebar:
   order: 2
 ---

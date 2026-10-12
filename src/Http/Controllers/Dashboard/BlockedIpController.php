@@ -7,21 +7,19 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Validation\ValidationException;
-use Inertia\Inertia;
-use Inertia\Response;
 use Internal\Pasak\Models\BlockedIp;
 use Internal\Pasak\Models\IpUnblockRequest;
 use Internal\Pasak\Models\SecurityLog;
 use Internal\Pasak\Services\PasakService;
 
 /**
- * Blocked IP management page for the Inertia + React dashboard.
+ * Blocked IP management page for the Blade monitoring dashboard.
  */
 class BlockedIpController extends Controller
 {
     use RespondsWithDashboard;
 
-    public function index(Request $request): View|Response
+    public function index(Request $request): View
     {
         $query = BlockedIp::query()->latest('id');
 
@@ -47,7 +45,6 @@ class BlockedIpController extends Controller
 
         return $this->dashboardResponse(
             'pages.pasak.blocked-ips',
-            'pasak/blocked-ips',
             [
                 'blocks' => $query->paginate(25)->withQueryString(),
                 'stats' => [
@@ -71,7 +68,7 @@ class BlockedIpController extends Controller
         );
     }
 
-    public function show(int $id): View|Response
+    public function show(int $id): View
     {
         $block = BlockedIp::query()->find($id);
 
@@ -81,7 +78,6 @@ class BlockedIpController extends Controller
 
         return $this->dashboardResponse(
             'pages.pasak.blocked-ip-detail',
-            'pasak/blocked-ip-detail',
             [
                 'block' => $block,
                 'relatedLogs' => SecurityLog::query()

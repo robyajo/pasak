@@ -1,6 +1,6 @@
 ---
 title: "Konfigurasi Lengkap & Environment Variable"
-description: "Seluruh perilaku robyajo/pasak dikontrol melalui berkas konfigurasi config/pasak.php. Konfigurasi ini dirancang agar dapat..."
+description: "Seluruh perilaku robyajo/pasak dikontrol melalui berkas konfigurasi config/pasak.php. Konfigurasi ini dirancang agar dapat disesuaikan tanpa perlu..."
 sidebar:
   order: 3
 ---

@@ -6,8 +6,6 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
-use Inertia\Inertia;
-use Inertia\Response;
 use Internal\Pasak\Services\PasakService;
 use Internal\Pasak\Services\VersionCheckService;
 
@@ -20,13 +18,12 @@ class SettingController extends Controller
     ) {}
 
     /**
-     * Render the settings page on Inertia + React dashboard.
+     * Render the settings page on the Blade dashboard.
      */
-    public function index(VersionCheckService $versionChecker): View|Response
+    public function index(VersionCheckService $versionChecker): View
     {
         return $this->dashboardResponse(
             'pages.pasak.settings',
-            'pasak/settings',
             [
                 'settings' => $this->securityService->getSettings(),
                 'version' => [

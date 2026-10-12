@@ -1,11 +1,11 @@
 ---
-title: "Integrasi Frontend Blade & Livewire"
-description: "Jika aplikasi host Anda menggunakan template berbasis Blade atau Livewire, integrasi dengan robyajo/pasak sangat cepat dan intuitif."
+title: "Integrasi Frontend Blade"
+description: "Jika aplikasi host Anda menggunakan template berbasis Blade, integrasi dengan robyajo/pasak sangat cepat dan intuitif — dashboard paket adalah Blade murni..."
 sidebar:
   order: 2
 ---
 
-Jika aplikasi host Anda menggunakan template berbasis Blade atau Livewire, integrasi dengan **`robyajo/pasak`** sangat cepat dan intuitif.
+Jika aplikasi host Anda menggunakan template berbasis Blade, integrasi dengan **`robyajo/pasak`** sangat cepat dan intuitif — dashboard paket adalah Blade murni (100% Pure PHP) sehingga jalan di semua aplikasi Laravel tanpa Livewire/Inertia/Vue.
 
 ---
 
@@ -83,12 +83,13 @@ Jika ada, paket akan me-render view tersebut dengan meneruskan variabel:
 
 ---
 
-## 2. Dashboard Monitoring Livewire Starter Kit Siap Pakai
+## 2. Dashboard Monitoring Blade Murni Siap Pakai
 
-Jika aplikasi host Anda dibangun di atas **Laravel Livewire Starter Kit** (Livewire v3), Anda tidak perlu membangun panel monitoring dari nol. Paket menyediakan enam halaman Livewire siap pakai berbasis **Pure Vanilla CSS** yang dapat dipublikasikan dengan satu perintah:
+Anda tidak perlu membangun panel monitoring dari nol. Paket menyediakan halaman Blade siap pakai berbasis **Pure Vanilla CSS** yang dapat dipublikasikan dengan satu perintah:
 
 ```bash
-php artisan vendor:publish --tag=starterkit-livewire
+php artisan pasak:install --with-dashboard
+# atau: php artisan vendor:publish --tag=plain-views
 ```
 
 Perintah tersebut menyalin berkas berikut ke aplikasi Anda:
@@ -97,10 +98,13 @@ Perintah tersebut menyalin berkas berikut ke aplikasi Anda:
 | :----------------------------------------------------- | :---------------------------------------------------------- |
 | `resources/views/pages/pasak/overview.blade.php`    | Statistik, tren serangan, dan top attacker.                 |
 | `resources/views/pages/pasak/logs.blade.php`        | Tabel log keamanan dengan filter dan aksi bersihkan/hapus.  |
+| `resources/views/pages/pasak/log-detail.blade.php`  | Detail satu entri log: evidence, konteks request, dan log terkait. |
 | `resources/views/pages/pasak/blocked-ips.blade.php` | Manajemen karantina IP (blokir manual, toggle, unblock).    |
+| `resources/views/pages/pasak/blocked-ip-detail.blade.php` | Detail satu blokir: alasan, log pemicu, dan tiket banding terkait. |
 | `resources/views/pages/pasak/server.blade.php`      | Audit integritas, pemindai webshell, baseline, dan lockout. |
 | `resources/views/pages/pasak/sessions.blade.php`    | Sesi pengguna aktif, riwayat login, dan IP terpercaya.      |
 | `resources/views/pages/pasak/tickets.blade.php`     | Review tiket banding (approve/reject + auto-unblock).       |
+| `resources/views/pages/pasak/ticket-detail.blade.php` | Detail satu tiket: alasan pemohon, blokir terkait, dan formulir respon. |
 | `resources/views/pages/pasak/layout.blade.php`      | Sub-layout navigasi antar modul keamanan.                   |
 
 Setelah dipublikasikan, aktifkan dashboard melalui `.env`:
@@ -110,25 +114,25 @@ PASAK_DASHBOARD_ENABLED=true
 PASAK_DASHBOARD_PREFIX=pasak
 ```
 
-Panel dapat diakses pada `/security`. Halaman-halaman tersebut merupakan **single-file Livewire component** (`pages::security.*`) sehingga otomatis memakai layout starter kit (`layouts::app`).
+Panel dapat diakses pada `/pasak`. Halaman-halaman tersebut dirender controller bawaan paket sebagai Blade biasa.
 
 > 🔒 **Wajib Login**: Rute dashboard memakai middleware `web` + `auth`, dan secara bawaan juga `pasak.admin` (Gate `manage-pasak`). Untuk mengizinkan semua pengguna yang sudah login (tanpa syarat admin), kosongkan `pasak.dashboard.admin_middleware` pada `config/pasak.php`.
 
 ### Desain Sistem Pure Vanilla CSS (Zero External UI Dependencies)
 
-Stubs Livewire dibangun menggunakan **Pure Vanilla CSS**:
-- **Tidak mewajibkan Livewire Flux UI** ataupun UI kit eksternal lainnya.
+Stubs Blade dibangun menggunakan **Pure Vanilla CSS**:
+- **Tanpa dependensi frontend apa pun** (tanpa Livewire, Inertia, Vue, ataupun UI kit eksternal).
 - Menanamkan CSS custom properties terisolasi (`--sec-*`) di dalam sub-layout (`layout.blade.php`) sehingga konsisten, ringan, dan kompatibel dengan tata letak apa pun.
-- Dilengkapi dukungan **Dark Mode** otomatis via media query `@media (prefers-color-scheme: dark)` dan kelas `.dark`.
+- Dilengkapi dukungan **Dark Mode** otomatis via media query `@media (prefers-color-scheme: dark)` dan kelas `.dark`, plus tombol toggle manual (Auto → Terang → Gelap) yang tersimpan di `localStorage`.
 - Sepenuhnya **responsif** dengan tabel scroll horizontal di layar sempit/mobile serta grid fleksibel.
 
-### Menambahkan Tautan di Sidebar Starter Kit
+### Menambahkan Tautan di Sidebar
 
-Untuk memunculkan tautan ke panel, tambahkan item berikut pada navigasi sidebar aplikasi Anda (misalnya di `resources/views/layouts/app/sidebar.blade.php`):
+Untuk memunculkan tautan ke panel, tambahkan item berikut pada navigasi sidebar aplikasi Anda:
 
 ```blade
 <flux:sidebar.item icon="shield-check" :href="route('pasak.dashboard.overview')" :current="request()->routeIs('pasak.dashboard.*')" wire:navigate>
-    {{ __('Pasak') }}
+    {{ __('Security Monitor') }}
 </flux:sidebar.item>
 ```
 
@@ -136,6 +140,6 @@ Atau jika menggunakan link HTML standar:
 
 ```blade
 <a href="{{ route('pasak.dashboard.overview') }}" wire:navigate class="nav-item">
-    Pasak
+    Security Monitor
 </a>
 ```

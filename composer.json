@@ -52,10 +52,6 @@
         "pestphp/pest": "^2.0|^3.0|^4.0",
         "pestphp/pest-plugin-laravel": "^2.0|^3.0|^4.0"
     },
-    "suggest": {
-        "livewire/livewire": "Required for the optional Livewire Starter Kit monitoring dashboard (vendor:publish --tag=starterkit-livewire).",
-        "inertiajs/inertia-laravel": "Required for the optional React Starter Kit monitoring dashboard (vendor:publish --tag=starterkit-react)."
-    },
     "autoload": {
         "psr-4": {
             "Internal\\Pasak\\": "src/"

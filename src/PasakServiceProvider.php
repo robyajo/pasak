@@ -14,7 +14,6 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
-use Inertia\Inertia;
 use Internal\Pasak\Console\Commands\PasakUninstallCommand;
 use Internal\Pasak\Console\Commands\PruneSecurityLogs;
 use Internal\Pasak\Console\Commands\PurgeInjectedData;
@@ -37,7 +36,6 @@ use Internal\Pasak\Services\PasakService;
 use Internal\Pasak\Services\ServerSecurityService;
 use Internal\Pasak\Services\UserLoginService;
 use Internal\Pasak\Services\VersionCheckService;
-use Livewire\Livewire;
 
 class PasakServiceProvider extends ServiceProvider
 {
@@ -230,107 +228,22 @@ class PasakServiceProvider extends ServiceProvider
             'pasak-routes-api',
         );
 
-        // Livewire Starter Kit Monitoring Dashboard (views + configuration).
-        //
-        // Publishes the Blade/single-file Livewire pages that make up the
-        // monitoring dashboard, tailored for the official Laravel Livewire
-        // Starter Kit (Flux UI), together with the package configuration.
-        $dashboardAssets = [
-            __DIR__.'/../stubs/livewire/pages/pasak' => resource_path(
+        // Dashboard monitoring Blade murni (views + konfigurasi).
+        // Satu-satunya dashboard yang didukung: Blade murni tanpa
+        // Livewire/Inertia/Vue — 100% Pure PHP (standar Spatie).
+        $bladeViews = [
+            __DIR__.'/../stubs/blade/pages/pasak' => resource_path(
                 'views/pages/pasak',
             ),
-            __DIR__.'/../config/pasak.php' => config_path('pasak.php'),
         ];
+        $dashboardAssets = array_merge(
+            $bladeViews,
+            [__DIR__.'/../config/pasak.php' => config_path('pasak.php')],
+        );
 
-        $this->publishes($dashboardAssets, 'starterkit-livewire');
-        $this->publishes($dashboardAssets, 'starterkit-blade');
         $this->publishes($dashboardAssets, 'pasak-dashboard');
-        $this->publishes($dashboardAssets, 'pasak-dashboard-blade');
-
-        // Backwards/typo-compatible alias so that both spellings work.
-        $this->publishes($dashboardAssets, 'staterkit-livewire');
-        $this->publishes($dashboardAssets, 'staterkit-blade');
-
-        // Monitoring views only (no configuration overwrite).
-        $this->publishes(
-            [
-                __DIR__.'/../stubs/livewire/pages/pasak' => resource_path(
-                    'views/pages/pasak',
-                ),
-            ],
-            'pasak-dashboard-views',
-        );
-        $this->publishes(
-            [
-                __DIR__.'/../stubs/blade/pages/pasak' => resource_path(
-                    'views/pages/pasak',
-                ),
-            ],
-            'plain-views',
-        );
-        $this->publishes(
-            [
-                __DIR__.'/../stubs/livewire/pages/pasak' => resource_path(
-                    'views/pages/pasak',
-                ),
-            ],
-            'pasak-dashboard-blade-views',
-        );
-
-        // React Starter Kit Monitoring Dashboard (views + configuration).
-        //
-        // Publishes the Inertia + React pages and shared components that make
-        // up the monitoring dashboard, tailored for the official Laravel React
-        // Starter Kit (Inertia + shadcn/ui), together with the package config.
-        $reactDashboardAssets = [
-            __DIR__.'/../stubs/react/pages/pasak' => resource_path(
-                'js/pages/pasak',
-            ),
-            __DIR__.'/../stubs/react/components/pasak' => resource_path(
-                'js/components/pasak',
-            ),
-            __DIR__.'/../config/pasak.php' => config_path('pasak.php'),
-        ];
-
-        $this->publishes($reactDashboardAssets, 'starterkit-react');
-        $this->publishes($reactDashboardAssets, 'starterkit-tsx');
-        $this->publishes($reactDashboardAssets, 'pasak-dashboard-react');
-        $this->publishes($reactDashboardAssets, 'pasak-dashboard-tsx');
-
-        // Backwards/typo-compatible alias so that both spellings work.
-        $this->publishes($reactDashboardAssets, 'staterkit-react');
-        $this->publishes($reactDashboardAssets, 'staterkit-tsx');
-
-        // React monitoring views only (no configuration overwrite).
-        $this->publishes(
-            [
-                __DIR__.'/../stubs/react/pages/pasak' => resource_path(
-                    'js/pages/pasak',
-                ),
-                __DIR__.
-                '/../stubs/react/components/pasak' => resource_path(
-                    'js/components/pasak',
-                ),
-            ],
-            'pasak-dashboard-react-views',
-        );
-        $this->publishes(
-            [
-                __DIR__.'/../stubs/react/pages/pasak' => resource_path(
-                    'js/pages/pasak',
-                ),
-                __DIR__.
-                '/../stubs/react/components/pasak' => resource_path(
-                    'js/components/pasak',
-                ),
-            ],
-            'pasak-dashboard-tsx-views',
-        );
-
-        // Combined publication of both Blade and TSX dashboard assets.
-        $bothDashboardAssets = array_merge($dashboardAssets, $reactDashboardAssets);
-        $this->publishes($bothDashboardAssets, 'starterkit-all');
-        $this->publishes($bothDashboardAssets, 'pasak-dashboard-all');
+        $this->publishes($dashboardAssets, 'plain-views');
+        $this->publishes($bladeViews, 'pasak-dashboard-views');
 
         $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
     }
@@ -383,14 +296,12 @@ class PasakServiceProvider extends ServiceProvider
     }
 
     /**
-     * Register the optional Starter Kit monitoring dashboard.
+     * Register the Blade monitoring dashboard (the only dashboard driver).
      *
      * The dashboard is only wired up when it has been explicitly enabled via
-     * "pasak.dashboard.enabled" and the matching frontend package is present
-     * in the host application. Its views are published separately using:
+     * "pasak.dashboard.enabled". Its views are published separately using:
      *
-     *     php artisan vendor:publish --tag=starterkit-livewire
-     *     php artisan vendor:publish --tag=starterkit-react
+     *     php artisan pasak:install --with-dashboard
      */
     protected function registerDashboardRoutes(): void
     {
@@ -411,19 +322,7 @@ class PasakServiceProvider extends ServiceProvider
             return;
         }
 
-        $driver = strtolower((string) config('pasak.dashboard.driver', 'blade'));
-
-        if (in_array($driver, ['livewire', 'all', 'both'], true)) {
-            $this->registerLivewireDashboardRoutes();
-        }
-
-        if (in_array($driver, ['blade', 'plain', 'all', 'both'], true)) {
-            $this->registerBladeDashboardRoutes();
-        }
-
-        if (in_array($driver, ['react', 'tsx', 'all', 'both'], true)) {
-            $this->registerReactDashboardRoutes();
-        }
+        $this->registerBladeDashboardRoutes();
     }
 
     /**
@@ -432,32 +331,6 @@ class PasakServiceProvider extends ServiceProvider
     protected function registerBladeDashboardRoutes(): void
     {
         $this->loadRoutesFrom(__DIR__.'/../routes/pasak-dashboard-blade.php');
-    }
-
-    /**
-     * Register the Livewire (Flux UI) dashboard routes.
-     */
-    protected function registerLivewireDashboardRoutes(): void
-    {
-        if (! class_exists(Livewire::class)) {
-            return;
-        }
-
-        $this->loadRoutesFrom(__DIR__.'/../routes/pasak-dashboard.php');
-    }
-
-    /**
-     * Register the Inertia + React dashboard routes.
-     */
-    protected function registerReactDashboardRoutes(): void
-    {
-        if (! class_exists(Inertia::class)) {
-            return;
-        }
-
-        $this->loadRoutesFrom(
-            __DIR__.'/../routes/pasak-dashboard-react.php',
-        );
     }
 
     protected function registerSchedule(): void

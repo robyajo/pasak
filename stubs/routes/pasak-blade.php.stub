@@ -7,10 +7,10 @@ use Illuminate\Support\Facades\Route;
 | Pasak Web Dashboard Routes (Plain Blade)
 |--------------------------------------------------------------------------
 |
-| Rute dashboard Blade murni — HANYA untuk stack yang dipilih saat instalasi
-| (--with-plain / --with-blade / --stack=blade). Me-render tampilan di
-| resources/views/pages/pasak tanpa Livewire/Inertia sehingga Anda bebas
-| menyesuaikan tampilan, prefix URL, middleware, atau menambah halaman sendiri.
+| Rute dashboard Blade murni — satu-satunya dashboard Pasak (100% Pure PHP).
+| Me-render tampilan di resources/views/pages/pasak tanpa dependensi
+| frontend sehingga Anda bebas menyesuaikan tampilan, prefix URL,
+| middleware, atau menambah halaman sendiri.
 |
 */
 
@@ -22,7 +22,7 @@ Route::middleware(array_merge($middleware, $adminMiddleware))
     ->prefix($prefix)
     ->name('pasak.dashboard.')
     ->group(function () {
-        // Dashboard Blade murni via controller (resources/views/pages/pasak, tanpa Livewire/Inertia)
+        // Dashboard Blade murni via controller (resources/views/pages/pasak).
         Route::get('/', \Internal\Pasak\Http\Controllers\Dashboard\OverviewController::class)->name('overview');
         Route::get('logs', [\Internal\Pasak\Http\Controllers\Dashboard\LogController::class, 'index'])->name('logs');
         Route::get('logs/{id}', [\Internal\Pasak\Http\Controllers\Dashboard\LogController::class, 'show'])->whereNumber('id')->name('logs.show');

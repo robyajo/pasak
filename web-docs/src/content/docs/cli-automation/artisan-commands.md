@@ -11,7 +11,7 @@ Paket menyertakan kumpulan perintah Artisan CLI untuk administrasi, otomasi pemi
 
 ## 1. `pasak:install`
 
-Wizard instalasi terpandu bilingual (Indonesia default / English via `--lang=en`): pilihan mode API-only (`--api-only`), pilihan dashboard (Blade murni / Livewire / React / keduanya / tidak ada), cek kelengkapan lingkungan, tawaran migrasi langsung, dan saran langkah berikutnya beserta tautan dokumentasi.
+Wizard instalasi terpandu bilingual (Indonesia default / English via `--lang=en`): pilihan mode API-only (`--api-only`), tawaran dashboard Blade murni, cek kelengkapan lingkungan, tawaran migrasi langsung, dan saran langkah berikutnya beserta tautan dokumentasi.
 
 Menginisialisasi paket, mempublikasikan konfigurasi, migrasi database, konfigurasi Nginx hardened WAF, serta menerapkan aturan **Apache `.htaccess` Hardened** di folder `public/`.
 
@@ -35,12 +35,10 @@ php artisan pasak:install [options]
 
 - `--force`: Menimpa seluruh berkas konfigurasi, migrasi, `nginx.conf`, dan `public/.htaccess` dengan template bawaan.
 - `--lang=`: Bahasa wizard (`id` | `en`).
-- `--api-only`: Instalasi API-only — inti + keamanan saja, tanpa halaman/dashboard.
-- `--with-plain` / `--with-blade`: Dashboard Blade murni (semua aplikasi Laravel).
-- `--with-livewire` / `--with-dashboard`: Dashboard Livewire Starter Kit.
-- `--with-tsx` / `--with-react-dashboard`: Dashboard React/TSX Starter Kit.
-- `--with-both`: Blade murni + TSX.
-- `--stack=`: `blade`, `livewire`, `tsx`, `both`, atau `none`.
+- `--api-only`: Jalan pintas — API ya, Web tidak (inti + keamanan saja, tanpa halaman/dashboard).
+- `--without-api`: Melewatkan pemasangan dukungan API.
+- `--without-web`: Melewatkan pemasangan dashboard web.
+- `--with-dashboard` / `--with-plain` / `--with-blade`: Dashboard Blade murni (semua aplikasi Laravel, tanpa dependensi frontend).
 - `--without-nginx`: Melewatkan publikasi berkas `nginx.conf`.
 - `--without-htaccess`: Melewatkan publikasi atau penambahan aturan pada `public/.htaccess`.
 - `--with-htaccess`: Memaksa pembaruan berkas `public/.htaccess` dengan aturan hardening keamanan.
