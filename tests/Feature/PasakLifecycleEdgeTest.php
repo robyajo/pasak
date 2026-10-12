@@ -165,6 +165,19 @@ test('upgrade migrates legacy env values and warns on mismatched driver', functi
         ->and(File::exists($edgeDir.'/public/.htaccess.pasak'))->toBeTrue();
 });
 
+test('upgrade warns when published views lack the latest features', function () use (&$edgeDir) {
+    $this->app->setBasePath($edgeDir);
+
+    File::makeDirectory($edgeDir.'/resources/views/pages/pasak', 0755, true, true);
+    File::put($edgeDir.'/resources/views/pages/pasak/layout.blade.php', 'layout lama tanpa dialog');
+
+    $this->artisan('pasak:upgrade', [
+        '--force' => true,
+        '--no-composer' => true,
+        '--no-migrate' => true,
+    ])->expectsOutputToContain('kedaluwarsa')->assertSuccessful();
+});
+
 test('upgrade migrates legacy security-named host files to pasak names', function () use (&$edgeDir) {
     $this->app->setBasePath($edgeDir);
 

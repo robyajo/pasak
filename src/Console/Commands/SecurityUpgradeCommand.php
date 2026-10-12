@@ -151,6 +151,10 @@ class SecurityUpgradeCommand extends Command
                 '--force' => (bool) $this->option('sync-views'),
             ]);
             $this->info('  ✓ Tampilan dashboard Blade/Livewire telah disinkronkan.');
+            $this->warnIfViewsOutdated(
+                resource_path('views/pages/pasak/layout.blade.php'),
+                'pasakAnnounce'
+            );
         }
 
         if ($hasReactViews) {
@@ -162,6 +166,10 @@ class SecurityUpgradeCommand extends Command
                 '--force' => (bool) $this->option('sync-views'),
             ]);
             $this->info('  ✓ Tampilan dashboard React/Inertia telah disinkronkan.');
+            $this->warnIfViewsOutdated(
+                resource_path('js/components/pasak/pasak-nav.tsx'),
+                'showAnnounce'
+            );
         }
 
         if (File::exists(resource_path('views/errors/blocked.blade.php'))) {
@@ -311,8 +319,13 @@ class SecurityUpgradeCommand extends Command
                 dirname(__DIR__, 2).'/stubs/htaccess.stub',
             ] as $stubPath) {
                 if (File::exists($stubPath)) {
-                    File::copy($stubPath, $sidecar);
-                    $this->info('  ✓ Berkas tinjauan public/.htaccess.pasak dibuat (milik Anda tidak diubah).');
+                    try {
+                        File::ensureDirectoryExists(dirname($sidecar));
+                        File::copy($stubPath, $sidecar);
+                        $this->info('  ✓ Berkas tinjauan public/.htaccess.pasak dibuat (milik Anda tidak diubah).');
+                    } catch (\Throwable $e) {
+                        $this->warn('  ⚠ Gagal membuat public/.htaccess.pasak: '.$e->getMessage());
+                    }
                     break;
                 }
             }
@@ -349,6 +362,29 @@ class SecurityUpgradeCommand extends Command
         }
 
         return [];
+    }
+
+    /**
+     * Peringatkan bila tampilan terpublish kedaluwarsa (tidak memuat marker
+     * fitur terbaru) agar user menjalankan --sync-views. Tidak mengubah apa pun.
+     */
+    protected function warnIfViewsOutdated(string $path, string $marker): void
+    {
+        if (! File::exists($path)) {
+            return;
+        }
+
+        if (! str_contains(File::get($path), $marker)) {
+            $this->warn("  ⚠ Tampilan terpublish kedaluwarsa ({$this->relativeHostPath($path)} tidak memuat fitur terbaru).");
+            $this->line('    Jalankan <fg=yellow>php artisan pasak:upgrade --sync-views</fg=yellow> untuk memperbarui (kustomisasi dicadangkan dulu).');
+        }
+    }
+
+    protected function relativeHostPath(string $path): string
+    {
+        $base = base_path().DIRECTORY_SEPARATOR;
+
+        return str_starts_with($path, $base) ? substr($path, strlen($base)) : $path;
     }
 
     /**
