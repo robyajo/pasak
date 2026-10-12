@@ -66,6 +66,17 @@
         <p class="sec-card-desc">{{ __('Aturan ambang batas jumlah pelanggaran sebelum tindakan karantina dijalankan.') }}</p>
         <div class="sec-card-body" style="display: flex; flex-direction: column; gap: 18px;">
             <div>
+                <span class="sec-label">{{ __('Threat levels counted toward auto-block') }}</span>
+                <div style="display: flex; gap: 14px; flex-wrap: wrap;">
+                    @foreach (['low' => __('Low'), 'medium' => __('Medium'), 'high' => __('High'), 'critical' => __('Critical')] as $lvl => $label)
+                        <label style="display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600;">
+                            <input type="checkbox" name="auto_block_levels[]" value="{{ $lvl }}" @checked(in_array($lvl, $s['auto_block_levels'] ?? ['high', 'critical'], true))>
+                            {{ $label }}
+                        </label>
+                    @endforeach
+                </div>
+            </div>
+            <div>
                 <label class="sec-label" for="auto_block_enabled">
                     <input id="auto_block_enabled" type="checkbox" name="auto_block_enabled" value="1" @checked(! empty($s['auto_block_enabled']))>
                     {{ __('Enable auto-block') }}

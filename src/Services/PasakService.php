@@ -34,7 +34,7 @@ class PasakService
     /**
      * Versi paket Pasak (Bulwark).
      */
-    public const VERSION = '1.2.9';
+    public const VERSION = '1.2.10';
 
     /**
      * Rentang waktu yang didukung grafik tren serangan.
@@ -105,6 +105,28 @@ class PasakService
     }
 
     /**
+     * Threat levels that count toward the auto-block threshold,
+     * honoring the user's settings first.
+     *
+     * @return array<int, string>
+     */
+    public function autoBlockLevels(): array
+    {
+        $levels = $this->getSetting('auto_block.levels', config('pasak.auto_block.levels', ['high', 'critical']));
+
+        if (! is_array($levels)) {
+            $levels = [$levels];
+        }
+
+        $levels = array_values(array_intersect(
+            array_map('strtolower', array_map('trim', array_map('strval', $levels))),
+            SecurityLog::LEVELS
+        ));
+
+        return $levels !== [] ? $levels : ['high', 'critical'];
+    }
+
+    /**
      * Persist a dynamic security setting.
      */
     public function setSetting(string $key, mixed $value): void
@@ -139,6 +161,7 @@ class PasakService
             'auto_block_threshold' => (int) $this->getSetting('auto_block.threshold', config('pasak.auto_block.threshold', 3)),
             'auto_block_window' => (int) $this->getSetting('auto_block.window_minutes', config('pasak.auto_block.window_minutes', 10)),
             'auto_block_duration' => (int) $this->getSetting('auto_block.duration_hours', config('pasak.auto_block.duration_hours', 24)),
+            'auto_block_levels' => $this->autoBlockLevels(),
             'instant_block_enabled' => (bool) $this->getSetting('instant_block.enabled', config('pasak.instant_block.enabled', true)),
             'instant_block_duration' => (int) $this->getSetting('instant_block.duration_hours', config('pasak.instant_block.duration_hours', 720)),
             'block_enforcement' => (bool) $this->getSetting('block_enforcement', config('pasak.block_enforcement', true)),
@@ -175,6 +198,17 @@ class PasakService
 
         if (isset($values['auto_block_duration'])) {
             $this->setSetting('auto_block.duration_hours', max(0, (int) $values['auto_block_duration']));
+        }
+
+        if (isset($values['auto_block_levels']) && is_array($values['auto_block_levels'])) {
+            $levels = array_values(array_intersect(
+                array_map('strtolower', array_map('trim', $values['auto_block_levels'])),
+                SecurityLog::LEVELS
+            ));
+
+            if ($levels !== []) {
+                $this->setSetting('auto_block.levels', $levels);
+            }
         }
 
         if (isset($values['instant_block_enabled'])) {
@@ -218,6 +252,7 @@ class PasakService
                 'PASAK_AUTO_BLOCK_THRESHOLD' => (string) ($settings['auto_block_threshold'] ?? 3),
                 'PASAK_AUTO_BLOCK_WINDOW' => (string) ($settings['auto_block_window'] ?? 10),
                 'PASAK_AUTO_BLOCK_DURATION' => (string) ($settings['auto_block_duration'] ?? 24),
+                'PASAK_AUTO_BLOCK_LEVELS' => implode(',', $settings['auto_block_levels'] ?? ['high', 'critical']),
                 'PASAK_INSTANT_BLOCK_ENABLED' => ($settings['instant_block_enabled'] ?? true) ? 'true' : 'false',
                 'PASAK_INSTANT_BLOCK_DURATION' => (string) ($settings['instant_block_duration'] ?? 720),
                 'PASAK_BLOCK_ENFORCEMENT' => ($settings['block_enforcement'] ?? true) ? 'true' : 'false',
@@ -1492,7 +1527,7 @@ class PasakService
         try {
             $threshold = max(1, (int) $this->getSetting('auto_block.threshold', $config['threshold'] ?? 3));
             $window = max(1, (int) $this->getSetting('auto_block.window_minutes', $config['window_minutes'] ?? 10));
-            $levels = $config['levels'] ?? ['high', 'critical'];
+            $levels = $this->autoBlockLevels();
 
             $query = SecurityLog::query()
                 ->whereIn('threat_level', $levels)

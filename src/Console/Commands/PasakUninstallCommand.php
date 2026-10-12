@@ -339,6 +339,12 @@ class PasakUninstallCommand extends Command
     protected function restoreHtaccess(): void
     {
         $htaccessPath = public_path('.htaccess');
+        $pasakHtaccessPath = public_path('.htaccess.pasak');
+
+        if (File::exists($pasakHtaccessPath)) {
+            File::delete($pasakHtaccessPath);
+            $this->info('  ✓ Berkas public/.htaccess.pasak dihapus.');
+        }
 
         $backups = glob(public_path('.htaccess.backup-*')) ?: [];
         if ($backups !== []) {

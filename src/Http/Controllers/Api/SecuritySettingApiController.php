@@ -42,6 +42,8 @@ class SecuritySettingApiController extends Controller
             'auto_block_threshold' => ['nullable', 'integer', 'min:1', 'max:100'],
             'auto_block_window' => ['nullable', 'integer', 'min:1', 'max:1440'],
             'auto_block_duration' => ['nullable', 'integer', 'min:0', 'max:8760'],
+            'auto_block_levels' => ['nullable', 'array', 'min:1'],
+            'auto_block_levels.*' => ['string', 'in:low,medium,high,critical'],
             'instant_block_enabled' => ['nullable', 'boolean'],
             'instant_block_duration' => ['nullable', 'integer', 'min:0', 'max:8760'],
             'block_enforcement' => ['nullable', 'boolean'],

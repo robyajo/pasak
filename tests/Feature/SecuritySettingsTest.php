@@ -1,6 +1,7 @@
 <?php
 
 use Internal\Pasak\Models\BlockedIp;
+use Internal\Pasak\Models\SecurityLog;
 use Internal\Pasak\Services\PasakService;
 use Internal\Pasak\Tests\TestUser;
 
@@ -34,6 +35,39 @@ test('admin can retrieve current security settings via api', function () {
             'auto_block_threshold' => 3,
         ],
     ]);
+});
+
+test('auto-block honors user-configured threat levels', function () {
+    config()->set('pasak.auto_block.scope', 'ip');
+
+    $service = app(PasakService::class);
+
+    // Default: high + critical dihitung.
+    expect($service->autoBlockLevels())->toBe(['high', 'critical']);
+
+    // User membatasi hanya critical: high tidak lagi memicu.
+    $service->updateSettings(['auto_block_levels' => ['critical']]);
+    expect($service->autoBlockLevels())->toBe(['critical']);
+
+    $ip = '198.51.100.77';
+    foreach (range(1, 5) as $i) {
+        SecurityLog::create([
+            'ip_address' => $ip,
+            'event_type' => 'threat_detected',
+            'threat_level' => 'high',
+            'path' => "/?q=union-select-{$i}",
+        ]);
+    }
+
+    expect($service->autoBlockIfNeeded($ip))->toBeNull();
+
+    // Kembalikan high: ambang tercapai → blokir.
+    $service->updateSettings(['auto_block_levels' => ['high', 'critical']]);
+    expect($service->autoBlockIfNeeded($ip))->not->toBeNull();
+
+    // Nilai invalid diabaikan, pengaturan lama bertahan.
+    $service->updateSettings(['auto_block_levels' => ['bogus']]);
+    expect($service->autoBlockLevels())->toBe(['high', 'critical']);
 });
 
 test('admin can update settings to switch between device and ip scope', function () {

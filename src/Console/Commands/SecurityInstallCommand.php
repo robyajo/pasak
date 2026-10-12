@@ -198,12 +198,12 @@ class SecurityInstallCommand extends Command
             ]);
         }
 
-        // 4. Publish / Hardening Apache .htaccess
+        // 4. Publish / Hardening Apache .htaccess (tidak pernah mengedit milik user)
         if (! $withoutHtaccess) {
             $this->comment(
-                'Mempublikasikan dan menerapkan aturan hardening Apache (public/.htaccess)...',
+                'Menyiapkan aturan hardening Apache (public/.htaccess)...',
             );
-            $this->applyHtaccessHardening($force);
+            $this->applyHtaccessHardening($force || (bool) $this->option('with-htaccess'));
         }
 
         // 5. Publish Default Blocked (403) Page
@@ -372,7 +372,9 @@ class SecurityInstallCommand extends Command
             $steps[] = [$this->t('Web server Apache2: periksa dan sesuaikan apache2.conf di root proyek, lalu reload apache2.', 'Apache2 web server: review and adjust apache2.conf at the project root, then reload apache2.'), $doc('webserver-hardening/apache-htaccess-hardening')];
         }
         if (! $withoutHtaccess) {
-            $steps[] = [$this->t('Apache / cPanel: public/.htaccess telah diperkuat terhadap upload webshell, double extension, dotfile, dan file backup.', 'Apache / cPanel: public/.htaccess has been hardened against webshell uploads, double extensions, dotfiles, and backup files.'), $doc('webserver-hardening/apache-htaccess-hardening')];
+            $steps[] = File::exists(public_path('.htaccess.pasak'))
+                ? [$this->t('Apache / cPanel: .htaccess milik Anda TIDAK diubah. Aturan hardening siap di public/.htaccess.pasak — tinjau lalu aktifkan manual (`--with-htaccess` untuk aktivasi otomatis).', 'Apache / cPanel: your .htaccess was NOT modified. Hardening rules are ready in public/.htaccess.pasak — review then activate manually (`--with-htaccess` for automatic activation).'), $doc('webserver-hardening/apache-htaccess-hardening')]
+                : [$this->t('Apache / cPanel: public/.htaccess telah diperkuat terhadap upload webshell, double extension, dotfile, dan file backup.', 'Apache / cPanel: public/.htaccess has been hardened against webshell uploads, double extensions, dotfiles, and backup files.'), $doc('webserver-hardening/apache-htaccess-hardening')];
         }
         if (! $withoutViews) {
             $steps[] = [$this->t('Halaman blokir: sesuaikan resources/views/errors/blocked.blade.php dengan branding aplikasi Anda.', 'Blocked page: customize resources/views/errors/blocked.blade.php with your app branding.'), $doc('integration-guides/frontend-blade-livewire')];
@@ -567,9 +569,23 @@ class SecurityInstallCommand extends Command
         }
 
         $htaccessPath = public_path('.htaccess');
+        $pasakHtaccessPath = public_path('.htaccess.pasak');
 
-        if (! File::exists($htaccessPath) || $force) {
-            // Buat atau timpa dengan stub lengkap
+        if (! File::exists($htaccessPath)) {
+            // Belum ada .htaccess: aman membuat baru dari stub lengkap.
+            File::put($htaccessPath, $stubContent);
+            $this->info(
+                '  ✓ Berkas public/.htaccess berhasil dibuat dengan aturan hardening lengkap.',
+            );
+
+            return;
+        }
+
+        if ($force) {
+            // Eksplisit (--force / --with-htaccess): cadangkan lalu aktifkan.
+            $backupPath = public_path('.htaccess.backup-'.date('Ymd_His'));
+            File::copy($htaccessPath, $backupPath);
+            $this->line("  ℹ Cadangan dibuat di: <fg=gray>{$backupPath}</>");
             File::put($htaccessPath, $stubContent);
             $this->info(
                 '  ✓ Berkas public/.htaccess berhasil diperbarui dengan aturan hardening lengkap.',
@@ -578,44 +594,17 @@ class SecurityInstallCommand extends Command
             return;
         }
 
-        $currentContent = File::get($htaccessPath);
-
-        // Cek apakah hardening rules sudah terpasang
-        if (
-            str_contains($currentContent, 'Hardening keamanan') ||
-            str_contains($currentContent, 'Hardening Keamanan') ||
-            str_contains($currentContent, 'FilesMatch "^\."') ||
-            str_contains($currentContent, 'phtml|pht|phar')
-        ) {
-            $this->line(
-                '  ✓ Berkas public/.htaccess sudah memiliki aturan hardening keamanan.',
-            );
-
-            return;
-        }
-
-        // Backup htaccess lama
-        $backupPath = public_path('.htaccess.backup-'.date('Ymd_His'));
-        File::copy($htaccessPath, $backupPath);
-        $this->line("  ℹ Cadangan dibuat di: <fg=gray>{$backupPath}</>");
-
-        // Ambil bagian hardening dari stub
-        $pos = strpos(
-            $stubContent,
-            '# ---------------------------------------------------------------------------',
-        );
-        $hardeningSection =
-            $pos !== false
-                ? '
-
-'.substr($stubContent, $pos)
-                : '
-
-'.$stubContent;
-        File::append($htaccessPath, $hardeningSection);
-
+        // Bawaan: JANGAN sentuh .htaccess milik user. Tulis berkas BARU
+        // berdampingan agar dapat ditinjau sebelum diaktifkan manual.
+        File::put($pasakHtaccessPath, $stubContent);
         $this->info(
-            '  ✓ Aturan hardening keamanan berhasil ditambahkan ke berkas public/.htaccess.',
+            '  ✓ Berkas public/.htaccess milik Anda TIDAK diubah.',
+        );
+        $this->line(
+            '  ℹ Aturan hardening lengkap ditulis ke berkas BARU: <fg=yellow>public/.htaccess.pasak</>',
+        );
+        $this->line(
+            '  ℹ Untuk mengaktifkan: tinjau isinya, cadangkan .htaccess lama, lalu `mv public/.htaccess.pasak public/.htaccess`.',
         );
     }
 

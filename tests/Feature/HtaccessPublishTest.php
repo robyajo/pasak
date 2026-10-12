@@ -67,7 +67,7 @@ test('security install command runs and publishes htaccess configuration', funct
         ->and($content)->toContain('Options -Indexes');
 });
 
-test('security install command appends hardening to existing htaccess and creates backup', function () {
+test('security install command never touches existing htaccess and creates a new file instead', function () {
     $publicDir = public_path();
     if (! File::isDirectory($publicDir)) {
         File::makeDirectory($publicDir, 0755, true, true);
@@ -79,17 +79,14 @@ test('security install command appends hardening to existing htaccess and create
     $this->artisan('pasak:install')
         ->assertSuccessful();
 
-    expect(File::exists($publishedPath))->toBeTrue();
-    $content = File::get($publishedPath);
+    // Berkas milik user wajib utuh, tanpa tambahan apa pun.
+    expect(File::get($publishedPath))->toBe("# Custom User Rewrite Rules\nRewriteEngine On\n");
 
-    // Pastikan aturan custom user tidak hilang dan aturan hardening bertambah
-    expect($content)->toContain('# Custom User Rewrite Rules')
-        ->and($content)->toContain('Hardening keamanan')
-        ->and($content)->toContain('Options -Indexes');
-
-    // Pastikan berkas cadangan tercipta
-    $backups = File::glob($publicDir.'/.htaccess.backup-*');
-    expect(count($backups))->toBeGreaterThanOrEqual(1);
+    // Aturan hardening ditulis ke berkas BARU berdampingan.
+    $pasakPath = public_path('.htaccess.pasak');
+    expect(File::exists($pasakPath))->toBeTrue();
+    expect(File::get($pasakPath))->toContain('Hardening keamanan')
+        ->and(File::get($pasakPath))->toContain('Options -Indexes');
 });
 
 test('security install command respects without-htaccess option', function () {

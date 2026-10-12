@@ -57,7 +57,10 @@ return [
         'threshold' => (int) env('PASAK_AUTO_BLOCK_THRESHOLD', env('SECURITY_AUTO_BLOCK_THRESHOLD', 3)),
         'window_minutes' => (int) env('PASAK_AUTO_BLOCK_WINDOW', env('SECURITY_AUTO_BLOCK_WINDOW', 10)),
         'duration_hours' => (int) env('PASAK_AUTO_BLOCK_DURATION', env('SECURITY_AUTO_BLOCK_DURATION', 24)),
-        'levels' => ['high', 'critical'],
+        'levels' => array_values(array_filter(array_map(
+            'trim',
+            explode(',', (string) env('PASAK_AUTO_BLOCK_LEVELS', env('SECURITY_AUTO_BLOCK_LEVELS', 'high,critical')))
+        ))),
         // Scope pemblokiran otomatis: 'device' (hanya isolasi perangkat penyerang, aman untuk IP publik/WiFi NAT bersama)
         // atau 'ip' (seluruh IP router publik).
         'scope' => env('PASAK_AUTO_BLOCK_SCOPE', env('SECURITY_AUTO_BLOCK_SCOPE', 'device')),
