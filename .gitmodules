@@ -1,0 +1,3 @@
+[submodule "app-waf"]
+	path = app-waf
+	url = https://github.com/robyajo/app-waf-testing.git
