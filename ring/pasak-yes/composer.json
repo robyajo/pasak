@@ -94,7 +94,7 @@
     "repositories": [{
         "name": "pasak-path",
         "type": "path",
-        "url": "/home/roby/PROJECT/PACKAGE/PHP/LARAVEL-SECURITY/pasak",
+        "url": "../../",
         "options": {
             "symlink": true
         }

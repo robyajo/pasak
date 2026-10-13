@@ -1,11 +1,10 @@
-<!DOCTYPE html>
-<html lang="id">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Ubah Kontak</title></head>
-<body style="font-family:system-ui,sans-serif;max-width:52rem;margin:0 auto;padding:1.5rem">
-<h1>✏️ Ubah Kontak</h1>
+@extends('layouts.app')
+@section('title', 'Ubah Kontak')
+@section('content')
+<div class="hero"><h1>✏️ Ubah Kontak</h1><p>{{ $contact->name }}</p></div>
+<div class="card" style="max-width:36rem">
 <form method="POST" action="{{ route('contacts.update', $contact) }}" enctype="multipart/form-data">
 @include('contacts._form', ['submitLabel' => 'Perbarui'])
 </form>
-</body>
-</html>
+</div>
+@endsection

@@ -20,7 +20,7 @@ export default function MethodRemediationSection({
                 <WrenchIcon data-icon="inline-start" />
                 <AlertTitle>Cara menutup celah {vulnName}</AlertTitle>
                 <AlertDescription className="mt-1">
-                    <ScrollArea className="max-h-48 pr-2">
+                    <ScrollArea className="max-h-32 pr-2">
                         <div className="text-xs leading-relaxed whitespace-pre-wrap">
                             {fix}
                         </div>

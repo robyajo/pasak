@@ -1,11 +1,10 @@
-<!DOCTYPE html>
-<html lang="id">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Tambah Kontak</title></head>
-<body style="font-family:system-ui,sans-serif;max-width:52rem;margin:0 auto;padding:1.5rem">
-<h1>➕ Tambah Kontak</h1>
+@extends('layouts.app')
+@section('title', 'Tambah Kontak')
+@section('content')
+<div class="hero"><h1>➕ Tambah Kontak</h1><p>Tambahkan entri baru ke buku alamat.</p></div>
+<div class="card" style="max-width:36rem">
 <form method="POST" action="{{ route('contacts.store') }}" enctype="multipart/form-data">
 @include('contacts._form', ['submitLabel' => 'Simpan'])
 </form>
-</body>
-</html>
+</div>
+@endsection

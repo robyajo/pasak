@@ -46,6 +46,11 @@ export default function MethodChainSection({
                                         size="sm"
                                         variant="secondary"
                                         disabled={busy !== null}
+                                        title={
+                                            busy !== null && !isStepBusy
+                                                ? "Tunggu proses lain selesai dulu"
+                                                : undefined
+                                        }
                                         onClick={() => onRunChainStep(step)}
                                     >
                                         {isStepBusy ? (

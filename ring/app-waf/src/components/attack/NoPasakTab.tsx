@@ -1139,6 +1139,9 @@ export default function NoPasakTab({
 
     /** Jalankan satu langkah rantai eskalasi dari Sheet. */
     const runChainStep = async (step: ChainStep): Promise<void> => {
+        if (busy !== null) {
+            return;
+        }
         setBusy(`chain-${step.label}`);
         try {
             const res = await sendRaw({
@@ -1147,7 +1150,11 @@ export default function NoPasakTab({
                 method: step.method ?? "GET",
                 ip: attackerIp.trim(),
             });
-            const hit = (res.body ?? "").includes(step.expect);
+            const body =
+                typeof res.body === "string"
+                    ? res.body
+                    : JSON.stringify(res.body ?? "");
+            const hit = body.includes(step.expect);
             setChainRuns((prev) => ({
                 ...prev,
                 [step.label]: {
@@ -1165,6 +1172,19 @@ export default function NoPasakTab({
                                       ? `tanda "${step.expect}" DITEMUKAN ✅`
                                       : `tanda "${step.expect}" tak ada, lanjutkan langkah berikut`
                               }`,
+                },
+            }));
+        } catch (error) {
+            // Tanpa catch, klik yang gagal hanya mereset loading tanpa
+            // meninggalkan informasi apa pun di bawah tombol.
+            const message =
+                error instanceof Error ? error.message : String(error);
+            setChainRuns((prev) => ({
+                ...prev,
+                [step.label]: {
+                    status: undefined,
+                    ok: false,
+                    note: `gagal: ${message}`,
                 },
             }));
         } finally {
