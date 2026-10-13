@@ -162,12 +162,14 @@ export default function App() {
                             MODE PRODUCTION — target server nyata
                         </AlertTitle>
                         <AlertDescription>
-                            Isi URL target dengan domain audit (mis.{" "}
-                            <code>https://dummy-api.lapeh.web.id</code>). Header
-                            IP virtual hanya terbaca bila server memercayai
-                            proxy; atribusi IP bisa jatuh ke IP server. Upaya
-                            upload tahap 4 diizinkan (bukti 403 = terlindungi);
-                            eksekusi perintah (/shell) hanya untuk lab lokal.
+                            Isi URL target dengan domain audit ber-skema{" "}
+                            <code>https://</code> (mis.{" "}
+                            <code>https://dummy-api.lapeh.web.id</code>).
+                            Alur pengujian identik dengan mode lokal —
+                            termasuk verifikasi webshell tahap 4 dan
+                            eksekusi RCE (/shell). Header IP virtual
+                            hanya terbaca bila server memercayai proxy;
+                            atribusi IP bisa jatuh ke IP server.
                         </AlertDescription>
                     </Alert>
                 )}
@@ -251,9 +253,10 @@ export default function App() {
                             Aktifkan mode PRODUCTION?
                         </AlertDialogTitle>
                         <AlertDialogDescription>
-                            Serangan akan mengenai server <b>NYATA</b>.
-                            Lanjutkan hanya dengan izin audit tertulis. Tahap 4
-                            (upload/webshell) tetap dinonaktifkan di mode ini.
+                            Serangan akan mengenai server <b>NYATA</b>{" "}
+                            via <code>https://</code>. Alur pengujian
+                            sama persis seperti mode lokal. Lanjutkan
+                            hanya dengan izin audit tertulis.
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>

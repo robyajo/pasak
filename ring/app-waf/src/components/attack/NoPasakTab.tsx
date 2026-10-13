@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { VULN_INFO, type ChainStep } from "@/lib/vulnInfo";
 import type { NoPasakRecommendation } from "@/lib/noPasak";
@@ -10,15 +10,12 @@ import {
     type BusyState,
     type ChainRun,
     type MethodRun,
-    type PendingMethodState,
     type SheetMethodState,
 } from "./sheet";
 import {
     ActiveStageHeader,
     AttackerCard,
     ConfigStepperCard,
-    ConfirmMethodDialog,
-    ConfirmProdDialog,
     DEMO_LOCAL_IP,
     gradeVector,
     isPassed,
@@ -87,24 +84,16 @@ export default function NoPasakTab({
     );
     const [sheetRun, setSheetRun] = useState<MethodRun | null>(null);
     const [chainRuns, setChainRuns] = useState<Record<string, ChainRun>>({});
-    const [confirmMethod, setConfirmMethod] = useState(false);
-    const [pendingMethod, setPendingMethod] =
-        useState<PendingMethodState | null>(null);
 
-    // Konfirmasi generik untuk aksi rantai/payload ke PRODUKSI.
-    const pendingProd = useRef<{ label: string; run: () => void } | null>(null);
-    const [confirmProd, setConfirmProd] = useState(false);
-    const [confirmProdLabel, setConfirmProdLabel] = useState("");
-
-    /** Produksi: minta konfirmasi dulu; lokal: langsung jalan. */
+    /**
+     * Mode lokal vs produksi hanya membedakan target pengujian
+     * (lokal = http://localhost:8000, produksi = https://...).
+     * Seluruh alur pengujian — termasuk verifikasi webshell tahap 4 dan
+     * eksekusi RCE (/shell) — berperilaku sama di kedua mode.
+     */
     const askProd = (label: string, run: () => void): void => {
-        if (mode !== "production") {
-            run();
-            return;
-        }
-        pendingProd.current = { label, run };
-        setConfirmProdLabel(label);
-        setConfirmProd(true);
+        void label;
+        run();
     };
 
     const url = storedTarget || target || "http://localhost:8000";
@@ -159,18 +148,8 @@ export default function NoPasakTab({
         stagePassed(stageId - 1) ||
         waived[stageId - 1] !== undefined;
 
-    /** Tahap 4: buktikan file webshell benar-benar bisa diakses publik. */
+    /** Tahap 4: buktikan file webshell benar-benar bisa diakses publik (semua mode). */
     const verifyUploadedFile = async (uploadIndex: number): Promise<void> => {
-        if (mode === "production") {
-            setFileCheck({
-                fileUrl: "",
-                status: 0,
-                ok: false,
-                snippet:
-                    "Verifikasi file hanya untuk lab lokal — di produksi, bukti pemblokiran adalah status 403 / file tidak tersimpan.",
-            });
-            return;
-        }
         setBusy(`verify-${uploadIndex}`);
         try {
             const uploadRes = results[uploadIndex];
@@ -243,7 +222,7 @@ export default function NoPasakTab({
     ): Promise<{ ok: boolean; output: string; status?: number }> =>
         exploitShellWith(uploadIndex, execCmd);
 
-    /** Jalankan satu langkah rantai eskalasi dari Sheet (produksi: konfirmasi dulu). */
+    /** Jalankan satu langkah rantai eskalasi dari Sheet (sama di semua mode). */
     const runChainStep = (step: ChainStep): void => {
         if (busy !== null) {
             return;
@@ -490,20 +469,14 @@ export default function NoPasakTab({
         }
     };
 
-    /** Eksekusi nyata tiap metode hacker. */
+    /** Eksekusi nyata tiap metode hacker (sama di semua mode). */
     const runMethod = async (
         cardIndex: number,
         item: NoPasakRecommendation,
         mi: number,
-        force = false,
     ): Promise<void> => {
         const m = VULN_INFO[item.label]?.methods[mi];
         if (!m?.exec) {
-            return;
-        }
-        if (mode === "production" && !force) {
-            setPendingMethod({ cardIndex, item, mi, label: m.title });
-            setConfirmMethod(true);
             return;
         }
         const key = `${cardIndex}:${mi}`;
@@ -638,7 +611,7 @@ export default function NoPasakTab({
                     ),
                 });
             } else if (exec.kind === "rce") {
-                if (mode === "local" && !fileCheck?.ok) {
+                if (!fileCheck?.ok) {
                     record({
                         label: m.title,
                         ok: false,
@@ -964,34 +937,6 @@ export default function NoPasakTab({
                         />
                     </aside>
                 }
-            />
-
-            <ConfirmMethodDialog
-                open={confirmMethod}
-                onOpenChange={setConfirmMethod}
-                pendingMethod={pendingMethod}
-                url={url}
-                onConfirm={() => {
-                    if (pendingMethod !== null) {
-                        const { cardIndex, item, mi } = pendingMethod;
-                        setConfirmMethod(false);
-                        setPendingMethod(null);
-                        void runMethod(cardIndex, item, mi, true);
-                    }
-                }}
-            />
-
-            <ConfirmProdDialog
-                open={confirmProd}
-                onOpenChange={setConfirmProd}
-                label={confirmProdLabel}
-                url={url}
-                onConfirm={() => {
-                    const pending = pendingProd.current;
-                    pendingProd.current = null;
-                    setConfirmProd(false);
-                    pending?.run();
-                }}
             />
 
             <MethodSheet

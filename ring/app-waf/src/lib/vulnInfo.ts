@@ -7,7 +7,7 @@ export interface HackerMethod {
     desc: string;
     /**
      * Aksi eksekusi nyata. `vector` = kirim request GET/POST biasa;
-     * `reupload`/`htaccess`/`rce` khusus kartu upload (lab & produksi berkonfirmasi).
+     * `reupload`/`htaccess`/`rce` khusus kartu upload (perilaku sama di semua mode).
      */
     exec?:
         | { kind: "vector"; path: string; method?: string; userAgent?: string; payload?: string }

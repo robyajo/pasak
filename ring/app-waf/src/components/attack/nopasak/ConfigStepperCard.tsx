@@ -95,34 +95,14 @@ export function ConfigStepperCard({
                 <CardDescription>
                     Ikuti tahap 1→4 berurutan. Tiap tahap terkunci
                     sampai tahap sebelumnya <b>semua LOLOS</b>{" "}
-                    (tidak 403).
-                    {mode === "production" ? (
-                        <>
-                            {" "}
-                            Target produksi{" "}
-                            <b>{url || "(isi URL dulu)"}</b> — semua
-                            tahap boleh dijalankan.{" "}
-                            <b>Upaya upload</b> diizinkan sebagai
-                            bukti pemblokiran (adil: 403 =
-                            terlindungi, lolos = temuan). Yang
-                            dimatikan hanya{" "}
-                            <b>eksekusi perintah (/shell)</b> — itu
-                            RCE sungguhan, khusus lab lokal.
-                        </>
-                    ) : (
-                        <>
-                            {" "}
-                            Di tahap 4 Anda menanam webshell
-                            sungguhan lalu{" "}
-                            <b>
-                                memverifikasi file-nya bisa dibuka
-                                publik
-                            </b>{" "}
-                            — bukti tak terbantahkan. Target:
-                            pasak-no di{" "}
-                            <code>http://localhost:8000</code>.
-                        </>
-                    )}
+                    (tidak 403). Di tahap 4 Anda menanam webshell
+                    sungguhan lalu{" "}
+                    <b>memverifikasi file-nya bisa dibuka publik</b>{" "}
+                    — bukti tak terbantahkan. Target{" "}
+                    <b>{url || "(isi URL dulu)"}</b>
+                    {mode === "production"
+                        ? " — gunakan URL https server audit."
+                        : " — mis. pasak-no di http://localhost:8000."}
                 </CardDescription>
             </CardHeader>
             <CardContent className="flex flex-col gap-3">
@@ -381,13 +361,9 @@ export function ConfigStepperCard({
                                 📊 {passedCount}/{totalCount} lolos (
                                 {pct}%)
                                 {allPassed &&
-                                    (mode === "production" ||
-                                        fileCheck?.ok) &&
-                                    (mode === "production"
-                                        ? " — TERBUKTI: PRODUKSI TAK MENOLAK SERANGAN ✅"
-                                        : " — TERBUKTI 100% JEBOL + WEBSHELL AKTIF ✅")}
+                                    fileCheck?.ok &&
+                                    " — TERBUKTI 100% JEBOL + WEBSHELL AKTIF ✅"}
                                 {allPassed &&
-                                    mode === "local" &&
                                     !fileCheck?.ok &&
                                     " — semua lolos, verifikasi file tahap 4 untuk vonis final."}
                             </p>
@@ -402,15 +378,11 @@ export function ConfigStepperCard({
                             {busy !== null && (
                                 <Skeleton className="h-2 w-full" />
                             )}
-                            {allPassed &&
-                                (mode === "production" ||
-                                    fileCheck?.ok) && (
+                            {allPassed && fileCheck?.ok && (
                                     <Alert variant="destructive">
                                         <TriangleAlertIcon data-icon="inline-start" />
                                         <AlertTitle>
-                                            {mode === "production"
-                                                ? "Vonis produksi: TAK ADA PENOLAKAN — pasang Pasak sekarang"
-                                                : "Saran (terbukti bekerja):"}
+                                            Saran (terbukti bekerja):
                                         </AlertTitle>
                                         <AlertDescription>
                                             <ol className="ml-4 list-decimal">
@@ -422,84 +394,31 @@ export function ConfigStepperCard({
                                                     laporan
                                                     baseline.
                                                 </li>
-                                                {mode ===
-                                                "production" ? (
-                                                    <>
-                                                        <li>
-                                                            Server
-                                                            produksi
-                                                            tidak
-                                                            menolak
-                                                            satu pun
-                                                            dari{" "}
-                                                            {totalCount}{" "}
-                                                            serangan
-                                                            — tidak
-                                                            ada WAF
-                                                            di
-                                                            gerbang.
-                                                        </li>
-                                                        <li>
-                                                            Uji
-                                                            banding:
-                                                            pasang
-                                                            Pasak di
-                                                            staging,
-                                                            ulangi 4
-                                                            tahap —
-                                                            target
-                                                            semua
-                                                            403.
-                                                        </li>
-                                                        <li>
-                                                            Demo RCE
-                                                            penuh
-                                                            (kartu
-                                                            penyerang)
-                                                            hanya di
-                                                            lab
-                                                            lokal{" "}
-                                                            <code>
-                                                                :8000
-                                                            </code>{" "}
-                                                            dengan
-                                                            vektor
-                                                            identik.
-                                                        </li>
-                                                    </>
-                                                ) : (
-                                                    <>
-                                                        <li>
-                                                            Cek{" "}
-                                                            <code>
-                                                                {url}/
-                                                            </code>{" "}
-                                                            —
-                                                            serangan
-                                                            tercatat
-                                                            di
-                                                            Monitor
-                                                            = rantai
-                                                            deteksi
-                                                            berjalan.
-                                                        </li>
-                                                        <li>
-                                                            Ulangi 4
-                                                            tahap ke
-                                                            pasak-yes
-                                                            (
-                                                            <code>
-                                                                :8001
-                                                            </code>
-                                                            ) —
-                                                            target:
-                                                            terhenti
-                                                            di tahap
-                                                            2 (semua
-                                                            403).
-                                                        </li>
-                                                    </>
-                                                )}
+                                                <li>
+                                                    Cek{" "}
+                                                    <code>
+                                                        {url}/
+                                                    </code>{" "}
+                                                    —
+                                                    serangan
+                                                    tercatat
+                                                    di
+                                                    Monitor
+                                                    = rantai
+                                                    deteksi
+                                                    berjalan.
+                                                </li>
+                                                <li>
+                                                    Ulangi 4
+                                                    tahap ke
+                                                    target
+                                                    ber-Pasak —
+                                                    target:
+                                                    terhenti
+                                                    di tahap
+                                                    2 (semua
+                                                    403).
+                                                </li>
                                                 {Object.entries(
                                                     waived,
                                                 ).map(
