@@ -15,6 +15,7 @@ use Symfony\Component\HttpFoundation\Response;
  * Hanya menyentuh respons HTML GET berstatus 200 yang memuat tag <body>.
  * Banner tampil setiap kunjungan sampai ditutup; dialog tampil sekali
  * per versi paket. Nonaktifkan via `PASAK_ANNOUNCEMENT_ENABLED=false`.
+ * Hanya aktif saat `APP_ENV=local` dan `APP_DEBUG=true`.
  */
 class InjectAnnouncementBanner
 {
@@ -51,6 +52,10 @@ class InjectAnnouncementBanner
 
     protected function shouldInject(Request $request, mixed $response): bool
     {
+        if (! app()->environment('local') || ! (bool) config('app.debug')) {
+            return false;
+        }
+
         if (! (bool) config('pasak.announcement.enabled', true)) {
             return false;
         }

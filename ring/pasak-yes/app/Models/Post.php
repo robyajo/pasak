@@ -37,6 +37,12 @@ class Post extends Model
             return null;
         }
 
+        // Berkas hilang di disk (mis. storage di-reset) → anggap tidak ada
+        // agar tampil placeholder, bukan gambar rusak.
+        if (! Storage::disk('public')->exists($this->thumbnail)) {
+            return null;
+        }
+
         return Storage::disk('public')->url($this->thumbnail);
     }
 }

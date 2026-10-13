@@ -6,6 +6,13 @@ All notable changes to `robyajo/pasak` will be documented in this file.
 
 ### Fixed
 
+- **`pasak:uninstall` kini total bersih**: path stub `.env` salah (`'__DIR__/....'` literal + `dirname(..., 2)`) sehingga komentar stub tidak pernah terhapus — diperbaiki; receiver `$middleware` gantung ikut dihapus saat blok `append()` dikosongkan (sebelumnya merusak sintaks `bootstrap/app.php`); file `*.backup-*` milik Pasak dan direktori induk kosong (`views/errors`, `views/pages`, `js/pages`, `js/components`) ikut dihapus. Tercakup 2 test regresi baru.
+- **Tautan mati di banner web-docs**: `announce.ts` menaut ke `/cli-automation/upgrade-guide/` yang tidak ada — dibetulkan ke `/cli-automation/upgrade-and-uninstall/`; tambah `public/.htaccess` (`ErrorDocument 404 /404.html` + redirect 301 URL lama) karena production memakai Apache.
+
+### Changed
+
+- **Pengumuman hanya di local + debug**: banner/dialog `InjectAnnouncementBanner` dan modal `pasakAnnounce` dashboard tidak lagi dirender kecuali `APP_ENV=local` dan `APP_DEBUG=true`.
+
 - **PHPStan level 5 hijau kembali (CI merah sejak v1.3.x)**: `AllowedIp::isValidPattern()` ditulis ulang tanpa perbandingan `!== null` yang selalu benar (terdeteksi sebagai `notIdentical.alwaysTrue`) — validasi CIDR kini memakai early-return yang setara perilakunya. Seluruh 12 kombinasi matriks pest + Pint sudah hijau; hanya job PHPStan yang gagal.
 
 ### Added

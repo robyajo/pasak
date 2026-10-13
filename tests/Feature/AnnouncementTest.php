@@ -4,6 +4,8 @@ use Illuminate\Support\Facades\Route;
 use Internal\Pasak\Http\Middleware\InjectAnnouncementBanner;
 
 beforeEach(function () {
+    app()->detectEnvironment(fn () => 'local');
+    config()->set('app.debug', true);
     config()->set('pasak.announcement.enabled', true);
     config()->set('pasak.announcement.paths', ['__pasak_home']);
 
@@ -47,6 +49,22 @@ test('announcement can be disabled via config', function () {
     config()->set('pasak.announcement.enabled', false);
 
     $html = $this->get('/__pasak_home')->getContent();
+
+    expect($html)->not->toContain('psk-announce-bar');
+});
+
+test('announcement is skipped in production even when enabled', function () {
+    app()->detectEnvironment(fn () => 'production');
+    config()->set('app.debug', false);
+
+    try {
+        $html = $this->get('/__pasak_home')->getContent();
+    } catch (\Throwable $e) {
+        app()->detectEnvironment(fn () => 'testing');
+        throw $e;
+    }
+
+    app()->detectEnvironment(fn () => 'testing');
 
     expect($html)->not->toContain('psk-announce-bar');
 });

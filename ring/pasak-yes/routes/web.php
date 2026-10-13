@@ -32,5 +32,3 @@ Route::get('/dashboard', [DashboardController::class, 'index'])->middleware('aut
 Route::resource('posts', PostController::class);
 Route::resource('categories', CategoryController::class)->except(['show']);
 Route::resource('tags', TagController::class)->except(['show']);
-
-require __DIR__.'/pasak.php';

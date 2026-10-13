@@ -8,7 +8,7 @@
 <div class="grid-posts">
 @forelse($posts as $p)
 <article class="post-card">
-@if($p->thumbnailUrl())<a href="{{ route('posts.show', $p) }}"><img class="cover" src="{{ $p->thumbnailUrl() }}" alt="{{ $p->title }}" loading="lazy"></a>@endif
+<a href="{{ route('posts.show', $p) }}">@include('layouts._cover', ['url' => $p->thumbnailUrl(), 'title' => $p->title, 'class' => 'cover'])</a>
 <div class="body">
 <div>@if($p->category)<span class="badge cat">{{ $p->category->name }}</span>@endif @unless($p->is_published)<span class="badge">Draft</span>@endunless</div>
 <h2><a href="{{ route('posts.show', $p) }}">{{ $p->title }}</a></h2>

@@ -827,7 +827,7 @@
                 width: 100%;
             }
         }
-    
+
     </style>
 </head>
 <body class="sec-body" style="margin: 0;">
@@ -904,7 +904,7 @@
             </button>
         </aside>
 
-        
+
         <main class="sec-main">
             @if (session()->has('security_message'))
                 <div class="sec-alert sec-alert-success">
@@ -930,7 +930,8 @@
         </main>
     </div>
 
-            <!-- Pengumuman kunjungan pertama -->
+            <!-- Pengumuman kunjungan pertama (hanya local + debug) -->
+            @if (app()->environment('local') && config('app.debug'))
             <div class="sec-modal-backdrop" id="pasakAnnounce" hidden>
                 <div class="sec-modal-box" role="dialog" aria-modal="true" aria-labelledby="pasakAnnounceTitle">
                     <div class="sec-modal-header">
@@ -962,6 +963,7 @@
                 } catch (e) {}
             })();
             </script>
+            @endif
 </div>
 <script>
     // Toggle tema gelap/terang manual (tersimpan di localStorage, default ikuti sistem).

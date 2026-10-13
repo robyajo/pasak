@@ -91,7 +91,63 @@ test('pasak uninstall removes all traces without touching host files', function 
         ->and(File::exists($uninstallDir.'/config/pasak.php'))->toBeFalse()
         ->and(File::get($uninstallDir.'/public/.htaccess'))->toBe('Original htaccess')
         ->and(File::exists($uninstallDir.'/resources/views/errors/blocked.blade.php'))->toBeFalse()
-        ->and(File::isDirectory($uninstallDir.'/resources/views/pages/pasak'))->toBeFalse();
+        ->and(File::isDirectory($uninstallDir.'/resources/views/errors'))->toBeFalse()
+        ->and(File::isDirectory($uninstallDir.'/resources/views/pages/pasak'))->toBeFalse()
+        ->and(File::isDirectory($uninstallDir.'/resources/views/pages'))->toBeFalse();
+});
+
+test('pasak uninstall leaves valid bootstrap app when host has trust proxies plus pasak append', function () use (&$uninstallDir) {
+    File::put($uninstallDir.'/bootstrap/app.php', <<<'PHP'
+        <?php
+
+        use Illuminate\Foundation\Application;
+        use Illuminate\Foundation\Configuration\Middleware;
+
+        return Application::configure(basePath: dirname(__DIR__))
+            ->withMiddleware(function (Middleware $middleware): void {
+                $middleware->trustProxies(at: ['127.0.0.1', '::1']);
+                $middleware->append([
+                    \Internal\Pasak\Http\Middleware\BlockIpAddress::class,
+                    \Internal\Pasak\Http\Middleware\DetectSecurityThreats::class,
+                    \Internal\Pasak\Http\Middleware\InjectAnnouncementBanner::class,
+                ]);
+            })
+            ->create();
+        PHP
+    );
+
+    $this->artisan('pasak:uninstall', ['--force' => true])->assertSuccessful();
+
+    $content = File::get($uninstallDir.'/bootstrap/app.php');
+
+    expect($content)->not->toContain('Pasak')
+        ->and($content)->toContain('trustProxies');
+
+    // Tidak boleh ada statement variabel gantung ("$middleware" tanpa method call).
+    foreach (explode("\n", $content) as $line) {
+        expect(trim($line))->not->toBe('$middleware')
+            ->and(trim($line))->not->toBe('$middleware;');
+    }
+
+    exec('php -l '.escapeshellarg($uninstallDir.'/bootstrap/app.php').' 2>&1', $output, $code);
+    expect($code)->toBe(0);
+});
+
+test('pasak uninstall removes stub env comments and pasak backup files', function () use (&$uninstallDir) {
+    $stub = file_get_contents(dirname(__DIR__, 2).'/stubs/env.stub');
+    File::put($uninstallDir.'/.env', "APP_NAME=Demo\n\n".$stub."\n");
+    File::put($uninstallDir.'/routes/pasak.php.backup-20260101_000000', 'backup');
+    File::put($uninstallDir.'/public/.htaccess.backup-20260101_000000', 'Original htaccess');
+    File::makeDirectory($uninstallDir.'/resources/views/pages/pasak.backup-20260101_000000', 0755, true, true);
+
+    $this->artisan('pasak:uninstall', ['--force' => true])->assertSuccessful();
+
+    expect(File::get($uninstallDir.'/.env'))->not->toContain('PASAK_')
+        ->and(File::get($uninstallDir.'/.env'))->not->toContain('# Pasak')
+        ->and(File::get($uninstallDir.'/.env'))->toContain('APP_NAME=Demo')
+        ->and(File::exists($uninstallDir.'/routes/pasak.php.backup-20260101_000000'))->toBeFalse()
+        ->and(File::exists($uninstallDir.'/public/.htaccess.backup-20260101_000000'))->toBeFalse()
+        ->and(File::isDirectory($uninstallDir.'/resources/views/pages/pasak.backup-20260101_000000'))->toBeFalse();
 });
 
 test('pasak uninstall respects keep options', function () {

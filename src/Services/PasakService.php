@@ -35,7 +35,7 @@ class PasakService
     /**
      * Versi paket Pasak (Bulwark).
      */
-    public const VERSION = '1.4.1';
+    public const VERSION = '1.4.2';
 
     /**
      * Rentang waktu yang didukung grafik tren serangan.

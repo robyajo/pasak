@@ -68,7 +68,7 @@ function buildBanner(): HTMLElement {
   bar.innerHTML =
     `<span>🛡️ <strong>Pasak v${version}</strong> — WAF mandiri untuk Laravel. Lihat pembaruan &amp; panduan upgrade.</span>` +
     '<button type="button" data-info style="background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.4);color:#fff;border-radius:6px;padding:2px 10px;font:600 12px/1.6 inherit;">Info &amp; Upgrade</button>' +
-    '<a href="/cli-automation/upgrade-guide/">Panduan CLI</a>' +
+    '<a href="/cli-automation/upgrade-and-uninstall/">Panduan CLI</a>' +
     '<button type="button" data-close aria-label="Tutup" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:transparent;border:none;color:#fff;font-size:16px;line-height:1;">✕</button>';
 
   const close = bar.querySelector("[data-close]");
@@ -119,7 +119,7 @@ function buildModal(): HTMLElement {
     '<div style="margin-top:6px;font-size:11px;color:#64748b;">*Perintah ini otomatis mempublish migrasi baru, migrasi DB, dan sinkronisasi berkas tanpa menimpa konfigurasi kustom.</div>' +
     "</div>" +
     '<div style="display:flex;flex-wrap:wrap;gap:12px;font-size:13px;padding-top:2px;">' +
-    '<a href="/cli-automation/upgrade-guide/" style="color:#2563eb;text-decoration:underline;font-weight:600;">📖 Panduan Upgrade Bertahap</a>' +
+    '<a href="/cli-automation/upgrade-and-uninstall/" style="color:#2563eb;text-decoration:underline;font-weight:600;">📖 Panduan Upgrade Bertahap</a>' +
     '<a href="/changelog/" style="color:#2563eb;text-decoration:underline;font-weight:600;">📋 Catatan Rilis (Changelog)</a>' +
     '<a href="/downloads/Pasak-Bulwark.pptx" style="color:#2563eb;text-decoration:underline;font-weight:600;">📊 Unduh Presentasi (.pptx)</a>' +
     "</div>" +

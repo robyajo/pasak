@@ -1,0 +1,30 @@
+# =============================================================================
+#  Apache — Situs Dokumentasi Pasak (Astro, statis)
+#  Berkas ini tinggal di `public/` sehingga ikut tersalin ke `dist/` saat build
+#  dan ter-deploy via rsync ke DocumentRoot VPS.
+# =============================================================================
+
+# --- Halaman 404 kustom dari Astro (dist/404.html) ---
+ErrorDocument 404 /404.html
+
+# --- Redirect URL lama yang sudah tidak ada (bookmark/tautan luar) ---
+Redirect 301 /cli-automation/upgrade-guide /cli-automation/upgrade-and-uninstall/
+Redirect 301 /cli-automation/upgrade-guide/ /cli-automation/upgrade-and-uninstall/
+
+# --- Aset ber-hash: boleh di-cache sangat lama ---
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType text/html "access plus 0 seconds"
+    <LocationMatch "^/_astro/">
+        ExpiresDefault "access plus 1 year"
+    </LocationMatch>
+    <LocationMatch "^/pagefind/">
+        ExpiresDefault "access plus 7 days"
+    </LocationMatch>
+</IfModule>
+
+# --- Blokir berkas tersembunyi (kecuali .well-known untuk ACME/certbot) ---
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteRule "(^|/)\.(?!well-known)" - [F]
+</IfModule>

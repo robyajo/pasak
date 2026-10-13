@@ -39,6 +39,7 @@ class PasakUninstallCommand extends Command
         $this->removeEnvironmentVariables((bool) $this->option('keep-env'));
         $this->restoreHtaccess();
         $this->removePublishedFiles();
+        $this->removeBackupFiles();
         $this->removeComposerPackage();
 
         try {
@@ -196,10 +197,18 @@ class PasakUninstallCommand extends Command
             ));
 
             // Bersihkan blok append yang kini kosong: "$middleware->append([\n]);"
-            $content = preg_replace(
-                '/(?:->[a-zA-Z_]+)?->append\(\[\s*\]\);\n?/',
+            // (termasuk receiver $middleware agar tidak tersisa statement gantung).
+            $content = (string) preg_replace(
+                '/(?:\$middleware\s*)?->append\(\[\s*\]\);\n?/',
                 '',
                 implode("\n", $filtered)
+            );
+
+            // Baris sisa berupa statement variabel gantung ("$middleware" / "$middleware;") -> buang.
+            $content = (string) preg_replace(
+                '/^[ \t]*\$middleware[ \t]*;?[ \t]*\r?$/m',
+                '',
+                $content
             );
 
             if ($content !== null && $content !== File::get($path)) {
@@ -294,7 +303,7 @@ class PasakUninstallCommand extends Command
         }
 
         $stubLines = [];
-        foreach (['__DIR__/../../../stubs/env.stub', dirname(__DIR__, 2).'/stubs/env.stub'] as $candidate) {
+        foreach ([__DIR__.'/../../../stubs/env.stub', dirname(__DIR__, 3).'/stubs/env.stub'] as $candidate) {
             if (File::exists($candidate)) {
                 $stubLines = explode("\n", File::get($candidate));
                 break;
@@ -417,8 +426,7 @@ class PasakUninstallCommand extends Command
             }
         }
 
-        foreach (['nginx.conf.stub' => 'nginx.conf', 'apache2.conf.stub' => 'apache2.conf'] as $stub => $target) {
-            $targetPath = base_path($target);
+        foreach (['nginx.conf.stub' => 'nginx.conf', 'apache2.conf.stub' => 'apache2.conf'] as $stub => $target) {            $targetPath = base_path($target);
             if (! File::exists($targetPath)) {
                 continue;
             }
@@ -431,6 +439,68 @@ class PasakUninstallCommand extends Command
                     File::delete($targetPath);
                     $this->info("  ✓ Berkas {$target} (murni dari Pasak) dihapus.");
                     break;
+                }
+            }
+        }
+
+        // Hapus direktori induk yang kini kosong agar tidak ada folder yatim.
+        foreach ([
+            resource_path('views/errors'),
+            resource_path('views/pages'),
+            resource_path('js/pages'),
+            resource_path('js/components'),
+        ] as $dir) {
+            $this->removeDirectoryIfEmpty($dir);
+        }
+    }
+
+    /**
+     * Hapus direktori bila kosong (termasuk berkas tersembunyi seperti .gitkeep
+     * ikut dihitung; direktori berisi apa pun dibiarkan).
+     */
+    protected function removeDirectoryIfEmpty(string $dir): void
+    {
+        if (! File::isDirectory($dir)) {
+            return;
+        }
+
+        $entries = array_diff(scandir($dir) ?: [], ['.', '..']);
+
+        if ($entries === []) {
+            try {
+                File::deleteDirectory($dir);
+                $this->info('  ✓ Direktori kosong dihapus: '.$this->relativePath($dir));
+            } catch (\Throwable $e) {
+                $this->warn('  ⚠ Gagal menghapus direktori '.$dir.': '.$e->getMessage());
+            }
+        }
+    }
+
+    /**
+     * Hapus berkas cadangan (*.backup-*) yang dibuat oleh perintah Pasak
+     * (installer & pasak:upgrade --sync-*) agar tidak ada jejak tertinggal.
+     * Hanya pola milik Pasak yang disentuh; cadangan pengguna tidak diganggu.
+     */
+    protected function removeBackupFiles(): void
+    {
+        $patterns = [
+            base_path('routes/pasak.php.backup-*'),
+            base_path('routes/pasak-api.php.backup-*'),
+            resource_path('views/pages/pasak.backup-*'),
+            public_path('.htaccess.backup-*'),
+        ];
+
+        foreach ($patterns as $pattern) {
+            foreach (glob($pattern) ?: [] as $path) {
+                try {
+                    if (File::isDirectory($path)) {
+                        File::deleteDirectory($path);
+                    } else {
+                        File::delete($path);
+                    }
+                    $this->info('  ✓ Cadangan dihapus: '.$this->relativePath((string) $path));
+                } catch (\Throwable $e) {
+                    $this->warn('  ⚠ Gagal menghapus cadangan '.$path.': '.$e->getMessage());
                 }
             }
         }

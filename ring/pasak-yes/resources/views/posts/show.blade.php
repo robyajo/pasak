@@ -7,7 +7,7 @@
 @foreach($post->tags as $t)<span class="badge">#{{ $t->name }}</span>@endforeach
 <h1>{{ $post->title }}</h1>
 <p class="meta">{{ $post->created_at->format('d M Y H:i') }} · {{ $post->created_at->diffForHumans() }} · {{ $post->is_published ? 'Published' : 'Draft' }}</p>
-@if($post->thumbnailUrl())<img class="hero-img" src="{{ $post->thumbnailUrl() }}" alt="{{ $post->title }}">@endif
+@include('layouts._cover', ['url' => $post->thumbnailUrl(), 'title' => $post->title, 'class' => 'hero-img', 'loading' => 'eager'])
 @if($post->excerpt)<p class="lead">{{ $post->excerpt }}</p>@endif
 <div class="content">{!! nl2br(e($post->body)) !!}</div>
 <hr style="border-color:#1f2937;margin:2rem 0">
@@ -18,7 +18,7 @@
 <div class="grid-posts">
 @foreach($related as $r)
 <article class="post-card">
-@if($r->thumbnailUrl())<a href="{{ route('posts.show', $r) }}"><img class="cover" src="{{ $r->thumbnailUrl() }}" alt="{{ $r->title }}" loading="lazy"></a>@endif
+<a href="{{ route('posts.show', $r) }}">@include('layouts._cover', ['url' => $r->thumbnailUrl(), 'title' => $r->title, 'class' => 'cover'])</a>
 <div class="body">
 <h2><a href="{{ route('posts.show', $r) }}">{{ $r->title }}</a></h2>
 <p class="meta">{{ $r->created_at->format('d M Y') }}</p>

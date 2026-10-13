@@ -12,6 +12,8 @@ use Internal\Pasak\Services\PasakService;
 
 test('dashboard overview renders plain blade views when driver is blade', function () {
     config()->set('pasak.dashboard.driver', 'blade');
+    app()->detectEnvironment(fn () => 'local');
+    config()->set('app.debug', true);
 
     // Terbitkan stub Blade murni ke view path bawaan testbench.
     $target = resource_path('views/pages/pasak');

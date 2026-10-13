@@ -8,7 +8,7 @@
 
 @if($featured !== null)
 <article class="card" style="display:flex;gap:1.5rem;flex-wrap:wrap;align-items:center">
-@if($featured->thumbnailUrl())<a href="{{ route('posts.show', $featured) }}" style="flex:1 1 280px"><img src="{{ $featured->thumbnailUrl() }}" alt="{{ $featured->title }}" style="width:100%;border-radius:.5rem;object-fit:cover;max-height:280px"></a>@endif
+<a href="{{ route('posts.show', $featured) }}" style="flex:1 1 280px">@include('layouts._cover', ['url' => $featured->thumbnailUrl(), 'title' => $featured->title, 'style' => 'width:100%;border-radius:.5rem;object-fit:cover;max-height:280px', 'loading' => 'eager'])</a>
 <div style="flex:2 1 320px">
 <span class="badge">✨ Sorotan</span> @if($featured->category)<span class="badge cat">{{ $featured->category->name }}</span>@endif
 <h2 style="margin:.5rem 0"><a href="{{ route('posts.show', $featured) }}" style="color:#fff">{{ $featured->title }}</a></h2>
@@ -23,7 +23,7 @@
 <div class="grid-posts">
 @forelse($latestPosts as $p)
 <article class="post-card">
-@if($p->thumbnailUrl())<a href="{{ route('posts.show', $p) }}"><img class="cover" src="{{ $p->thumbnailUrl() }}" alt="{{ $p->title }}" loading="lazy"></a>@endif
+<a href="{{ route('posts.show', $p) }}">@include('layouts._cover', ['url' => $p->thumbnailUrl(), 'title' => $p->title, 'class' => 'cover'])</a>
 <div class="body">
 <div>@if($p->category)<span class="badge cat">{{ $p->category->name }}</span>@endif</div>
 <h2><a href="{{ route('posts.show', $p) }}">{{ $p->title }}</a></h2>

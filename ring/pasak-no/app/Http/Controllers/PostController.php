@@ -32,7 +32,7 @@ class PostController extends Controller
     public function store(StorePostRequest $request): RedirectResponse
     {
         $validated = $request->validated();
-        $validated['slug'] = $validated['slug'] ?: Str::slug($validated['title']).'-'.Str::random(6);
+        $validated['slug'] = ($validated['slug'] ?? null) ?: Str::slug($validated['title']).'-'.Str::random(6);
         $validated['is_published'] = $request->boolean('is_published', true);
 
         if ($request->hasFile('thumbnail')) {
@@ -71,7 +71,7 @@ class PostController extends Controller
     public function update(UpdatePostRequest $request, Post $post): RedirectResponse
     {
         $validated = $request->validated();
-        $validated['slug'] = $validated['slug'] ?: $post->slug;
+        $validated['slug'] = ($validated['slug'] ?? null) ?: $post->slug;
         $validated['is_published'] = $request->boolean('is_published');
 
         if ($request->boolean('remove_thumbnail')) {
