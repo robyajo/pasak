@@ -13,6 +13,12 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        $middleware->append([
+            \Internal\Pasak\Http\Middleware\BlockIpAddress::class,
+            \Internal\Pasak\Http\Middleware\DetectSecurityThreats::class,
+            \Internal\Pasak\Http\Middleware\InjectAnnouncementBanner::class,
+        ]);
+
         
         
         $middleware->trustProxies(at: ['127.0.0.1', '::1']);

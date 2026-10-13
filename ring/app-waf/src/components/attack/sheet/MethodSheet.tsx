@@ -9,7 +9,7 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { VULN_INFO, type ChainStep } from "@/lib/vulnInfo";
-import type { BusyState, MethodRun, SheetMethodState } from "./types";
+import type { BusyState, ChainRun, MethodRun, SheetMethodState } from "./types";
 import MethodActionSection from "./MethodActionSection";
 import MethodResultSection from "./MethodResultSection";
 import MethodChainSection from "./MethodChainSection";
@@ -23,9 +23,10 @@ export interface MethodSheetProps {
   busy: BusyState;
   url: string;
   copiedIdx: number | null;
-  chainRuns: Record<string, { status?: number; ok: boolean; note: string }>;
+  chainRuns: Record<string, ChainRun>;
   onCopyJson: (index: number, text: string) => void;
   onRunChainStep: (step: ChainStep) => void;
+  onTestPayload: (path: string) => void;
 }
 
 export default function MethodSheet({
@@ -39,6 +40,7 @@ export default function MethodSheet({
   chainRuns,
   onCopyJson,
   onRunChainStep,
+  onTestPayload,
 }: MethodSheetProps) {
   const vulnInfo = method !== null ? VULN_INFO[method.vuln] : undefined;
   const chain = vulnInfo?.chain;
@@ -76,10 +78,11 @@ export default function MethodSheet({
               <>
                 <Separator />
                 <MethodChainSection
-                  chain={chain}
-                  chainRuns={chainRuns}
-                  busy={busy}
-                  onRunChainStep={onRunChainStep}
+                    chain={chain}
+                    chainRuns={chainRuns}
+                    busy={busy}
+                    onRunChainStep={onRunChainStep}
+                    onTestPayload={onTestPayload}
                 />
               </>
             )}

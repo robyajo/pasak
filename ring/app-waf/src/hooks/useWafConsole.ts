@@ -39,6 +39,8 @@ export interface ProxyPayload {
   payload: string;
   content_type: string;
   upload: ProxyUpload | null;
+  device_id: string;
+  local_ip: string;
 }
 
 /** Hasil mentah dari proxy (success) maupun kegagalan jaringan. */
@@ -84,6 +86,10 @@ export interface SendRawOverride {
   payload?: string;
   contentType?: string;
   upload?: ProxyUpload | null;
+  /** Identitas perangkat lab (header X-Device-Id) — samakan agar blokir device konsisten. */
+  deviceId?: string;
+  /** IP lokal lab (header X-Local-Ip). */
+  localIp?: string;
 }
 
 /** Vektor aktif yang sedang diterapkan pada formulir. */
@@ -182,6 +188,8 @@ export function useWafConsole() {
                           content: form.uploadContent,
                       }
                     : null,
+                device_id: "",
+                local_ip: "",
             });
 
             setResult(data);
@@ -240,6 +248,8 @@ export function useWafConsole() {
             payload: override.payload ?? "",
             content_type: (override.contentType ?? "").trim(),
             upload: override.upload ?? null,
+            device_id: (override.deviceId ?? "").trim(),
+            local_ip: (override.localIp ?? "").trim(),
         };
 
         try {

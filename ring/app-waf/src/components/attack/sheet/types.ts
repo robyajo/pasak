@@ -14,6 +14,13 @@ export interface MethodRun {
     json: string;
 }
 
+export interface ChainRun {
+    status?: number;
+    ok: boolean;
+    note: string;
+    /** Payload lanjutan siap salin (dari ChainStep.next). */
+    next?: string;
+}
 export interface SheetMethodState {
     title: string;
     desc: string;

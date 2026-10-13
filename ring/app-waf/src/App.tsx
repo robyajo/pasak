@@ -7,6 +7,7 @@ import AppTabs from "@/components/AppTabs";
 import RequestForm from "@/components/RequestForm";
 import ResultPanel from "@/components/ResultPanel";
 import HistoryTable from "@/components/HistoryTable";
+import ConsoleReport from "@/components/ConsoleReport";
 import PreviewModal from "@/components/PreviewModal";
 import AttackTab from "@/components/attack/AttackTab";
 import NoPasakTab from "@/components/attack/NoPasakTab";
@@ -27,7 +28,10 @@ import { Separator } from "@/components/ui/separator";
 /**
  * Origin target dipakai untuk menurunkan path relatif saat menganalisis body.
  */
-interface WafResultLike { base_url?: string; url?: string }
+interface WafResultLike {
+    base_url?: string;
+    url?: string;
+}
 function baseUrlOf(result: ProxyResult | null | undefined): string {
     if (!result) {
         return "";
@@ -50,10 +54,13 @@ function baseUrlOf(result: ProxyResult | null | undefined): string {
 
 export default function App() {
     const waf = useWafConsole();
-    const [view, setView] = useState("console");
+    const [view, setView] = useState("nopasak");
     const [mode, setMode] = useState<ConsoleMode>(() => {
         try {
-            return window.localStorage.getItem("waf-console-mode") === "production" ? "production" : "local";
+            return window.localStorage.getItem("waf-console-mode") ===
+                "production"
+                ? "production"
+                : "local";
         } catch {
             return "local";
         }
@@ -61,7 +68,9 @@ export default function App() {
     const [confirmProduction, setConfirmProduction] = useState(false);
     const [theme, setTheme] = useState<"dark" | "light">(() => {
         try {
-            return window.localStorage.getItem("waf-console-theme") === "dark" ? "dark" : "light";
+            return window.localStorage.getItem("waf-console-theme") === "dark"
+                ? "dark"
+                : "light";
         } catch {
             return "dark";
         }
@@ -85,7 +94,10 @@ export default function App() {
 
     /** Terapkan mode produksi setelah dikonfirmasi via dialog. */
     const applyProduction = (): void => {
-        if (waf.form.target.includes("localhost") || waf.form.target.includes("127.0.0.1")) {
+        if (
+            waf.form.target.includes("localhost") ||
+            waf.form.target.includes("127.0.0.1")
+        ) {
             waf.update({ target: "https://" });
         }
         setMode("production");
@@ -101,7 +113,11 @@ export default function App() {
             setConfirmProduction(true);
             return;
         }
-        if (next === "local" && (waf.form.target.trim() === "" || waf.form.target.trim() === "https://")) {
+        if (
+            next === "local" &&
+            (waf.form.target.trim() === "" ||
+                waf.form.target.trim() === "https://")
+        ) {
             waf.update({ target: "http://localhost:8000" });
         }
         setMode(next);
@@ -118,13 +134,13 @@ export default function App() {
     );
 
     const tabs = [
+        { id: "nopasak", label: "⚠️ Tanpa Pasak = Jebol" },
         { id: "console", label: "Konsol Uji" },
         {
             id: "attack",
             label: "Pengujian Serangan",
             badge: surface.summary.total,
         },
-        { id: "nopasak", label: "⚠️ Tanpa Pasak = Jebol" },
     ];
 
     return (
@@ -142,18 +158,29 @@ export default function App() {
                 {mode === "production" && (
                     <Alert variant="destructive" className="mb-6">
                         <TriangleAlertIcon data-icon="inline-start" />
-                        <AlertTitle>MODE PRODUCTION — target server nyata</AlertTitle>
+                        <AlertTitle>
+                            MODE PRODUCTION — target server nyata
+                        </AlertTitle>
                         <AlertDescription>
-                            Isi URL target dengan domain audit (mis. <code>https://dummy-api.lapeh.web.id</code>).
-                            Header IP virtual hanya terbaca bila server memercayai proxy; atribusi IP bisa jatuh ke IP
-                            server. Upaya upload tahap 4 diizinkan (bukti 403 = terlindungi); eksekusi perintah (/shell)
-                            hanya untuk lab lokal.
+                            Isi URL target dengan domain audit (mis.{" "}
+                            <code>https://dummy-api.lapeh.web.id</code>). Header
+                            IP virtual hanya terbaca bila server memercayai
+                            proxy; atribusi IP bisa jatuh ke IP server. Upaya
+                            upload tahap 4 diizinkan (bukti 403 = terlindungi);
+                            eksekusi perintah (/shell) hanya untuk lab lokal.
                         </AlertDescription>
                     </Alert>
                 )}
                 <AppTabs tabs={tabs} active={view} onChange={setView} />
 
-                {view === "console" ? (
+                {view === "nopasak" ? (
+                    <NoPasakTab
+                        sendRaw={waf.sendRaw}
+                        target={waf.form.target}
+                        onTargetChange={(target) => waf.update({ target })}
+                        mode={mode}
+                    />
+                ) : view === "console" ? (
                     <div className="grid gap-6 xl:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)]">
                         <div className="flex flex-col gap-6">
                             <RequestForm
@@ -173,6 +200,11 @@ export default function App() {
                                 history={waf.history}
                                 onClear={waf.clearHistory}
                             />
+                            <ConsoleReport
+                                history={waf.history}
+                                target={waf.form.target}
+                                surface={surface}
+                            />
                         </div>
 
                         <ResultPanel
@@ -184,19 +216,12 @@ export default function App() {
                             progress={waf.progress}
                         />
                     </div>
-                ) : view === "attack" ? (
+                ) : (
                     <AttackTab
                         result={waf.result}
                         findings={surface.findings}
                         sendRaw={waf.sendRaw}
                         fallbackPath={waf.form.path}
-                    />
-                ) : (
-                    <NoPasakTab
-                        sendRaw={waf.sendRaw}
-                        target={waf.form.target}
-                        onTargetChange={(target) => waf.update({ target })}
-                        mode={mode}
                     />
                 )}
 
@@ -216,14 +241,19 @@ export default function App() {
                 onClose={() => waf.setPreviewOpen(false)}
             />
 
-            <AlertDialog open={confirmProduction} onOpenChange={setConfirmProduction}>
+            <AlertDialog
+                open={confirmProduction}
+                onOpenChange={setConfirmProduction}
+            >
                 <AlertDialogContent>
                     <AlertDialogHeader>
-                        <AlertDialogTitle>Aktifkan mode PRODUCTION?</AlertDialogTitle>
+                        <AlertDialogTitle>
+                            Aktifkan mode PRODUCTION?
+                        </AlertDialogTitle>
                         <AlertDialogDescription>
-                            Serangan akan mengenai server <b>NYATA</b>. Lanjutkan hanya dengan
-                            izin audit tertulis. Tahap 4 (upload/webshell) tetap dinonaktifkan
-                            di mode ini.
+                            Serangan akan mengenai server <b>NYATA</b>.
+                            Lanjutkan hanya dengan izin audit tertulis. Tahap 4
+                            (upload/webshell) tetap dinonaktifkan di mode ini.
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>

@@ -215,3 +215,7 @@ body {
     scrollbar-color: var(--sb-thumb-color) var(--sb-track-color);
   }
 }
+/* Cegah iframe merebut mouse/pointer events saat resizable divider digeser */
+[data-slot="resizable-panel-group"]:has([data-separator="active"]) iframe {
+  pointer-events: none;
+}

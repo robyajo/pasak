@@ -17,7 +17,10 @@ export default function MethodResultSection({
     onCopyJson,
 }: MethodResultSectionProps) {
     return (
-        <section className="flex min-h-0 flex-col gap-2">
+        <section
+            id="method-result"
+            className="flex min-h-0 flex-col gap-2"
+        >
             <h3 className="text-xs font-bold tracking-wide text-muted-foreground uppercase">
                 Hasil eksekusi
             </h3>

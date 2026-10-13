@@ -297,6 +297,10 @@ async function handleProxyRequest(req, res) {
     const payload = String(input.payload ?? "");
     const upload = normalizeUpload(input.upload);
     const contentTypeOverride = String(input.content_type ?? "").trim();
+    // Identitas perangkat lab: bila dikirim, Pasak mengikat blokir device-scope
+    // ke ID ini sehingga serangan + preview (identitas sama) konsisten.
+    const deviceId = String(input.device_id ?? "").trim();
+    const localIp = String(input.local_ip ?? "").trim();
 
     const basePath = parsed.pathname.replace(/\/+$/, "");
     let requestPath = String(input.path ?? "/").trim();
@@ -319,6 +323,14 @@ async function handleProxyRequest(req, res) {
         "X-Forwarded-For": ip,
         Accept: "text/html,application/json;q=0.9,*/*;q=0.8",
     };
+
+    if (deviceId !== "") {
+        headers["X-Device-Id"] = deviceId;
+    }
+
+    if (localIp !== "") {
+        headers["X-Local-Ip"] = localIp;
+    }
 
     if (userAgent !== "") {
         headers["User-Agent"] = userAgent;
@@ -402,6 +414,123 @@ async function handleProxyRequest(req, res) {
 }
 
 /**
+ * Preview korban via IP penyerang: GET /api/preview-victim?target=&page=&ip=
+ *
+ * Mengambil halaman target sisi server dengan header IP virtual yang sama
+ * seperti /api/proxy, menyuntik `<base href>` agar aset relatif tetap
+ * termuat, lalu menyajikannya dari origin yang sama (bebas X-Frame-Options).
+ * Akibatnya blokir per-IP (mis. halaman 403 Pasak) ikut TERLIHAT di iframe.
+ *
+ * HANYA UNTUK PENGUJIAN LOKAL.
+ */
+async function handlePreviewRequest(req, res) {
+    let params;
+
+    try {
+        params = new URL(req.url ?? "", "http://localhost").searchParams;
+    } catch {
+        sendJson(res, 400, { success: false, message: "Query tidak valid." });
+
+        return;
+    }
+
+    const parsed = parseTarget(String(params.get("target") ?? "").trim());
+
+    if (!parsed) {
+        sendJson(res, 422, {
+            success: false,
+            message: "Target URL tidak valid. Gunakan format http://host[:port].",
+        });
+
+        return;
+    }
+
+    const ip = String(params.get("ip") ?? "").trim();
+
+    if (isIP(ip) === 0) {
+        sendJson(res, 422, {
+            success: false,
+            message: "Alamat IP penyerang tidak valid.",
+        });
+
+        return;
+    }
+
+    const deviceId = String(params.get("device") ?? "").trim();
+    const localIp = String(params.get("localip") ?? "").trim();
+
+    let page = String(params.get("page") ?? "/").trim();
+
+    if (page === "") {
+        page = "/";
+    }
+
+    if (!page.startsWith("/")) {
+        page = `/${page}`;
+    }
+
+    let result;
+
+    const previewHeaders = {
+        "CF-Connecting-IP": ip,
+        "True-Client-IP": ip,
+        "X-Real-IP": ip,
+        "X-Forwarded-For": ip,
+        Accept: "text/html,application/json;q=0.9,*/*;q=0.8",
+        "User-Agent": "Mozilla/5.0 (WAF-Lab-Preview)",
+    };
+
+    if (deviceId !== "") {
+        previewHeaders["X-Device-Id"] = deviceId;
+    }
+
+    if (localIp !== "") {
+        previewHeaders["X-Local-Ip"] = localIp;
+    }
+
+    try {
+        result = await performRequest({
+            protocol: parsed.protocol,
+            hostname: parsed.hostname,
+            port: parsed.port || (parsed.protocol === "https:" ? 443 : 80),
+            path: page,
+            method: "GET",
+            headers: previewHeaders,
+            body: null,
+        });
+    } catch (error) {
+        sendJson(res, 502, {
+            success: false,
+            message: `Gagal memuat preview: ${error.message}`,
+        });
+
+        return;
+    }
+
+    let body = result.body;
+
+    if (String(result.contentType).includes("text/html")) {
+        const base = `<base href="${parsed.origin}/">`;
+
+        if (/<head[^>]*>/i.test(body)) {
+            body = body.replace(/<head[^>]*>/i, (m) => `${m}${base}`);
+        } else {
+            body = `${base}${body}`;
+        }
+    }
+
+    res.statusCode = 200;
+    res.setHeader(
+        "Content-Type",
+        String(result.contentType).includes("text/html")
+            ? "text/html; charset=utf-8"
+            : result.contentType || "text/html; charset=utf-8",
+    );
+    res.setHeader("Cache-Control", "no-store");
+    res.end(body);
+}
+
+/**
  * Middleware dev-server Vite untuk rute `POST /api/proxy`.
  *
  * Seluruh eksekusi dibungkus try/catch supaya kesalahan tak terduga tidak
@@ -410,6 +539,23 @@ async function handleProxyRequest(req, res) {
 export function createProxyHandler() {
     return async function wafTestingProxy(req, res, next) {
         const route = (req.url ?? "").split("?")[0];
+
+        if (route === "/api/preview-victim" && req.method === "GET") {
+            try {
+                await handlePreviewRequest(req, res);
+            } catch (error) {
+                console.error("[waf-testing-proxy] preview gagal:", error);
+
+                if (!res.headersSent) {
+                    sendJson(res, 500, {
+                        success: false,
+                        message: `Kesalahan internal preview: ${error instanceof Error ? error.message : String(error)}`,
+                    });
+                }
+            }
+
+            return;
+        }
 
         if (route !== "/api/proxy") {
             next();

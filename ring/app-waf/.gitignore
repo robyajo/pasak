@@ -2,3 +2,8 @@ node_modules/
 dist/
 .DS_Store
 *.log
+
+# Laporan hasil probe (dibuat ulang tiap run via scripts/waf_probe.py):
+# berisi timestamp, IP acak, dan URL target — jangan masuk version control.
+report/*.json
+!report/.gitkeep
