@@ -1,0 +1,44 @@
+{
+    "date": "2026-10-13",
+    "type": "update",
+    "title": {
+        "id": "Pemantauan murni satu sumber dan gerbang mutu sebelum rilis",
+        "en": "Pure single-source monitoring and a pre-release quality gate"
+    },
+    "body": {
+        "id": "Perbaikan arah: seluruh panel pemantauan dilebur ke satu tampilan ringan resmi, pemasangan kini bertanya cakupan pelindung yang diinginkan, dan setiap penyiaran kini wajib melintasi gerbang mutu dulu — uji penuh, gaya tulis, serta catatan perubahan.",
+        "en": "Direction reset: all monitoring panels merge into one official lightweight view, installation now asks which protective scope you want, and every broadcast must first pass a quality gate — full tests, writing style, and change notes."
+    },
+    "items": [
+        {
+            "type": "improvement",
+            "id": "Panel pemantauan kini satu sumber saja: varian tampilan yang rapuh dipensiunkan demi perawatan yang fokus dan konsisten.",
+            "en": "Monitoring is single-source now: brittle view variants are retired for focused, consistent maintenance."
+        },
+        {
+            "type": "new",
+            "id": "Pemasangan bertanya cakupan: pelindung untuk lalu lintas aplikasi, antarmuka web, atau keduanya — bawaan keduanya, dengan jalan pintas khusus utas API saja.",
+            "en": "Install asks the scope: protection for app traffic, the web interface, or both — defaulting to both, with an API-only shortcut."
+        },
+        {
+            "type": "security",
+            "id": "Analisis pemeriksaan ketat kembali sehat penuh: pola perbandingan yang tak pernah bisa benar pada validasi alamat dibetulkan.",
+            "en": "Strict static analysis is fully healthy again: an always-false comparison pattern in address validation is fixed."
+        },
+        {
+            "type": "improvement",
+            "id": "Gerbang mutu sebelum siar: uji penuh, gaya tulis kode, dan catatan perubahan wajib lulus terlebih dahulu — aktivitas di setiap repositori kini tercatat rapi.",
+            "en": "Quality gate before broadcast: full tests, code style, and change notes must pass first — and activity is now logged cleanly on every push."
+        },
+        {
+            "type": "new",
+            "id": "Aplikasi dunia nyata menyatu di repositori: lab berblog-blogging untuk membuktikan pemasangan sampai berdiri dari nol.",
+            "en": "Real-world apps merged into the repository: blog-flavored labs proving installation stands up from scratch end to end."
+        },
+        {
+            "type": "new",
+            "id": "Konsol uji serangan resmi menyatu sebagai satu repositori utuh: lab siber milik sendiri untuk membuktikan pelindung benar-benar bekerja.",
+            "en": "An official attack-testing console unites as one whole repository: a self-owned cyber lab proving the guard truly works."
+        }
+    ]
+}

@@ -1,0 +1,64 @@
+{
+    "date": "2026-10-12",
+    "type": "important",
+    "title": {
+        "id": "Daftar putih, pemblokiran pilihan, dan pemantauan lebih kaya",
+        "en": "Allowlist, opt-in blocking, and richer monitoring"
+    },
+    "body": {
+        "id": "Hari kedua menghadirkan kendali lebih halus: instalasi baru kini purna-mengamati sampai diaktifkan, alamat terpercaya masuk daftar putih yang dikelola penuh, dan setiap log, blokir, serta tiket bisa dibedah dari halaman detailnya.",
+        "en": "Day two delivers finer control: new installs now stay watch-only until enabled, trusted addresses get a fully managed allowlist, and every log, block, and ticket can be dissected from its detail page."
+    },
+    "items": [
+        {
+            "type": "security",
+            "id": "Bawaan ramah: pasangan baru murni memantau dulu; pemblokiran otomatis dan penolakan langsung menjadi pilihan yang dinyalakan pengguna sendiri.",
+            "en": "Friendly default: fresh installs purely observe first; automatic and instant blocking become opt-in choices by the owner."
+        },
+        {
+            "type": "security",
+            "id": "Daftar putih alamat terpercaya: percobaan dari alamat yang diizinkan dicatat namun tak pernah diblokir; kelola tambah/ubah/hapus dari panel maupun laporan.",
+            "en": "Trusted-address allowlist: attempts from permitted addresses are recorded yet never blocked; manage add/edit/delete from the panel or the reporting interface."
+        },
+        {
+            "type": "new",
+            "id": "Ambang pemblokiran otomatis kini disetel pemilik aplikasi: seberapa keras pelindung menghukum penyerang jadi keputusan Anda.",
+            "en": "Automatic blocking thresholds are now owner-tuned: how hard the guard punishes attackers becomes your call."
+        },
+        {
+            "type": "new",
+            "id": "Halaman detail untuk log, blokir, dan tiket: bukti permintaan lengkap, konteks pemicu, dan aksi langsung (hapus, cabut blokir, setujui/tolak) satu tempat.",
+            "en": "Detail pages for logs, blocks, and tickets: full request evidence, trigger context, and direct actions (delete, unblock, approve/reject) in one place."
+        },
+        {
+            "type": "new",
+            "id": "Mode gelap manual di panel: pilihan otomatis–terang–gelap tersimpan per pengguna, tanpa kedipan saat pindah halaman.",
+            "en": "Manual dark mode in the panel: auto–light–dark choice saved per user, with no flicker between pages."
+        },
+        {
+            "type": "improvement",
+            "id": "Ringkasan akhir pemasangan kini mencetak alamat lengkap seluruh halaman pemantauan — tak perlu mencari-cari rute.",
+            "en": "The final install summary now prints the full address of every monitoring page — no route hunting."
+        },
+        {
+            "type": "new",
+            "id": "Pengumuman kunjungan pertama: banner atas dan sambutan otomatis memperkenalkan pembaruan terbaru kepada pengunjung aplikasi.",
+            "en": "First-visit announcements: a top banner and an automatic welcome introduce the latest updates to app visitors."
+        },
+        {
+            "type": "security",
+            "id": "Jaminan tak menyentuh berkas konfigurasi milik aplikasi secara diam-diam: sesetengah berkas hanya boleh diubah pemiliknya sendiri.",
+            "en": "Guarantee of never silently touching the app's own configuration files: certain files may only ever be edited by their owner."
+        },
+        {
+            "type": "improvement",
+            "id": "Pembaruan mengangkut pemasangan lama ke standar terbaru secara otomatis — termasuk penamaan bekas — tanpa perlu memasang ulang.",
+            "en": "Upgrades automatically carry old installs to the latest standards — including legacy naming — with no reinstall needed."
+        },
+        {
+            "type": "improvement",
+            "id": "Situs dokumen diperkaya: jawaban atas pertanyaan umum, indeks kata kunci, halaman tak-ditu-temukan berdedikasi, dan kartu berbagi sosial.",
+            "en": "Docs site enriched: a FAQ page, keyword index, a dedicated not-found page, and social sharing cards."
+        }
+    ]
+}

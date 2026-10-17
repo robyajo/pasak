@@ -1,0 +1,39 @@
+{
+    "date": "2026-10-14",
+    "type": "important",
+    "title": {
+        "id": "Lepas-pasang bersih total dan lab uji serangan lengkap",
+        "en": "Fully clean removal and a complete attack-testing lab"
+    },
+    "body": {
+        "id": "Lepas-pasang kini benar-benar menghilangkan seluruh jejak — sisa berkas, blok cerobong kosong, hingga salinan cadangan usang — sementara lab uji serangan lengkap dengan templat penguatan server tiba untuk membuktikan pelindung di segala nada, lokal maupun produksi.",
+        "en": "Removal now truly erases every trace — leftover files, empty stubs, even stale backups — while a full attack-testing lab with server-hardening templates arrives to prove the guard on every front, local and production alike."
+    },
+    "items": [
+        {
+            "type": "fix",
+            "id": "Lepas-pasang bersih total: berkas bekas tersembunyi, blok yang bocor di berkas aplikasi, dan salinan cadangan lumpur lama ikut dihapus rapi tanpa merusak aplikasi.",
+            "en": "Triple-clean removal: hidden leftovers, leaked blocks in app files, and stale backups are all tidily erased without harming the app."
+        },
+        {
+            "type": "new",
+            "id": "Lab uji serangan lengkap: konsol pemeriksaan serangan, alat pemeriksa baris perintah, dan templat konfigurasi siap pakai.",
+            "en": "A complete attack-testing lab: an attack-inspection console, a command-line probing tool, and ready-made configuration templates."
+        },
+        {
+            "type": "security",
+            "id": "Templat penguatan server: aturan pelindung web server siap pakai untuk menolak pola berbahaya dan berkas cadangan sejak gerbang, sebelum menyentuh aplikasi.",
+            "en": "Server-hardening templates: ready-to-use web-server guard rules that reject malicious patterns and backup files right at the gate, before touching the app."
+        },
+        {
+            "type": "improvement",
+            "id": "Alur uji untuk memandu pengaturan: mode lokal dan produksi kini berperilaku identik — pembedanya hanya alamat tujuan pengujian, tidak ada langkah yang tersembunyi.",
+            "en": "Unified testing flow: local and production modes now behave identically — only the test destination differs, with no hidden steps."
+        },
+        {
+            "type": "new",
+            "id": "Dasbor cadangan dan berkas cadangan berbahaya: antarmuka untuk memeriksa jejak penyerang yang ditolak sebelum mencapai aplikasi.",
+            "en": "Backup dashboard and dangerous-file views: interfaces for inspecting the trails of attackers turned away before reaching the app."
+        }
+    ]
+}

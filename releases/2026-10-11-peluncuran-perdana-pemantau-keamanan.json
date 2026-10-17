@@ -1,0 +1,54 @@
+{
+    "date": "2026-10-11",
+    "type": "new",
+    "title": {
+        "id": "Peluncuran perdana pemantau keamanan Pasak",
+        "en": "First launch of the Pasak security monitor"
+    },
+    "body": {
+        "id": "Versi pertama paket pelindung aplikasi Pasak hadir: satu warna identitas, pemasangan berpemandu, panel pemantauan ringan, serta siklus pasang–perbarui–lepas yang aman — semuanya dilengkapi dokumentasi resmi dan berkas paparan yang bisa diunduh.",
+        "en": "The first version of the Pasak app-protection package arrives: one consistent identity, a guided install, a lightweight monitoring panel, and a safe install–upgrade–uninstall cycle — all backed by official documentation and a downloadable presentation deck."
+    },
+    "items": [
+        {
+            "type": "new",
+            "id": "Peluncuran perdana paket pelindung aplikasi dengan identitas baru yang terdaftar resmi; seluruh nama perintah, akun, dan panduan kini satu warna.",
+            "en": "First launch of the app-protection package under a new official identity; every command, account, and guide now speaks one name."
+        },
+        {
+            "type": "new",
+            "id": "Pemasangan berpemandu: pilihan bahasa, pemeriksaan kesiapan sistem, dan langkah lanjut bernomor lengkap dengan tautan panduan resmi.",
+            "en": "Guided installation: language choice, environment readiness checks, and numbered next steps with links to the official guide."
+        },
+        {
+            "type": "new",
+            "id": "Lepas-pasang bersih: satu perintah menghapus seluruh jejak pemasangan dari aplikasi dengan rapi.",
+            "en": "Clean removal: a single command tidily erases every trace of the installation from the app."
+        },
+        {
+            "type": "security",
+            "id": "Pembaruan yang aman: pencadangan otomatis berkas milik aplikasi sebelum perubahan, plus simulasi kasus tepi agar pembaruan tak merusak konten.",
+            "en": "Safe upgrades: automatic backup of host files before changes, plus edge-case simulations so updates never corrupt content."
+        },
+        {
+            "type": "new",
+            "id": "Panel pemantauan ringan yang berjalan pada aplikasi apa pun tanpa komponen tambahan — log serangan, blokir, tiket, dan pengaturan satu tempat.",
+            "en": "A lightweight monitoring panel that runs on any app without extra components — attacks, blocks, tickets, and settings in one place."
+        },
+        {
+            "type": "fix",
+            "id": "Perapihan panel: kelas gaya yang hilang dilengkapi, ikon diganti gambar bersih, dan penyortiran pesan gangguan di perangkat modern diperbaiki.",
+            "en": "Panel tidying: missing styles filled in, icons replaced with clean graphics, and warning messages on modern devices fixed."
+        },
+        {
+            "type": "new",
+            "id": "Dokumentasi resmi 25 bab + berkas paparan siap unduh dari situs dokumen untuk kesiapan pemaparan publik.",
+            "en": "Official 25-chapter documentation + a ready-to-download presentation deck on the docs site for public briefing readiness."
+        },
+        {
+            "type": "fix",
+            "id": "Seluruh panduan dipangkas dari nama dan tautan usang supaya rujukan pengembang tidak menyesatkan.",
+            "en": "All guides pruned of stale names and links so developer references never mislead."
+        }
+    ]
+}
