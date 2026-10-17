@@ -1,0 +1,29 @@
+{
+    "date": "2026-10-17",
+    "type": "important",
+    "title": {
+        "id": "Pasak hadir di katalog paket PHP publik",
+        "en": "Pasak is now listed in the public PHP package catalog"
+    },
+    "body": {
+        "id": "Paket keamanan aplikasi Pasak kini resmi terdaftar di katalog paket PHP publik sehingga pengembang mana pun dapat memasangnya langsung ke aplikasi mereka dengan satu perintah, lengkap dengan dokumentasi dan halaman paket yang siap dibaca.",
+        "en": "The Pasak application security package is now officially registered in the public PHP package catalog, so any developer can install it into their app with a single command, complete with documentation and a ready-to-read package page."
+    },
+    "items": [
+        {
+            "type": "new",
+            "id": "Daftar paket di katalog PHP publik: pengembang dapat memasang alat pelindung aplikasi ini dengan satu perintah.",
+            "en": "Package listing in the public PHP catalog: developers can install this app-shielding tool with a single command."
+        },
+        {
+            "type": "new",
+            "id": "Profil repositori diperbarui: deskripsi, topik, dan tautan dokumen dipertajam agar mudah ditemukan dan dipahami.",
+            "en": "Repository profile updated: description, topics, and documentation links sharpened for easier discovery and understanding."
+        },
+        {
+            "type": "new",
+            "id": "Alur kerja asisten digital diikat aturan baru: setiap perubahan yang terasa pengguna wajib dicatat dan dilaporkan ke laman portofolio.",
+            "en": "Digital assistant workflow now bound by new rules: every user-visible change must be recorded and reported to the portfolio page."
+        }
+    ]
+}

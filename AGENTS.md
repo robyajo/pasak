@@ -196,6 +196,32 @@ finis.sh                   # Root wrapper for web-docs VPS build & deploy
 - **Naming invariant**: no user-visible `security.*` / `SECURITY_*` / `SecurityMonitor` identifiers remain — only `pasak` / `PASAK_*`. Legacy names survive solely as silent fallbacks (env, config keys, table renames, class aliases). Grep before release.
 - **Docs sync**: `README.md` ↔ `documents/` ↔ `web-docs/` must agree on install flow, publish tags, flags, route names, and middleware aliases.
 
+---
+
+## 8. Activity Sync — lapor kegiatan ke portfolio (WAJIB, berlaku ke depan)
+
+Setiap selesai mengerjakan perubahan yang **dirasakan pengguna** (fitur baru,
+perbaikan bug, perubahan perilaku, rilis, deploy, hapus fitur), AI WAJIB:
+
+1. Tulis/perbarui berkas rilis `releases/YYYY-MM-DD-*.json` memakai skill
+   `release-notes` (`.agents/skills/activity-sync/release-notes/SKILL.md`):
+   konsolidasi 1 berkas JSON per hari, dwibahasa (`id` + `en`), bahasa pelayanan
+   publik — dilarang menyebut nama library/framework/database/file kode.
+2. Muat skill `activity-sync` (`.agents/skills/activity-sync/SKILL.md`) dan
+   ikuti alur CRUD di sana: cek proyek (`GET /api/projects?key=`), kirim isi
+   berkas rilis apa adanya lewat `POST https://ajoroby.is-a.dev/api/activities`
+   (tambah `"project": {"name": "Pasak Security Monitor Laravel Packagist"}`),
+   lalu verifikasi (`GET /api/activities?slug=…` + pastikan tidak dobel).
+3. Kunci `X-project`: baca dari `.ACTIVITY_PROJECT_KEYS` di folder skill
+   `activity-sync` — JANGAN commit berkas kunci, JANGAN menampilkannya ke user
+   kecuali diminta. `401`/`403` → berhenti dan minta kunci baru ke pemilik.
+4. Refactor internal, format kode, komentar, dan tes tak terlihat pengguna:
+   jangan kirim.
+5. Laporkan ke user: id baris yang terkirim + hasil verifikasinya.
+
+Rujukan lengkap: `.agents/skills/activity-sync/SKILL.md` dan
+`.agents/skills/activity-sync/AGENTS.md`.
+
 <mcp_instructions>
   <server name="mcp-server-context7">
     Use this server to fetch current documentation whenever the user asks about a library, framework, SDK, API, CLI tool, or cloud service — even well-known ones like React, Next.js, Prisma, Express, Tailwind, Django, or Spring Boot. This includes API syntax, configuration, version migration, library-specific debugging, setup instructions, and CLI tool usage. Use even when you think you know the answer — your training data may not reflect recent changes. Prefer this over web search for library docs.
