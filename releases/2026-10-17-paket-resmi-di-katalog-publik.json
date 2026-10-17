@@ -6,24 +6,59 @@
         "en": "Pasak is now listed in the public PHP package catalog"
     },
     "body": {
-        "id": "Paket keamanan aplikasi Pasak kini resmi terdaftar di katalog paket PHP publik sehingga pengembang mana pun dapat memasangnya langsung ke aplikasi mereka dengan satu perintah, lengkap dengan dokumentasi dan halaman paket yang siap dibaca.",
-        "en": "The Pasak application security package is now officially registered in the public PHP package catalog, so any developer can install it into their app with a single command, complete with documentation and a ready-to-read package page."
+        "id": "Paket keamanan aplikasi Pasak kini resmi terdaftar di katalog paket PHP publik: satu perangkat perlindungan menyeluruh untuk aplikasi web — menolak serangan di gerbang, mengisolasi pelaku, menjaga integritas server, dan menyajikan laporan pemantauan — yang bisa dipasang pengembang mana pun dengan satu perintah, lengkap dengan 25 bab dokumentasi, alat audit baris perintah, dan halaman paket siap baca.",
+        "en": "The Pasak application security package is now officially registered in the public PHP package catalog: one all-around protection suite for web applications — stopping attacks at the gate, isolating offenders, guarding server integrity, and serving monitoring reports — installable by any developer with a single command, complete with a 25-chapter documentation suite, command-line audit tools, and a ready-to-read package page."
     },
     "items": [
         {
             "type": "new",
-            "id": "Daftar paket di katalog PHP publik: pengembang dapat memasang alat pelindung aplikasi ini dengan satu perintah.",
-            "en": "Package listing in the public PHP catalog: developers can install this app-shielding tool with a single command."
+            "id": "Daftar resmi di katalog paket PHP publik — pengembang memasang seluruh perlindungan ini ke aplikasi mereka dengan satu perintah, tanpa alat tambahan.",
+            "en": "Official listing in the public PHP package catalog — developers install this entire protection suite into their apps with a single command, no extra tooling."
+        },
+        {
+            "type": "security",
+            "id": "Pengawal permintaan tanpa kompromi serangan berbahaya: injeksi ke basis data, skrip jahat di browser, pembacaan berkas di luar batas, penyelidikan berkas rahasia, dan lampiran berbahaya ditolak langsung pada percobaan pertama.",
+            "en": "No-compromise request guard against malicious attacks: database injection, browser-side script injection, out-of-bounds file reading, secret-file probing, and dangerous attachments are rejected straight on the first attempt."
+        },
+        {
+            "type": "security",
+            "id": "Karantina tingkat perangkat: pelaku diblokir spesifik per perangkatnya, sehingga pengguna sah yang kebetulan berbagi satu jaringan (kantor/wifi publik) tetap tidak terganggu.",
+            "en": "Device-level quarantine: the offender is blocked per device, so legitimate users who happen to share one network (office/public wifi) remain unaffected."
+        },
+        {
+            "type": "security",
+            "id": "Pengunci percobaan masuk berjenjang: kegagalan login berulang naik bertahap dari penahanan singkat hingga sehari penuh, mematahkan uji kata sandi massal dan pencurian akun.",
+            "en": "Stepped login lockout: repeated failed sign-ins escalate gradually from a short hold to a full day, breaking mass password-guessing and account takeover."
+        },
+        {
+            "type": "security",
+            "id": "Penjaga integritas server: sidik berkas inti dibandingkan berkala, berkas webshell dan lampiran mencurigakan terdeteksi, dan penghapusannya dilakukan aman sambil melindungi berkas sistem vital.",
+            "en": "Server integrity guard: core file fingerprints are periodically verified, webshell and suspicious attachments are detected, and their removal happens safely while vital system files stay protected."
+        },
+        {
+            "type": "security",
+            "id": "Pemindai log akses berhemat memori: penyerang yang sudah ditolak web server sebelum menyentuh aplikasi tetap ditangkap dan dicatat, termasukinya yang lolos dari pengawal aplikasi.",
+            "en": "Memory-friendly access-log scanner: attackers already turned away by the web server before reaching the app are still caught and recorded — including those that slipped past the application guard."
         },
         {
             "type": "new",
-            "id": "Profil repositori diperbarui: deskripsi, topik, dan tautan dokumen dipertajam agar mudah ditemukan dan dipahami.",
-            "en": "Repository profile updated: description, topics, and documentation links sharpened for easier discovery and understanding."
+            "id": "Tiket banding mandiri: pengguna yang terblokir bisa mengajukan permohonan buka blokir lewat saluran resmi dengan cooldown adil, dan persetujuan admin otomatis mencabut karantina.",
+            "en": "Self-service appeal tickets: blocked users can request an unban through an official channel with a fair cooldown, and admin approval automatically lifts the quarantine."
         },
         {
             "type": "new",
-            "id": "Alur kerja asisten digital diikat aturan baru: setiap perubahan yang terasa pengguna wajib dicatat dan dilaporkan ke laman portofolio.",
-            "en": "Digital assistant workflow now bound by new rules: every user-visible change must be recorded and reported to the portfolio page."
+            "id": "Pemantauan siap pakai: halaman pemantauan internal untuk melihat log serangan, daftar blokir, sesi aktif, dan tiket — plus antarmuka laporan tanpa tampilan (JSON) untuk dibangun di panel mana pun.",
+            "en": "Out-of-the-box monitoring: internal pages to review attack logs, block lists, active sessions, and tickets — plus a viewless reporting interface (JSON) to build panels on any stack."
+        },
+        {
+            "type": "new",
+            "id": "Rawatan otomatis harian: penyisihan log kedaluwarsa, pasti denyut kesehatan, dan pemindaian log jalan sendiri lewat penjadwal bawaan — tanpa setup tambahan.",
+            "en": "Automatic daily upkeep: aging log pruning, health heartbeats, and log scanning run on their own via the built-in scheduler — no extra setup."
+        },
+        {
+            "type": "new",
+            "id": "Dokumentasi lengkap 25 bab + templat penguatan server (aturan web server siap pakai, daftar periksa produksi, dan panduan integrasi tampilan) agar operasional dari instalasi sampai insiden terpandu penuh.",
+            "en": "Complete 25-chapter documentation + server hardening templates (ready-to-use web server rules, a production checklist, and interface integration guides) so operations from install to incident are fully guided."
         }
     ]
 }
