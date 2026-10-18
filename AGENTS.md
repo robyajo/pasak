@@ -219,6 +219,23 @@ perbaikan bug, perubahan perilaku, rilis, deploy, hapus fitur), AI WAJIB:
    jangan kirim.
 5. Laporkan ke user: id baris yang terkirim + hasil verifikasinya.
 
+**Klasifikasi WAJIB `deploy` (tanpa menunggu pertanyaan):** setiap commit yang
+menyentuh — atau perkiraan efeknya menyentuh — salah satu dari berikut otomatis
+dianggap perubahan yang bisa dirasakan pengguna dan wajib dicatat sebagai
+`type: "deploy"` pada berkas rilis hari itu:
+
+- Berkas domain/verifikasi host situs (`web-docs/*.json` seperti
+  `_vercel.*.json`, `*.duck*.json`, berkas `A`/`TXT`/records apapun).
+- Alamat/URL resmi yang dipakai paket (halaman `homepage`,
+  `documents/**/*.md` yang berubah pranala dasar, `web-docs` konfigurasi
+  base URL).
+- Build/deploy infrastrukturnya sendiri (`finis.sh`, workflow CI/CD,
+  penjadwal build docs).
+
+Bila ragu apakah sebuah perubahan "terasa pengguna" → **kirim**.
+Send ganda bukan masalah (`source` sama = update baris yang sama), sedangkan
+kegagalan mencatat = kabar hilang permanen dari portfolio.
+
 Rujukan lengkap: `.agents/skills/activity-sync/SKILL.md` dan
 `.agents/skills/activity-sync/AGENTS.md`.
 
