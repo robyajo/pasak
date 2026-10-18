@@ -426,7 +426,8 @@ class PasakUninstallCommand extends Command
             }
         }
 
-        foreach (['nginx.conf.stub' => 'nginx.conf', 'apache2.conf.stub' => 'apache2.conf'] as $stub => $target) {            $targetPath = base_path($target);
+        foreach (['nginx.conf.stub' => 'nginx.conf', 'apache2.conf.stub' => 'apache2.conf'] as $stub => $target) {
+            $targetPath = base_path($target);
             if (! File::exists($targetPath)) {
                 continue;
             }

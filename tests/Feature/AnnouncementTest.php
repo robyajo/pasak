@@ -59,7 +59,7 @@ test('announcement is skipped in production even when enabled', function () {
 
     try {
         $html = $this->get('/__pasak_home')->getContent();
-    } catch (\Throwable $e) {
+    } catch (Throwable $e) {
         app()->detectEnvironment(fn () => 'testing');
         throw $e;
     }
