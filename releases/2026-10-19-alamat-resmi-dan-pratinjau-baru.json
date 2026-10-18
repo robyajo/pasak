@@ -1,0 +1,44 @@
+{
+    "date": "2026-10-19",
+    "type": "deploy",
+    "title": {
+        "id": "Alamat resmi sendiri sekaligus pratinjau berbagi baru untuk situs dokumen",
+        "en": "A dedicated official address and a fresh sharing preview for the documentation site"
+    },
+    "body": {
+        "id": "Portal dokumentasi Pasak kini menanjak dua langkah sekaligus: alamat tangkas resmi pasak.is-a.dev (plus alias alternatif www.pasak-security.duckdns.org) yang terverifikasi sah dan digired jaringan global, serta kartu pratinjau baru saat tautan dibagikan — judul tegas, ringkasan isi panduan, dan tanda-tanda fitur unggulan yang terbaca penuh, sehingga rujukan resmi jadi pendek, cepat, dan mudah dikenali.",
+        "en": "The Pasak documentation portal advanced two steps at once: the verified official short address pasak.is-a.dev (plus an alternative alias at www.pasak-security.duckdns.org) served from a global network, and a new preview card when links are shared — a bold headline, a guide summary, and fully readable standout-feature markers, making official reference short, fast, and instantly recognizable."
+    },
+    "items": [
+        {
+            "type": "new",
+            "id": "Alamat resmi pasak.is-a.dev tervalidasi milik langsung untuk portal dokumen — tautan resmi di seluruh paket dapat bergerak ke alamat pendek ini.",
+            "en": "The verified official address pasak.is-a.dev now belongs to the documentation portal — official links across the package can move to the short address."
+        },
+        {
+            "type": "new",
+            "id": "Alias alternatif www.pasak-security.duckdns.org siap sebagai atap cadangan bagi portal yang sama.",
+            "en": "The alternative alias www.pasak-security.duckdns.org stands ready as a backup roof for the same portal."
+        },
+        {
+            "type": "improvement",
+            "id": "Kartu pratinjau dibarui dengan tata letak baru: identitas di atas, judul besar di tengah, serta tanda-tanda fitur unggulan di bawah.",
+            "en": "The preview card was redesigned with a new layout: identity on top, a large headline at center, and feature markers at the bottom."
+        },
+        {
+            "type": "improvement",
+            "id": "Cap fitur unggulan kini jelas dan tidak lagi menutupi teks — semua butir terbaca penuh di ukuran berapa pun.",
+            "en": "Standout feature markers are now clear and no longer clip their labels — every item reads fully at any size."
+        },
+        {
+            "type": "improvement",
+            "id": "Keterangan gambar pratinjau untuk layanan berbagi diperkaya sehingga pembaca kartu paham isinya sebelum mengklik.",
+            "en": "Preview image captions for sharing services were enriched so readers understand the content before clicking."
+        },
+        {
+            "type": "deploy",
+            "id": "Penyajian melalui jaringan sebar global: dokumentasi lebih cepat diakses dari mana pun dengan alamat yang konsisten.",
+            "en": "Serving routed through a global distribution network: documentation loads faster from anywhere at a consistent address."
+        }
+    ]
+}
