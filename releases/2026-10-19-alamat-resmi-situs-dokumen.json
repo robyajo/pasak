@@ -1,0 +1,29 @@
+{
+    "date": "2026-10-19",
+    "type": "deploy",
+    "title": {
+        "id": "Situs dokumen kini beralamat resmi sendiri",
+        "en": "The documentation site now has its own official address"
+    },
+    "body": {
+        "id": "Portal dokumentasi Pasak kini dapat diakses melalui alamat tangkas resmi pasak.is-a.dev beserta alamat alternatif www.pasak-security.duckdns.org, terverifikasi sah dan digired oleh jaringan global — pengembang kini punya alamat pendek dan mudah diingat untuk rujukan resmi.",
+        "en": "The Pasak documentation portal is now reachable via its verified official address pasak.is-a.dev along with an alternative at www.pasak-security.duckdns.org, properly authenticated and served from a global network — developers finally have a short, memorable address for official reference."
+    },
+    "items": [
+        {
+            "type": "new",
+            "id": "Alamat resmi pasak.is-a.dev tervalidasi milik langsung untuk portal dokumen — tautan resmi di seluruh paket dapat bergerak ke alamat pendek ini.",
+            "en": "The verified official address pasak.is-a.dev now belongs to the documentation portal — official links across the package can move to the short address."
+        },
+        {
+            "type": "new",
+            "id": "Cara penyajian melalui jaringan sebar global: dokumentasi lebih cepat diakses dari mana pun dengan alamat yang konsisten.",
+            "en": "Serving routed through a global distribution network: documentation loads faster from anywhere at a consistent address."
+        },
+        {
+            "type": "new",
+            "id": "Alias alternatif www.pasak-security.duckdns.org siap sebagai atap cadangan bagi portal yang sama.",
+            "en": "The alternative alias www.pasak-security.duckdns.org stands ready as a backup roof for the same portal."
+        }
+    ]
+}
