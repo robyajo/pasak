@@ -54,6 +54,11 @@
             "type": "improvement",
             "id": "Dasbor menghormati jendela layar lebar, peta tidak lagi melebar sendiri, dan daftar serangan hanya mengalirkan serangan baru sungguhan tanpa mengulang arsip lama.",
             "en": "The dashboard fits wide screens, the map no longer stretches by itself, and the attacks list streams only genuinely new live attacks without re-looping stale archives."
+        },
+        {
+            "type": "new",
+            "id": "Peta ancaman kini punya mode layar penuh: satu tombol membawa peta memenuhi seluruh jendela layar dan tombol Esc mengembalikannya seperti semula — nyaman dipantau di layar besar.",
+            "en": "The threat map now has a full screen mode: one button makes the map fill the entire window and Escape restores it — comfortable to watch on big screens."
         }
     ],
     "project": {
