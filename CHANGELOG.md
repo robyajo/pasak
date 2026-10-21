@@ -13,6 +13,11 @@ All notable changes to `robyajo/pasak` will be documented in this file.
 - **Rute dashboard**: `Route::get('threat-map')` → `PasakThreatMapController::index` (halaman) + `threat-map/feed` → `feed` (JSON) pada `routes/pasak-dashboard-blade.php` dan stub `pasak-blade.php.stub`, dilindungi middleware `web`+`auth` sama seperti seluruh halaman dashboard; item navigasi sidebar dilindungi `@if (\Route::has(...))` agar aman bagi berkas layout host yang lama.
 - **Pengingat upgrade untuk menu baru**: `pasak:upgrade` kini memeriksa penanda `pasak.dashboard.threat-map` pada `layout.blade.php` terpublikasi dan memperingatkan menjalankan `--sync-views` (dengan pencadangan otomatis) bila menu Threat Map belum ada.
 
+### Fixed
+
+- **Stub rute dashboard terpublikasi kini memuat Threat Map**: stub `routes/pasak.php` yang diterbitkan host (tag `pasak-routes`) sempat kehilangan dua rute `threat-map` sehingga tautan petanya mati setelah proyek host memuat berkas rute kustom; kini keduanyaikut `pasak-dashboard-blade.php` dan tervalidasi di aplikasi real (`ring/pasak-yes`) lewat alur `pasak:upgrade --sync-routes`.
+- **Petunjuk CLI memakai rute dashboard resmi**: keluaran `pasak:scan-logs` kini mengarah ke `/pasak/logs` dan `/pasak/blocked-ips` (bukan alias lama `/security/*`), wizard `pasak:install` menyebut prefix API `/api/pasak/*`, dan hasil pemindaian access log tercatat dengan `path` rute konsisten.
+
 ## [1.4.5] - 2026-10-21
 
 ### Fixed
