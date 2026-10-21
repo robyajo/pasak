@@ -15,6 +15,8 @@ import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Spinner } from "@/components/ui/spinner";
 import { ATTACKER_PRESETS, QUICK_COMMANDS } from "./constants";
+import { attackerLocationLabel, useAttackerLocation } from "@/hooks/useAttackerLocation";
+import { useLabStore } from "@/stores/lab";
 import type { AttackerCardProps } from "./types";
 
 export function AttackerCard({
@@ -27,6 +29,10 @@ export function AttackerCard({
     onExploitShellWith,
 }: AttackerCardProps) {
     const isExecBusy = busy === `exec-${uploadIdx}`;
+    const attackerIp = useLabStore((s) => s.attackerIp);
+    const shellLocation = attackerLocationLabel(
+        useAttackerLocation(attackerIp),
+    );
 
     return (
         <Card size="sm" className="@2xl:col-span-2">
@@ -42,6 +48,7 @@ export function AttackerCard({
                 <CardDescription>
                     Webshell terverifikasi. Bertindak sebagai penyerang: kiri
                     perintah bebas, kanan paket pencurian data sekali klik.
+                    {shellLocation !== "" ? ` — 🛰️ ${shellLocation}` : ""}
                 </CardDescription>
             </CardHeader>
             <CardContent className="flex flex-col gap-3">

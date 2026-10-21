@@ -23,6 +23,7 @@ import {
     TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { LAB_BROWSERS } from "@/stores/lab";
+import { attackerLocationLabel, useAttackerLocation } from "@/hooks/useAttackerLocation";
 import { PREVIEW_PAGES } from "./constants";
 import type { LivePreviewCardProps } from "./types";
 
@@ -45,6 +46,9 @@ export function LivePreviewCard({
         blocked: boolean;
     } | null>(null);
     const [checking, setChecking] = useState(false);
+    const previewLocation = attackerLocationLabel(
+        useAttackerLocation(attackerIp),
+    );
 
     /** Cek apakah IP penyerang kini diblokir (GET / memakai IP spoof). */
     const checkAttackerBlocked = async (): Promise<void> => {
@@ -96,6 +100,14 @@ export function LivePreviewCard({
                     {LAB_BROWSERS.find((b) => b.code === browser)?.label ??
                         browser}{" "}
                     · 🖥️ {deviceId}
+                    {previewLocation !== "" && (
+                        <>
+                            {" · "}
+                            <span className="font-sans">
+                                🛰️ {previewLocation}
+                            </span>
+                        </>
+                    )}
                 </CardDescription>
             </CardHeader>
             <CardContent className="flex flex-col gap-2">

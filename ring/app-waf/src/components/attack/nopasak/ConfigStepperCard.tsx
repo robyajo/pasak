@@ -46,6 +46,7 @@ import {
     TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { LAB_BROWSERS, useLabStore } from "@/stores/lab";
+import { attackerLocationLabel, useAttackerLocation } from "@/hooks/useAttackerLocation";
 import { DEMO_LOCAL_IP } from "./constants";
 import type { ConfigStepperCardProps } from "./types";
 
@@ -80,6 +81,10 @@ export function ConfigStepperCard({
     const setBrowser = useLabStore((s) => s.setBrowser);
     const resetLab = useLabStore((s) => s.resetLab);
     const storeTarget = useLabStore((s) => s.setTarget);
+
+    const activeLocation = attackerLocationLabel(
+        useAttackerLocation(attackerIp),
+    );
 
     const [draftTarget, setDraftTarget] = useState<string | null>(null);
     const [draftIp, setDraftIp] = useState<string | null>(null);
@@ -162,6 +167,14 @@ export function ConfigStepperCard({
                             Draf — klik Set untuk dipakai serangan +
                             preview korban.
                         </span>
+                        {activeLocation !== "" && (
+                            <span className="text-xs font-normal text-muted-foreground">
+                                🛰️ Lokasi aktif:{" "}
+                                <b className="font-semibold">
+                                    {activeLocation}
+                                </b>
+                            </span>
+                        )}
                     </div>
                     <div className="flex flex-col gap-1">
                         <Label htmlFor="nopasak-browser">

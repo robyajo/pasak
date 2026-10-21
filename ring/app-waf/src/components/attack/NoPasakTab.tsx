@@ -4,6 +4,10 @@ import { VULN_INFO, type ChainStep } from "@/lib/vulnInfo";
 import type { NoPasakRecommendation } from "@/lib/noPasak";
 import type { ProxyResult, SendRawFn } from "@/hooks/useWafConsole";
 import { noPasakRecommendations, noPasakStages } from "@/lib/noPasak";
+import {
+    attackerLocationLabel,
+    useAttackerLocation,
+} from "@/hooks/useAttackerLocation";
 import { labBrowserUa, useLabStore } from "@/stores/lab";
 import {
     MethodSheet,
@@ -45,6 +49,9 @@ export default function NoPasakTab({
     const browser = useLabStore((s) => s.browser);
     const storedTarget = useLabStore((s) => s.target);
     const storeTarget = useLabStore((s) => s.setTarget);
+    const attackerLocation = attackerLocationLabel(
+        useAttackerLocation(attackerIp),
+    );
 
     // Benihkan target store dari form konsol bila store masih kosong.
     useEffect(() => {
@@ -711,6 +718,13 @@ export default function NoPasakTab({
             target: url,
             mode,
             waktu: new Date().toISOString(),
+            penyerang: {
+                ip: attackerIp.trim(),
+                browser,
+                perangkat: deviceId,
+                lokasi:
+                    attackerLocation !== "" ? attackerLocation : null,
+            },
             ringkasan: {
                 total_serangan: total,
                 lolos: lolos.length,

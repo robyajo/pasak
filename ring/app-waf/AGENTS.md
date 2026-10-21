@@ -73,6 +73,11 @@ Respons: `{success, ip, url, base_url, method, status, status_text,
 blocked(403/429), duration_ms, size, truncated, content_type,
 request_headers, response_headers, body}`.
 
+Kontrak `GET /api/geo?ip=`: lokasi IP penyerang (negara, provinsi, kota,
+lat/lon, ISP) untuk kartu identitas Tanpa-Pasak — jalankan di dev-server
+via service publik ip-api.com (tanpa kunci); IP privat/reserved
+`{lokasi:false}`; di-cache dalam memori dev-server.
+
 Batasan proxy: body request ≤ 5MB, respons ditampung ≤ 2MB / tampil ≤ 200KB,
 timeout 15 dtk, guard SSRF minimal (tolak `169.254.169.254`,
 `metadata.google.internal`, skema non-http/https).

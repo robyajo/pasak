@@ -2,7 +2,7 @@ import http from "node:http";
 import https from "node:https";
 import { isIP } from "node:net";
 import { randomBytes } from "node:crypto";
-import { randomPublicIp } from "../src/lib/ip.js";
+import { isPrivateOrReserved, randomPublicIp } from "../src/lib/ip.js";
 
 /**
  * Proxy pengujian WAF (sisi server).
@@ -106,6 +106,168 @@ function formatRawHeaders(rawHeaders) {
     }
 
     return lines.join("\n");
+}
+
+function geoLookupRaw(url) {
+    return new Promise((resolve, reject) => {
+        const request = http.request(
+            url,
+            { method: "GET", timeout: 5000 },
+            (response) => {
+                const chunks = [];
+                let received = 0;
+
+                response.on("data", (chunk) => {
+                    received += chunk.length;
+
+                    if (received <= GEO_RESPONSE_LIMIT) {
+                        chunks.push(chunk);
+                    } else {
+                        response.destroy();
+                    }
+                });
+
+                response.on("end", () => {
+                    try {
+                        resolve(
+                            JSON.parse(
+                                Buffer.concat(chunks).toString("utf8"),
+                            ),
+                        );
+                    } catch {
+                        reject(
+                            new Error("Respons geoIP bukan JSON yang valid."),
+                        );
+                    }
+                });
+            },
+        );
+
+        request.on("timeout", () =>
+            request.destroy(new Error("Waktu tunggu geoIP habis.")),
+        );
+        request.on("error", reject);
+        request.end();
+    });
+}
+
+function isPrivateIp(ip) {
+    if (isIP(ip) === 4) {
+        const [a, b] = ip.split(".").map((piece) => Number(piece));
+
+        return typeof b === "number" && isPrivateOrReserved(a, b);
+    }
+
+    return ip === "::1" || ip.startsWith("fe80:") || /^(f[cd])/.test(ip);
+}
+
+/**
+ * Lokasi IP penyerang (negara, provinsi, kota): GET /api/geo?ip=
+ *
+ * Lookup geoIP dijalankan di dev-server memakai service publik gratis
+ * ip-api.com (tanpa kunci). IP privat/reserved dijawab tanpa lokasi.
+ * Hasil di-cache di memori dev-server agar service publik tidak diboros.
+ *
+ * HANYA UNTUK PENGUJIAN LOKAL.
+ */
+const GEO_CACHE_LIMIT = 500;
+const GEO_RESPONSE_LIMIT = 65536;
+const geoCache = new Map();
+
+async function handleGeoRequest(req, res) {
+    let params;
+
+    try {
+        params = new URL(req.url ?? "", "http://localhost").searchParams;
+    } catch {
+        sendJson(res, 400, { success: false, message: "Query tidak valid." });
+
+        return;
+    }
+
+    const ip = String(params.get("ip") ?? "").trim();
+
+    if (isIP(ip) === 0) {
+        sendJson(res, 422, {
+            success: false,
+            message: "Alamat IP penyerang tidak valid.",
+        });
+
+        return;
+    }
+
+    const cached = geoCache.get(ip);
+
+    if (cached !== undefined) {
+        sendJson(res, 200, cached);
+
+        return;
+    }
+
+    if (isPrivateIp(ip)) {
+        const offline = {
+            success: true,
+            ip,
+            lokasi: false,
+            message: "IP privat/loopback/reserved — tanpa lokasi publik.",
+        };
+        geoCache.set(ip, offline);
+        sendJson(res, 200, offline);
+
+        return;
+    }
+
+    let data;
+
+    try {
+        data = await geoLookupRaw(
+            `http://ip-api.com/json/${encodeURIComponent(ip)}?fields=status,message,country,countryCode,regionName,city,lat,lon,isp`,
+        );
+    } catch (error) {
+        sendJson(res, 502, {
+            success: false,
+            message: `Layanan geoIP gagal dihubungi: ${error.message}`,
+        });
+
+        return;
+    }
+
+    if (data.status !== "success") {
+        const unknown = {
+            success: true,
+            ip,
+            lokasi: false,
+            message: `Lokasi IP tidak diketahui (${data.message ?? "unknown"}).`,
+        };
+        geoCache.set(ip, unknown);
+        sendJson(res, 200, unknown);
+
+        return;
+    }
+
+    const payload = {
+        success: true,
+        ip,
+        lokasi: true,
+        country: data.country,
+        country_code: data.countryCode,
+        region: data.regionName,
+        city: data.city,
+        lat: data.lat,
+        lon: data.lon,
+        isp: data.isp,
+    };
+
+    if (geoCache.size >= GEO_CACHE_LIMIT) {
+        const oldest = geoCache.keys().next();
+
+        if (oldest.done !== true) {
+            geoCache.delete(oldest.value);
+        }
+    }
+
+    geoCache.set(ip, payload);
+    sendJson(res, 200, payload);
 }
 
 function performRequest(options) {
@@ -539,6 +701,23 @@ async function handlePreviewRequest(req, res) {
 export function createProxyHandler() {
     return async function wafTestingProxy(req, res, next) {
         const route = (req.url ?? "").split("?")[0];
+
+        if (route === "/api/geo" && req.method === "GET") {
+            try {
+                await handleGeoRequest(req, res);
+            } catch (error) {
+                console.error("[waf-testing-proxy] geo gagal:", error);
+
+                if (!res.headersSent) {
+                    sendJson(res, 500, {
+                        success: false,
+                        message: `Kesalahan internal geo: ${error instanceof Error ? error.message : String(error)}`,
+                    });
+                }
+            }
+
+            return;
+        }
 
         if (route === "/api/preview-victim" && req.method === "GET") {
             try {
