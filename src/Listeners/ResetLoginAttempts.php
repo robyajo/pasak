@@ -2,35 +2,13 @@
 
 namespace Internal\Pasak\Listeners;
 
-use Illuminate\Auth\Events\Login;
-use Illuminate\Support\Facades\Gate;
-use Internal\Pasak\Services\LoginThrottleService;
-use Internal\Pasak\Services\PasakService;
-
 /**
- * Mengosongkan riwayat kegagalan login setelah pengguna berhasil masuk,
- * sehingga cooldown bertingkat tidak "menempel" pada pengguna yang sah,
- * serta otomatis membuka blokir IP apabila yang login adalah admin.
+ * Legacy alias for PasakResetLoginAttempts.
  */
-class ResetLoginAttempts
+class ResetLoginAttempts extends PasakResetLoginAttempts
 {
-    public function __construct(
-        protected LoginThrottleService $throttle,
-        protected PasakService $security,
-    ) {}
+}
 
-    public function handle(Login $event): void
-    {
-        $ip = request()->ip();
-        $this->throttle->registerSuccess($event->user?->email, $ip);
-
-        // Buka blokir IP otomatis bila yang login adalah administrator.
-        if (
-            $ip &&
-            $event->user &&
-            Gate::forUser($event->user)->allows('manage-pasak')
-        ) {
-            $this->security->unblockIp($ip);
-        }
-    }
+if (! class_exists('Internal\Pasak\Listeners\ResetLoginAttempts', false)) {
+    class_alias(PasakResetLoginAttempts::class, 'Internal\Pasak\Listeners\ResetLoginAttempts');
 }

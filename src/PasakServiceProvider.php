@@ -14,25 +14,30 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
+use Internal\Pasak\Console\Commands\PasakBaselineCommand;
+use Internal\Pasak\Console\Commands\PasakInstallCommand;
+use Internal\Pasak\Console\Commands\PasakPruneSecurityLogsCommand;
+use Internal\Pasak\Console\Commands\PasakPurgeInjectedDataCommand;
+use Internal\Pasak\Console\Commands\PasakScanAccessLogsCommand;
+use Internal\Pasak\Console\Commands\PasakUnblockIpCommand;
 use Internal\Pasak\Console\Commands\PasakUninstallCommand;
-use Internal\Pasak\Console\Commands\PruneSecurityLogs;
-use Internal\Pasak\Console\Commands\PurgeInjectedData;
-use Internal\Pasak\Console\Commands\SecurityBaselineCommand;
-use Internal\Pasak\Console\Commands\SecurityInstallCommand;
-use Internal\Pasak\Console\Commands\SecurityScanAccessLogs;
-use Internal\Pasak\Console\Commands\SecurityUpgradeCommand;
-use Internal\Pasak\Console\Commands\UnblockIpAddress;
-use Internal\Pasak\Http\Middleware\BlockIpAddress;
-use Internal\Pasak\Http\Middleware\DetectSecurityThreats;
-use Internal\Pasak\Http\Middleware\EnsureSecurityAdmin;
-use Internal\Pasak\Http\Middleware\InjectAnnouncementBanner;
-use Internal\Pasak\Http\Middleware\TrackUserActivity;
-use Internal\Pasak\Listeners\LogFailedLoginAttempt;
-use Internal\Pasak\Listeners\RecordUserLogin;
-use Internal\Pasak\Listeners\ResetLoginAttempts;
+use Internal\Pasak\Console\Commands\PasakUpgradeCommand;
+use Internal\Pasak\Http\Middleware\PasakBlockIpAddress;
+use Internal\Pasak\Http\Middleware\PasakDetectSecurityThreats;
+use Internal\Pasak\Http\Middleware\PasakEnsureSecurityAdmin;
+use Internal\Pasak\Http\Middleware\PasakInjectAnnouncementBanner;
+use Internal\Pasak\Http\Middleware\PasakTrackUserActivity;
+use Internal\Pasak\Listeners\PasakLogFailedLoginAttempt;
+use Internal\Pasak\Listeners\PasakRecordUserLogin;
+use Internal\Pasak\Listeners\PasakResetLoginAttempts;
 use Internal\Pasak\Services\AccessLogScannerService;
 use Internal\Pasak\Services\LoginThrottleService;
+use Internal\Pasak\Services\PasakAccessLogScannerService;
+use Internal\Pasak\Services\PasakLoginThrottleService;
 use Internal\Pasak\Services\PasakService;
+use Internal\Pasak\Services\PasakServerSecurityService;
+use Internal\Pasak\Services\PasakUserLoginService;
+use Internal\Pasak\Services\PasakVersionCheckService;
 use Internal\Pasak\Services\ServerSecurityService;
 use Internal\Pasak\Services\UserLoginService;
 use Internal\Pasak\Services\VersionCheckService;
@@ -65,35 +70,40 @@ class PasakServiceProvider extends ServiceProvider
             return new PasakService;
         });
 
-        $this->app->singleton(LoginThrottleService::class, function ($app) {
-            return new LoginThrottleService(
+        $this->app->singleton(PasakLoginThrottleService::class, function ($app) {
+            return new PasakLoginThrottleService(
                 $app->make(PasakService::class),
             );
         });
+        $this->app->alias(PasakLoginThrottleService::class, LoginThrottleService::class);
 
-        $this->app->singleton(UserLoginService::class, function ($app) {
-            return new UserLoginService;
+        $this->app->singleton(PasakUserLoginService::class, function ($app) {
+            return new PasakUserLoginService;
         });
+        $this->app->alias(PasakUserLoginService::class, UserLoginService::class);
 
-        $this->app->singleton(ServerSecurityService::class, function ($app) {
-            return new ServerSecurityService(
+        $this->app->singleton(PasakServerSecurityService::class, function ($app) {
+            return new PasakServerSecurityService(
                 $app->make(PasakService::class),
-                $app->make(LoginThrottleService::class),
+                $app->make(PasakLoginThrottleService::class),
             );
         });
+        $this->app->alias(PasakServerSecurityService::class, ServerSecurityService::class);
 
-        $this->app->singleton(AccessLogScannerService::class, function ($app) {
-            return new AccessLogScannerService(
+        $this->app->singleton(PasakAccessLogScannerService::class, function ($app) {
+            return new PasakAccessLogScannerService(
                 $app->make(PasakService::class),
             );
         });
+        $this->app->alias(PasakAccessLogScannerService::class, AccessLogScannerService::class);
 
-        $this->app->singleton(VersionCheckService::class, function () {
-            return new VersionCheckService;
+        $this->app->singleton(PasakVersionCheckService::class, function () {
+            return new PasakVersionCheckService;
         });
+        $this->app->alias(PasakVersionCheckService::class, VersionCheckService::class);
 
         $this->app->alias(PasakService::class, 'pasak');
-        $this->app->alias(VersionCheckService::class, 'pasak.version');
+        $this->app->alias(PasakVersionCheckService::class, 'pasak.version');
     }
 
     /**
@@ -255,22 +265,22 @@ class PasakServiceProvider extends ServiceProvider
         }
 
         $this->commands([
-            SecurityInstallCommand::class,
+            PasakInstallCommand::class,
             PasakUninstallCommand::class,
-            SecurityUpgradeCommand::class,
-            PruneSecurityLogs::class,
-            UnblockIpAddress::class,
-            SecurityScanAccessLogs::class,
-            SecurityBaselineCommand::class,
-            PurgeInjectedData::class,
+            PasakUpgradeCommand::class,
+            PasakPruneSecurityLogsCommand::class,
+            PasakUnblockIpCommand::class,
+            PasakScanAccessLogsCommand::class,
+            PasakBaselineCommand::class,
+            PasakPurgeInjectedDataCommand::class,
         ]);
     }
 
     protected function registerListeners(): void
     {
-        Event::listen(Failed::class, LogFailedLoginAttempt::class);
-        Event::listen(Login::class, ResetLoginAttempts::class);
-        Event::listen(Login::class, RecordUserLogin::class);
+        Event::listen(Failed::class, PasakLogFailedLoginAttempt::class);
+        Event::listen(Login::class, PasakResetLoginAttempts::class);
+        Event::listen(Login::class, PasakRecordUserLogin::class);
     }
 
     protected function registerRoutes(): void
@@ -355,7 +365,7 @@ class PasakServiceProvider extends ServiceProvider
                 $schedule
                     ->call(function (): void {
                         Cache::put(
-                            ServerSecurityService::HEARTBEAT_KEY,
+                            PasakServerSecurityService::HEARTBEAT_KEY,
                             now()->toIso8601String(),
                             now()->addHour(),
                         );
@@ -418,23 +428,23 @@ class PasakServiceProvider extends ServiceProvider
     protected function registerMiddleware(): void
     {
         $router = $this->app->make(Router::class);
-        $router->aliasMiddleware('pasak.admin', EnsureSecurityAdmin::class);
-        $router->aliasMiddleware('pasak.block', BlockIpAddress::class);
+        $router->aliasMiddleware('pasak.admin', PasakEnsureSecurityAdmin::class);
+        $router->aliasMiddleware('pasak.block', PasakBlockIpAddress::class);
         $router->aliasMiddleware(
             'pasak.detect',
-            DetectSecurityThreats::class,
+            PasakDetectSecurityThreats::class,
         );
-        $router->aliasMiddleware('pasak.activity', TrackUserActivity::class);
-        $router->aliasMiddleware('pasak.announce', InjectAnnouncementBanner::class);
+        $router->aliasMiddleware('pasak.activity', PasakTrackUserActivity::class);
+        $router->aliasMiddleware('pasak.announce', PasakInjectAnnouncementBanner::class);
 
         if (config('pasak.auto_register_middleware', false)) {
             $this->app->booted(function (): void {
                 $kernel = $this->app->make(KernelContract::class);
 
                 if ($kernel instanceof HttpKernel) {
-                    $kernel->pushMiddleware(BlockIpAddress::class);
-                    $kernel->pushMiddleware(DetectSecurityThreats::class);
-                    $kernel->pushMiddleware(InjectAnnouncementBanner::class);
+                    $kernel->pushMiddleware(PasakBlockIpAddress::class);
+                    $kernel->pushMiddleware(PasakDetectSecurityThreats::class);
+                    $kernel->pushMiddleware(PasakInjectAnnouncementBanner::class);
                 }
             });
         }
@@ -460,7 +470,7 @@ class PasakServiceProvider extends ServiceProvider
             }
 
             try {
-                $versionChecker = $this->app->make(VersionCheckService::class);
+                $versionChecker = $this->app->make(PasakVersionCheckService::class);
                 $versionChecker->notifyIfUpdateAvailable($event->output);
             } catch (\Throwable) {
                 // Abaikan kesalahan agar tidak pernah mengganggu server dev

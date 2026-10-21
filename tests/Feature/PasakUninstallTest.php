@@ -66,13 +66,13 @@ afterEach(function () use (&$uninstallDir) {
 });
 
 test('pasak uninstall removes all traces without touching host files', function () use (&$uninstallDir) {
-    foreach (['blocked_ips', 'pasak_logs', 'login_attempts', 'ip_unblock_requests', 'user_logins', 'trusted_ips', 'pasak_settings'] as $table) {
+    foreach (['pasak_blocked_ips', 'pasak_logs', 'pasak_login_attempts', 'pasak_ip_unblock_requests', 'pasak_user_logins', 'pasak_trusted_ips', 'pasak_allowed_ips', 'pasak_settings'] as $table) {
         expect(Schema::hasTable($table))->toBeTrue();
     }
 
     $this->artisan('pasak:uninstall', ['--force' => true])->assertSuccessful();
 
-    foreach (['blocked_ips', 'pasak_logs', 'login_attempts', 'ip_unblock_requests', 'user_logins', 'trusted_ips', 'pasak_settings'] as $table) {
+    foreach (['pasak_blocked_ips', 'pasak_logs', 'pasak_login_attempts', 'pasak_ip_unblock_requests', 'pasak_user_logins', 'pasak_trusted_ips', 'pasak_allowed_ips', 'pasak_settings'] as $table) {
         expect(Schema::hasTable($table))->toBeFalse();
     }
 
@@ -153,7 +153,7 @@ test('pasak uninstall removes stub env comments and pasak backup files', functio
 test('pasak uninstall respects keep options', function () {
     $this->artisan('pasak:uninstall', ['--force' => true, '--keep-tables' => true])->assertSuccessful();
 
-    expect(Schema::hasTable('blocked_ips'))->toBeTrue();
+    expect(Schema::hasTable('pasak_blocked_ips'))->toBeTrue();
 });
 
 test('pasak uninstall removes its migration records so reinstall recreates tables', function () {
@@ -162,5 +162,5 @@ test('pasak uninstall removes its migration records so reinstall recreates table
     $this->artisan('pasak:uninstall', ['--force' => true])->assertSuccessful();
 
     expect(DB::table('migrations')->where('migration', 'like', '%pasak%')->exists())->toBeFalse()
-        ->and(Schema::hasTable('blocked_ips'))->toBeFalse();
+        ->and(Schema::hasTable('pasak_blocked_ips'))->toBeFalse();
 });

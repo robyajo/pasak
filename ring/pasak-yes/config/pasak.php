@@ -647,11 +647,16 @@ return [
         */
         'suspicious_files_exclude' => [
             'config/pasak.php',
+            'app/Services/PasakServerSecurityService.php',
             'app/Services/ServerSecurityService.php',
             'app/Services/PasakService.php',
+            'app/Http/Middleware/PasakDetectSecurityThreats.php',
             'app/Http/Middleware/DetectSecurityThreats.php',
+            'app/Console/Commands/PasakBaselineCommand.php',
             'app/Console/Commands/SecurityBaselineCommand.php',
+            'app/Console/Commands/PasakPurgeInjectedDataCommand.php',
             'app/Console/Commands/PurgeInjectedData.php',
+            'app/Console/Commands/PasakScanAccessLogsCommand.php',
             'app/Console/Commands/SecurityScanAccessLogs.php',
             'routes/console.php',
         ],
@@ -677,13 +682,13 @@ return [
     */
     'table_names' => [
         'users' => env('PASAK_USERS_TABLE', env('SECURITY_USERS_TABLE', 'users')),
-        'blocked_ips' => env('PASAK_BLOCKED_IPS_TABLE', env('SECURITY_BLOCKED_IPS_TABLE', 'blocked_ips')),
+        'blocked_ips' => env('PASAK_BLOCKED_IPS_TABLE', env('SECURITY_BLOCKED_IPS_TABLE', 'pasak_blocked_ips')),
         'pasak_logs' => env('PASAK_LOGS_TABLE', env('SECURITY_LOGS_TABLE', 'pasak_logs')),
-        'login_attempts' => env('PASAK_LOGIN_ATTEMPTS_TABLE', env('SECURITY_LOGIN_ATTEMPTS_TABLE', 'login_attempts')),
-        'ip_unblock_requests' => env('PASAK_IP_UNBLOCK_REQUESTS_TABLE', env('SECURITY_IP_UNBLOCK_REQUESTS_TABLE', 'ip_unblock_requests')),
-        'user_logins' => env('PASAK_USER_LOGINS_TABLE', env('SECURITY_USER_LOGINS_TABLE', 'user_logins')),
-        'trusted_ips' => env('PASAK_TRUSTED_IPS_TABLE', env('SECURITY_TRUSTED_IPS_TABLE', 'trusted_ips')),
-        'allowed_ips' => env('PASAK_ALLOWED_IPS_TABLE', 'allowed_ips'),
+        'login_attempts' => env('PASAK_LOGIN_ATTEMPTS_TABLE', env('SECURITY_LOGIN_ATTEMPTS_TABLE', 'pasak_login_attempts')),
+        'ip_unblock_requests' => env('PASAK_IP_UNBLOCK_REQUESTS_TABLE', env('SECURITY_IP_UNBLOCK_REQUESTS_TABLE', 'pasak_ip_unblock_requests')),
+        'user_logins' => env('PASAK_USER_LOGINS_TABLE', env('SECURITY_USER_LOGINS_TABLE', 'pasak_user_logins')),
+        'trusted_ips' => env('PASAK_TRUSTED_IPS_TABLE', env('SECURITY_TRUSTED_IPS_TABLE', 'pasak_trusted_ips')),
+        'allowed_ips' => env('PASAK_ALLOWED_IPS_TABLE', 'pasak_allowed_ips'),
         'settings' => env('PASAK_SETTINGS_TABLE', 'pasak_settings'),
     ],
 
@@ -700,7 +705,7 @@ return [
         'prefix' => env('PASAK_ROUTES_PREFIX', env('SECURITY_ROUTES_PREFIX', 'api/pasak')),
         'middleware' => ['api'],
         'auth_middleware' => ['auth'],
-        'admin_middleware' => ['Internal\\Pasak\\Http\\Middleware\\EnsureSecurityAdmin'],
+        'admin_middleware' => ['Internal\\Pasak\\Http\\Middleware\\PasakEnsureSecurityAdmin'],
     ],
 
     /*
@@ -733,7 +738,7 @@ return [
         'prefix' => env('PASAK_DASHBOARD_PREFIX', env('SECURITY_DASHBOARD_PREFIX', 'pasak')),
         'middleware' => ['web', 'auth'],
         'admin_middleware' => env('PASAK_DASHBOARD_ADMIN_ONLY', env('SECURITY_DASHBOARD_ADMIN_ONLY', false))
-            ? ['Internal\\Pasak\\Http\\Middleware\\EnsureSecurityAdmin']
+            ? ['Internal\\Pasak\\Http\\Middleware\\PasakEnsureSecurityAdmin']
             : [],
         'admin_only' => (bool) env('PASAK_DASHBOARD_ADMIN_ONLY', env('SECURITY_DASHBOARD_ADMIN_ONLY', false)),
     ],

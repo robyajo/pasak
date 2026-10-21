@@ -140,7 +140,7 @@ PHP
 
 test('uninstall with missing tables and files does not error', function () use (&$edgeDir) {
     $this->app->setBasePath($edgeDir);
-    foreach (['blocked_ips', 'pasak_logs', 'login_attempts', 'ip_unblock_requests', 'user_logins', 'trusted_ips', 'pasak_settings'] as $table) {
+    foreach (['pasak_blocked_ips', 'blocked_ips', 'pasak_logs', 'pasak_login_attempts', 'login_attempts', 'pasak_ip_unblock_requests', 'ip_unblock_requests', 'pasak_user_logins', 'user_logins', 'pasak_trusted_ips', 'trusted_ips', 'pasak_allowed_ips', 'allowed_ips', 'pasak_settings'] as $table) {
         Schema::dropIfExists($table);
     }
 

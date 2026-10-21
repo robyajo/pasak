@@ -9,14 +9,14 @@ use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Internal\Pasak\Concerns\HasSecurityRelations;
+use Internal\Pasak\Concerns\HasPasakSecurityRelations;
 
 #[Fillable(['name', 'email', 'password'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
-    use HasSecurityRelations, HasFactory, Notifiable;
+    use HasPasakSecurityRelations, HasFactory, Notifiable;
 
     /**
      * Get the attributes that should be cast.

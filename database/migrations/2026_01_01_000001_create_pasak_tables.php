@@ -9,27 +9,38 @@ return new class extends Migration
     public function up(): void
     {
         $usersTable = config('pasak.table_names.users', 'users');
-        $blockedIpsTable = config('pasak.table_names.blocked_ips', 'blocked_ips');
+        $blockedIpsTable = config('pasak.table_names.blocked_ips', 'pasak_blocked_ips');
         $logsTable = config(
             'pasak.table_names.pasak_logs',
             config('pasak.table_names.security_logs', 'pasak_logs')
         );
-        $loginAttemptsTable = config('pasak.table_names.login_attempts', 'login_attempts');
-        $unblockRequestsTable = config('pasak.table_names.ip_unblock_requests', 'ip_unblock_requests');
-        $userLoginsTable = config('pasak.table_names.user_logins', 'user_logins');
-        $trustedIpsTable = config('pasak.table_names.trusted_ips', 'trusted_ips');
+        $loginAttemptsTable = config('pasak.table_names.login_attempts', 'pasak_login_attempts');
+        $unblockRequestsTable = config('pasak.table_names.ip_unblock_requests', 'pasak_ip_unblock_requests');
+        $userLoginsTable = config('pasak.table_names.user_logins', 'pasak_user_logins');
+        $trustedIpsTable = config('pasak.table_names.trusted_ips', 'pasak_trusted_ips');
         $settingsTable = config('pasak.table_names.settings', 'pasak_settings');
-        $allowedIpsTable = config('pasak.table_names.allowed_ips', 'allowed_ips');
+        $allowedIpsTable = config('pasak.table_names.allowed_ips', 'pasak_allowed_ips');
 
-        // Seamless upgrade from robyajo/pasak installs predating the rename:
+        // Seamless upgrade from robyajo/pasak installs predating the rename / prefix:
         // carry existing data over instead of starting from empty tables.
-        foreach ([
-            'security_logs' => $logsTable,
-            'security_settings' => $settingsTable,
-        ] as $legacy => $current) {
-            if ($legacy !== $current && Schema::hasTable($legacy) && ! Schema::hasTable($current)) {
-                Schema::rename($legacy, $current);
+        Schema::disableForeignKeyConstraints();
+        try {
+            foreach ([
+                'security_logs' => $logsTable,
+                'security_settings' => $settingsTable,
+                'blocked_ips' => $blockedIpsTable,
+                'login_attempts' => $loginAttemptsTable,
+                'ip_unblock_requests' => $unblockRequestsTable,
+                'user_logins' => $userLoginsTable,
+                'trusted_ips' => $trustedIpsTable,
+                'allowed_ips' => $allowedIpsTable,
+            ] as $legacy => $current) {
+                if ($legacy !== $current && Schema::hasTable($legacy) && ! Schema::hasTable($current)) {
+                    Schema::rename($legacy, $current);
+                }
             }
+        } finally {
+            Schema::enableForeignKeyConstraints();
         }
 
         if (! Schema::hasTable($blockedIpsTable)) {
@@ -196,20 +207,33 @@ return new class extends Migration
     {
         $tables = [
             config('pasak.table_names.settings', 'pasak_settings'),
-            config('pasak.table_names.allowed_ips', 'allowed_ips'),
-            config('pasak.table_names.trusted_ips', 'trusted_ips'),
-            config('pasak.table_names.user_logins', 'user_logins'),
-            config('pasak.table_names.ip_unblock_requests', 'ip_unblock_requests'),
-            config('pasak.table_names.login_attempts', 'login_attempts'),
+            config('pasak.table_names.allowed_ips', 'pasak_allowed_ips'),
+            config('pasak.table_names.trusted_ips', 'pasak_trusted_ips'),
+            config('pasak.table_names.user_logins', 'pasak_user_logins'),
+            config('pasak.table_names.ip_unblock_requests', 'pasak_ip_unblock_requests'),
+            config('pasak.table_names.login_attempts', 'pasak_login_attempts'),
             config(
                 'pasak.table_names.pasak_logs',
                 config('pasak.table_names.security_logs', 'pasak_logs')
             ),
-            config('pasak.table_names.blocked_ips', 'blocked_ips'),
+            config('pasak.table_names.blocked_ips', 'pasak_blocked_ips'),
+            'allowed_ips',
+            'trusted_ips',
+            'user_logins',
+            'ip_unblock_requests',
+            'login_attempts',
+            'blocked_ips',
+            'security_logs',
+            'security_settings',
         ];
 
-        foreach ($tables as $table) {
-            Schema::dropIfExists($table);
+        Schema::disableForeignKeyConstraints();
+        try {
+            foreach (array_unique($tables) as $table) {
+                Schema::dropIfExists($table);
+            }
+        } finally {
+            Schema::enableForeignKeyConstraints();
         }
     }
 };

@@ -15,12 +15,12 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
-use Internal\Pasak\Models\AllowedIp;
-use Internal\Pasak\Models\BlockedIp;
-use Internal\Pasak\Models\SecurityLog;
-use Internal\Pasak\Models\SecuritySetting;
-use Internal\Pasak\Models\TrustedIp;
-use Internal\Pasak\Models\UserLogin;
+use Internal\Pasak\Models\PasakAllowedIp;
+use Internal\Pasak\Models\PasakBlockedIp;
+use Internal\Pasak\Models\PasakLog;
+use Internal\Pasak\Models\PasakSetting;
+use Internal\Pasak\Models\PasakTrustedIp;
+use Internal\Pasak\Models\PasakUserLogin;
 use Throwable;
 
 /**
@@ -35,7 +35,7 @@ class PasakService
     /**
      * Versi paket Pasak (Bulwark).
      */
-    public const VERSION = '1.4.2';
+    public const VERSION = '1.4.3';
 
     /**
      * Rentang waktu yang didukung grafik tren serangan.
@@ -47,7 +47,7 @@ class PasakService
     /**
      * Block state memoized for the current request lifecycle.
      *
-     * @var array<string, BlockedIp|null>
+     * @var array<string, PasakBlockedIp|null>
      */
     protected array $blockCache = [];
 
@@ -89,8 +89,8 @@ class PasakService
                 return $this->settingsMemoryCache[$key] = Cache::get("sec_cfg.{$key}");
             }
 
-            if (Schema::hasTable((new SecuritySetting)->getTable())) {
-                $record = SecuritySetting::query()->where('key', $key)->first();
+            if (Schema::hasTable((new PasakSetting)->getTable())) {
+                $record = PasakSetting::query()->where('key', $key)->first();
                 if ($record !== null) {
                     $val = unserialize($record->value);
                     Cache::put("sec_cfg.{$key}", $val, 86400);
@@ -121,7 +121,7 @@ class PasakService
 
         $levels = array_values(array_intersect(
             array_map('strtolower', array_map('trim', array_map('strval', $levels))),
-            SecurityLog::LEVELS
+            PasakLog::LEVELS
         ));
 
         return $levels !== [] ? $levels : ['high', 'critical'];
@@ -137,8 +137,8 @@ class PasakService
         try {
             Cache::forever("sec_cfg.{$key}", $value);
 
-            if (Schema::hasTable((new SecuritySetting)->getTable())) {
-                SecuritySetting::query()->updateOrCreate(
+            if (Schema::hasTable((new PasakSetting)->getTable())) {
+                PasakSetting::query()->updateOrCreate(
                     ['key' => $key],
                     ['value' => serialize($value)]
                 );
@@ -204,7 +204,7 @@ class PasakService
         if (isset($values['auto_block_levels']) && is_array($values['auto_block_levels'])) {
             $levels = array_values(array_intersect(
                 array_map('strtolower', array_map('trim', $values['auto_block_levels'])),
-                SecurityLog::LEVELS
+                PasakLog::LEVELS
             ));
 
             if ($levels !== []) {
@@ -403,10 +403,10 @@ class PasakService
         }
 
         try {
-            $allowedTable = (new AllowedIp)->getTable();
+            $allowedTable = (new PasakAllowedIp)->getTable();
 
             if (Schema::hasTable($allowedTable)) {
-                $entry = AllowedIp::query()
+                $entry = PasakAllowedIp::query()
                     ->where('is_active', true)
                     ->where(function ($query) {
                         $query->whereNull('expires_at')->orWhere('expires_at', '>', now());
@@ -424,19 +424,19 @@ class PasakService
         }
 
         try {
-            if (TrustedIp::isAnyTrusted($ip, $deviceId, $localIp)) {
+            if (PasakTrustedIp::isAnyTrusted($ip, $deviceId, $localIp)) {
                 return true;
             }
 
-            if ($deviceId && UserLogin::query()->where('device_id', $deviceId)->whereNull('logout_at')->exists()) {
+            if ($deviceId && PasakUserLogin::query()->where('device_id', $deviceId)->whereNull('logout_at')->exists()) {
                 return true;
             }
 
-            if ($localIp && UserLogin::query()->where('local_ip', $localIp)->whereNull('logout_at')->exists()) {
+            if ($localIp && PasakUserLogin::query()->where('local_ip', $localIp)->whereNull('logout_at')->exists()) {
                 return true;
             }
 
-            if (UserLogin::query()->where('ip_address', $ip)->whereNull('logout_at')->exists()) {
+            if (PasakUserLogin::query()->where('ip_address', $ip)->whereNull('logout_at')->exists()) {
                 return true;
             }
 
@@ -524,7 +524,7 @@ class PasakService
     /**
      * Return the active block record for an IP / device, if any.
      */
-    public function activeBlock(?string $ip, ?string $deviceId = null, ?string $localIp = null): ?BlockedIp
+    public function activeBlock(?string $ip, ?string $deviceId = null, ?string $localIp = null): ?PasakBlockedIp
     {
         if (! is_string($ip) || $ip === '') {
             return null;
@@ -537,7 +537,7 @@ class PasakService
         }
 
         try {
-            $blocks = BlockedIp::query()
+            $blocks = PasakBlockedIp::query()
                 ->active()
                 ->where(function (Builder $query) use ($ip, $deviceId) {
                     $query->where('ip_address', $ip);
@@ -584,14 +584,14 @@ class PasakService
      *
      * @param  array{reason?: string|null, notes?: string|null, source?: string, blocked_by?: int|null, duration_hours?: int|string|null, expires_at?: mixed, local_ip?: string|null, device_id?: string|null, block_scope?: string}  $attributes
      */
-    public function block(string $ip, array $attributes = []): BlockedIp
+    public function block(string $ip, array $attributes = []): PasakBlockedIp
     {
         $deviceId = $attributes['device_id'] ?? null;
         $localIp = $attributes['local_ip'] ?? null;
         $blockScope = $attributes['block_scope'] ?? 'ip';
 
         if ($this->isWhitelisted($ip, $deviceId, $localIp)) {
-            return BlockedIp::query()->firstOrNew(['ip_address' => $ip, 'is_active' => false]);
+            return PasakBlockedIp::query()->firstOrNew(['ip_address' => $ip, 'is_active' => false]);
         }
 
         $duration = $attributes['duration_hours'] ?? null;
@@ -601,8 +601,8 @@ class PasakService
             $expiresAt = now()->addHours((int) $duration);
         }
 
-        /** @var BlockedIp $block */
-        $blockQuery = BlockedIp::query()->where('ip_address', $ip);
+        /** @var PasakBlockedIp $block */
+        $blockQuery = PasakBlockedIp::query()->where('ip_address', $ip);
         if ($deviceId) {
             $blockQuery->where('device_id', $deviceId);
         }
@@ -635,7 +635,7 @@ class PasakService
     /**
      * Lift a block. The record is kept for audit purposes.
      */
-    public function unblock(BlockedIp $block): void
+    public function unblock(PasakBlockedIp $block): void
     {
         $block->forceFill([
             'is_active' => false,
@@ -656,7 +656,7 @@ class PasakService
         $this->blockCache = [];
 
         try {
-            $query = BlockedIp::query()->where('is_active', true);
+            $query = PasakBlockedIp::query()->where('is_active', true);
 
             if ($deviceId) {
                 $query->where(function (Builder $q) use ($ip, $deviceId) {
@@ -688,7 +688,7 @@ class PasakService
     /**
      * Count a hit on a blocked IP (and log it, throttled per IP).
      */
-    public function logBlockedAttempt(BlockedIp $block, Request $request): void
+    public function logBlockedAttempt(PasakBlockedIp $block, Request $request): void
     {
         try {
             $block->forceFill([
@@ -911,7 +911,7 @@ class PasakService
      *
      * @param  array<int, array{label?: string, instant?: bool}>  $threats
      */
-    public function blockImmediately(string $ip, array $threats, ?string $deviceId = null, ?string $localIp = null): ?BlockedIp
+    public function blockImmediately(string $ip, array $threats, ?string $deviceId = null, ?string $localIp = null): ?PasakBlockedIp
     {
         if (! $this->instantBlockEnabled() || $this->isWhitelisted($ip, $deviceId, $localIp)) {
             return null;
@@ -1299,7 +1299,7 @@ class PasakService
 
     protected function weight(string $level): int
     {
-        return SecurityLog::LEVEL_WEIGHTS[$level] ?? 0;
+        return PasakLog::LEVEL_WEIGHTS[$level] ?? 0;
     }
 
     /*
@@ -1314,7 +1314,7 @@ class PasakService
      *
      * @param  array<int, array{rule: string, label: string, level: string, evidence: string}>  $threats
      */
-    public function record(Request $request, array $threats, ?string $action = null): ?SecurityLog
+    public function record(Request $request, array $threats, ?string $action = null): ?PasakLog
     {
         if ($threats === [] || ! $this->enabled()) {
             return null;
@@ -1323,7 +1323,7 @@ class PasakService
         $primary = $this->primaryThreat($threats);
 
         try {
-            return SecurityLog::create([
+            return PasakLog::create([
                 'ip_address' => $this->resolveClientIp($request),
                 'local_ip' => $this->resolveLocalIp($request),
                 'device_id' => $this->resolveDeviceId($request),
@@ -1505,14 +1505,14 @@ class PasakService
      *
      * @param  array<string, mixed>  $attributes
      */
-    public function log(array $attributes): ?SecurityLog
+    public function log(array $attributes): ?PasakLog
     {
         if (! $this->enabled()) {
             return null;
         }
 
         try {
-            return SecurityLog::create($attributes);
+            return PasakLog::create($attributes);
         } catch (Throwable) {
             return null;
         }
@@ -1521,7 +1521,7 @@ class PasakService
     /**
      * Block an IP/device once it crossed the configured threshold.
      */
-    public function autoBlockIfNeeded(string $ip, ?string $deviceId = null, ?string $localIp = null): ?BlockedIp
+    public function autoBlockIfNeeded(string $ip, ?string $deviceId = null, ?string $localIp = null): ?PasakBlockedIp
     {
         $config = config('pasak.auto_block', []);
         $enabled = (bool) $this->getSetting('auto_block.enabled', $config['enabled'] ?? false);
@@ -1551,7 +1551,7 @@ class PasakService
             $window = max(1, (int) $this->getSetting('auto_block.window_minutes', $config['window_minutes'] ?? 10));
             $levels = $this->autoBlockLevels();
 
-            $query = SecurityLog::query()
+            $query = PasakLog::query()
                 ->whereIn('threat_level', $levels)
                 ->where('created_at', '>=', now()->subMinutes($window));
 
@@ -1605,33 +1605,33 @@ class PasakService
         $startOfDay = now()->startOfDay();
 
         return [
-            'total_logs' => SecurityLog::query()->count(),
-            'logs_today' => SecurityLog::query()->where('created_at', '>=', $startOfDay)->count(),
-            'critical_today' => SecurityLog::query()
+            'total_logs' => PasakLog::query()->count(),
+            'logs_today' => PasakLog::query()->where('created_at', '>=', $startOfDay)->count(),
+            'critical_today' => PasakLog::query()
                 ->where('created_at', '>=', $startOfDay)
                 ->where('threat_level', 'critical')
                 ->count(),
-            'blocked_attempts_today' => SecurityLog::query()
+            'blocked_attempts_today' => PasakLog::query()
                 ->where('created_at', '>=', $startOfDay)
                 ->where('event_type', 'blocked_ip')
                 ->count(),
-            'unique_ips_today' => SecurityLog::query()
+            'unique_ips_today' => PasakLog::query()
                 ->where('created_at', '>=', $startOfDay)
                 ->distinct()
                 ->count('ip_address'),
-            'active_blocks' => BlockedIp::query()->active()->count(),
-            'total_blocks' => BlockedIp::query()->count(),
+            'active_blocks' => PasakBlockedIp::query()->active()->count(),
+            'total_blocks' => PasakBlockedIp::query()->count(),
         ];
     }
 
     /**
      * Most frequent offenders within a time window.
      *
-     * @return Collection<int, SecurityLog>
+     * @return Collection<int, PasakLog>
      */
     public function topAttackers(int $limit = 5, int $hours = 24)
     {
-        return SecurityLog::query()
+        return PasakLog::query()
             ->selectRaw('ip_address, COUNT(*) as hits, MAX(threat_level) as level, MAX(created_at) as last_seen')
             ->where('created_at', '>=', now()->subHours($hours))
             ->groupBy('ip_address')
@@ -1647,7 +1647,7 @@ class PasakService
      */
     public function levelBreakdown(int $hours = 24): array
     {
-        $counts = SecurityLog::query()
+        $counts = PasakLog::query()
             ->selectRaw('threat_level, COUNT(*) as total')
             ->where('created_at', '>=', now()->subHours($hours))
             ->groupBy('threat_level')
@@ -1655,7 +1655,7 @@ class PasakService
 
         $breakdown = [];
 
-        foreach (SecurityLog::LEVELS as $level) {
+        foreach (PasakLog::LEVELS as $level) {
             $breakdown[$level] = (int) ($counts[$level] ?? 0);
         }
 
@@ -1691,7 +1691,7 @@ class PasakService
             : now()->subDays($range === 'month' ? 29 : 6)->startOfDay();
 
         try {
-            $rows = SecurityLog::query()
+            $rows = PasakLog::query()
                 ->selectRaw('DATE(created_at) as day, threat_level, COUNT(*) as total')
                 ->where('created_at', '>=', $start)
                 ->groupBy('day', 'threat_level')
@@ -1789,7 +1789,7 @@ class PasakService
     {
         $levels = [];
 
-        foreach (SecurityLog::LEVELS as $level) {
+        foreach (PasakLog::LEVELS as $level) {
             $levels[$level] = (int) ($bucket['levels'][$level] ?? 0);
         }
 

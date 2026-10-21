@@ -69,16 +69,23 @@ class PasakUninstallCommand extends Command
 
         $tables = [
             config('pasak.table_names.settings', 'pasak_settings'),
-            config('pasak.table_names.allowed_ips', 'allowed_ips'),
-            config('pasak.table_names.trusted_ips', 'trusted_ips'),
-            config('pasak.table_names.user_logins', 'user_logins'),
-            config('pasak.table_names.ip_unblock_requests', 'ip_unblock_requests'),
-            config('pasak.table_names.login_attempts', 'login_attempts'),
+            config('pasak.table_names.allowed_ips', 'pasak_allowed_ips'),
+            config('pasak.table_names.trusted_ips', 'pasak_trusted_ips'),
+            config('pasak.table_names.user_logins', 'pasak_user_logins'),
+            config('pasak.table_names.ip_unblock_requests', 'pasak_ip_unblock_requests'),
+            config('pasak.table_names.login_attempts', 'pasak_login_attempts'),
             config(
                 'pasak.table_names.pasak_logs',
                 config('pasak.table_names.security_logs', 'pasak_logs')
             ),
-            config('pasak.table_names.blocked_ips', 'blocked_ips'),
+            config('pasak.table_names.blocked_ips', 'pasak_blocked_ips'),
+            // Varian lama (pra-prefix) agar tidak tertinggal.
+            'allowed_ips',
+            'trusted_ips',
+            'user_logins',
+            'ip_unblock_requests',
+            'login_attempts',
+            'blocked_ips',
             // Varian lama (pra-rename) agar tidak tertinggal.
             'security_logs',
             'security_settings',
@@ -177,6 +184,9 @@ class PasakUninstallCommand extends Command
         ];
 
         $markers = [
+            'Internal\\Pasak\\Http\\Middleware\\PasakBlockIpAddress::class',
+            'Internal\\Pasak\\Http\\Middleware\\PasakDetectSecurityThreats::class',
+            'Internal\\Pasak\\Http\\Middleware\\PasakInjectAnnouncementBanner::class',
             'Internal\\Pasak\\Http\\Middleware\\BlockIpAddress::class',
             'Internal\\Pasak\\Http\\Middleware\\DetectSecurityThreats::class',
             'Internal\\Pasak\\Http\\Middleware\\InjectAnnouncementBanner::class',
@@ -250,8 +260,9 @@ class PasakUninstallCommand extends Command
             base_path('app/User.php'),
         ];
 
-        $trait = 'HasSecurityRelations';
+        $traits = ['HasPasakSecurityRelations', 'HasSecurityRelations'];
         $imports = [
+            'use Internal\\Pasak\\Concerns\\HasPasakSecurityRelations;',
             'use Internal\\Pasak\\Concerns\\HasSecurityRelations;',
             'use Internal\\SecurityMonitor\\Concerns\\HasSecurityRelations;',
         ];
@@ -266,27 +277,29 @@ class PasakUninstallCommand extends Command
 
             $content = str_replace($imports, '', $content);
 
-            // "use HasSecurityRelations;" mandiri -> hapus barisnya.
-            $content = (string) preg_replace(
-                '/^[ \t]*use\s+'.preg_quote($trait, '/').'\s*;[ \t]*\r?\n?/m',
-                '',
-                $content
-            );
-            // Daftar gabungan "use A, HasSecurityRelations, B;" -> keluarkan namanya.
-            $content = (string) preg_replace(
-                '/,\s*'.preg_quote($trait, '/').'\b/',
-                '',
-                $content
-            );
-            $content = (string) preg_replace(
-                '/\b'.preg_quote($trait, '/').'\s*,\s*/',
-                '',
-                $content
-            );
+            foreach ($traits as $trait) {
+                // "use HasPasakSecurityRelations;" mandiri -> hapus barisnya.
+                $content = (string) preg_replace(
+                    '/^[ \t]*use\s+'.preg_quote($trait, '/').'\s*;[ \t]*\r?\n?/m',
+                    '',
+                    $content
+                );
+                // Daftar gabungan "use A, HasPasakSecurityRelations, B;" -> keluarkan namanya.
+                $content = (string) preg_replace(
+                    '/,\s*'.preg_quote($trait, '/').'\b/',
+                    '',
+                    $content
+                );
+                $content = (string) preg_replace(
+                    '/\b'.preg_quote($trait, '/').'\s*,\s*/',
+                    '',
+                    $content
+                );
+            }
 
             if ($content !== $original) {
                 File::put($path, $this->normalizePhpFile($content));
-                $this->info('  ✓ Trait HasSecurityRelations dilepas dari model User.');
+                $this->info('  ✓ Trait Pasak dilepas dari model User.');
             }
         }
     }

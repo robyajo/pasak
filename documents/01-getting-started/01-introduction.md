@@ -37,13 +37,13 @@ Sama seperti paket Spatie terpopuler, paket ini menyatu secara elegan ke dalam t
 graph TD
     Composer[composer require robyajo/pasak] --> Discovery[1. Laravel Package Auto-Discovery<br/>PasakServiceProvider + Facade]
 
-    Discovery --> Hook1["2. Core Eloquent: HasSecurityRelations Trait<br/>User::logins(), User::trustedIps()"]
+    Discovery --> Hook1["2. Core Eloquent: HasPasakSecurityRelations Trait<br/>User::logins(), User::trustedIps()"]
     Discovery --> Hook2[3. Core Auth Events: Event::listen<br/>Failed & Login Events Otomatis Diawasi]
     Discovery --> Hook3[4. Core HTTP Kernel: Middleware Aliases<br/>pasak.block, pasak.detect, pasak.admin]
     Discovery --> Hook4["5. Core Authorization: Gate<br/>Gate::define('manage-pasak')"]
     Discovery --> Hook5[6. Core Artisan CLI: Console Commands<br/>pasak:install, pasak:scan-logs, dll]
     Discovery --> Hook6[7. Core Scheduler: Schedule Runner<br/>Prune log harian & liveness heartbeat]
-    Discovery --> Hook7[8. Core Validation: ValidationRule<br/>SafeImageFile, SafeAssetPath]
+    Discovery --> Hook7[8. Core Validation: ValidationRule<br/>PasakSafeImageFile, PasakSafeAssetPath]
 ```
 
 ### 1. Package Auto-Discovery
@@ -70,15 +70,17 @@ Laravel otomatis memuat provider ini saat proses booting. Pengembang tidak perlu
 Sama seperti menambahkan `use HasRoles;` pada paket Spatie Permission, pengembang cukup menambahkan satu baris ke model `User` miliknya:
 
 ```php
-use Internal\Pasak\Concerns\HasSecurityRelations;
+use Internal\Pasak\Concerns\HasPasakSecurityRelations;
 
 class User extends Authenticatable
 {
-    use HasSecurityRelations;
+    use HasPasakSecurityRelations;
 }
 ```
 
-Ini langsung membuka relasi `$user->logins()`, `$user->trustedIps()`, `$user->securityLogs()`, dan `$user->blockedIps()`.
+> **Catatan Kompatibilitas**: Nama lama `HasSecurityRelations` tetap didukung secara transparan via alias.
+
+Ini langsung membuka relasi `$user->logins()`, `$user->trustedIps()`, `$user->pasakLogs()` (atau `$user->securityLogs()`), dan `$user->blockedIps()`.
 
 ### 3. Mengaitkan Event Otentikasi Bawaan Laravel
 

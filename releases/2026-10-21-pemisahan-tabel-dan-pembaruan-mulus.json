@@ -1,0 +1,39 @@
+{
+    "date": "2026-10-21",
+    "type": "improvement",
+    "title": {
+        "id": "Penyelarasan ruang data mandiri dan pembaruan sistem yang mulus tanpa mengganggu data lama",
+        "en": "Harmonized dedicated data storage and smooth system upgrades without disrupting existing records"
+    },
+    "body": {
+        "id": "Seluruh wadah penyimpanan data keamanan kini menggunakan penanda khusus agar berdiri mandiri dan tidak bercampur atau menimpa data milik aplikasi utama. Sistem pembaruan otomatis juga dibekali kemampuan membaca data lama secara cerdas, memindahkan riwayat keamanan ke wadah baru tanpa jeda, serta menjaga agar layanan tetap berjalan normal sebelum maupun sesudah pembaruan diterapkan.",
+        "en": "All security data storage containers now feature dedicated identifiers so they operate independently without overlapping or overwriting data from the host application. The automated upgrade system has also been enhanced to intelligently read legacy records, transition security history into new containers without downtime, and ensure services remain fully operational both before and after updates are applied."
+    },
+    "items": [
+        {
+            "type": "improvement",
+            "id": "Seluruh wadah data keamanan kini memiliki penanda khusus mandiri agar terpisah bersih dari data aplikasi pengguna.",
+            "en": "All security data containers now carry dedicated identifiers to cleanly separate them from the user's application data."
+        },
+        {
+            "type": "improvement",
+            "id": "Pembaruan sistem berjalan mulus dan otomatis mengalihkan data keamanan lama ke wadah baru tanpa kehilangan data apa pun.",
+            "en": "System upgrades proceed smoothly and automatically transition legacy security records into new containers without data loss."
+        },
+        {
+            "type": "improvement",
+            "id": "Dukungan transisi cerdas menjaga sistem tetap dapat membaca data lama secara langsung saat pembaruan sedang berlangsung.",
+            "en": "Smart transitional support ensures the system can seamlessly access legacy records in real time while updates are in progress."
+        },
+        {
+            "type": "improvement",
+            "id": "Pengenal data lama tetap dikenali sepenuhnya sehingga pengaturan dan kode integrasi pengguna yang sudah ada tidak perlu diubah.",
+            "en": "Legacy data identifiers remain fully recognized so existing user configurations and integrations continue working without changes."
+        },
+        {
+            "type": "improvement",
+            "id": "Seluruh komponen keamanan, filter pemeriksaan, dan pengendali sistem kini diberi penanda khusus agar mudah dikenali dan tidak tertukar dengan komponen aplikasi milik pengguna.",
+            "en": "All security components, inspection filters, and system controllers now carry dedicated identifiers so they are easily distinguished and never conflict with existing user application components."
+        }
+    ]
+}

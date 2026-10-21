@@ -52,18 +52,23 @@ PHP
 
     // Mock app_path and base_path behavior by running targeted methods or verifying regex transformations
     $userContent = File::get($userFile);
-    expect($userContent)->not->toContain('HasSecurityRelations');
+    expect($userContent)->not->toContain('HasPasakSecurityRelations')
+        ->and($userContent)->not->toContain('HasSecurityRelations');
 
     $bootstrapContent = File::get($bootstrapFile);
-    expect($bootstrapContent)->not->toContain('BlockIpAddress');
+    expect($bootstrapContent)->not->toContain('PasakBlockIpAddress')
+        ->and($bootstrapContent)->not->toContain('BlockIpAddress');
 
-    // Test install options are registered in command
-    $command = $this->app->make(SecurityInstallCommand::class);
+    // Test install options are registered in command (supports both PasakInstallCommand & SecurityInstallCommand)
+    $command = $this->app->make(\Internal\Pasak\Console\Commands\PasakInstallCommand::class);
     $definition = $command->getDefinition();
     expect($definition->hasOption('without-user-trait'))->toBeTrue()
         ->and($definition->hasOption('without-middleware'))->toBeTrue()
         ->and($definition->hasOption('without-routes'))->toBeTrue()
         ->and($definition->hasOption('without-api'))->toBeTrue();
+
+    $legacyCommand = $this->app->make(SecurityInstallCommand::class);
+    expect($legacyCommand)->toBeInstanceOf(\Internal\Pasak\Console\Commands\PasakInstallCommand::class);
 });
 
 test('pasak routes tag publishes pasak.php and pasak-api.php', function () {

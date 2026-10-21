@@ -4,6 +4,26 @@ All notable changes to `robyajo/pasak` will be documented in this file.
 
 ## [Unreleased]
 
+## [1.5.0] - 2026-10-21
+
+### Added
+
+- **Prefix `Pasak*` pada seluruh komponen & berkas yang diterima pengguna**:
+  - Seluruh komponen yang dipublikasikan atau diintegrasikan ke proyek host saat `composer require robyajo/pasak` dan `php artisan pasak:install` kini menggunakan awalan `Pasak` yang konsisten agar mudah dibedakan dari kelas bawaan aplikasi host:
+    - **Models**: `PasakBlockedIp`, `PasakLog`, `PasakLoginAttempt`, `PasakIpUnblockRequest`, `PasakUserLogin`, `PasakTrustedIp`, `PasakAllowedIp`, `PasakSetting` (dan tabel bawaan `pasak_*`).
+    - **Middleware**: `PasakBlockIpAddress`, `PasakDetectSecurityThreats`, `PasakEnsureSecurityAdmin`, `PasakInjectAnnouncementBanner`, `PasakTrackUserActivity`.
+    - **Listeners**: `PasakLogFailedLoginAttempt`, `PasakRecordUserLogin`, `PasakResetLoginAttempts`.
+    - **Validation Rules**: `PasakSafeAssetPath`, `PasakSafeImageFile`.
+    - **Services**: `PasakAccessLogScannerService`, `PasakLoginThrottleService`, `PasakServerSecurityService`, `PasakUserLoginService`, `PasakVersionCheckService`, `PasakService`.
+    - **Support**: `PasakDashboardView`, `PasakTableResolver`.
+    - **Concerns / Traits**: `HasPasakSecurityRelations`, `ResolvesPasakTable`, `RespondsWithPasakDashboard`.
+    - **Console Commands**: `PasakInstallCommand`, `PasakUpgradeCommand`, `PasakBaselineCommand`, `PasakPruneSecurityLogsCommand`, `PasakPurgeInjectedDataCommand`, `PasakScanAccessLogsCommand`, `PasakUnblockIpCommand`, `PasakUninstallCommand`.
+    - **API Controllers**: `PasakAllowedIpApiController`, `PasakBlockedIpApiController`, `PasakIpUnblockRequestApiController`, `PasakSecurityLogApiController`, `PasakSecuritySettingApiController`, `PasakServerSecurityApiController`, `PasakUserSessionApiController`.
+    - **Dashboard Controllers**: `PasakAllowedIpController`, `PasakBlockedIpController`, `PasakLogController`, `PasakOverviewController`, `PasakServerController`, `PasakSessionController`, `PasakSettingController`, `PasakTicketController`.
+  - **100% Kompatibilitas Mundur**: Seluruh nama kelas lama (`BlockedIp`, `SecurityLog`, `BlockIpAddress`, `HasSecurityRelations`, `ServerSecurityService`, dll.) tetap disediakan sebagai subclass dan `class_alias` transparan di `src/compat.php` dan berkas kelas lama, sehingga kode pengguna lama, test, maupun import yang sudah ada tidak mengalami pemecahan (zero breaking changes).
+  - **Upgrade Mulus**: Migrasi `2026_10_21_000001_prefix_pasak_tables.php` dan `ResolvesPasakTable` mendeteksi status tabel secara runtime sehingga aplikasi tidak error `table not found` sebelum maupun sesudah migrasi dijalankan.
+  - **Installer & Uninstaller**: `pasak:install` otomatis menyematkan `HasPasakSecurityRelations` dan `PasakBlockIpAddress` / `PasakDetectSecurityThreats`. `pasak:uninstall` membersihkan kedua versi nama (berawalan `Pasak` maupun lama).
+
 ### Fixed
 
 - **`pasak:uninstall` kini total bersih**: path stub `.env` salah (`'__DIR__/....'` literal + `dirname(..., 2)`) sehingga komentar stub tidak pernah terhapus — diperbaiki; receiver `$middleware` gantung ikut dihapus saat blok `append()` dikosongkan (sebelumnya merusak sintaks `bootstrap/app.php`); file `*.backup-*` milik Pasak dan direktori induk kosong (`views/errors`, `views/pages`, `js/pages`, `js/components`) ikut dihapus. Tercakup 2 test regresi baru.

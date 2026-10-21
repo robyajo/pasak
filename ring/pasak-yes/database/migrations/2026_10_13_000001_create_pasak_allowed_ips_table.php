@@ -8,8 +8,12 @@ return new class extends Migration
 {
     public function up(): void
     {
-        $table = config('pasak.table_names.allowed_ips', 'allowed_ips');
+        $table = config('pasak.table_names.allowed_ips', 'pasak_allowed_ips');
         $usersTable = config('pasak.table_names.users', 'users');
+
+        if (Schema::hasTable('allowed_ips') && ! Schema::hasTable($table)) {
+            Schema::rename('allowed_ips', $table);
+        }
 
         if (! Schema::hasTable($table)) {
             Schema::create($table, function (Blueprint $blueprint) use ($usersTable) {
@@ -29,6 +33,7 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::dropIfExists(config('pasak.table_names.allowed_ips', 'allowed_ips'));
+        Schema::dropIfExists(config('pasak.table_names.allowed_ips', 'pasak_allowed_ips'));
+        Schema::dropIfExists('allowed_ips');
     }
 };

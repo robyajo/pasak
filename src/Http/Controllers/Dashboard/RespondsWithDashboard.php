@@ -2,25 +2,14 @@
 
 namespace Internal\Pasak\Http\Controllers\Dashboard;
 
-use Illuminate\Contracts\View\View;
-
 /**
- * Render dashboard pages as plain Blade views.
- *
- * Pasak hanya mendukung dashboard Blade murni (100% Pure PHP, tanpa
- * Livewire/Inertia/Vue).
+ * Legacy trait alias for RespondsWithPasakDashboard.
  */
 trait RespondsWithDashboard
 {
-    /**
-     * @param  array<string, mixed>  $data
-     */
-    protected function dashboardResponse(string $blade, array $data): View
-    {
-        if (! view()->exists($blade)) {
-            abort(500, 'Dashboard views are not published. Run: php artisan pasak:install --with-dashboard');
-        }
+    use RespondsWithPasakDashboard;
+}
 
-        return view($blade, $data);
-    }
+if (! class_exists('Internal\Pasak\Http\Controllers\Dashboard\RespondsWithDashboard', false) && ! trait_exists('Internal\Pasak\Http\Controllers\Dashboard\RespondsWithDashboard', false)) {
+    class_alias(RespondsWithPasakDashboard::class, 'Internal\Pasak\Http\Controllers\Dashboard\RespondsWithDashboard');
 }
