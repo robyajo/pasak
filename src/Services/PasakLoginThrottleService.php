@@ -197,7 +197,7 @@ class PasakLoginThrottleService
 
     protected function config(string $key, mixed $default = null): mixed
     {
-        return config('pasak.login_lockout.'.$key, $default);
+        return $this->security->getSetting('login_lockout.'.$key, config('pasak.login_lockout.'.$key, $default));
     }
 
     protected function find(?string $email, ?string $ip): ?PasakLoginAttempt

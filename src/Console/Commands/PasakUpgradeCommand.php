@@ -5,6 +5,7 @@ namespace Internal\Pasak\Console\Commands;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\File;
+use Internal\Pasak\Database\Seeders\PasakDefaultSettingsSeeder;
 use Internal\Pasak\Services\PasakVersionCheckService;
 use Symfony\Component\Process\Process;
 use Throwable;
@@ -108,6 +109,22 @@ class PasakUpgradeCommand extends Command
         $this->info('  ✓ Berkas migrasi telah disinkronkan dan diterapkan.');
         $this->newLine();
 
+        // 2b. Tanam nilai bawaan pengaturan yang belum ada (idempotent — yang sudah diset user tidak disentuh).
+        try {
+            $seededKeys = app(PasakDefaultSettingsSeeder::class)->run();
+
+            if ($seededKeys === []) {
+                $this->line('  ✓ Pengaturan keamanan bawaan sudah lengkap di database.');
+            } else {
+                $this->info('  ✓ '.count($seededKeys).' pengaturan keamanan baru ditanam ke database (atur dari dashboard /pasak/settings).');
+            }
+        } catch (Throwable $e) {
+            $this->comment(
+                '  ℹ Nilai bawaan pengaturan belum ditanam. Jalankan: php artisan db:seed --class=Internal\\Pasak\\Database\\Seeders\\PasakDefaultSettingsSeeder --force',
+            );
+        }
+        $this->newLine();
+
         // 3. Synchronize routes (tanpa menimpa kustomisasi host kecuali diminta).
         $this->comment('3/5. Menyinkronkan berkas rute kustom...');
         $this->migrateLegacyHostFiles();
@@ -152,6 +169,10 @@ class PasakUpgradeCommand extends Command
             $this->warnIfViewsOutdated(
                 resource_path('views/pages/pasak/layout.blade.php'),
                 'pasak.dashboard.threat-map'
+            );
+            $this->warnIfViewsOutdated(
+                resource_path('views/pages/pasak/settings.blade.php'),
+                'auto_block_level_thresholds'
             );
         }
 
@@ -372,7 +393,33 @@ class PasakUpgradeCommand extends Command
 
             preg_match_all('/^(PASAK_[A-Z0-9_]+)=/m', File::get($stubPath), $m);
 
-            return $m[1];
+            // Kunci perilaku legacy di luar stub inti tetap didukung sebagai
+            // override manual, jadi migrasi SECURITY_* -> PASAK_* harus tetap
+            // mencakup semuanya.
+            return array_values(array_unique(array_merge($m[1], [
+                'PASAK_AUTO_BLOCK_ENABLED',
+                'PASAK_AUTO_BLOCK_THRESHOLD',
+                'PASAK_AUTO_BLOCK_WINDOW',
+                'PASAK_AUTO_BLOCK_DURATION',
+                'PASAK_AUTO_BLOCK_LEVELS',
+                'PASAK_AUTO_BLOCK_SCOPE',
+                'PASAK_AUTO_BLOCK_LEVEL_THRESHOLDS',
+                'PASAK_AUTO_BLOCK_COMBINED_THRESHOLD',
+                'PASAK_INSTANT_BLOCK_ENABLED',
+                'PASAK_INSTANT_BLOCK_DURATION',
+                'PASAK_INSTANT_BLOCK_SCOPE',
+                'PASAK_LOGIN_LOCKOUT_ENABLED',
+                'PASAK_LOGIN_LOCKOUT_THRESHOLD',
+                'PASAK_LOGIN_LOCKOUT_BASE_MINUTES',
+                'PASAK_LOGIN_LOCKOUT_MAX_MINUTES',
+                'PASAK_LOGIN_LOCKOUT_DECAY_MINUTES',
+                'PASAK_LOG_RETENTION_DAYS',
+                'PASAK_BLOCK_ENFORCEMENT',
+                'PASAK_MONITOR_ENABLED',
+                'PASAK_ANNOUNCEMENT_ENABLED',
+                'PASAK_VERSION_CHECK_ENABLED',
+                'PASAK_DASHBOARD_DRIVER',
+            ])));
         }
 
         return [];

@@ -163,21 +163,127 @@ class PasakService
             'auto_block_window' => (int) $this->getSetting('auto_block.window_minutes', config('pasak.auto_block.window_minutes', 10)),
             'auto_block_duration' => (int) $this->getSetting('auto_block.duration_hours', config('pasak.auto_block.duration_hours', 24)),
             'auto_block_levels' => $this->autoBlockLevels(),
+            'auto_block_level_thresholds' => $this->autoBlockLevelThresholds(),
+            'auto_block_combined_threshold' => (int) $this->getSetting('auto_block.combined_threshold', config('pasak.auto_block.combined_threshold', 3)),
             'instant_block_enabled' => (bool) $this->getSetting('instant_block.enabled', config('pasak.instant_block.enabled', false)),
             'instant_block_duration' => (int) $this->getSetting('instant_block.duration_hours', config('pasak.instant_block.duration_hours', 720)),
             'block_enforcement' => (bool) $this->getSetting('block_enforcement', config('pasak.block_enforcement', true)),
+            'login_lockout_enabled' => (bool) $this->getSetting('login_lockout.enabled', config('pasak.login_lockout.enabled', true)),
+            'login_lockout_threshold' => (int) $this->getSetting('login_lockout.threshold', config('pasak.login_lockout.threshold', 3)),
+            'login_lockout_base_minutes' => (int) $this->getSetting('login_lockout.base_minutes', config('pasak.login_lockout.base_minutes', 1)),
+            'login_lockout_max_minutes' => (int) $this->getSetting('login_lockout.max_minutes', config('pasak.login_lockout.max_minutes', 30)),
+            'login_lockout_decay_minutes' => (int) $this->getSetting('login_lockout.decay_minutes', config('pasak.login_lockout.decay_minutes', 60)),
+            'log_retention_days' => (int) $this->getSetting('log_retention_days', config('pasak.retention_days', 90)),
         ];
     }
 
     /**
-     * Update structured settings and optionally sync with .env file.
+     * Built-in default security settings that are seeded into the database
+     * (pasak_settings) so the admin can tune everything from the dashboard
+     * without touching .env.
+     *
+     * @return array<string, mixed>
+     */
+    public function defaultSettings(): array
+    {
+        return [
+            'block_enforcement' => (bool) config('pasak.block_enforcement', true),
+
+            'auto_block.enabled' => (bool) config('pasak.auto_block.enabled', false),
+            'auto_block.threshold' => (int) config('pasak.auto_block.threshold', 3),
+            'auto_block.window_minutes' => (int) config('pasak.auto_block.window_minutes', 10),
+            'auto_block.duration_hours' => (int) config('pasak.auto_block.duration_hours', 24),
+            'auto_block.levels' => $this->autoBlockLevels() === [] ? ['high', 'critical'] : $this->autoBlockLevels(),
+            'auto_block.scope' => config('pasak.auto_block.scope', 'device'),
+            'auto_block.level_thresholds' => $this->autoBlockLevelThresholds(),
+            'auto_block.combined_threshold' => (int) config('pasak.auto_block.combined_threshold', 3),
+
+            'instant_block.enabled' => (bool) config('pasak.instant_block.enabled', false),
+            'instant_block.duration_hours' => (int) config('pasak.instant_block.duration_hours', 720),
+            'instant_block.scope' => config('pasak.instant_block.scope', 'device'),
+
+            'login_lockout.enabled' => (bool) config('pasak.login_lockout.enabled', true),
+            'login_lockout.threshold' => (int) config('pasak.login_lockout.threshold', 3),
+            'login_lockout.base_minutes' => (int) config('pasak.login_lockout.base_minutes', 1),
+            'login_lockout.max_minutes' => (int) config('pasak.login_lockout.max_minutes', 30),
+            'login_lockout.decay_minutes' => (int) config('pasak.login_lockout.decay_minutes', 60),
+
+            'log_retention_days' => (int) config('pasak.retention_days', 90),
+        ];
+    }
+
+    /**
+     * Insert missing default settings into the database (idempotent —
+     * existing values are never overwritten). Used by the default settings
+     * seeder, pasak:install, and pasak:upgrade.
+     *
+     * @return array<int, string> keys that were newly created
+     */
+    public function seedDefaultSettings(): array
+    {
+        $created = [];
+
+        try {
+            if (! Schema::hasTable((new PasakSetting)->getTable())) {
+                return $created;
+            }
+        } catch (Throwable) {
+            return $created;
+        }
+
+        foreach ($this->defaultSettings() as $key => $default) {
+            try {
+                if (PasakSetting::query()->where('key', $key)->exists()) {
+                    continue;
+                }
+                $this->setSetting($key, $default);
+                $created[] = $key;
+            } catch (Throwable) {
+                // Skip a single key failure; do not abort the whole seeding.
+            }
+        }
+
+        return $created;
+    }
+
+    /**
+     * Per-threat-level auto-block thresholds (events before that exact
+     * level trips an automatic block), honooring user settings first.
+     *
+     * @return array<string, int>
+     */
+    public function autoBlockLevelThresholds(): array
+    {
+        $stored = $this->getSetting(
+            'auto_block.level_thresholds',
+            config('pasak.auto_block.level_thresholds', ['critical' => 1, 'high' => 2, 'medium' => 3, 'low' => 5])
+        );
+
+        $thresholds = [];
+
+        foreach (array_reverse(PasakLog::LEVELS) as $level) {
+            $thresholds[$level] = max(1, min(100, (int) ($stored[$level] ?? match ($level) {
+                'critical' => 1,
+                'high' => 2,
+                'medium' => 3,
+                default => 5,
+            })));
+        }
+
+        return $thresholds;
+    }
+
+    /**
+     * Update structured settings (database-backed; see defaultSettings()
+     * for the seeded keys). Env overrides PASAK_* remain supported as a
+     * silent fallback when a setting row does not exist.
      *
      * @param  array<string, mixed>  $values
      * @return array<string, mixed>
      */
     public function updateSettings(array $values): array
     {
-        if (isset($values['auto_block_scope']) && in_array($values['auto_block_scope'], ['device', 'ip'], true)) {
+        if (isset($values['auto_block_scope']) && in_array($values['auto_block_scope'], ['device', 'ip', 'auto'], true)) {
             $this->setSetting('auto_block.scope', (string) $values['auto_block_scope']);
         }
 
@@ -199,6 +305,24 @@ class PasakService
 
         if (isset($values['auto_block_duration'])) {
             $this->setSetting('auto_block.duration_hours', max(0, (int) $values['auto_block_duration']));
+        }
+
+        if (isset($values['auto_block_combined_threshold'])) {
+            $this->setSetting('auto_block.combined_threshold', max(1, (int) $values['auto_block_combined_threshold']));
+        }
+
+        if (isset($values['auto_block_level_thresholds']) && is_array($values['auto_block_level_thresholds'])) {
+            $current = $this->autoBlockLevelThresholds();
+
+            foreach ($values['auto_block_level_thresholds'] as $level => $raw) {
+                if (! in_array((string) $level, PasakLog::LEVELS, true)) {
+                    continue;
+                }
+
+                $current[$level] = max(1, min(100, (int) $raw));
+            }
+
+            $this->setSetting('auto_block.level_thresholds', $current);
         }
 
         if (isset($values['auto_block_levels']) && is_array($values['auto_block_levels'])) {
@@ -224,14 +348,40 @@ class PasakService
             $this->setSetting('block_enforcement', (bool) $values['block_enforcement']);
         }
 
+        if (isset($values['login_lockout_enabled'])) {
+            $this->setSetting('login_lockout.enabled', (bool) $values['login_lockout_enabled']);
+        }
+
+        if (isset($values['login_lockout_threshold'])) {
+            $this->setSetting('login_lockout.threshold', max(1, (int) $values['login_lockout_threshold']));
+        }
+
+        if (isset($values['login_lockout_base_minutes'])) {
+            $this->setSetting('login_lockout.base_minutes', max(1, (int) $values['login_lockout_base_minutes']));
+        }
+
+        if (isset($values['login_lockout_max_minutes'])) {
+            $this->setSetting('login_lockout.max_minutes', max(1, (int) $values['login_lockout_max_minutes']));
+        }
+
+        if (isset($values['login_lockout_decay_minutes'])) {
+            $this->setSetting('login_lockout.decay_minutes', max(1, (int) $values['login_lockout_decay_minutes']));
+        }
+
+        if (isset($values['log_retention_days'])) {
+            $this->setSetting('log_retention_days', max(0, (int) $values['log_retention_days']));
+        }
+
         $fresh = $this->getSettings();
-        $this->syncSettingsToEnv($fresh);
 
         return $fresh;
     }
 
     /**
      * Sync updated settings to .env file if it exists and is writable.
+     *
+     * Deprecated: settings are database-backed by default now; this helper
+     * is kept only for hosts that still persist a mirrored .env snapshot.
      *
      * @param  array<string, mixed>  $settings
      */
@@ -1523,7 +1673,13 @@ class PasakService
     }
 
     /**
-     * Block an IP/device once it crossed the configured threshold.
+     * Block an IP/device once the configured thresholds are crossed.
+     *
+     * Two gates trip an automatic block within the monitoring window:
+     *  1. Any single monitored threat level reaches its own threshold
+     *     (e.g. 1x critical, 2x high, 3x medium, 5x low).
+     *  2. Mixed levels combined total at least the combined threshold
+     *     (e.g. 2x high + 1x medium = 3 mixed events).
      */
     public function autoBlockIfNeeded(string $ip, ?string $deviceId = null, ?string $localIp = null): ?PasakBlockedIp
     {
@@ -1536,12 +1692,23 @@ class PasakService
 
         $scope = (string) $this->getSetting('auto_block.scope', $config['scope'] ?? 'device');
 
-        if ($scope === 'device' && empty($deviceId)) {
-            $deviceId = $this->resolveDeviceId();
+        if (in_array($scope, ['device', 'auto'], true) && empty($deviceId)) {
+            $deviceId = $scope === 'auto'
+                // Adaptive hanya menganggap perangkat "terdeteksi" bila identitas
+                // perangkat eksplisit tersedia (header/cookie/device stub), bukan
+                // sintesis fingerprint spekulatif.
+                ? $this->resolveDeviceId(null, false)
+                : $this->resolveDeviceId();
         }
 
         if (empty($localIp)) {
             $localIp = $this->resolveLocalIp();
+        }
+
+        // Adaptive scope: block per device whenever a fingerprint exists;
+        // only fall back to blocking the whole IP when nothing is detectable.
+        if ($scope === 'auto') {
+            $scope = (empty($deviceId) && empty($localIp)) ? 'ip' : 'device';
         }
 
         $existing = $this->activeBlock($ip, $deviceId, $localIp);
@@ -1551,9 +1718,13 @@ class PasakService
         }
 
         try {
-            $threshold = max(1, (int) $this->getSetting('auto_block.threshold', $config['threshold'] ?? 3));
             $window = max(1, (int) $this->getSetting('auto_block.window_minutes', $config['window_minutes'] ?? 10));
             $levels = $this->autoBlockLevels();
+            $levelThresholds = $this->autoBlockLevelThresholds();
+            $combinedThreshold = max(1, (int) $this->getSetting(
+                'auto_block.combined_threshold',
+                $config['combined_threshold'] ?? 3
+            ));
 
             $query = PasakLog::query()
                 ->whereIn('threat_level', $levels)
@@ -1570,9 +1741,35 @@ class PasakService
                 $query->where('ip_address', $ip);
             }
 
-            $count = $query->count();
+            $counts = $query->select('threat_level', DB::raw('COUNT(*) as total'))
+                ->groupBy('threat_level')
+                ->pluck('total', 'threat_level')
+                ->map(fn ($count): int => (int) $count)
+                ->toArray();
 
-            if ($count < $threshold) {
+            $total = array_sum($counts);
+
+            // Gate 1: exact per-level thresholds.
+            $trippedBy = null;
+
+            foreach ($counts as $level => $count) {
+                if ($count >= $levelThresholds[$level]) {
+                    $trippedBy = ['level' => $level, 'count' => $count];
+                    break;
+                }
+            }
+
+            // Gate 2: mixed-level combined threshold — hanya berlaku bila
+            // beberapa level berbeda bercampur dalam jendela yang sama.
+            if (
+                $trippedBy === null
+                && count($counts) >= 2
+                && $total >= $combinedThreshold
+            ) {
+                $trippedBy = ['level' => null, 'count' => $total];
+            }
+
+            if ($trippedBy === null) {
                 return null;
             }
         } catch (Throwable) {
@@ -1585,7 +1782,7 @@ class PasakService
             'block_scope' => $scope,
             'reason' => sprintf(
                 'Diblokir otomatis: %d aktivitas berisiko terdeteksi dalam %d menit terakhir.'.($scope === 'device' ? ' (Hanya isolasi perangkat penyerang)' : ''),
-                $count,
+                $total,
                 $window
             ),
             'source' => 'automatic',

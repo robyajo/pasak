@@ -73,8 +73,12 @@ test('announcement middleware alias is registered', function () {
     expect(app('router')->getMiddleware())->toHaveKey('pasak.announce');
 });
 
-test('env stub documents the announcement toggle', function () {
+test('env stub stays core-only and announcement is a database-backed setting', function () {
     $stub = file_get_contents(dirname(__DIR__, 2).'/stubs/env.stub');
 
-    expect($stub)->toContain('PASAK_ANNOUNCEMENT_ENABLED');
+    // Env inti hanya memuat sakelar boot/routing; perilaku pengumuman
+    // dikelola dari dashboard (pasak_settings) dan dibaca lewat bawaan
+    // konfigurasi bila belum diatur.
+    expect($stub)->toContain('PASAK_MONITOR_ENABLED')
+        ->and($stub)->not->toContain('PASAK_ANNOUNCEMENT_ENABLED');
 });

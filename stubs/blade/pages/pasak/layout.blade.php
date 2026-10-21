@@ -698,6 +698,202 @@
             border-bottom: 1px solid var(--sec-border);
         }
 
+        /* Settings — scope pills, level cards, toggle switch */
+        .sec-scope-box.active-info {
+            border-color: var(--sec-primary);
+            background: rgba(59, 130, 246, 0.08);
+        }
+        .sec-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            height: 22px;
+            padding: 0 8px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.02em;
+        }
+        .sec-pill-info {
+            background: var(--sec-success-bg);
+            color: #047857;
+            border: 1px solid var(--sec-success-border);
+        }
+        .sec-switch-wrap {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            user-select: none;
+        }
+        .sec-switch {
+            position: relative;
+            width: 46px;
+            height: 26px;
+            flex: 0 0 46px;
+        }
+        .sec-switch input {
+            position: absolute;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            cursor: pointer;
+            z-index: 2;
+        }
+        .sec-switch-track {
+            position: absolute;
+            inset: 0;
+            border-radius: 999px;
+            background: var(--sec-border);
+            transition: background 0.2s ease-in-out;
+        }
+        .sec-switch-track::after {
+            content: '';
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #ffffff;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+            transition: transform 0.2s ease-in-out;
+        }
+        .sec-switch input:checked ~ .sec-switch-track {
+            background: var(--sec-success);
+        }
+        .sec-switch input:checked ~ .sec-switch-track::after {
+            transform: translateX(20px);
+        }
+        .sec-switch-label {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--sec-success);
+        }
+        .sec-switch-label.off {
+            color: var(--sec-text-muted);
+        }
+        .sec-level-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 14px;
+        }
+        .sec-level-card {
+            border: 1px solid var(--sec-border);
+            border-left-width: 4px;
+            border-left-style: solid;
+            border-radius: var(--sec-radius);
+            padding: 14px 16px;
+            background: var(--sec-card);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .sec-level-card.critical { border-left-color: var(--sec-danger); }
+        .sec-level-card.high { border-left-color: var(--sec-warning); }
+        .sec-level-card.medium { border-left-color: var(--sec-warning); }
+        .sec-level-card.low { border-left-color: var(--sec-primary); }
+        .sec-level-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+        }
+        .sec-level-title {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            font-weight: 700;
+            font-size: 14px;
+            color: var(--sec-text);
+        }
+        .sec-level-badge {
+            font-size: 10.5px;
+            font-weight: 800;
+            padding: 3px 8px;
+            border-radius: var(--sec-radius-sm);
+            white-space: nowrap;
+        }
+        .sec-level-badge.critical { background: var(--sec-danger-bg); color: #b91c1c; }
+        .sec-level-badge.high { background: var(--sec-warning-bg); color: #92400e; }
+        .sec-level-badge.medium { background: var(--sec-warning-bg); color: #92400e; }
+        .sec-level-badge.low { background: var(--sec-primary-bg, #eff6ff); color: #1d4ed8; }
+        .sec-level-input {
+            width: 100%;
+            padding: 8px 12px;
+            font-size: 14px;
+            font-weight: 700;
+            font-family: var(--sec-font-mono);
+            border: 1px solid var(--sec-border);
+            border-radius: var(--sec-radius-sm);
+            background: var(--sec-card-hover);
+            color: var(--sec-text);
+        }
+        .sec-level-input:focus {
+            outline: none;
+            border-color: var(--sec-primary);
+        }
+        .sec-level-desc {
+            font-size: 11.5px;
+            line-height: 1.5;
+            color: var(--sec-text-muted);
+            margin: 0;
+        }
+        .sec-level-check {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 12px 14px;
+            border: 1px solid var(--sec-border);
+            border-radius: var(--sec-radius);
+            background: var(--sec-card);
+            cursor: pointer;
+            transition: all 0.15s ease-in-out;
+        }
+        .sec-level-check:hover {
+            border-color: var(--sec-border-light);
+            background: var(--sec-card-hover);
+        }
+        .sec-level-check.checked {
+            border-color: var(--sec-primary);
+            background: rgba(59, 130, 246, 0.06);
+        }
+        .sec-level-check input { margin-top: 2px; accent-color: var(--sec-primary); }
+        .sec-select-input {
+            width: 100%;
+            padding: 9px 12px;
+            font-size: 13.5px;
+            font-weight: 600;
+            border: 1px solid var(--sec-border);
+            border-radius: var(--sec-radius-sm);
+            background: var(--sec-card-hover);
+            color: var(--sec-text);
+        }
+        .sec-select-input:focus { outline: none; border-color: var(--sec-primary); }
+        .sec-sim-box {
+            border: 1px solid var(--sec-warning-border);
+            background: var(--sec-warning-bg);
+            border-radius: var(--sec-radius);
+            padding: 14px 16px;
+            color: #78350f;
+        }
+        .sec-sim-chip {
+            display: inline-flex;
+            align-items: center;
+            padding: 3px 9px;
+            border-radius: var(--sec-radius-sm);
+            font-family: var(--sec-font-mono);
+            font-size: 11.5px;
+            font-weight: 700;
+            color: #ffffff;
+        }
+        .sec-sim-chip.critical { background: #dc2626; }
+        .sec-sim-chip.high { background: #d97706; }
+        .sec-sim-chip.medium { background: #ca8a04; }
+        .sec-sim-chip.low { background: #2563eb; }
+        .sec-sim-chip.combined { background: #7c3aed; }
+
         /* Theme Toggle */
         .sec-theme-toggle {
             margin-top: 16px;

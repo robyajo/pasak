@@ -7,8 +7,10 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ViewErrorBag;
 use Internal\Pasak\Http\Controllers\Dashboard\AllowedIpController;
 use Internal\Pasak\Http\Controllers\Dashboard\OverviewController;
+use Internal\Pasak\Http\Controllers\Dashboard\SettingController;
 use Internal\Pasak\Models\AllowedIp;
 use Internal\Pasak\Services\PasakService;
+use Internal\Pasak\Services\PasakVersionCheckService;
 
 test('dashboard overview renders plain blade views when driver is blade', function () {
     config()->set('pasak.dashboard.driver', 'blade');
@@ -122,6 +124,47 @@ test('dashboard overview always renders blade views regardless of legacy driver 
 
         // Dashboard kini Blade murni: nilai driver warisan diabaikan.
         expect($response)->toBeInstanceOf(View::class);
+    } finally {
+        File::deleteDirectory($target);
+    }
+});
+
+test('dashboard settings page renders per-level thresholds and simulation summary', function () {
+    config()->set('pasak.dashboard.driver', 'blade');
+
+    $target = resource_path('views/pages/pasak');
+    if (! File::isDirectory($target)) {
+        File::copyDirectory(
+            dirname(__DIR__, 2).'/stubs/blade/pages/pasak',
+            $target
+        );
+    }
+
+    foreach (['overview', 'logs', 'blocked-ips', 'server', 'sessions', 'tickets', 'settings'] as $page) {
+        Route::get('/__pasak_test_'.$page, fn () => 'ok')->name('pasak.dashboard.'.$page);
+    }
+    Route::post('/__pasak_test_settings', fn () => 'ok')->name('pasak.dashboard.settings.update');
+
+    try {
+        app(PasakService::class)->updateSettings([
+            'auto_block_scope' => 'auto',
+            'auto_block_level_thresholds' => ['critical' => 1, 'high' => 2, 'medium' => 3, 'low' => 5],
+            'auto_block_combined_threshold' => 3,
+            'auto_block_enabled' => true,
+        ]);
+
+        $response = app(SettingController::class)->index(
+            app(PasakVersionCheckService::class)
+        );
+
+        $html = $response->render();
+
+        expect($html)->toContain('auto_block_level_thresholds')
+            ->and($html)->toContain('value="auto"')
+            ->and($html)->toContain('pasak-sim-chips')
+            ->and($html)->toContain('data-sec-sim-level="critical"')
+            ->and($html)->toContain('auto_block_duration_select')
+            ->and($html)->toContain('login_lockout_enabled');
     } finally {
         File::deleteDirectory($target);
     }

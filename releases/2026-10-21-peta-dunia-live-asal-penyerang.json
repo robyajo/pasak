@@ -39,6 +39,16 @@
             "type": "improvement",
             "id": "Panduan pembaruan otomatis: saat perintah pembaruan paket dijalankan, sistem kini mengingatkan bila menu peta belum terpasang di berkas navigasi lama beserta cara memperbaruinya dengan aman.",
             "en": "Self-guided upgrade: when the package update command runs, the system now warns if the map menu is missing from an older navigation file along with the safe way to refresh it."
+        },
+        {
+            "type": "fix",
+            "id": "Tautan peta kini ikut terpasang untuk proyek yang memakai berkas rute sendiri: pilihan penyesuaian rute milik pengguna tidak lagi membuat menu peta mati setelah pembaruan paket.",
+            "en": "The map link now installs for projects that keep their own route file: user-customized routes no longer leave the map menu dead after a package update."
+        },
+        {
+            "type": "fix",
+            "id": "Saran petunjuk pada perintah baris kini mengarah ke halaman dasbor resmi, bukan alamat lama yang sudah dipensiunkan.",
+            "en": "Command-line hints now point to the official dashboard pages instead of the retired legacy addresses."
         }
     ],
     "project": {

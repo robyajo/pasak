@@ -17,6 +17,8 @@ Berikut adalah daftar lengkap seluruh variabel lingkungan yang didukung:
 | `PASAK_AUTO_BLOCK_THRESHOLD`        |  int   |          `3`           | Jumlah kejadian ancaman yang harus dicapai dalam kurun waktu sebelum IP diblokir.                         |
 | `PASAK_AUTO_BLOCK_WINDOW`           |  int   |          `10`          | Rentang jendela waktu evaluasi auto-block (dalam menit).                                                  |
 | `PASAK_AUTO_BLOCK_DURATION`         |  int   |          `24`          | Durasi pemblokiran otomatis (dalam jam). Masukkan `0` jika ingin memblokir permanen.                      |
+
+> **Sumber kebenaran baru: tabel `pasak_settings`** — Karena versi ini, ambang default auto-block per tingkat (`critical:1, high:2, medium:3, low:5`), ambang kombinasi, lingkup blokir (`device|ip|auto`), durasi, throttle lockout login, dan retensi log kini dikelola dari **dashboard pengaturan** dan disemai ke tabel `pasak_settings` oleh `PasakDefaultSettingsSeeder` (otomatis saat `pasak:install` / `pasak:upgrade`). Baris settings DB **mengungguli** kunci env di atas; kunci env lama tetap didukung sebagai fallback senyap (tanpa deprecate error) agar instalasi lama tidak terputus.
 | `PASAK_INSTANT_BLOCK_ENABLED`       |  bool  |         `false`        | Opt-in blokir instan. Default monitoring saja; aktifkan bila siap karantina otomatis.             |
 | `PASAK_INSTANT_BLOCK_DURATION`      |  int   |         `720`          | Durasi blokir instan (dalam jam; bawaan: 720 jam = 30 hari). Masukkan `0` untuk permanen.                 |
 | `PASAK_MAX_INSPECT_LENGTH`          |  int   |         `4000`         | Batas maksimum panjang karakter string payload yang diinspeksi untuk mencegah ReDoS pada payload raksasa. |
@@ -138,17 +140,10 @@ Di server produksi, seluruh perlindungan diaktifkan penuh dengan pembersihan log
 ```dotenv
 PASAK_MONITOR_ENABLED=true
 PASAK_BLOCK_ENFORCEMENT=true
-PASAK_AUTO_BLOCK_ENABLED=false
-PASAK_AUTO_BLOCK_THRESHOLD=3
-PASAK_AUTO_BLOCK_WINDOW=10
-PASAK_AUTO_BLOCK_DURATION=24
 PASAK_INSTANT_BLOCK_ENABLED=false
-PASAK_INSTANT_BLOCK_DURATION=720
-PASAK_BLOCK_SUSPICIOUS=false
 PASAK_LOG_RETENTION_DAYS=90
 PASAK_ACCESS_LOG_AUTO_SCAN=true
 PASAK_ACCESS_LOG_PATHS=/var/log/nginx/access.log
-PASAK_LOGIN_LOCKOUT_ENABLED=true
-PASAK_SCHEDULE_ENABLED=true
-PASAK_SUPPORT_EMAIL=security@domain-anda.com
 ```
+
+> Setelah sebaris settings tersedia di `pasak_settings`, ambang, lingkup, durasi, throttle lockout, dan retensi log dapat disetel penuh dari dashboard (`/pasak/settings`) tanpa mengubah file `.env` lagi.

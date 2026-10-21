@@ -14,6 +14,8 @@ beforeEach(function () {
     config()->set('pasak.auto_block.enabled', true);
     config()->set('pasak.auto_block.threshold', 3);
     config()->set('pasak.auto_block.window_minutes', 10);
+    config()->set('pasak.auto_block.combined_threshold', 3);
+    config()->set('pasak.auto_block.level_thresholds', ['critical' => 1, 'high' => 3, 'medium' => 3, 'low' => 5]);
 });
 
 test('ip that is blocked receives a 403 response', function () {

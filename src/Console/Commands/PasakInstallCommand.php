@@ -6,6 +6,7 @@ use Illuminate\Console\Command;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
+use Internal\Pasak\Database\Seeders\PasakDefaultSettingsSeeder;
 
 class PasakInstallCommand extends Command
 {
@@ -258,6 +259,29 @@ class PasakInstallCommand extends Command
             }
         }
 
+        // 4b. Tanam nilai bawaan pengaturan keamanan ke database (siap diedit di dashboard).
+        $seededKeys = [];
+
+        if ($migrated) {
+            try {
+                $seededKeys = app(PasakDefaultSettingsSeeder::class)->run();
+
+                $this->newLine();
+
+                if ($seededKeys === []) {
+                    $this->line('  ✓ Pengaturan keamanan bawaan sudah ada di database.');
+                } else {
+                    $this->info(
+                        '  ✓ '.count($seededKeys).' pengaturan keamanan bawaan ditanam ke database (atur dari dashboard /pasak/settings).',
+                    );
+                }
+            } catch (\Throwable $e) {
+                $this->comment(
+                    '  ℹ Nilai bawaan pengaturan belum ditanam. Jalankan: php artisan db:seed --class=Internal\\Pasak\\Database\\Seeders\\PasakDefaultSettingsSeeder --force',
+                );
+            }
+        }
+
         $dashboardPrefix = '/'.ltrim((string) config('pasak.dashboard.prefix', 'pasak'), '/');
         $dashboardBase = rtrim((string) config('app.url', 'http://localhost:8000'), '/').$dashboardPrefix;
         $dashboardUrls = array_map(
@@ -297,10 +321,15 @@ class PasakInstallCommand extends Command
                 $doc('api-reference/api-overview')];
         }
         $steps[] = [
-            $this->t('Sesuaikan variabel PASAK_* di berkas .env, minimal:', 'Adjust the PASAK_* variables in your .env file, at minimum:'),
+            $this->t('Sesuaikan .env minimal (varibel inti saja — sisanya diatur dari dashboard):', 'Adjust your .env minimally (core variables only — everything else is managed from the dashboard):'),
             'PASAK_IP_WHITELIST=127.0.0.1,::1,<ip-kantor-anda>   # agar IP internal tidak pernah diblokir',
             'PASAK_SUPPORT_EMAIL=security@domain-anda.test          # tampil di halaman blokir 403',
             $doc('getting-started/configuration'),
+        ];
+        $steps[] = [
+            $this->t('Atur ambang pemblokiran & proteksi dari dashboard (tersimpan di database):', 'Tune blocking thresholds & protection from the dashboard (stored in the database):'),
+            '/pasak/settings — ambang per tingkat ancaman, lingkup isolasi, durasi blokir',
+            $doc('security-modules/stepped-login-throttling'),
         ];
         $steps[] = [
             $this->t('Aktifkan scheduler Laravel agar pembersihan log & heartbeat berjalan (sekali saja):', 'Enable the Laravel scheduler so log pruning & heartbeat run (one time):'),

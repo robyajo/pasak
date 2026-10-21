@@ -13,10 +13,20 @@ All notable changes to `robyajo/pasak` will be documented in this file.
 - **Rute dashboard**: `Route::get('threat-map')` → `PasakThreatMapController::index` (halaman) + `threat-map/feed` → `feed` (JSON) pada `routes/pasak-dashboard-blade.php` dan stub `pasak-blade.php.stub`, dilindungi middleware `web`+`auth` sama seperti seluruh halaman dashboard; item navigasi sidebar dilindungi `@if (\Route::has(...))` agar aman bagi berkas layout host yang lama.
 - **Pengingat upgrade untuk menu baru**: `pasak:upgrade` kini memeriksa penanda `pasak.dashboard.threat-map` pada `layout.blade.php` terpublikasi dan memperingatkan menjalankan `--sync-views` (dengan pencadangan otomatis) bila menu Threat Map belum ada.
 
+### Added
+
+- **Pengaturan berbasis database dengan ambang per tingkat ancaman**: seluruh perilaku auto-block WAF kini dapat diatur langsung dari dashboard tanpa menyentuh `.env` — ambang blokir per tingkat (`critical`, `high`, `medium`, `low`, default 1/2/3/5) disimpan pada tabel `pasak_settings` dan disemai otomatis oleh seeder `PasakDefaultSettingsSeeder` saat `pasak:install` maupun `pasak:upgrade`.
+- **Lingkup blokir adaptif `auto`**: mode `'device,ip,auto'` pada pengaturan auto-block — perangkat bila identitas `device_id` eksplisit terdeteksi, fallback ke isolasi IP utuh saat fingerprint tidak tersedia (aman bagi pengguna lain di WiFi yang sama).
+- **Sanksi kombinasi**: blokir gabungan hanya bila ancaman datang dari minimal 2 tingkat berbeda dan total kejadian melampaui `auto_block.combined_threshold` (default 3) sehingga serangan satu jenis berfrekuensi rendah tidak tersapu salah.
+- **Penghalaman pengaturan dashboard diperbarui**: kartu lingkup 3 pilihan (Device/IP/Auto dengan pill "WiFi-Safe"), kartu ambang per tingkat dengan warna tingkat ancaman, pilihan durasi blokir berjenjang (6 jam s.d. 1 tahun/permanen), ambang kombinasi, modul brute-force login, mitigasi retensi log, dan kotak simulasi live auto-block — seluruhnya memakai JavaScript vanilla tanpa NPM.
+- **`pasak_settings` kini menyetel throttle login & retensi log**: `PasakLoginThrottleService` membaca konfigurasi lockout dari database terlebih dahulu (fallback `.env`/config) sehingga operasional harian dapat menyetel dari dashboard.
+- **Env core-only**: `stubs/env.stub` dirampingkan hanya berisi kunci bootstrap inti (`PASAK_MONITOR_ENABLED`, `PASAK_IP_WHITELIST`, `PASAK_AUTO_REGISTER_MIDDLEWARE`, flag rute/dashboard, `PASAK_SUPPORT_EMAIL`); kunci lain lama tetap didukung sebagai fallback senyap namun tidak lagi ditulis installer.
+
 ### Fixed
 
-- **Stub rute dashboard terpublikasi kini memuat Threat Map**: stub `routes/pasak.php` yang diterbitkan host (tag `pasak-routes`) sempat kehilangan dua rute `threat-map` sehingga tautan petanya mati setelah proyek host memuat berkas rute kustom; kini keduanyaikut `pasak-dashboard-blade.php` dan tervalidasi di aplikasi real (`ring/pasak-yes`) lewat alur `pasak:upgrade --sync-routes`.
+- **Stubs rute dashboard terpublikasi kini memuat Threat Map**: stub `routes/pasak.php` yang diterbitkan host (tag `pasak-routes`) sempat kehilangan dua rute `threat-map` sehingga tautan petanya mati setelah proyek host memuat berkas rute kustom; kini keduanya ikut `pasak-dashboard-blade.php` dan tervalidasi di aplikasi real (`ring/pasak-yes`) lewat alur `pasak:upgrade --sync-routes`.
 - **Petunjuk CLI memakai rute dashboard resmi**: keluaran `pasak:scan-logs` kini mengarah ke `/pasak/logs` dan `/pasak/blocked-ips` (bukan alias lama `/security/*`), wizard `pasak:install` menyebut prefix API `/api/pasak/*`, dan hasil pemindaian access log tercatat dengan `path` rute konsisten.
+- **Halaman pengaturan gagal render karena penanganan `@json` Blade**: ekspresi `@json([...larik inline...])` dengan lebih dari 2 koma (mis. larik 4 pasang ambang per tingkat) dipangkas senyap oleh parser komma `compileJson` milik Laravel sehingga elemen terakhir hilang dan sisa tanda `]`/`)` membuat Blade error `Unclosed '['`; daftar referensi JS kini dihitung via `@php` lalu dikirim sebagai variabel (`@json($simLevels)` dst.) yang aman terhadap penyectaan koma — regresi dijaga test render halaman pengaturan.
 
 ## [1.4.5] - 2026-10-21
 

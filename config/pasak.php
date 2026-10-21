@@ -61,9 +61,16 @@ return [
             'trim',
             explode(',', (string) env('PASAK_AUTO_BLOCK_LEVELS', env('SECURITY_AUTO_BLOCK_LEVELS', 'high,critical')))
         ))),
-        // Scope pemblokiran otomatis: 'device' (hanya isolasi perangkat penyerang, aman untuk IP publik/WiFi NAT bersama)
-        // atau 'ip' (seluruh IP router publik).
+        // Lingkup pemblokiran otomatis: 'device' (hanya isolasi perangkat penyerang, aman untuk IP
+        // publik/WiFi NAT bersama), 'ip' (seluruh IP router publik), atau 'auto' (blokir perangkat
+        // bila fingerprint perangkat terdeteksi; bila tidak terdeteksi sama sekali, blokir IP).
         'scope' => env('PASAK_AUTO_BLOCK_SCOPE', env('SECURITY_AUTO_BLOCK_SCOPE', 'device')),
+        // Ambang per tingkat ancaman: jumlah insiden level tersebut dalam satu jendela waktu
+        // memicu blokir otomatis langsung, tanpa menunggu ambang gabungan.
+        'level_thresholds' => ['critical' => 1, 'high' => 2, 'medium' => 3, 'low' => 5],
+        // Ambang kombinasi/fallback: total insiden lintas tingkat (dari level yang dihitung)
+        // yang dicampur mencapai angka ini juga memicu blokir meski tiap tingkat belum kena.
+        'combined_threshold' => 3,
     ],
 
     /*
