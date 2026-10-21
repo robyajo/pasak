@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\File;
+use Internal\Pasak\Console\Commands\PasakInstallCommand;
 use Internal\Pasak\Console\Commands\SecurityInstallCommand;
 
 $tempDir = '';
@@ -60,7 +61,7 @@ PHP
         ->and($bootstrapContent)->not->toContain('BlockIpAddress');
 
     // Test install options are registered in command (supports both PasakInstallCommand & SecurityInstallCommand)
-    $command = $this->app->make(\Internal\Pasak\Console\Commands\PasakInstallCommand::class);
+    $command = $this->app->make(PasakInstallCommand::class);
     $definition = $command->getDefinition();
     expect($definition->hasOption('without-user-trait'))->toBeTrue()
         ->and($definition->hasOption('without-middleware'))->toBeTrue()
@@ -68,7 +69,7 @@ PHP
         ->and($definition->hasOption('without-api'))->toBeTrue();
 
     $legacyCommand = $this->app->make(SecurityInstallCommand::class);
-    expect($legacyCommand)->toBeInstanceOf(\Internal\Pasak\Console\Commands\PasakInstallCommand::class);
+    expect($legacyCommand)->toBeInstanceOf(PasakInstallCommand::class);
 });
 
 test('pasak routes tag publishes pasak.php and pasak-api.php', function () {

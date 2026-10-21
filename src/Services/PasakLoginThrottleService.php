@@ -4,8 +4,8 @@ namespace Internal\Pasak\Services;
 
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
-use Internal\Pasak\Models\PasakLoginAttempt;
 use Internal\Pasak\Models\PasakLog;
+use Internal\Pasak\Models\PasakLoginAttempt;
 use Throwable;
 
 /**

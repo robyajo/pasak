@@ -1,9 +1,60 @@
 <?php
 
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Schema;
+use Internal\Pasak\Concerns\HasPasakSecurityRelations;
+use Internal\Pasak\Concerns\HasSecurityRelations;
 use Internal\Pasak\Concerns\ResolvesPasakTable;
+use Internal\Pasak\Console\Commands\PasakBaselineCommand;
+use Internal\Pasak\Console\Commands\PasakInstallCommand;
+use Internal\Pasak\Console\Commands\PasakPruneSecurityLogsCommand;
+use Internal\Pasak\Console\Commands\PasakPurgeInjectedDataCommand;
+use Internal\Pasak\Console\Commands\PasakScanAccessLogsCommand;
+use Internal\Pasak\Console\Commands\PasakUnblockIpCommand;
+use Internal\Pasak\Console\Commands\PasakUninstallCommand;
+use Internal\Pasak\Console\Commands\PasakUpgradeCommand;
+use Internal\Pasak\Console\Commands\PruneSecurityLogs;
+use Internal\Pasak\Console\Commands\PurgeInjectedData;
+use Internal\Pasak\Console\Commands\SecurityBaselineCommand;
+use Internal\Pasak\Console\Commands\SecurityInstallCommand;
+use Internal\Pasak\Console\Commands\SecurityScanAccessLogs;
+use Internal\Pasak\Console\Commands\SecurityUpgradeCommand;
+use Internal\Pasak\Console\Commands\UnblockIpAddress;
+use Internal\Pasak\Http\Controllers\Api\PasakAllowedIpApiController;
+use Internal\Pasak\Http\Controllers\Api\PasakBlockedIpApiController;
+use Internal\Pasak\Http\Controllers\Api\PasakIpUnblockRequestApiController;
+use Internal\Pasak\Http\Controllers\Api\PasakSecurityLogApiController;
+use Internal\Pasak\Http\Controllers\Api\PasakSecuritySettingApiController;
+use Internal\Pasak\Http\Controllers\Api\PasakServerSecurityApiController;
+use Internal\Pasak\Http\Controllers\Api\PasakUserSessionApiController;
+use Internal\Pasak\Http\Controllers\Dashboard\PasakAllowedIpController;
+use Internal\Pasak\Http\Controllers\Dashboard\PasakBlockedIpController;
+use Internal\Pasak\Http\Controllers\Dashboard\PasakLogController;
+use Internal\Pasak\Http\Controllers\Dashboard\PasakOverviewController;
+use Internal\Pasak\Http\Controllers\Dashboard\PasakServerController;
+use Internal\Pasak\Http\Controllers\Dashboard\PasakSessionController;
+use Internal\Pasak\Http\Controllers\Dashboard\PasakSettingController;
+use Internal\Pasak\Http\Controllers\Dashboard\PasakTicketController;
+use Internal\Pasak\Http\Controllers\Dashboard\RespondsWithDashboard;
+use Internal\Pasak\Http\Controllers\Dashboard\RespondsWithPasakDashboard;
+use Internal\Pasak\Http\Middleware\BlockIpAddress;
+use Internal\Pasak\Http\Middleware\DetectSecurityThreats;
+use Internal\Pasak\Http\Middleware\EnsureSecurityAdmin;
+use Internal\Pasak\Http\Middleware\InjectAnnouncementBanner;
+use Internal\Pasak\Http\Middleware\PasakBlockIpAddress;
+use Internal\Pasak\Http\Middleware\PasakDetectSecurityThreats;
+use Internal\Pasak\Http\Middleware\PasakEnsureSecurityAdmin;
+use Internal\Pasak\Http\Middleware\PasakInjectAnnouncementBanner;
+use Internal\Pasak\Http\Middleware\PasakTrackUserActivity;
+use Internal\Pasak\Http\Middleware\TrackUserActivity;
+use Internal\Pasak\Listeners\LogFailedLoginAttempt;
+use Internal\Pasak\Listeners\PasakLogFailedLoginAttempt;
+use Internal\Pasak\Listeners\PasakRecordUserLogin;
+use Internal\Pasak\Listeners\PasakResetLoginAttempts;
+use Internal\Pasak\Listeners\RecordUserLogin;
+use Internal\Pasak\Listeners\ResetLoginAttempts;
 use Internal\Pasak\Models\AllowedIp;
 use Internal\Pasak\Models\BlockedIp;
 use Internal\Pasak\Models\IpUnblockRequest;
@@ -20,6 +71,25 @@ use Internal\Pasak\Models\SecurityLog;
 use Internal\Pasak\Models\SecuritySetting;
 use Internal\Pasak\Models\TrustedIp;
 use Internal\Pasak\Models\UserLogin;
+use Internal\Pasak\Rules\PasakSafeAssetPath;
+use Internal\Pasak\Rules\PasakSafeImageFile;
+use Internal\Pasak\Rules\SafeAssetPath;
+use Internal\Pasak\Rules\SafeImageFile;
+use Internal\Pasak\Services\AccessLogScannerService;
+use Internal\Pasak\Services\LoginThrottleService;
+use Internal\Pasak\Services\PasakAccessLogScannerService;
+use Internal\Pasak\Services\PasakLoginThrottleService;
+use Internal\Pasak\Services\PasakServerSecurityService;
+use Internal\Pasak\Services\PasakService;
+use Internal\Pasak\Services\PasakUserLoginService;
+use Internal\Pasak\Services\PasakVersionCheckService;
+use Internal\Pasak\Services\ServerSecurityService;
+use Internal\Pasak\Services\UserLoginService;
+use Internal\Pasak\Services\VersionCheckService;
+use Internal\Pasak\Support\DashboardView;
+use Internal\Pasak\Support\PasakDashboardView;
+use Internal\Pasak\Support\PasakTableResolver;
+use Internal\Pasak\Support\TableResolver;
 
 afterEach(function () {
     ResolvesPasakTable::clearResolvedTableCache();
@@ -62,13 +132,13 @@ test('legacy model classes are transparent aliases of the prefixed models', func
 test('user relations support both legacy and new relation names', function () {
     $user = $this->createRegularUser();
 
-    expect($user->securityLogs())->toBeInstanceOf(\Illuminate\Database\Eloquent\Relations\HasMany::class)
-        ->and($user->pasakLogs())->toBeInstanceOf(\Illuminate\Database\Eloquent\Relations\HasMany::class)
-        ->and($user->blockedIps())->toBeInstanceOf(\Illuminate\Database\Eloquent\Relations\HasMany::class)
-        ->and($user->logins())->toBeInstanceOf(\Illuminate\Database\Eloquent\Relations\HasMany::class)
-        ->and($user->trustedIps())->toBeInstanceOf(\Illuminate\Database\Eloquent\Relations\HasMany::class)
-        ->and($user->allowedIps())->toBeInstanceOf(\Illuminate\Database\Eloquent\Relations\HasMany::class)
-        ->and($user->resolvedTickets())->toBeInstanceOf(\Illuminate\Database\Eloquent\Relations\HasMany::class);
+    expect($user->securityLogs())->toBeInstanceOf(HasMany::class)
+        ->and($user->pasakLogs())->toBeInstanceOf(HasMany::class)
+        ->and($user->blockedIps())->toBeInstanceOf(HasMany::class)
+        ->and($user->logins())->toBeInstanceOf(HasMany::class)
+        ->and($user->trustedIps())->toBeInstanceOf(HasMany::class)
+        ->and($user->allowedIps())->toBeInstanceOf(HasMany::class)
+        ->and($user->resolvedTickets())->toBeInstanceOf(HasMany::class);
 });
 
 test('resolvesPasakTable transparently falls back to legacy table when prefixed table is not yet migrated', function () {
@@ -211,98 +281,97 @@ PHP;
 
 test('all pasak middleware, listeners, rules, services, commands, controllers are prefixed with Pasak', function () {
     // Middleware
-    expect(class_exists(\Internal\Pasak\Http\Middleware\PasakBlockIpAddress::class))->toBeTrue()
-        ->and(class_exists(\Internal\Pasak\Http\Middleware\PasakDetectSecurityThreats::class))->toBeTrue()
-        ->and(class_exists(\Internal\Pasak\Http\Middleware\PasakEnsureSecurityAdmin::class))->toBeTrue()
-        ->and(class_exists(\Internal\Pasak\Http\Middleware\PasakInjectAnnouncementBanner::class))->toBeTrue()
-        ->and(class_exists(\Internal\Pasak\Http\Middleware\PasakTrackUserActivity::class))->toBeTrue();
+    expect(class_exists(PasakBlockIpAddress::class))->toBeTrue()
+        ->and(class_exists(PasakDetectSecurityThreats::class))->toBeTrue()
+        ->and(class_exists(PasakEnsureSecurityAdmin::class))->toBeTrue()
+        ->and(class_exists(PasakInjectAnnouncementBanner::class))->toBeTrue()
+        ->and(class_exists(PasakTrackUserActivity::class))->toBeTrue();
 
     // Middleware legacy aliases
-    expect(class_exists(\Internal\Pasak\Http\Middleware\BlockIpAddress::class))->toBeTrue()
-        ->and(class_exists(\Internal\Pasak\Http\Middleware\DetectSecurityThreats::class))->toBeTrue()
-        ->and(class_exists(\Internal\Pasak\Http\Middleware\EnsureSecurityAdmin::class))->toBeTrue()
-        ->and(class_exists(\Internal\Pasak\Http\Middleware\InjectAnnouncementBanner::class))->toBeTrue()
-        ->and(class_exists(\Internal\Pasak\Http\Middleware\TrackUserActivity::class))->toBeTrue();
+    expect(class_exists(BlockIpAddress::class))->toBeTrue()
+        ->and(class_exists(DetectSecurityThreats::class))->toBeTrue()
+        ->and(class_exists(EnsureSecurityAdmin::class))->toBeTrue()
+        ->and(class_exists(InjectAnnouncementBanner::class))->toBeTrue()
+        ->and(class_exists(TrackUserActivity::class))->toBeTrue();
 
     // Listeners
-    expect(class_exists(\Internal\Pasak\Listeners\PasakLogFailedLoginAttempt::class))->toBeTrue()
-        ->and(class_exists(\Internal\Pasak\Listeners\PasakRecordUserLogin::class))->toBeTrue()
-        ->and(class_exists(\Internal\Pasak\Listeners\PasakResetLoginAttempts::class))->toBeTrue();
+    expect(class_exists(PasakLogFailedLoginAttempt::class))->toBeTrue()
+        ->and(class_exists(PasakRecordUserLogin::class))->toBeTrue()
+        ->and(class_exists(PasakResetLoginAttempts::class))->toBeTrue();
 
     // Listeners legacy aliases
-    expect(class_exists(\Internal\Pasak\Listeners\LogFailedLoginAttempt::class))->toBeTrue()
-        ->and(class_exists(\Internal\Pasak\Listeners\RecordUserLogin::class))->toBeTrue()
-        ->and(class_exists(\Internal\Pasak\Listeners\ResetLoginAttempts::class))->toBeTrue();
+    expect(class_exists(LogFailedLoginAttempt::class))->toBeTrue()
+        ->and(class_exists(RecordUserLogin::class))->toBeTrue()
+        ->and(class_exists(ResetLoginAttempts::class))->toBeTrue();
 
     // Rules
-    expect(class_exists(\Internal\Pasak\Rules\PasakSafeAssetPath::class))->toBeTrue()
-        ->and(class_exists(\Internal\Pasak\Rules\PasakSafeImageFile::class))->toBeTrue()
-        ->and(class_exists(\Internal\Pasak\Rules\SafeAssetPath::class))->toBeTrue()
-        ->and(class_exists(\Internal\Pasak\Rules\SafeImageFile::class))->toBeTrue();
+    expect(class_exists(PasakSafeAssetPath::class))->toBeTrue()
+        ->and(class_exists(PasakSafeImageFile::class))->toBeTrue()
+        ->and(class_exists(SafeAssetPath::class))->toBeTrue()
+        ->and(class_exists(SafeImageFile::class))->toBeTrue();
 
     // Services
-    expect(class_exists(\Internal\Pasak\Services\PasakService::class))->toBeTrue()
-        ->and(class_exists(\Internal\Pasak\Services\PasakAccessLogScannerService::class))->toBeTrue()
-        ->and(class_exists(\Internal\Pasak\Services\PasakLoginThrottleService::class))->toBeTrue()
-        ->and(class_exists(\Internal\Pasak\Services\PasakServerSecurityService::class))->toBeTrue()
-        ->and(class_exists(\Internal\Pasak\Services\PasakUserLoginService::class))->toBeTrue()
-        ->and(class_exists(\Internal\Pasak\Services\PasakVersionCheckService::class))->toBeTrue();
+    expect(class_exists(PasakService::class))->toBeTrue()
+        ->and(class_exists(PasakAccessLogScannerService::class))->toBeTrue()
+        ->and(class_exists(PasakLoginThrottleService::class))->toBeTrue()
+        ->and(class_exists(PasakServerSecurityService::class))->toBeTrue()
+        ->and(class_exists(PasakUserLoginService::class))->toBeTrue()
+        ->and(class_exists(PasakVersionCheckService::class))->toBeTrue();
 
     // Services legacy aliases
-    expect(class_exists(\Internal\Pasak\Services\AccessLogScannerService::class))->toBeTrue()
-        ->and(class_exists(\Internal\Pasak\Services\LoginThrottleService::class))->toBeTrue()
-        ->and(class_exists(\Internal\Pasak\Services\ServerSecurityService::class))->toBeTrue()
-        ->and(class_exists(\Internal\Pasak\Services\UserLoginService::class))->toBeTrue()
-        ->and(class_exists(\Internal\Pasak\Services\VersionCheckService::class))->toBeTrue();
+    expect(class_exists(AccessLogScannerService::class))->toBeTrue()
+        ->and(class_exists(LoginThrottleService::class))->toBeTrue()
+        ->and(class_exists(ServerSecurityService::class))->toBeTrue()
+        ->and(class_exists(UserLoginService::class))->toBeTrue()
+        ->and(class_exists(VersionCheckService::class))->toBeTrue();
 
     // Support
-    expect(class_exists(\Internal\Pasak\Support\PasakDashboardView::class))->toBeTrue()
-        ->and(class_exists(\Internal\Pasak\Support\PasakTableResolver::class))->toBeTrue()
-        ->and(class_exists(\Internal\Pasak\Support\DashboardView::class))->toBeTrue()
-        ->and(class_exists(\Internal\Pasak\Support\TableResolver::class))->toBeTrue();
+    expect(class_exists(PasakDashboardView::class))->toBeTrue()
+        ->and(class_exists(PasakTableResolver::class))->toBeTrue()
+        ->and(class_exists(DashboardView::class))->toBeTrue()
+        ->and(class_exists(TableResolver::class))->toBeTrue();
 
     // Concerns / Traits
-    expect(trait_exists(\Internal\Pasak\Concerns\HasPasakSecurityRelations::class))->toBeTrue()
-        ->and(trait_exists(\Internal\Pasak\Concerns\HasSecurityRelations::class))->toBeTrue()
-        ->and(trait_exists(\Internal\Pasak\Http\Controllers\Dashboard\RespondsWithPasakDashboard::class))->toBeTrue()
-        ->and(trait_exists(\Internal\Pasak\Http\Controllers\Dashboard\RespondsWithDashboard::class))->toBeTrue();
+    expect(trait_exists(HasPasakSecurityRelations::class))->toBeTrue()
+        ->and(trait_exists(HasSecurityRelations::class))->toBeTrue()
+        ->and(trait_exists(RespondsWithPasakDashboard::class))->toBeTrue()
+        ->and(trait_exists(RespondsWithDashboard::class))->toBeTrue();
 
     // Commands
-    expect(class_exists(\Internal\Pasak\Console\Commands\PasakInstallCommand::class))->toBeTrue()
-        ->and(class_exists(\Internal\Pasak\Console\Commands\PasakUpgradeCommand::class))->toBeTrue()
-        ->and(class_exists(\Internal\Pasak\Console\Commands\PasakBaselineCommand::class))->toBeTrue()
-        ->and(class_exists(\Internal\Pasak\Console\Commands\PasakPruneSecurityLogsCommand::class))->toBeTrue()
-        ->and(class_exists(\Internal\Pasak\Console\Commands\PasakPurgeInjectedDataCommand::class))->toBeTrue()
-        ->and(class_exists(\Internal\Pasak\Console\Commands\PasakScanAccessLogsCommand::class))->toBeTrue()
-        ->and(class_exists(\Internal\Pasak\Console\Commands\PasakUnblockIpCommand::class))->toBeTrue()
-        ->and(class_exists(\Internal\Pasak\Console\Commands\PasakUninstallCommand::class))->toBeTrue();
+    expect(class_exists(PasakInstallCommand::class))->toBeTrue()
+        ->and(class_exists(PasakUpgradeCommand::class))->toBeTrue()
+        ->and(class_exists(PasakBaselineCommand::class))->toBeTrue()
+        ->and(class_exists(PasakPruneSecurityLogsCommand::class))->toBeTrue()
+        ->and(class_exists(PasakPurgeInjectedDataCommand::class))->toBeTrue()
+        ->and(class_exists(PasakScanAccessLogsCommand::class))->toBeTrue()
+        ->and(class_exists(PasakUnblockIpCommand::class))->toBeTrue()
+        ->and(class_exists(PasakUninstallCommand::class))->toBeTrue();
 
     // Commands legacy aliases
-    expect(class_exists(\Internal\Pasak\Console\Commands\SecurityInstallCommand::class))->toBeTrue()
-        ->and(class_exists(\Internal\Pasak\Console\Commands\SecurityUpgradeCommand::class))->toBeTrue()
-        ->and(class_exists(\Internal\Pasak\Console\Commands\SecurityBaselineCommand::class))->toBeTrue()
-        ->and(class_exists(\Internal\Pasak\Console\Commands\PruneSecurityLogs::class))->toBeTrue()
-        ->and(class_exists(\Internal\Pasak\Console\Commands\PurgeInjectedData::class))->toBeTrue()
-        ->and(class_exists(\Internal\Pasak\Console\Commands\SecurityScanAccessLogs::class))->toBeTrue()
-        ->and(class_exists(\Internal\Pasak\Console\Commands\UnblockIpAddress::class))->toBeTrue();
+    expect(class_exists(SecurityInstallCommand::class))->toBeTrue()
+        ->and(class_exists(SecurityUpgradeCommand::class))->toBeTrue()
+        ->and(class_exists(SecurityBaselineCommand::class))->toBeTrue()
+        ->and(class_exists(PruneSecurityLogs::class))->toBeTrue()
+        ->and(class_exists(PurgeInjectedData::class))->toBeTrue()
+        ->and(class_exists(SecurityScanAccessLogs::class))->toBeTrue()
+        ->and(class_exists(UnblockIpAddress::class))->toBeTrue();
 
     // API Controllers
-    expect(class_exists(\Internal\Pasak\Http\Controllers\Api\PasakAllowedIpApiController::class))->toBeTrue()
-        ->and(class_exists(\Internal\Pasak\Http\Controllers\Api\PasakBlockedIpApiController::class))->toBeTrue()
-        ->and(class_exists(\Internal\Pasak\Http\Controllers\Api\PasakIpUnblockRequestApiController::class))->toBeTrue()
-        ->and(class_exists(\Internal\Pasak\Http\Controllers\Api\PasakSecurityLogApiController::class))->toBeTrue()
-        ->and(class_exists(\Internal\Pasak\Http\Controllers\Api\PasakSecuritySettingApiController::class))->toBeTrue()
-        ->and(class_exists(\Internal\Pasak\Http\Controllers\Api\PasakServerSecurityApiController::class))->toBeTrue()
-        ->and(class_exists(\Internal\Pasak\Http\Controllers\Api\PasakUserSessionApiController::class))->toBeTrue();
+    expect(class_exists(PasakAllowedIpApiController::class))->toBeTrue()
+        ->and(class_exists(PasakBlockedIpApiController::class))->toBeTrue()
+        ->and(class_exists(PasakIpUnblockRequestApiController::class))->toBeTrue()
+        ->and(class_exists(PasakSecurityLogApiController::class))->toBeTrue()
+        ->and(class_exists(PasakSecuritySettingApiController::class))->toBeTrue()
+        ->and(class_exists(PasakServerSecurityApiController::class))->toBeTrue()
+        ->and(class_exists(PasakUserSessionApiController::class))->toBeTrue();
 
     // Dashboard Controllers
-    expect(class_exists(\Internal\Pasak\Http\Controllers\Dashboard\PasakAllowedIpController::class))->toBeTrue()
-        ->and(class_exists(\Internal\Pasak\Http\Controllers\Dashboard\PasakBlockedIpController::class))->toBeTrue()
-        ->and(class_exists(\Internal\Pasak\Http\Controllers\Dashboard\PasakLogController::class))->toBeTrue()
-        ->and(class_exists(\Internal\Pasak\Http\Controllers\Dashboard\PasakOverviewController::class))->toBeTrue()
-        ->and(class_exists(\Internal\Pasak\Http\Controllers\Dashboard\PasakServerController::class))->toBeTrue()
-        ->and(class_exists(\Internal\Pasak\Http\Controllers\Dashboard\PasakSessionController::class))->toBeTrue()
-        ->and(class_exists(\Internal\Pasak\Http\Controllers\Dashboard\PasakSettingController::class))->toBeTrue()
-        ->and(class_exists(\Internal\Pasak\Http\Controllers\Dashboard\PasakTicketController::class))->toBeTrue();
+    expect(class_exists(PasakAllowedIpController::class))->toBeTrue()
+        ->and(class_exists(PasakBlockedIpController::class))->toBeTrue()
+        ->and(class_exists(PasakLogController::class))->toBeTrue()
+        ->and(class_exists(PasakOverviewController::class))->toBeTrue()
+        ->and(class_exists(PasakServerController::class))->toBeTrue()
+        ->and(class_exists(PasakSessionController::class))->toBeTrue()
+        ->and(class_exists(PasakSettingController::class))->toBeTrue()
+        ->and(class_exists(PasakTicketController::class))->toBeTrue();
 });
-
