@@ -1,0 +1,39 @@
+{
+    "date": "2026-10-21",
+    "type": "new",
+    "title": {
+        "id": "Peta dunia live: menelusuri asal penyerang menuju server yang dipantau",
+        "en": "Live world map: trace attacker origins straight to the watched server"
+    },
+    "body": {
+        "id": "Dasbor pemantauan Pasak kini punya halaman Peta Ancaman: bola dunia yang menggambar lintasan serangan dari kota asal penyerang (diambil dari alamat riil 24 jam terakhir) menuju titik server yang dilindungi, lengkap dengan gelombang kejut saat kena dan panel catatan serangan yang menyala setiap serangan baru masuk — tanpa muat ulang halaman.",
+        "en": "The Pasak monitoring dashboard now has a Threat Map page: a world globe drawing attack trajectories from each attacker's origin city (resolved from real addresses of the last 24 hours) toward the protected server point, complete with impact ripples and a real-time attack log panel that lights up whenever a new attack arrives — no page reload needed."
+    },
+    "items": [
+        {
+            "type": "new",
+            "id": "Bola dunia interaktif: bisa diputar (drag) dan diperbesar (zoom) dengan lintasan berwarna sesuai tingkat ancaman, dari kritis (merah) hingga rendah (hijau).",
+            "en": "Interactive world globe: drag to rotate and zoom in, with trajectories colored by threat level, from critical (red) down to low (green)."
+        },
+        {
+            "type": "new",
+            "id": "Panel log insiden waktu-nyata: menampilkan lokasi kota/negara, alamat penyerang, nama serangan, jalur target, dan status diblokir untuk tiap catatan.",
+            "en": "Real-time incident log panel: shows the city/country location, attacker address, attack name, targeted path, and blocked status for each record."
+        },
+        {
+            "type": "new",
+            "id": "Pembaruan otomatis tanpa muat ulang: halaman memandu pembaruan berkala; serangan baru langsung menggambar arka dan menyalakan log seketika.",
+            "en": "Auto refresh without reload: the page polls periodically; new attacks immediately draw an arc and light up the log."
+        },
+        {
+            "type": "new",
+            "id": "Panel status sistem: status perlindungan aktif atau hanya monitor, nama server yang dilindungi, pencacah serangan hari ini, dan jumlah karantina aktif.",
+            "en": "System status panel: protection state (active blocking or monitor-only), the protected server name, today's attack counter, and active quarantine count."
+        },
+        {
+            "type": "new",
+            "id": "Reservasi performa: lokasi alamat dihafal sampai 30 hari, asal panah dibatasi teratas, semua jalur hidup lewat setengah browser tanpa pustaka bangun tampilan.",
+            "en": "Performance-minded: address locations are memorized for up to 30 days, arrow origins are capped to the top offenders, all live through the browser with no UI framework."
+        }
+    ]
+}
