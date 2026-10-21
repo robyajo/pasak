@@ -51,7 +51,7 @@
 <style>
     .threat-map-card .threat-map-wrap {
         display: flex;
-        min-height: 560px;
+        height: 560px;
         background: #020813;
     }
     .threat-panel-log {
@@ -181,7 +181,7 @@
     }
 
     @media (max-width: 900px) {
-        .threat-map-card .threat-map-wrap { flex-direction: column; }
+        .threat-map-card .threat-map-wrap { flex-direction: column; height: auto; }
         .threat-map-side { width: 100%; order: -1; border-left: none; border-bottom: 1px solid #1e293b; }
         .threat-map-canvas-holder { min-height: 380px; }
     }
@@ -380,6 +380,13 @@
         }
 
         window.addEventListener('resize', resize);
+
+        if (typeof ResizeObserver === 'function') {
+            var holderObserver = new ResizeObserver(function () {
+                resize();
+            });
+            holderObserver.observe(holder);
+        }
 
         function isVisible(coords) {
             var rot = projection.rotate();

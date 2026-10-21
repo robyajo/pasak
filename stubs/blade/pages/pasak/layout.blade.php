@@ -1028,7 +1028,7 @@
 </head>
 <body class="sec-body" style="margin: 0;">
 <div class="sec-root">
-    <div class="sec-container" style="max-width: 1200px; margin: 0 auto; padding: 24px 20px;">
+    <div class="sec-container" style="max-width: 1600px; margin: 0 auto; padding: 24px 20px;">
         <!-- Sidebar Navigation -->
         <aside class="sec-sidebar" aria-label="Security Navigation">
             <nav>
