@@ -12,6 +12,7 @@ All notable changes to `robyajo/pasak` will be documented in this file.
 - **Konfigurasi peta**: kunci `pasak.dashboard.threat_map.*` + env `PASAK_DASHBOARD_TARGET_NAME|LAT|LON`, `PASAK_DASHBOARD_MAP_WINDOW_HOURS` (default 24), `PASAK_DASHBOARD_MAP_MAX_ORIGINS` (10), `PASAK_DASHBOARD_MAP_REFRESH_SECONDS` (8) untuk menyetel jendela data, jumlah asal panah, cadence polling, dan titik server.
 - **Rute dashboard**: `Route::get('threat-map')` → `PasakThreatMapController::index` (halaman) + `threat-map/feed` → `feed` (JSON) pada `routes/pasak-dashboard-blade.php` dan stub `pasak-blade.php.stub`, dilindungi middleware `web`+`auth` sama seperti seluruh halaman dashboard; item navigasi sidebar dilindungi `@if (\Route::has(...))` agar aman bagi berkas layout host yang lama.
 - **Pengingat upgrade untuk menu baru**: `pasak:upgrade` kini memeriksa penanda `pasak.dashboard.threat-map` pada `layout.blade.php` terpublikasi dan memperingatkan menjalankan `--sync-views` (dengan pencadangan otomatis) bila menu Threat Map belum ada.
+- **Mode layar penuh Threat Map**: tombol `⛶ Full screen` di sudut kanan atas kanvas menyematkan kartu peta di seluruh jendela (`position:fixed; inset:0` + kelas body penahan skrol) sehingga dapat dipakai apa pun tata letak dasbor host; kanvas mematuhi ukuran baru lewat `ResizeObserver`, tombol `Escape` keluar dari mode, dan pada ponsel panel sisi dibatasi 45vh agar peta tetap dominan.
 
 ### Added
 

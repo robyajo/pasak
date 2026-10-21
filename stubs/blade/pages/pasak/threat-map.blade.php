@@ -9,6 +9,13 @@
         <div class="threat-map-canvas-holder">
             <canvas data-map-base></canvas>
             <canvas data-map-anim></canvas>
+            <button
+                type="button"
+                class="threat-fullscreen-btn"
+                data-map-fullscreen
+                title="{{ __('Full screen') }}"
+                aria-pressed="false"
+            >⛶ {{ __('Full screen') }}</button>
             <div class="threat-map-offline" data-map-offline hidden>
                 <div>
                     <strong>{{ __('Globe tidak tersedia') }}</strong>
@@ -53,6 +60,45 @@
         display: flex;
         height: 560px;
         background: #020813;
+    }
+
+    /* Tombol mode layar penuh, kanan atas kanvas. */
+    .threat-fullscreen-btn {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        z-index: 4;
+        padding: 6px 12px;
+        border: 1px solid rgba(6, 182, 212, 0.4);
+        border-radius: 6px;
+        background: rgba(3, 11, 23, 0.75);
+        color: #06b6d4;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        cursor: pointer;
+        backdrop-filter: blur(2px);
+    }
+    .threat-fullscreen-btn:hover {
+        background: rgba(6, 182, 212, 0.15);
+    }
+
+    /* Mode layar penuh: kartu dipin di seluruh jendela, skrol halaman ditahan. */
+    .threat-map-card.is-fullscreen {
+        position: fixed;
+        inset: 0;
+        z-index: 2147483000;
+        width: 100vw;
+        height: 100vh;
+        margin: 0;
+        border-radius: 0;
+    }
+    .threat-map-card.is-fullscreen .threat-map-wrap {
+        height: 100%;
+    }
+    body.pasak-threat-fs {
+        overflow: hidden !important;
     }
     .threat-panel-log {
         flex: 1;
@@ -182,7 +228,9 @@
 
     @media (max-width: 900px) {
         .threat-map-card .threat-map-wrap { flex-direction: column; height: auto; }
+        .threat-map-card.is-fullscreen .threat-map-wrap { height: 100vh; }
         .threat-map-side { width: 100%; order: -1; border-left: none; border-bottom: 1px solid #1e293b; }
+        .threat-map-side { max-height: 45vh; }
         .threat-map-canvas-holder { min-height: 380px; }
     }
 </style>
@@ -576,6 +624,36 @@
 
         resize();
         animate();
+
+        // ==================== Mode layar penuh ====================
+        // Kanvas mengikuti ukuran baru otomatis via ResizeObserver pada
+        // holder; Escape keluar; kelas body menahan skrol halaman utama.
+        var fullButton = card.querySelector('[data-map-fullscreen]');
+
+        function toggleFullscreen(active) {
+            card.classList.toggle('is-fullscreen', active);
+            document.body.classList.toggle('pasak-threat-fs', active);
+            if (fullButton) {
+                fullButton.setAttribute('aria-pressed', active ? 'true' : 'false');
+                fullButton.title = active
+                    ? '{{ __('Exit full screen') }}'
+                    : '{{ __('Full screen') }}';
+                fullButton.blur();
+            }
+            resize();
+        }
+
+        if (fullButton) {
+            fullButton.addEventListener('click', function () {
+                toggleFullscreen(!card.classList.contains('is-fullscreen'));
+            });
+        }
+
+        document.addEventListener('keydown', function (event) {
+            if (event.key === 'Escape' && card.classList.contains('is-fullscreen')) {
+                toggleFullscreen(false);
+            }
+        });
     })();
 </script>
 @endsection
