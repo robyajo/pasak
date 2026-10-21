@@ -39,6 +39,11 @@
             "type": "fix",
             "id": "Jalur pengajuan permohonan pembukaan blokir disempurnakan sehingga pengguna yang sah tetap dapat menyampaikan tiket bantuan tanpa terhalang filter keamanan.",
             "en": "The appeal submission channel has been refined so legitimate users can submit assistance tickets without being blocked by security filters."
+        },
+        {
+            "type": "fix",
+            "id": "Kemampuan deteksi alat pemindai otomatis disempurnakan dan penentuan identitas pengguna di balik server perantara kini lebih akurat dalam menerapkan perlindungan.",
+            "en": "Automated scanner detection capabilities were enhanced and user identity resolution behind intermediate proxies is now more accurate when enforcing protection."
         }
     ]
 }
