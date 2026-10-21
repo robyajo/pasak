@@ -205,6 +205,7 @@
         var originsIndex = {};
         var pendinglogs = [];
         var isGlobeReady = false;
+        var lastId = 0;
 
         function esc(value) {
             var div = document.createElement('div');
@@ -253,10 +254,13 @@
             }
         }
 
-        // Seed log panel + arcs dari payload awal (20 serangan terakhir 24 jam).
+        // Seed log panel + arcs dari payload awal (real: 20 serangan terakhir 24 jam).
         MAP.origins.forEach(function (origin) {
             originsIndex[origin.ip] = origin;
             origin.samples.forEach(function (entry, index) {
+                if (typeof entry.id === 'number' && entry.id > lastId) {
+                    lastId = entry.id;
+                }
                 if (index < 2) {
                     pendinglogs.push({ level: entry.level, origin: origin.ip, entry: entry });
                 }
@@ -278,11 +282,15 @@
 
         function poll() {
             if (isGlobeReady) {
-                fetch(MAP.feedUrl, { credentials: 'same-origin' }).then(function (res) {
+                var sep = String(MAP.feedUrl).indexOf('?') === -1 ? '?' : '&';
+                fetch(MAP.feedUrl + sep + 'after=' + lastId, { credentials: 'same-origin' }).then(function (res) {
                     return res.ok ? res.json() : null;
                 }).then(function (data) {
                     if (!data) {
                         return;
+                    }
+                    if (typeof data.last_id === 'number' && data.last_id > lastId) {
+                        lastId = data.last_id;
                     }
                     document.querySelector('[data-map-attacks]').innerText = Number(data.stats.logs_today || 0).toLocaleString('id-ID');
                     data.logs.forEach(function (entry) {

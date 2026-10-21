@@ -59,7 +59,7 @@ class PasakThreatMapController extends Controller
                     'weight' => (int) $row->weight,
                     'last_seen' => (string) $row->last_seen,
                     'samples' => $sample
-                        ->map(fn (PasakLog $log): array => $this->logToArray($log))
+                        ->map(fn (PasakLog $log): array => $this->logToArray($log, true))
                         ->values()
                         ->all(),
                 ];
