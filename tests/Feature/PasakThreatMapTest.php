@@ -167,3 +167,34 @@ test('threat map payload honors configured window and target overrides', functio
         ->and($payload['origins'][0]['hits'])->toBe(1)
         ->and($payload['origins'][0]['weight'])->toBe(2);
 });
+
+test('upgrade warns when published dashboard layout lacks the threat map menu', function () {
+    Http::fake([
+        'https://repo.packagist.org/p2/robyajo/pasak.json' => Http::response([
+            'packages' => ['robyajo/pasak' => [['version' => 'v99.9.9']]],
+        ], 200),
+        'https://api.github.com/repos/robyajo/pasak/tags' => Http::response([], 200),
+    ]);
+
+    $layout = resource_path('views/pages/pasak/layout.blade.php');
+    File::ensureDirectoryExists(dirname($layout));
+    $original = File::exists($layout) ? File::get($layout) : null;
+    File::put($layout, "@extends('x') pasakAnnounce {{ route('pasak.dashboard.overview') }}");
+
+    try {
+        $this->artisan('pasak:upgrade', [
+            '--force' => true,
+            '--no-composer' => true,
+            '--no-migrate' => true,
+        ])->expectsOutputToContain('kedaluwarsa')
+            ->expectsOutputToContain('--sync-views')
+            ->assertSuccessful();
+
+        // Tanpa --sync-views layout kustom host tidak ditimpa:
+        expect(File::get($layout))->toBe("@extends('x') pasakAnnounce {{ route('pasak.dashboard.overview') }}");
+    } finally {
+        if ($original !== null) {
+            File::put($layout, $original);
+        }
+    }
+});

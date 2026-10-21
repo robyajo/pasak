@@ -149,6 +149,10 @@ class PasakUpgradeCommand extends Command
                 resource_path('views/pages/pasak/layout.blade.php'),
                 'pasakAnnounce'
             );
+            $this->warnIfViewsOutdated(
+                resource_path('views/pages/pasak/layout.blade.php'),
+                'pasak.dashboard.threat-map'
+            );
         }
 
         if (File::exists(resource_path('views/errors/blocked.blade.php'))) {
