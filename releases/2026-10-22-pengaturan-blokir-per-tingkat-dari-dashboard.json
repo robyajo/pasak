@@ -12,48 +12,51 @@
     "items": [
         {
             "type": "new",
-            "id": "Ambang blokir per tingkat bahaya: serangan paling serius diblokir sejak kejadian pertama, tingkat ringan diberi jatah kejadian yang lebih longgar.",
-            "en": "Per-level block thresholds: the most serious attacks get blocked on the first attempt, while lighter levels get more forgiving event allowances."
+            "id": "Ambang blokir per tingkat bahaya: serangan paling serius diblokir sejak kejadian pertama.",
+            "en": "Per-level block thresholds: the most serious attacks are blocked on the first attempt."
         },
         {
             "type": "new",
-            "id": "Mode isolasi adaptif: pelaku serangan dengan identitas perangkat terdeteksi dikucilkan perangkatnya saja, dan pengguna lain yang kebetulan berbagi WiFi tetap aman; bila identitas perangkat tidak tersedia, isolasi naik ke seluruh jaringan agar tidak ada lubang keamanan.",
-            "en": "Adaptive isolation mode: attackers whose device identity is detected get quarantined by device only, keeping other users sharing the same WiFi safe; when no device identity is available, isolation escalates to the whole network so no security hole is left open."
+            "id": "Isolasi adaptif: pelaku beridentitas perangkat dikucilkan perangkatnya saja, pengguna lain yang berbagi jaringan tetap aman.",
+            "en": "Adaptive isolation: identified attackers are quarantined per device, keeping others on the same network safe."
         },
         {
             "type": "new",
-            "id": "Sanksi kombinasi: serangan merapat dari beberapa jenis sekaligus terhitung bersamaan, sedangkan penyalahgunaan sejenis dengan frekuensi rendah tidak ikut tersapu salah.",
-            "en": "Combined sanction: attacks converging from several types at once are counted together, while low-frequency abuse of a single kind is not swept up by mistake."
+            "id": "Halaman pengaturan baru: durasi blokir berjenjang, kartu ambang berwarna, tahap gabungan antar jenis serangan, dan kotak simulasi live.",
+            "en": "A new settings page: graduated block durations, color-coded level cards, combined cross-type staging, and a live simulation box."
         },
         {
             "type": "new",
-            "id": "Halaman pengaturan baru dengan pilihan durasi blokir berjenjang (6 jam hingga selamanya), kartu ambang berwarna per tingkat bahaya, serta kotak simulasi live untuk mencoba angka sebelum disimpan.",
-            "en": "A new settings page with graduated block duration choices (6 hours up to forever), color-coded threshold cards per threat level, and a live simulation box to try the numbers before saving."
-        },
-        {
-            "type": "new",
-            "id": "Pengaturan tambahan (jadwal lockout login gagal dan masa simpan log audit) ikut dikelola dari satu halaman yang sama.",
-            "en": "Additional settings (failed-login lockout schedule and audit log retention time) are now managed from the same single page."
+            "id": "Jadwal penjagaan login gagal dan masa simpan log audit kini dikelola dari halaman yang sama.",
+            "en": "Failed-login lockout schedule and audit log retention are now managed from the same page."
         },
         {
             "type": "improvement",
-            "id": "Berkas konfigurasi aplikasi proses pemasangan jauh lebih ramping; pengaturan perilaku kini milik dashboard, dan pengaturan lama yang tersimpan di berkas konfigurasi tetap jalan sebagai cadangan.",
-            "en": "The application configuration file is much leaner after installation; behavior settings now belong to the dashboard, and legacy settings stored in configuration files keep working as a fallback."
+            "id": "Berkas konfigurasi pemasangan jauh lebih ramping; perilaku kini milik dashboard dan pengaturan lama tetap bekerja sebagai cadangan.",
+            "en": "The configuration file is much leaner after installation; behavior now belongs to the dashboard and legacy settings keep working as fallback."
         },
         {
             "type": "fix",
-            "id": "Perbaikan halaman pengaturan yang gagal tampil karena elemen teks multi-bagian muat kurang pada perenderan; seluruh daftar opsi kini muncul lengkap dan perenderan dijaga oleh uji otomatis.",
-            "en": "Fixed the settings page failing to render because a multi-part text element was truncated during rendering; the full option list now appears complete and rendering is guarded by an automated test."
+            "id": "Halaman pengaturan gagal tampil karena potongan teks multi-bagian; kini muncul lengkap dan dijaga pengujian otomatis.",
+            "en": "Fixed the settings page failing to render from a truncated text element; now complete and guarded by automated tests."
         },
         {
             "type": "fix",
-            "id": "Perbaikan pembersihan saat proses pencopotan pada aplikasi yang mendaftarkan perlindungan lewat gaya impor: seluruh jejak kini ikut terangkat dan aplikasi tetap hidup setelah pencopotan, uji regresi ditambahkan untuk mencegah terulang.",
-            "en": "Fixed the uninstall cleanup for apps that register protection via the import style: all traces are now lifted and the app keeps running after removal; regression tests were added to keep it that way."
+            "id": "Pencopotan pada aplikasi gaya impor kini bersih sehingga aplikasi tetap hidup setelah paket dilepas.",
+            "en": "Removal on import-style apps is now clean, keeping the app alive after the package is uninstalled."
         },
         {
             "type": "fix",
-            "id": "Perbaikan pemasangan ulang lewat skrip tanpa interaksi: penyetelan keamanan bawaan kini ditanam otomatis begitu database siap, tanpa harus menjalankan langkah tambahan manual.",
-            "en": "Fixed unattended reinstallation via script: the default security settings are now seeded automatically as soon as the database is ready, with no extra manual step."
+            "id": "Pemasangan ulang lewat skrip tanpa interaksi kini menanam penyetelan bawaan otomatis.",
+            "en": "Unattended reinstall now seeds the default settings automatically."
+        },
+        {
+            "type": "improvement",
+            "id": "Dasbor menghormati jendela layar lebar, peta tidak lagi melebar sendiri, dan daftar serangan hanya mengalirkan serangan baru sungguhan tanpa mengulang arsip lama.",
+            "en": "The dashboard fits wide screens, the map no longer stretches by itself, and the attacks list streams only genuinely new live attacks without re-looping stale archives."
         }
-    ]
+    ],
+    "project": {
+        "name": "Pasak Security Monitor Laravel Packagist"
+    }
 }
