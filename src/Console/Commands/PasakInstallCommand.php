@@ -91,8 +91,8 @@ class PasakInstallCommand extends Command
         if (! $apiChoiceGiven && $interactive) {
             $withApi = $this->confirm(
                 $this->t(
-                    'Pasang dukungan API? (headless REST API di /api/security/*)',
-                    'Install API support? (headless REST API at /api/security/*)'
+                    'Pasang dukungan API? (headless REST API di /api/pasak/*)',
+                    'Install API support? (headless REST API at /api/pasak/*)'
                 ),
                 true
             );
@@ -262,7 +262,7 @@ class PasakInstallCommand extends Command
         $dashboardBase = rtrim((string) config('app.url', 'http://localhost:8000'), '/').$dashboardPrefix;
         $dashboardUrls = array_map(
             fn (string $page): string => $page === '' ? $dashboardBase : $dashboardBase.'/'.$page,
-            ['', 'logs', 'blocked-ips', 'server', 'sessions', 'tickets', 'settings']
+            ['', 'threat-map', 'logs', 'blocked-ips', 'server', 'sessions', 'tickets', 'settings']
         );
         $doc = fn (string $path): string => '📖 '.$this->docs($path);
         $steps = [];

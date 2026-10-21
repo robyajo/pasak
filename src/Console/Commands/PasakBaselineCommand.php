@@ -8,7 +8,7 @@ use Internal\Pasak\Services\PasakServerSecurityService;
 /**
  * Membuat / memeriksa baseline hash berkas penting.
  *
- * Baseline dipakai halaman /security/server untuk mendeteksi perubahan berkas
+ * Baseline dipakai halaman /pasak/server untuk mendeteksi perubahan berkas
  * yang tidak berasal dari deployment resmi (mis. backdoor yang disisipkan
  * setelah insiden marker "wne").
  */

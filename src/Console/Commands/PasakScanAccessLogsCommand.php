@@ -261,7 +261,7 @@ class PasakScanAccessLogsCommand extends Command
         }
 
         $this->info("{$created} temuan access log disimpan ke pasak_logs.");
-        $this->line('Tinjau di halaman /security/logs (jenis event "access_log:*").');
+        $this->line('Tinjau di halaman /pasak/logs (jenis event "access_log:*").');
     }
 
     /**
@@ -278,7 +278,7 @@ class PasakScanAccessLogsCommand extends Command
 
         if ($candidates === []) {
             $this->line('Tidak ada IP dengan zero tolerance signature, tidak ada yang diblokir.');
-            $this->line('Gunakan --min-level=high --import lalu blokir manual dari /security/blocked-ips bila perlu.');
+            $this->line('Gunakan --min-level=high --import lalu blokir manual dari /pasak/blocked-ips bila perlu.');
 
             return;
         }
@@ -317,7 +317,7 @@ class PasakScanAccessLogsCommand extends Command
                 'ip_address' => $ip,
                 'event_type' => 'access_log_block',
                 'threat_level' => (string) $candidate['level'],
-                'path' => '/security/scan-logs',
+                'path' => '/pasak/scan-logs',
                 'rule_label' => 'Pemblokiran berdasarkan analisis access log',
                 'evidence' => $scanner->attackerSummary($candidate),
                 'action_taken' => 'blocked',
