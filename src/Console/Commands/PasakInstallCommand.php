@@ -5,6 +5,7 @@ namespace Internal\Pasak\Console\Commands;
 use Illuminate\Console\Command;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\File;
 use Internal\Pasak\Database\Seeders\PasakDefaultSettingsSeeder;
 
@@ -41,7 +42,8 @@ class PasakInstallCommand extends Command
                             {--with-dashboard : Publikasikan dashboard monitoring Blade murni (semua aplikasi Laravel)}
                             {--with-plain : Alias --with-dashboard (Blade murni)}
                             {--with-blade : Alias --with-dashboard (Blade murni)}
-                            {--with-htaccess : Paksa perbarui berkas public/.htaccess dengan aturan hardening}';
+                            {--with-htaccess : Paksa perbarui berkas public/.htaccess dengan aturan hardening}
+                            {--migrate : Jalankan migrasi database sekarang (untuk mode non-interaktif script)}';
 
     protected $description = 'Instalasi dan publikasi aset Pasak (konfigurasi, migrasi, Nginx, Apache .htaccess, halaman blokir, dashboard Blade, trait User, middleware WAF, rute web & API kustom, dan .env)';
 
@@ -245,6 +247,11 @@ class PasakInstallCommand extends Command
         $this->newLine();
 
         // 4. Tawarkan menjalankan migrasi database sekarang.
+        if ($this->option('migrate') && ! $migrated) {
+            $this->call('migrate', ['--force' => true]);
+            $migrated = true;
+        }
+
         if ($interactive && ! $migrated) {
             $migrated = $this->confirm(
                 $this->t(
@@ -262,7 +269,7 @@ class PasakInstallCommand extends Command
         // 4b. Tanam nilai bawaan pengaturan keamanan ke database (siap diedit di dashboard).
         $seededKeys = [];
 
-        if ($migrated) {
+        if ($migrated || Schema::hasTable((string) config('pasak.table_names.settings', 'pasak_settings'))) {
             try {
                 $seededKeys = app(PasakDefaultSettingsSeeder::class)->run();
 

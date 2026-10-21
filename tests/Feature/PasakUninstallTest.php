@@ -96,6 +96,79 @@ test('pasak uninstall removes all traces without touching host files', function 
         ->and(File::isDirectory($uninstallDir.'/resources/views/pages'))->toBeFalse();
 });
 
+test('pasak uninstall removes middleware registered via use import and short class names', function () use (&$uninstallDir) {
+    File::put($uninstallDir.'/bootstrap/app.php', <<<'PHP'
+        <?php
+
+        use Illuminate\Foundation\Application;
+        use Illuminate\Foundation\Configuration\Exceptions;
+        use Illuminate\Foundation\Configuration\Middleware;
+        use Illuminate\Http\Request;
+        use Internal\Pasak\Http\Middleware\PasakBlockIpAddress;
+        use Internal\Pasak\Http\Middleware\PasakDetectSecurityThreats;
+        use Internal\Pasak\Http\Middleware\PasakInjectAnnouncementBanner;
+
+        return Application::configure(basePath: dirname(__DIR__))
+            ->withRouting(
+                web: __DIR__.'/../routes/web.php',
+                commands: __DIR__.'/../routes/console.php',
+                health: '/up',
+            )
+            ->withMiddleware(function (Middleware $middleware): void {
+                $middleware->append([
+                    PasakBlockIpAddress::class,
+                    PasakDetectSecurityThreats::class,
+                    PasakInjectAnnouncementBanner::class,
+                ]);
+
+                $middleware->trustProxies(at: ['127.0.0.1', '::1']);
+            })
+            ->withExceptions(function (Exceptions $exceptions): void {
+                $exceptions->shouldRenderJsonWhen(
+                    fn (Request $request) => $request->is('api/*') || $request->expectsJson(),
+                );
+            })->create();
+        PHP
+    );
+
+    $this->artisan('pasak:uninstall', ['--force' => true])->assertSuccessful();
+
+    $content = File::get($uninstallDir.'/bootstrap/app.php');
+
+    expect($content)->not->toContain('Pasak')
+        ->and($content)->toContain('withMiddleware')
+        ->and($content)->toContain('trustProxies')
+        ->and($content)->toContain('withExceptions')
+        ->and($content)->not->toContain('->append');
+
+    exec('php -l '.escapeshellarg($uninstallDir.'/bootstrap/app.php').' 2>&1', $output, $code);
+    expect($code)->toBe(0);
+});
+
+test('pasak uninstall keeps host middleware whose name merely contains a pasak suffix', function () use (&$uninstallDir) {
+    File::put($uninstallDir.'/bootstrap/app.php', <<<'PHP'
+        <?php
+
+        return Application::configure(basePath: dirname(__DIR__))
+            ->withMiddleware(function (Middleware $middleware): void {
+                $middleware->append([
+                    SomeBlockIpAddress::class,
+                    DetectSecurityThreatsV2::class,
+                ]);
+            })
+            ->create();
+        PHP
+    );
+
+    $this->artisan('pasak:uninstall', ['--force' => true])->assertSuccessful();
+
+    $content = File::get($uninstallDir.'/bootstrap/app.php');
+
+    expect($content)->toContain('SomeBlockIpAddress')
+        ->and($content)->toContain('DetectSecurityThreatsV2')
+        ->and($content)->toContain('->append');
+});
+
 test('pasak uninstall leaves valid bootstrap app when host has trust proxies plus pasak append', function () use (&$uninstallDir) {
     File::put($uninstallDir.'/bootstrap/app.php', <<<'PHP'
         <?php

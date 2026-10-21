@@ -194,6 +194,20 @@ class PasakUninstallCommand extends Command
             'Internal\\SecurityMonitor\\Http\\Middleware\\BlockIpAddress::class',
             'Internal\\SecurityMonitor\\Http\\Middleware\\DetectSecurityThreats::class',
         ];
+        // Gaya import "use Internal\Pasak\...;" (nama pendek tanpa namespace).
+        $importMarkers = [
+            'use Internal\\Pasak\\Http\\Middleware\\',
+            'use Internal\\SecurityMonitor\\Http\\Middleware\\',
+        ];
+        // Pemakaian nama pendek ("PasakBlockIpAddress::class," / "BlockIpAddress::class,").
+        $shortClassMarkers = [
+            'PasakBlockIpAddress::class',
+            'PasakDetectSecurityThreats::class',
+            'PasakInjectAnnouncementBanner::class',
+            'BlockIpAddress::class',
+            'DetectSecurityThreats::class',
+            'InjectAnnouncementBanner::class',
+        ];
 
         foreach ($targets as $path) {
             if (! File::exists($path)) {
@@ -204,7 +218,15 @@ class PasakUninstallCommand extends Command
             $filtered = array_values(array_filter(
                 $lines,
                 fn ($line) => ! $this->lineReferences($line, $markers)
+                    && ! $this->shortClassReferenced($line, $shortClassMarkers)
             ));
+
+            foreach ($importMarkers as $marker) {
+                $filtered = array_values(array_filter(
+                    $filtered,
+                    fn ($line) => ! str_contains($line, $marker)
+                ));
+            }
 
             // Bersihkan blok append yang kini kosong: "$middleware->append([\n]);"
             // (termasuk receiver $middleware agar tidak tersisa statement gantung).
@@ -232,6 +254,21 @@ class PasakUninstallCommand extends Command
     {
         foreach ($markers as $marker) {
             if (str_contains($line, $marker)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Cek pemakaian nama kelas pendek pada baris dengan batas kata,
+     * agar baris seperti "SomeBlockIpAddress::class," tidak ikut tersapu.
+     */
+    protected function shortClassReferenced(string $line, array $markers): bool
+    {
+        foreach ($markers as $marker) {
+            if (preg_match('/(^|[^A-Za-z0-9_\\\\])'.preg_quote($marker, '/').'/', $line) === 1) {
                 return true;
             }
         }

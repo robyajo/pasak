@@ -29,6 +29,7 @@ fi
 echo "== [2/4] Menjalankan wizard pasak:install =="
 php artisan pasak:install \
     --force \
+    --migrate \
     --lang=id \
     --with-dashboard \
     --no-interaction \

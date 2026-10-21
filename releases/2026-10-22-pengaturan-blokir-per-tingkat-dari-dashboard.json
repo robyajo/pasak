@@ -1,0 +1,59 @@
+{
+    "date": "2026-10-22",
+    "type": "feature",
+    "title": {
+        "id": "Pengaturan Perlindungan Otomatis Kini Diatur Langsung dari Dashboard",
+        "en": "Automatic Protection Settings Now Managed Directly from the Dashboard"
+    },
+    "body": {
+        "id": "Ambang batas pemblokiran otomatis kini diatur per tingkat bahaya langsung dari halaman pengaturan tanpa menyentuh berkas konfigurasi aplikasi. Kegiatan penyerangan dari beberapa jenis berbeda kini juga dapat memicu blokir secara cerdas dan adil bagi pengguna lain yang berbagi jaringan.",
+        "en": "Automatic block thresholds are now set per threat level straight from the settings page without touching application configuration files. Attacks spanning several different categories can also now trigger a block intelligently, staying fair to other users sharing the same network."
+    },
+    "items": [
+        {
+            "type": "new",
+            "id": "Ambang blokir per tingkat bahaya: serangan paling serius diblokir sejak kejadian pertama, tingkat ringan diberi jatah kejadian yang lebih longgar.",
+            "en": "Per-level block thresholds: the most serious attacks get blocked on the first attempt, while lighter levels get more forgiving event allowances."
+        },
+        {
+            "type": "new",
+            "id": "Mode isolasi adaptif: pelaku serangan dengan identitas perangkat terdeteksi dikucilkan perangkatnya saja, dan pengguna lain yang kebetulan berbagi WiFi tetap aman; bila identitas perangkat tidak tersedia, isolasi naik ke seluruh jaringan agar tidak ada lubang keamanan.",
+            "en": "Adaptive isolation mode: attackers whose device identity is detected get quarantined by device only, keeping other users sharing the same WiFi safe; when no device identity is available, isolation escalates to the whole network so no security hole is left open."
+        },
+        {
+            "type": "new",
+            "id": "Sanksi kombinasi: serangan merapat dari beberapa jenis sekaligus terhitung bersamaan, sedangkan penyalahgunaan sejenis dengan frekuensi rendah tidak ikut tersapu salah.",
+            "en": "Combined sanction: attacks converging from several types at once are counted together, while low-frequency abuse of a single kind is not swept up by mistake."
+        },
+        {
+            "type": "new",
+            "id": "Halaman pengaturan baru dengan pilihan durasi blokir berjenjang (6 jam hingga selamanya), kartu ambang berwarna per tingkat bahaya, serta kotak simulasi live untuk mencoba angka sebelum disimpan.",
+            "en": "A new settings page with graduated block duration choices (6 hours up to forever), color-coded threshold cards per threat level, and a live simulation box to try the numbers before saving."
+        },
+        {
+            "type": "new",
+            "id": "Pengaturan tambahan (jadwal lockout login gagal dan masa simpan log audit) ikut dikelola dari satu halaman yang sama.",
+            "en": "Additional settings (failed-login lockout schedule and audit log retention time) are now managed from the same single page."
+        },
+        {
+            "type": "improvement",
+            "id": "Berkas konfigurasi aplikasi proses pemasangan jauh lebih ramping; pengaturan perilaku kini milik dashboard, dan pengaturan lama yang tersimpan di berkas konfigurasi tetap jalan sebagai cadangan.",
+            "en": "The application configuration file is much leaner after installation; behavior settings now belong to the dashboard, and legacy settings stored in configuration files keep working as a fallback."
+        },
+        {
+            "type": "fix",
+            "id": "Perbaikan halaman pengaturan yang gagal tampil karena elemen teks multi-bagian muat kurang pada perenderan; seluruh daftar opsi kini muncul lengkap dan perenderan dijaga oleh uji otomatis.",
+            "en": "Fixed the settings page failing to render because a multi-part text element was truncated during rendering; the full option list now appears complete and rendering is guarded by an automated test."
+        },
+        {
+            "type": "fix",
+            "id": "Perbaikan pembersihan saat proses pencopotan pada aplikasi yang mendaftarkan perlindungan lewat gaya impor: seluruh jejak kini ikut terangkat dan aplikasi tetap hidup setelah pencopotan, uji regresi ditambahkan untuk mencegah terulang.",
+            "en": "Fixed the uninstall cleanup for apps that register protection via the import style: all traces are now lifted and the app keeps running after removal; regression tests were added to keep it that way."
+        },
+        {
+            "type": "fix",
+            "id": "Perbaikan pemasangan ulang lewat skrip tanpa interaksi: penyetelan keamanan bawaan kini ditanam otomatis begitu database siap, tanpa harus menjalankan langkah tambahan manual.",
+            "en": "Fixed unattended reinstallation via script: the default security settings are now seeded automatically as soon as the database is ready, with no extra manual step."
+        }
+    ]
+}

@@ -4,9 +4,6 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
-use Internal\Pasak\Http\Middleware\PasakBlockIpAddress;
-use Internal\Pasak\Http\Middleware\PasakDetectSecurityThreats;
-use Internal\Pasak\Http\Middleware\PasakInjectAnnouncementBanner;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -17,11 +14,13 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->append([
-            PasakBlockIpAddress::class,
-            PasakDetectSecurityThreats::class,
-            PasakInjectAnnouncementBanner::class,
+            \Internal\Pasak\Http\Middleware\PasakBlockIpAddress::class,
+            \Internal\Pasak\Http\Middleware\PasakDetectSecurityThreats::class,
+            \Internal\Pasak\Http\Middleware\PasakInjectAnnouncementBanner::class,
         ]);
 
+        
+        
         $middleware->trustProxies(at: ['127.0.0.1', '::1']);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
