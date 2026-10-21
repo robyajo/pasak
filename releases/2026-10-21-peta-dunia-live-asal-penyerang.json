@@ -34,6 +34,14 @@
             "type": "new",
             "id": "Reservasi performa: lokasi alamat dihafal sampai 30 hari, asal panah dibatasi teratas, semua jalur hidup lewat setengah browser tanpa pustaka bangun tampilan.",
             "en": "Performance-minded: address locations are memorized for up to 30 days, arrow origins are capped to the top offenders, all live through the browser with no UI framework."
+        },
+        {
+            "type": "improvement",
+            "id": "Panduan pembaruan otomatis: saat perintah pembaruan paket dijalankan, sistem kini mengingatkan bila menu peta belum terpasang di berkas navigasi lama beserta cara memperbaruinya dengan aman.",
+            "en": "Self-guided upgrade: when the package update command runs, the system now warns if the map menu is missing from an older navigation file along with the safe way to refresh it."
         }
-    ]
+    ],
+    "project": {
+        "name": "Pasak Security Monitor Laravel Packagist"
+    }
 }

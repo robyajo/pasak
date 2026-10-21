@@ -11,6 +11,7 @@ All notable changes to `robyajo/pasak` will be documented in this file.
 - **Resolver geoIP dipakai bersama**: lokasi IP penyerang memakai `PasakUserLoginService::resolveLocation()` dengan cache 30 hari yang sama seperti perekam sesi sehingga hemat panggilan API; IP lokal/intranet otomatis dipetakan ke Pekanbaru.
 - **Konfigurasi peta**: kunci `pasak.dashboard.threat_map.*` + env `PASAK_DASHBOARD_TARGET_NAME|LAT|LON`, `PASAK_DASHBOARD_MAP_WINDOW_HOURS` (default 24), `PASAK_DASHBOARD_MAP_MAX_ORIGINS` (10), `PASAK_DASHBOARD_MAP_REFRESH_SECONDS` (8) untuk menyetel jendela data, jumlah asal panah, cadence polling, dan titik server.
 - **Rute dashboard**: `Route::get('threat-map')` → `PasakThreatMapController::index` (halaman) + `threat-map/feed` → `feed` (JSON) pada `routes/pasak-dashboard-blade.php` dan stub `pasak-blade.php.stub`, dilindungi middleware `web`+`auth` sama seperti seluruh halaman dashboard; item navigasi sidebar dilindungi `@if (\Route::has(...))` agar aman bagi berkas layout host yang lama.
+- **Pengingat upgrade untuk menu baru**: `pasak:upgrade` kini memeriksa penanda `pasak.dashboard.threat-map` pada `layout.blade.php` terpublikasi dan memperingatkan menjalankan `--sync-views` (dengan pencadangan otomatis) bila menu Threat Map belum ada.
 
 ## [1.4.5] - 2026-10-21
 
