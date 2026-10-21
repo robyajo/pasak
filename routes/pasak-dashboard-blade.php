@@ -8,6 +8,7 @@ use Internal\Pasak\Http\Controllers\Dashboard\PasakOverviewController;
 use Internal\Pasak\Http\Controllers\Dashboard\PasakServerController;
 use Internal\Pasak\Http\Controllers\Dashboard\PasakSessionController;
 use Internal\Pasak\Http\Controllers\Dashboard\PasakSettingController;
+use Internal\Pasak\Http\Controllers\Dashboard\PasakThreatMapController;
 use Internal\Pasak\Http\Controllers\Dashboard\PasakTicketController;
 
 /*
@@ -30,6 +31,8 @@ Route::middleware(array_merge($middleware, $adminMiddleware))
     ->name('pasak.dashboard.')
     ->group(function () {
         Route::get('/', PasakOverviewController::class)->name('overview');
+        Route::get('threat-map', [PasakThreatMapController::class, 'index'])->name('threat-map');
+        Route::get('threat-map/feed', [PasakThreatMapController::class, 'feed'])->name('threat-map.feed');
         Route::get('logs', [PasakLogController::class, 'index'])->name('logs');
         Route::get('logs/{id}', [PasakLogController::class, 'show'])->whereNumber('id')->name('logs.show');
         Route::delete('logs', [PasakLogController::class, 'clear'])->name('logs.clear');

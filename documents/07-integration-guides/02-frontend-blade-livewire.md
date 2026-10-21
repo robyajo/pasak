@@ -92,6 +92,7 @@ Perintah tersebut menyalin berkas berikut ke aplikasi Anda:
 | Berkas yang Dipublikasikan                             | Deskripsi                                                   |
 | :----------------------------------------------------- | :---------------------------------------------------------- |
 | `resources/views/pages/pasak/overview.blade.php`    | Statistik, tren serangan, dan top attacker.                 |
+| `resources/views/pages/pasak/threat-map.blade.php`  | Peta geografis lintasan serangan dari asal penyerang menuju server (live). |
 | `resources/views/pages/pasak/logs.blade.php`        | Tabel log keamanan dengan filter dan aksi bersihkan/hapus.  |
 | `resources/views/pages/pasak/log-detail.blade.php`  | Detail satu entri log: evidence, konteks request, dan log terkait. |
 | `resources/views/pages/pasak/blocked-ips.blade.php` | Manajemen karantina IP (blokir manual, toggle, unblock).    |
@@ -110,6 +111,17 @@ PASAK_DASHBOARD_PREFIX=pasak
 ```
 
 Panel dapat diakses pada `/pasak`. Halaman-halaman tersebut dirender controller bawaan paket sebagai Blade biasa.
+
+### Threat Map — Peta Live Penyerang
+
+Halaman **Threat Map** (`/pasak/threat-map`) menampilkan bola dunia interaktif yang menggambar lintasan serangan dari lokasi geografis IP penyerang menuju lokasi server yang dipantau:
+
+- **Data nyata**: asal panah diambil dari log serangan 24 jam terakhir per IP (mirror `Top attackers`), dengan warna sesuai tingkat ancaman (`critical` merah → `low` hijau).
+- **Lokasi IP** diselesaikan server-side memakai resolver geoIP yang sama dengan pelacak sesi (cache 30 hari), sehingga tidak ada pengulangan query API.
+- **Live feed**: panel log kirim update otomatis tiap beberapa detik via `GET /pasak/threat-map/feed` (dilindungi middleware sama dengan dashboard).
+- **Globe** memakai d3.js + topojson dari CDN dengan degradasi anggun: apabila CDN tersekat, panel log & statistik tetap berfungsi.
+
+`PASAK_DASHBOARD_TARGET_NAME`, `PASAK_DASHBOARD_TARGET_LAT`, dan `PASAK_DASHBOARD_TARGET_LON` dapat disesuaikan di `.env` bila lokasi server Anda berbeda dari bawaan (Pekanbaru).
 
 > 🔒 **Wajib Login**: Rute dashboard memakai middleware `web` + `auth`, dan secara bawaan juga `pasak.admin` (Gate `manage-pasak`). Untuk mengizinkan semua pengguna yang sudah login (tanpa syarat admin), kosongkan `pasak.dashboard.admin_middleware` pada `config/pasak.php`.
 

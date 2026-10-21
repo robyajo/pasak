@@ -24,6 +24,8 @@ Route::middleware(array_merge($middleware, $adminMiddleware))
     ->group(function () {
         // Dashboard Blade murni via controller (resources/views/pages/pasak).
         Route::get('/', \Internal\Pasak\Http\Controllers\Dashboard\PasakOverviewController::class)->name('overview');
+        Route::get('threat-map', [\Internal\Pasak\Http\Controllers\Dashboard\PasakThreatMapController::class, 'index'])->name('threat-map');
+        Route::get('threat-map/feed', [\Internal\Pasak\Http\Controllers\Dashboard\PasakThreatMapController::class, 'feed'])->name('threat-map.feed');
         Route::get('logs', [\Internal\Pasak\Http\Controllers\Dashboard\PasakLogController::class, 'index'])->name('logs');
         Route::get('logs/{id}', [\Internal\Pasak\Http\Controllers\Dashboard\PasakLogController::class, 'show'])->whereNumber('id')->name('logs.show');
         Route::delete('logs', [\Internal\Pasak\Http\Controllers\Dashboard\PasakLogController::class, 'clear'])->name('logs.clear');

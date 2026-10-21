@@ -741,6 +741,17 @@ return [
             ? ['Internal\\Pasak\\Http\\Middleware\\PasakEnsureSecurityAdmin']
             : [],
         'admin_only' => (bool) env('PASAK_DASHBOARD_ADMIN_ONLY', env('SECURITY_DASHBOARD_ADMIN_ONLY', false)),
+
+        // Peta ancaman (Threat Map): titik server yang dipantau + jendela
+        // data serangan yang digambar.
+        'threat_map' => [
+            'target_name' => env('PASAK_DASHBOARD_TARGET_NAME', 'Pekanbaru, Riau (ID)'),
+            'target_lat' => (float) env('PASAK_DASHBOARD_TARGET_LAT', 0.5071),
+            'target_lon' => (float) env('PASAK_DASHBOARD_TARGET_LON', 101.4478),
+            'window_hours' => (int) env('PASAK_DASHBOARD_MAP_WINDOW_HOURS', 24),
+            'max_origins' => (int) env('PASAK_DASHBOARD_MAP_MAX_ORIGINS', 10),
+            'refresh_seconds' => (int) env('PASAK_DASHBOARD_MAP_REFRESH_SECONDS', 8),
+        ],
     ],
 
     /*
