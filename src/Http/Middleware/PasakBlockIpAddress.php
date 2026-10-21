@@ -71,6 +71,12 @@ class PasakBlockIpAddress
             'security/unblock-tickets/check/*',
             'pasak/unblock-tickets/submit',
             'pasak/unblock-tickets/check/*',
+            'api/pasak/unblock-tickets/submit',
+            'api/pasak/unblock-tickets/check/*',
+            'api/security/unblock-tickets/submit',
+            'api/security/unblock-tickets/check/*',
+            '*/unblock-tickets/submit',
+            '*/unblock-tickets/check/*',
         );
     }
 

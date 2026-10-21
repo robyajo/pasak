@@ -4,7 +4,14 @@ All notable changes to `robyajo/pasak` will be documented in this file.
 
 ## [Unreleased]
 
-## [1.5.0] - 2026-10-21
+## [1.4.4] - 2026-10-21
+
+### Fixed
+
+- **Whitelisting rute tiket banding di middleware `PasakBlockIpAddress`**: rute publik untuk pengajuan dan pengecekan status tiket banding (`api/pasak/unblock-tickets/*`, `api/security/unblock-tickets/*`, dan pola wildcard `*/unblock-tickets/*`) kini dikecualikan dari pencegatan `PasakBlockIpAddress` sehingga pengguna yang sah namun terblokir tetap dapat mengirimkan tiket banding melalui form modal maupun REST API.
+- **Validasi payload pengujian aplikasi real**: seluruh pengujian end-to-end WAF dan dashboard di `ring/pasak-yes` diverifikasi dan dipastikan berjalan hijau dengan status code dan payload yang valid.
+
+## [1.4.3] - 2026-10-21
 
 ### Added
 
