@@ -11,8 +11,11 @@ parameters:
     treatPhpDocTypesAsCertain: false
     reportUnmatchedIgnoredErrors: false
     ignoreErrors:
-        # The trait is consumed by the host application's User model.
-        - '#Trait Internal\\Pasak\\Concerns\\HasSecurityRelations is used zero times and is not analysed#'
+        # The traits are consumed by the host application (User model /
+        # dashboard controllers) only via dynamic aliases, never statically
+        # inside src. compat.php + alias files wire the legacy names.
+        - '#Trait Internal\\Pasak\\Concerns\\HasPasakSecurityRelations is used zero times and is not analysed#'
+        - '#Trait Internal\\Pasak\\Http\\Controllers\\Dashboard\\RespondsWithPasakDashboard is used zero times and is not analysed#'
         # Dynamic filesystem / runtime state checks
         - '#Negated boolean expression is always true.#'
         - '#Instanceof between .*Request and .*Request will always evaluate to true.#'
@@ -21,7 +24,7 @@ parameters:
         # the view, false on a clean checkout such as CI).
         -
             message: '#Factory::exists\(\) with .*errors\.blocked.* will always evaluate to (true|false)#'
-            path: src/Http/Middleware/BlockIpAddress.php
+            path: src/Http/Middleware/PasakBlockIpAddress.php
         # The configured user model is dynamic; `email` is not part of the contract.
         - '#Access to an undefined property Illuminate\\Contracts\\Auth\\Authenticatable::\$email#'
 

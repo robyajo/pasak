@@ -388,10 +388,10 @@ class PasakUserLoginService
 
             $activeList[] = [
                 'session_id' => $session->id,
-                'user_id' => $user->id,
-                'name' => $user->name,
-                'email' => $user->email,
-                'role' => $user->role,
+                'user_id' => $user->getAttribute('id'),
+                'name' => $user->getAttribute('name'),
+                'email' => $user->getAttribute('email'),
+                'role' => $user->getAttribute('role'),
                 'ip_address' => $session->ip_address,
                 'operating_system' => $clientInfo['os'],
                 'browser' => $clientInfo['browser'],

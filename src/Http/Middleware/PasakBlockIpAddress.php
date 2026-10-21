@@ -101,14 +101,16 @@ class PasakBlockIpAddress
         } else {
             $blockModel = $service->activeBlock($ip, $deviceId, $localIp);
             $reason =
-                $blockModel?->reason ?? 'Aktivitas mencurigakan terdeteksi';
+                ($blockModel !== null && $blockModel->reason !== null)
+                    ? $blockModel->reason
+                    : 'Aktivitas mencurigakan terdeteksi';
         }
 
         $referenceId =
             'SEC-'.
             strtoupper(
                 substr(
-                    md5($ip.($blockModel?->id ?? 'manual').date('Ymd')),
+                    md5($ip.(($blockModel !== null ? (string) $blockModel->id : 'manual')).date('Ymd')),
                     0,
                     8,
                 ),
@@ -126,7 +128,9 @@ class PasakBlockIpAddress
                     'ip_address' => $ip,
                     'device_id' => $deviceId,
                     'local_ip' => $localIp,
-                    'block_scope' => $blockModel?->block_scope ?? 'ip',
+                    'block_scope' => $blockModel !== null
+                    ? (string) $blockModel->block_scope
+                    : 'ip',
                     'reference_id' => $referenceId,
                     'expires_at' => $blockModel?->expires_at?->toIso8601String(),
                     'blocked' => true,

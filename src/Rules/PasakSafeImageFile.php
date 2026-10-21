@@ -72,18 +72,9 @@ class PasakSafeImageFile implements ValidationRule
         // 1. Baca konten berkas untuk pemeriksaan polyglot.
         $content = '';
         try {
-            /** @var mixed $rawFile */
-            $rawFile = $value;
-            if (is_object($rawFile) && property_exists($rawFile, 'tempFile') && is_resource($rawFile->tempFile)) {
-                rewind($rawFile->tempFile);
-                $content = (string) stream_get_contents($rawFile->tempFile);
-            } elseif (method_exists($value, 'get')) {
-                $content = (string) $value->get();
-            } elseif (method_exists($value, 'getContent')) {
-                $content = (string) $value->getContent();
-            }
+            $content = (string) $value->get();
         } catch (Throwable) {
-            // Abaikan dan gunakan fallback
+            // Abaikan dan biarkan fallback path di bawah bekerja.
         }
 
         if ($content === '') {
@@ -108,7 +99,7 @@ class PasakSafeImageFile implements ValidationRule
         }
 
         $clientExt = strtolower((string) $value->getClientOriginalExtension());
-        $clientMime = strtolower((string) ($value->getClientMimeType() ?? ''));
+        $clientMime = strtolower((string) $value->getClientMimeType());
 
         // 3. Pindai token PHP atau webshell berbahaya di seluruh byte file.
         foreach (self::DANGEROUS_PATTERNS as $pattern) {
@@ -141,7 +132,7 @@ class PasakSafeImageFile implements ValidationRule
             return;
         }
 
-        $detectedMime = $imageInfo['mime'] ?? '';
+        $detectedMime = (string) $imageInfo['mime'];
 
         if (! in_array($detectedMime, self::ALLOWED_MIMES, true)) {
             $fail('Tipe gambar :attribute tidak didukung.');
@@ -169,9 +160,7 @@ class PasakSafeImageFile implements ValidationRule
                 return;
             }
 
-            if (is_resource($img) || (is_object($img) && $img instanceof \GdImage)) {
-                imagedestroy($img);
-            }
+            imagedestroy($img);
         } catch (Throwable) {
             $fail('Struktur berkas gambar rusak atau tidak valid.');
         }

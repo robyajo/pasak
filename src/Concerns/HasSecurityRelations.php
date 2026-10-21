@@ -2,14 +2,8 @@
 
 namespace Internal\Pasak\Concerns;
 
-/**
- * Legacy trait alias for HasPasakSecurityRelations.
- */
-trait HasSecurityRelations
-{
-    use HasPasakSecurityRelations;
-}
-
-if (! class_exists('Internal\Pasak\Concerns\HasSecurityRelations', false) && ! trait_exists('Internal\Pasak\Concerns\HasSecurityRelations', false)) {
+// Alias nama legasi: HasSecurityRelations diarahkan ke tur utama
+// HasPasakSecurityRelations (bila compat.php belum sempat memasangnya).
+if (! trait_exists('Internal\Pasak\Concerns\HasSecurityRelations', false)) {
     class_alias(HasPasakSecurityRelations::class, 'Internal\Pasak\Concerns\HasSecurityRelations');
 }

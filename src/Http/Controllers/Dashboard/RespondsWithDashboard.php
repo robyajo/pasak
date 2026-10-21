@@ -2,14 +2,8 @@
 
 namespace Internal\Pasak\Http\Controllers\Dashboard;
 
-/**
- * Legacy trait alias for RespondsWithPasakDashboard.
- */
-trait RespondsWithDashboard
-{
-    use RespondsWithPasakDashboard;
-}
-
-if (! class_exists('Internal\Pasak\Http\Controllers\Dashboard\RespondsWithDashboard', false) && ! trait_exists('Internal\Pasak\Http\Controllers\Dashboard\RespondsWithDashboard', false)) {
+// Alias nama legasi: RespondsWithDashboard diarahkan ke tur utama
+// RespondsWithPasakDashboard (bila compat.php belum sempat memasangnya).
+if (! trait_exists('Internal\Pasak\Http\Controllers\Dashboard\RespondsWithDashboard', false)) {
     class_alias(RespondsWithPasakDashboard::class, 'Internal\Pasak\Http\Controllers\Dashboard\RespondsWithDashboard');
 }

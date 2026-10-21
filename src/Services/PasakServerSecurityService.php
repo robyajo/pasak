@@ -954,7 +954,7 @@ class PasakServerSecurityService
         );
 
         $withoutTwoFactor = $admins->filter(
-            fn ($user): bool => $user->two_factor_confirmed_at === null,
+            fn ($user): bool => $user->getAttribute('two_factor_confirmed_at') === null,
         );
         $checks[] = $this->check(
             'admin_two_factor',
@@ -2078,7 +2078,7 @@ class PasakServerSecurityService
                 PREG_OFFSET_CAPTURE,
             )
         ) {
-            $offset = (int) ($m[0][1] ?? 0);
+            $offset = (int) $m[0][1];
             $rawSnippet = substr($content, max(0, $offset - 10), 80);
             $snippet = preg_replace('/[^\x20-\x7E]/', ' ', $rawSnippet);
 
@@ -2099,7 +2099,7 @@ class PasakServerSecurityService
                     PREG_OFFSET_CAPTURE,
                 )
             ) {
-                $offset = (int) ($matches[0][1] ?? 0);
+                $offset = (int) $matches[0][1];
                 $rawSnippet = substr($content, max(0, $offset - 20), 100);
                 $snippet = preg_replace('/[^\x20-\x7E]/', ' ', $rawSnippet);
 

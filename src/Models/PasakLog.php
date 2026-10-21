@@ -28,6 +28,11 @@ use Internal\Pasak\Concerns\ResolvesPasakTable;
  * @property array<string, mixed>|null $meta
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
+ *                                   Alias proyeksi agregat (hanya ada pada hasil selectRaw threat map,
+ *                                   bukan kolom riil tabel):
+ * @property int|null $hits
+ * @property int|null $weight
+ * @property string|null $last_seen
  */
 class PasakLog extends Model
 {

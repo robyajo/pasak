@@ -292,7 +292,7 @@ class PasakAccessLogScannerService
         }
 
         $status = is_numeric($matches['status']) ? (int) $matches['status'] : null;
-        $bytes = isset($matches['bytes']) && is_numeric($matches['bytes']) ? (int) $matches['bytes'] : null;
+        $bytes = is_numeric($matches['bytes']) ? (int) $matches['bytes'] : null;
 
         return [
             'ip' => (string) $matches['ip'],

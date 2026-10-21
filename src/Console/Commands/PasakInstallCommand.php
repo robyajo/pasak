@@ -5,8 +5,8 @@ namespace Internal\Pasak\Console\Commands;
 use Illuminate\Console\Command;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Schema;
 use Internal\Pasak\Database\Seeders\PasakDefaultSettingsSeeder;
 
 class PasakInstallCommand extends Command

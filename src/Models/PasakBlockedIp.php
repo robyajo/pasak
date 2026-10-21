@@ -74,7 +74,7 @@ class PasakBlockedIp extends Model
     }
 
     /**
-     * @return HasMany<PasakIpUnblockRequest>
+     * @return HasMany<PasakIpUnblockRequest, $this>
      */
     public function appeals(): HasMany
     {
