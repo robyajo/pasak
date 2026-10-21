@@ -34,6 +34,11 @@
             "type": "improvement",
             "id": "Seluruh komponen keamanan, filter pemeriksaan, dan pengendali sistem kini diberi penanda khusus agar mudah dikenali dan tidak tertukar dengan komponen aplikasi milik pengguna.",
             "en": "All security components, inspection filters, and system controllers now carry dedicated identifiers so they are easily distinguished and never conflict with existing user application components."
+        },
+        {
+            "type": "fix",
+            "id": "Jalur pengajuan permohonan pembukaan blokir disempurnakan sehingga pengguna yang sah tetap dapat menyampaikan tiket bantuan tanpa terhalang filter keamanan.",
+            "en": "The appeal submission channel has been refined so legitimate users can submit assistance tickets without being blocked by security filters."
         }
     ]
 }
