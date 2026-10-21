@@ -739,7 +739,11 @@ class PasakService
      */
     public function inspect(Request $request): array
     {
-        if (! $this->enabled() || $this->isWhitelisted($request->ip())) {
+        $ip = $this->resolveClientIp($request);
+        $deviceId = $this->resolveDeviceId($request);
+        $localIp = $this->resolveLocalIp($request);
+
+        if (! $this->enabled() || $this->isWhitelisted($ip, $deviceId, $localIp)) {
             return [];
         }
 

@@ -4,6 +4,14 @@ All notable changes to `robyajo/pasak` will be documented in this file.
 
 ## [Unreleased]
 
+## [1.4.5] - 2026-10-21
+
+### Fixed
+
+- **Penyelarasan resolusi IP dan perangkat pada `PasakService::inspect()`**: pemeriksaan daftar putih (whitelist) di awal inspeksi kini menggunakan `resolveClientIp($request)` dan `resolveDeviceId($request)` secara penuh sehingga permintaan di balik proxy/tunnel dengan header forwarding tidak terkecoh oleh soket IP mentah.
+- **Deteksi pemindai ffuf dengan banner lengkap**: regex signature pemindai keamanan kini mendeteksi format banner bawaan `Fuzz Faster U Fool` selain singkatan `ffuf`.
+- **Pengerasan simulasi server pengembangan**: penanganan rute berkas konfigurasi rahasia (`.htaccess`, `.env`, `composer.json`) diuji dan diverifikasi memicu respons blokir instan 403 secara konsisten.
+
 ## [1.4.4] - 2026-10-21
 
 ### Fixed

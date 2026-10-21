@@ -17,12 +17,15 @@ _ITEM_RE = re.compile(r"\{\s*label:\s*", re.MULTILINE)
 
 def _str_field(chunk: str, name: str) -> str | None:
     m = re.search(rf"{name}:\s*\"((?:[^\"\\]|\\.)*)\"", chunk)
-    if not m:
-        return None
-    try:
-        return json.loads(f'"{m.group(1)}"')
-    except json.JSONDecodeError:
-        return m.group(1)
+    if m:
+        try:
+            return json.loads(f'"{m.group(1)}"')
+        except json.JSONDecodeError:
+            return m.group(1)
+    m = re.search(rf"{name}:\s*'((?:[^'\\]|\\.)*)'", chunk)
+    if m:
+        return m.group(1).replace("\\'", "'")
+    return None
 
 
 def _upload_field(chunk: str) -> dict | None:

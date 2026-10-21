@@ -197,7 +197,7 @@ return [
                     // OPD) sehingga blokir instan 30 hari akan salah sasaran.
                     // Keduanya tetap tertangkap secara perilaku (probe .env,
                     // wp-admin, dll) oleh signature lain.
-                    '/\b(sqlmap|nikto|nmap|masscan|nessus|openvas|acunetix|netsparker|appscan|webinspect|burp|dirbuster|gobuster|feroxbuster|ffuf|wfuzz|dirsearch|wpscan|joomscan|droopescan|nuclei|zgrab|hydra|medusa|metasploit|havij|arachni|skipfish|w3af|commix|jaeles|xray|zaproxy|zap|whatweb|wafw00f|subfinder|gospider|fimap|xsstrike|dalfox|tplmap|ysoserial)\b/i',
+                    '/\b(sqlmap|nikto|nmap|masscan|nessus|openvas|acunetix|netsparker|appscan|webinspect|burp|dirbuster|gobuster|feroxbuster|ffuf|fuzz\s+faster\s+u\s+fool|wfuzz|dirsearch|wpscan|joomscan|droopescan|nuclei|zgrab|hydra|medusa|metasploit|havij|arachni|skipfish|w3af|commix|jaeles|xray|zaproxy|zap|whatweb|wafw00f|subfinder|gospider|fimap|xsstrike|dalfox|tplmap|ysoserial)\b/i',
                 ],
             ],
             [
