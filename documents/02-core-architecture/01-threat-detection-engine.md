@@ -16,7 +16,7 @@ Setiap request diuraikan ke dalam beberapa area inspeksi spesifik (`target`):
 6. **`user_agent`**: String identifikasi browser/klien (`User-Agent` HTTP header).
 7. **`any`**: Seluruh target di atas digabungkan menjadi satu kesatuan inspeksi.
 
-> **Proteksi Batas Ukuran (`max_inspect_length`)**: Untuk mencegah serangan DoS berbasis konsumsi memori, teks yang diinspeksi dibatasi sepanjang maksimal `SECURITY_MAX_INSPECT_LENGTH` (default: 4000 karakter). Jika ukuran body melebihi batas ini, pemotongan dilakukan secara aman tanpa merusak keabsahan regex.
+> **Proteksi Batas Ukuran (`max_inspect_length`)**: Untuk mencegah serangan DoS berbasis konsumsi memori, teks yang diinspeksi dibatasi sepanjang maksimal `PASAK_MAX_INSPECT_LENGTH` (default: 4000 karakter). Jika ukuran body melebihi batas ini, pemotongan dilakukan secara aman tanpa merusak keabsahan regex.
 
 ---
 

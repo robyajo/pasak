@@ -91,17 +91,20 @@ Perintah tersebut menyalin berkas berikut ke aplikasi Anda:
 
 | Berkas yang Dipublikasikan                             | Deskripsi                                                   |
 | :----------------------------------------------------- | :---------------------------------------------------------- |
-| `resources/views/pages/pasak/overview.blade.php`    | Statistik, tren serangan, dan top attacker.                 |
-| `resources/views/pages/pasak/threat-map.blade.php`  | Peta geografis lintasan serangan dari asal penyerang menuju server (live). |
-| `resources/views/pages/pasak/logs.blade.php`        | Tabel log keamanan dengan filter dan aksi bersihkan/hapus.  |
+| `resources/views/pages/pasak/overview.blade.php`    | Statistik, tren serangan, dan kartu top attacker 24 jam real-time. |
+| `resources/views/pages/pasak/threat-map.blade.php`  | Peta geografis lintasan serangan dari asal penyerang menuju server (live globe). |
+| `resources/views/pages/pasak/logs.blade.php`        | Data table log keamanan dengan filter rentang tanggal, pencarian, dan per-page. |
 | `resources/views/pages/pasak/log-detail.blade.php`  | Detail satu entri log: evidence, konteks request, dan log terkait. |
-| `resources/views/pages/pasak/blocked-ips.blade.php` | Manajemen karantina IP (blokir manual, toggle, unblock).    |
+| `resources/views/pages/pasak/blocked-ips.blade.php` | Data table karantina IP dengan filter tanggal, toggle status, dan buka blokir. |
 | `resources/views/pages/pasak/blocked-ip-detail.blade.php` | Detail satu blokir: alasan, log pemicu, dan tiket banding terkait. |
-| `resources/views/pages/pasak/server.blade.php`      | Audit integritas, pemindai webshell, baseline, dan lockout. |
-| `resources/views/pages/pasak/sessions.blade.php`    | Sesi pengguna aktif, riwayat login, dan IP terpercaya.      |
-| `resources/views/pages/pasak/tickets.blade.php`     | Review tiket banding (approve/reject + auto-unblock).       |
+| `resources/views/pages/pasak/allowed-ips.blade.php` | Data table daftar IP yang diizinkan (allowlist) dengan filter tanggal dan per-page. |
+| `resources/views/pages/pasak/server.blade.php`      | Audit integritas, pemindai webshell, baseline SHA-256, dan status sistem. |
+| `resources/views/pages/pasak/sessions.blade.php`    | Data table sesi pengguna aktif, riwayat login, dan IP terpercaya. |
+| `resources/views/pages/pasak/tickets.blade.php`     | Data table review permohonan tiket banding buka blokir. |
 | `resources/views/pages/pasak/ticket-detail.blade.php` | Detail satu tiket: alasan pemohon, blokir terkait, dan formulir respon. |
-| `resources/views/pages/pasak/layout.blade.php`      | Sub-layout navigasi antar modul keamanan.                   |
+| `resources/views/pages/pasak/settings.blade.php`    | Pengaturan WAF: ambang per tingkat, lingkup adaptif, lockout login, dan simulasi live. |
+| `resources/views/pages/pasak/pagination.blade.php`  | Komponen pagination terpadu: ringkasan entri dan tombol navigasi halaman. |
+| `resources/views/pages/pasak/layout.blade.php`      | Sub-layout navigasi, tema (Dark Mode), dan styling custom properties. |
 
 Setelah dipublikasikan, aktifkan dashboard melalui `.env`:
 
@@ -112,28 +115,50 @@ PASAK_DASHBOARD_PREFIX=pasak
 
 Panel dapat diakses pada `/pasak`. Halaman-halaman tersebut dirender controller bawaan paket sebagai Blade biasa.
 
-### Threat Map — Peta Live Penyerang
+---
 
-Halaman **Threat Map** (`/pasak/threat-map`) menampilkan bola dunia interaktif yang menggambar lintasan serangan dari lokasi geografis IP penyerang menuju lokasi server yang dipantau:
+### 3. Fitur Unggulan Dashboard Blade
 
-- **Data nyata**: asal panah diambil dari log serangan 24 jam terakhir per IP (mirror `Top attackers`), dengan warna sesuai tingkat ancaman (`critical` merah → `low` hijau).
-- **Lokasi IP** diselesaikan server-side memakai resolver geoIP yang sama dengan pelacak sesi (cache 30 hari), sehingga tidak ada pengulangan query API.
-- **Live feed**: panel log kirim update otomatis tiap beberapa detik via `GET /pasak/threat-map/feed` (dilindungi middleware sama dengan dashboard).
-- **Globe** memakai d3.js + topojson dari CDN dengan degradasi anggun: apabila CDN tersekat, panel log & statistik tetap berfungsi.
+#### A. Data Table Interaktif (Filter Tanggal, Per-Page, & Pagination)
 
-`PASAK_DASHBOARD_TARGET_NAME`, `PASAK_DASHBOARD_TARGET_LAT`, dan `PASAK_DASHBOARD_TARGET_LON` dapat disesuaikan di `.env` bila lokasi server Anda berbeda dari bawaan (Pekanbaru).
+Seluruh tabel data utama (`logs`, `blocked-ips`, `allowed-ips`, `sessions`, `tickets`) dilengkapi antarmuka Data Table modern:
 
-> 🔒 **Wajib Login**: Rute dashboard memakai middleware `web` + `auth`, dan secara bawaan juga `pasak.admin` (Gate `manage-pasak`). Untuk mengizinkan semua pengguna yang sudah login (tanpa syarat admin), kosongkan `pasak.dashboard.admin_middleware` pada `config/pasak.php`.
+- **Filter Rentang Tanggal (`date_from` & `date_to`)**: Menyaring data berdasarkan tanggal kejadian dengan input tanggal visual dan tombol **Reset** untuk membersihkan saringan secara instan.
+- **Selector Entri Per Halaman**: Pilihan `10`, `25`, `50`, atau `100` entri per halaman dengan persistensi parameter URL otomatis saat berpindah halaman.
+- **Komponen Pagination Terpadu (`pagination.blade.php`)**: Menampilkan ringkasan informatif (*"Showing X to Y of Z entries"*) beserta tombol navigasi halaman responsif (*Previous*, nomor halaman berjenjang, dan *Next*).
 
-### Desain Sistem Pure Vanilla CSS (Zero External UI Dependencies)
+#### B. Threat Map — Peta Live Penyerang
+
+Halaman **Threat Map** (`/pasak/threat-map`) menampilkan bola dunia 3D interaktif yang memetakan lintasan serangan dari koordinat asal penyerang menuju server:
+
+- **Data Nyata & Warna Tingkat Ancaman**: Lintasan panah diambil dari `pasak_logs` 24 jam terakhir dengan warna sesuai tingkat bahaya (`critical` merah, `high` oranye, `medium` kuning, `low` hijau).
+- **Streaming Serangan Baru (`?after=`)**: Polling otomatis tiap 8 detik memanfaatkan kursor id terakhir sehingga hanya serangan baru yang digambar di globe tanpa memuat ulang log arsip lama.
+- **Mode Layar Penuh (Full Screen Mode)**: Tombol `⛶ Full screen` memperluas kanvas peta memenuhi layar secara fluid (`position: fixed; inset: 0`), dan tombol `Escape` mengembalikannya ke tampilan standar.
+- **Tata Letak Responsif Seluler**: Pada layar ponsel/tablet, globe tetap tampil dominan di bagian atas dan metrik serangan ditata rapi dalam grid kartu.
+- **Pemberitahuan Anggun (Graceful Fallback)**: Jika CDN visualisasi tidak dapat dijangkau, antarmuka menyediakan kartu pemberitahuan yang informatif tanpa merusak panel log.
+
+#### C. Pengaturan Dinamis & Simulasi Live
+
+Halaman **Pengaturan** (`/pasak/settings`) memungkinkan pengelola menyetel:
+- Ambang batas auto-block per tingkat ancaman (`critical`, `high`, `medium`, `low`).
+- Lingkup pemblokiran: `device` (hanya perangkat pelanggar), `ip` (seluruh IP), atau `auto` (adaptif, aman untuk Wi-Fi kantor bersama).
+- Durasi pemblokiran bertingkat (6 jam hingga permanen).
+- Ambang batas proteksi login bertingkat (stepped lockout) dan masa simpan log.
+- **Kotak Simulasi Live**: Menguji skenario serangan secara interaktif untuk melihat apakah tindakan blokir akan terpicu berdasarkan pengaturan yang sedang aktif.
+
+---
+
+### 4. Desain Sistem Pure Vanilla CSS (Zero External UI Dependencies)
 
 Stubs Blade dibangun menggunakan **Pure Vanilla CSS**:
-- **Tanpa dependensi frontend apa pun** (tanpa Livewire, Inertia, Vue, ataupun UI kit eksternal).
+- **Tanpa dependensi frontend apa pun** (tanpa NPM, Node.js, Vite, Livewire, Inertia, Vue, ataupun UI kit eksternal).
 - Menanamkan CSS custom properties terisolasi (`--sec-*`) di dalam sub-layout (`layout.blade.php`) sehingga konsisten, ringan, dan kompatibel dengan tata letak apa pun.
 - Dilengkapi dukungan **Dark Mode** otomatis via media query `@media (prefers-color-scheme: dark)` dan kelas `.dark`, plus tombol toggle manual (Auto → Terang → Gelap) yang tersimpan di `localStorage`.
 - Sepenuhnya **responsif** dengan tabel scroll horizontal di layar sempit/mobile serta grid fleksibel.
 
-### Menambahkan Tautan di Sidebar
+---
+
+### 5. Menambahkan Tautan di Sidebar
 
 Untuk memunculkan tautan ke panel, tambahkan item berikut pada navigasi sidebar aplikasi Anda:
 

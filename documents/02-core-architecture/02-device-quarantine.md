@@ -49,6 +49,11 @@ Di tabel `blocked_ips`, kolom `block_scope` menentukan ruang lingkup blokir:
 - Berlaku untuk serangan berskala masif, distributed botnet, atau penyerang dari IP server VPS/proxy publik (misal DigitalOcean, Linode) yang terbukti tidak memiliki pengguna sah.
 - Seluruh request dari IP publik tersebut langsung ditolak.
 
+### C. `block_scope = 'auto'` (Lingkup Adaptif Otomatis — Bawaan Pengaturan)
+- Mode cerdas yang **menyeimbangkan keamanan dan kenyamanan**:
+  - Jika request penyerang menyertakan identitas `device_id` eksplisit, WAF otomatis menjatuhkan isolasi pada **tingkat perangkat** (`block_scope = 'device'`) sehingga pengguna lain di kantor/Wi-Fi yang sama tidak terganggu.
+  - Jika request tidak memiliki fingerprint perangkat (misalnya bot HTTP mentah, skrip cURL, atau alat scanner CLI), WAF secara otomatis mengamankan perimeter dengan memblokir **seluruh IP** (`block_scope = 'ip'`).
+
 ---
 
 ## 4. Hirarki Evaluasi pada Middleware `BlockIpAddress`

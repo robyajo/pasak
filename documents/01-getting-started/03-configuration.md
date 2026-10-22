@@ -4,21 +4,58 @@ Seluruh perilaku **`robyajo/pasak`** dikontrol melalui berkas konfigurasi `confi
 
 ---
 
-## 1. Daftar Variabel Lingkungan (`.env`)
+## 1. Variabel Inti Lingkungan (`.env`) & Pengaturan Database
 
-Berikut adalah daftar lengkap seluruh variabel lingkungan yang didukung:
+Paket **`robyajo/pasak`** menerapkan prinsip pemisahan tanggung jawab yang jelas:
+- **Variabel Inti Bootstrap (`.env`)**: Berkas `.env` hanya memuat sakelar bootstrap paling vital (sakelar WAF, IP whitelist awal, dan rute).
+- **Pengaturan Operasional (`pasak_settings`)**: Seluruh perilaku keamanan dinamis (ambang blokir per-tingkat, ambang kombinasi, lingkup karantina `device|ip|auto`, durasi pemblokiran, brute force lockout, dan retensi log) diatur langsung dari **Dashboard Pasak → Pengaturan (`/pasak/settings`)** dan tersimpan di database.
 
-| Variabel `.env`                        |  Tipe  |      Nilai Bawaan      | Keterangan & Dampak                                                                                       |
-| :------------------------------------- | :----: | :--------------------: | :-------------------------------------------------------------------------------------------------------- |
-| `PASAK_MONITOR_ENABLED`             |  bool  |         `true`         | Sakelar utama untuk pemindaian ancaman di middleware. Jika `false`, inspeksi ditiadakan.                  |
-| `PASAK_BLOCK_ENFORCEMENT`           |  bool  |         `true`         | Penegakan blokir aktif. Jika `false`, IP terblokir tetap dicatat tetapi request tidak ditolak.            |
-| `PASAK_BLOCKED_LOG_INTERVAL`        |  int   |          `10`          | Jeda waktu (detik) pencatatan log untuk IP yang terus-menerus mencoba mengakses saat terblokir.           |
-| `PASAK_AUTO_BLOCK_ENABLED`          |  bool  |         `false`        | Opt-in pemblokiran otomatis. Default monitoring saja (deteksi + catat, tanpa blokir).                               |
-| `PASAK_AUTO_BLOCK_THRESHOLD`        |  int   |          `3`           | Jumlah kejadian ancaman yang harus dicapai dalam kurun waktu sebelum IP diblokir.                         |
-| `PASAK_AUTO_BLOCK_WINDOW`           |  int   |          `10`          | Rentang jendela waktu evaluasi auto-block (dalam menit).                                                  |
-| `PASAK_AUTO_BLOCK_DURATION`         |  int   |          `24`          | Durasi pemblokiran otomatis (dalam jam). Masukkan `0` jika ingin memblokir permanen.                      |
+### A. Blok Variabel Inti Bawaan (`stubs/env.stub`)
 
-> **Sumber kebenaran baru: tabel `pasak_settings`** — Karena versi ini, ambang default auto-block per tingkat (`critical:1, high:2, medium:3, low:5`), ambang kombinasi, lingkup blokir (`device|ip|auto`), durasi, throttle lockout login, dan retensi log kini dikelola dari **dashboard pengaturan** dan disemai ke tabel `pasak_settings` oleh `PasakDefaultSettingsSeeder` (otomatis saat `pasak:install` / `pasak:upgrade`). Baris settings DB **mengungguli** kunci env di atas; kunci env lama tetap didukung sebagai fallback senyap (tanpa deprecate error) agar instalasi lama tidak terputus.
+Berikut adalah blok variabel `.env` ringkas yang disematkan saat `php artisan pasak:install`:
+
+```dotenv
+# Sakelar utama WAF: Aktifkan (true) atau nonaktifkan (false) seluruh inspeksi keamanan
+PASAK_MONITOR_ENABLED=true
+
+# Daftar putih IP yang tidak akan pernah diblokir (pisahkan dengan koma jika lebih dari satu)
+PASAK_IP_WHITELIST=127.0.0.1,::1
+
+# Sakelar pendaftaran middleware WAF otomatis ke HTTP Kernel
+PASAK_AUTO_REGISTER_MIDDLEWARE=false
+
+# Rute REST API headless (/api/pasak/*)
+PASAK_ROUTES_ENABLED=true
+
+# Dashboard monitoring Blade murni (akses via /pasak, wajib login)
+PASAK_DASHBOARD_ENABLED=false
+PASAK_DASHBOARD_PREFIX=pasak
+
+# Alamat email dukungan yang ditampilkan pada respon blokir 403
+PASAK_SUPPORT_EMAIL=security@example.com
+```
+
+### B. Pengaturan Dinamis Berbasis Database (`pasak_settings`)
+
+Saat migrasi dijalankan (atau saat `pasak:install --migrate` / `pasak:upgrade`), seeder `PasakDefaultSettingsSeeder` otomatis menanam konfigurasi bawaan ke dalam tabel `pasak_settings`:
+
+| Kunci Pengaturan | Nilai Bawaan | Keterangan & Pengaturan di Dashboard |
+| :--- | :--- | :--- |
+| `auto_block.enabled` | `false` | Status aktifasi pemblokiran otomatis berbasis akumulasi ancaman. |
+| `auto_block.level_thresholds` | `{"critical":1,"high":2,"medium":3,"low":5}` | Ambang batas kejadian per tingkat bahaya sebelum blokir dijatuhkan. |
+| `auto_block.combined_threshold` | `3` | Ambang akumulasi gabungan lintas tingkat bahaya (minimal 2 level berbeda). |
+| `auto_block.window_minutes` | `10` | Jendela evaluasi waktu mundur (menit). |
+| `auto_block.duration_hours` | `24` | Durasi blokir otomatis (jam; 0 = permanen). |
+| `auto_block.scope` | `auto` | Lingkup karantina: `device` (perangkat), `ip` (seluruh IP), atau `auto` (adaptif, aman bagi Wi-Fi bersama). |
+| `instant_block.enabled` | `false` | Blokir langsung 30 hari untuk signature zero-tolerance. |
+| `login_throttle.lockout_threshold` | `3` | Jumlah kegagalan otentikasi sebelum akun/IP dikunci sementara. |
+| `login_throttle.base_minutes` | `1` | Durasi lockout awal pada tingkatan pertama (menit). |
+| `login_throttle.max_minutes` | `30` | Batas maksimum penalti penguncian berjenjang (menit). |
+| `logs.retention_days` | `90` | Masa simpan riwayat log audit (hari) sebelum dibersihkan otomatis. |
+
+> 💡 **Prioritas Konfigurasi**: Nilai yang tersimpan pada tabel `pasak_settings` diutamakan di atas nilai `.env`. Kunci `.env` lama tetap berlaku sebagai fallback senyap apabila entri pada database belum tersimpan.
+
+### C. Daftar Lengkap Variabel Override & Tingkat Lanjut (`.env`)
 | `PASAK_INSTANT_BLOCK_ENABLED`       |  bool  |         `false`        | Opt-in blokir instan. Default monitoring saja; aktifkan bila siap karantina otomatis.             |
 | `PASAK_INSTANT_BLOCK_DURATION`      |  int   |         `720`          | Durasi blokir instan (dalam jam; bawaan: 720 jam = 30 hari). Masukkan `0` untuk permanen.                 |
 | `PASAK_MAX_INSPECT_LENGTH`          |  int   |         `4000`         | Batas maksimum panjang karakter string payload yang diinspeksi untuk mencegah ReDoS pada payload raksasa. |

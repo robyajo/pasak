@@ -134,6 +134,22 @@ Menyimpan tiket banding yang diajukan oleh pengguna publik yang terblokir.
 
 ---
 
+### F. `PasakSetting` (`Internal\Pasak\Models\PasakSetting`)
+Menyimpan konfigurasi dinamis yang dikelola via **Dashboard Pasak → Pengaturan** (`/pasak/settings`) maupun API Admin. Default tabel: `pasak_settings`.
+
+| Kolom | Tipe Data | Deskripsi |
+| :--- | :--- | :--- |
+| `id` | BigIncrements | Primary key |
+| `key` | String(100), unique | Kunci identifikasi pengaturan (mis. `auto_block.level_thresholds`) |
+| `value` | LongText, nullable | Nilai pengaturan (string skalar atau format JSON) |
+| `description` | Text, nullable | Penjelasan fungsi pengaturan untuk administrator |
+| `created_at` | DateTime | Waktu pembuatan entri |
+| `updated_at` | DateTime | Waktu pembaruan terakhir |
+
+Entri default diisi otomatis oleh `PasakDefaultSettingsSeeder` saat `pasak:install --migrate` atau `pasak:upgrade`.
+
+---
+
 ## 3. Integrasi Trait `HasPasakSecurityRelations`
 
 Untuk menghubungkan model `User` aplikasi Anda dengan model-model di atas, cukup gunakan trait `Internal\Pasak\Concerns\HasPasakSecurityRelations`:

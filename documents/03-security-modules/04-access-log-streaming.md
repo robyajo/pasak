@@ -65,9 +65,9 @@ php artisan pasak:scan-logs --ip=104.207.74.38 --samples
 Anda dapat mengaktifkan pemindaian otomatis harian di latar belakang dengan menambahkan variabel berikut ke berkas `.env`:
 
 ```dotenv
-SECURITY_ACCESS_LOG_AUTO_SCAN=true
-SECURITY_ACCESS_LOG_AUTO_SCAN_HOURS=24
-SECURITY_ACCESS_LOG_PATHS=/var/log/nginx/access.log,/var/log/nginx/error.log
+PASAK_ACCESS_LOG_AUTO_SCAN=true
+PASAK_ACCESS_LOG_AUTO_SCAN_HOURS=24
+PASAK_ACCESS_LOG_PATHS=/var/log/nginx/access.log,/var/log/nginx/error.log
 ```
 
 Ketika opsi ini aktif, `PasakServiceProvider` akan secara otomatis menjadwalkan perintah:

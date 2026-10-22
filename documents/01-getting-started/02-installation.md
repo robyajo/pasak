@@ -86,6 +86,7 @@ Perintah ini akan secara otomatis:
 
 | Opsi                 | Fungsi                                                                                                                    |
 | :------------------- | :------------------------------------------------------------------------------------------------------------------------ |
+| `--migrate`          | Menjalankan migrasi database dan menyemai pengaturan bawaan ke `pasak_settings` secara otomatis (cocok untuk mode CI/non-interaktif). |
 | `--force`            | Menimpa seluruh berkas konfigurasi, migrasi, `nginx.conf`, dan `public/.htaccess` dengan template bawaan paket.           |
 | `--with-dashboard` / `--with-plain` / `--with-blade` | Mempublikasikan dashboard Blade murni — jalan di semua aplikasi Laravel, tanpa dependensi frontend. |
 | `--api-only`         | Jalan pintas: API ya, Web tidak (inti + keamanan saja, tanpa halaman/dashboard).                  |
@@ -95,7 +96,6 @@ Perintah ini akan secara otomatis:
 | `--without-user-trait` | Melewatkan penyematan otomatis trait `HasPasakSecurityRelations` ke model User.                                               |
 | `--without-middleware` | Melewatkan pendaftaran otomatis middleware WAF di `bootstrap/app.php` / `Kernel.php`.                                    |
 | `--without-routes`   | Melewatkan pembuatan berkas rute `routes/pasak.php` dan `routes/pasak-api.php`.                                     |
-| `--without-api`      | Melewatkan pemeriksaan dan instalasi rute API (`install:api`).                                                            |
 | `--without-nginx`    | Melewatkan publikasi berkas `nginx.conf` jika server Anda tidak menggunakan web server Nginx.                             |
 | `--without-htaccess` | Melewatkan pembaruan berkas `public/.htaccess` jika Anda menggunakan Nginx murni dan tidak memerlukan Apache `.htaccess`. |
 | `--with-htaccess`    | Memaksa pembaruan berkas `public/.htaccess` dengan aturan hardening keamanan paket.                                       |

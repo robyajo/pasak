@@ -10,7 +10,7 @@ Paket ini menyediakan mesin proteksi login bertingkat (**Stepped Login Lockout**
 
 Setiap kali terjadi kegagalan otentikasi (ditangkap secara otomatis oleh listener `LogFailedLoginAttempt` dari event Laravel `\Illuminate\Auth\Events\Failed`), sistem mencatat kegagalan pada tabel `login_attempts` untuk kombinasi `email` dan `ip_address`.
 
-Ketika jumlah kegagalan mencapai ambang batas (`SECURITY_LOGIN_LOCKOUT_THRESHOLD`, default: 3 kali), durasi penguncian akan meningkat secara eksponensial sesuai level penalti:
+Ketika jumlah kegagalan mencapai ambang batas (`PASAK_LOGIN_LOCKOUT_THRESHOLD` atau pengaturan dashboard, default: 3 kali), durasi penguncian akan meningkat secara eksponensial sesuai level penalti:
 
 | Tingkat (Level) | Durasi Penguncian | Skenario |
 | :---: | :--- | :--- |
@@ -22,7 +22,7 @@ Ketika jumlah kegagalan mencapai ambang batas (`SECURITY_LOGIN_LOCKOUT_THRESHOLD
 | **Level 6+** | **1440 Menit (24 Jam)** | Karantina penuh akun/IP dari otentikasi. |
 
 ### Jendela Peluruhan (Decay Window)
-Jika seorang pengguna sah berhasil login atau tidak melakukan percobaan apa pun selama durasi `SECURITY_LOGIN_LOCKOUT_DECAY_MINUTES` (default: 60 menit), level penalti akan meluruh dan direset kembali ke level nol.
+Jika seorang pengguna sah berhasil login atau tidak melakukan percobaan apa pun selama durasi `PASAK_LOGIN_LOCKOUT_DECAY_MINUTES` (default: 60 menit), level penalti akan meluruh dan direset kembali ke level nol.
 
 ---
 

@@ -11,8 +11,8 @@ Gunakan daftar periksa (*checklist*) ini sebelum meluncurkan aplikasi ke lingkun
 - [ ] `SESSION_SECURE_COOKIE=true`: Memastikan cookie sesi hanya dikirim melalui koneksi terenkripsi HTTPS.
 - [ ] `PASAK_MONITOR_ENABLED=true`: Sakelar WAF aktif.
 - [ ] `PASAK_BLOCK_ENFORCEMENT=true`: Penolakan HTTP 403 aktif untuk IP yang terblokir.
-- [ ] `SECURITY_INSTANT_BLOCK_ENABLED=true`: Blokir langsung 30 hari untuk zero-tolerance attack.
-- [ ] `SECURITY_LOGIN_LOCKOUT_ENABLED=true`: Proteksi stepped brute force aktif.
+- [ ] `PASAK_INSTANT_BLOCK_ENABLED=true`: Blokir langsung 30 hari untuk zero-tolerance attack.
+- [ ] `PASAK_LOGIN_LOCKOUT_ENABLED=true`: Proteksi stepped brute force aktif.
 - [ ] `PASAK_SUPPORT_EMAIL`: Diisi alamat email resmi helpdesk/keamanan instansi Anda.
 
 ---
@@ -86,4 +86,4 @@ Jika karena suatu insiden tak terduga, IP kantor pusat atau IP pimpinan terbloki
    ```bash
    php artisan pasak:unblock-ip --all
    ```
-3. Tambahkan IP tersebut ke variabel `SECURITY_WHITELIST` di berkas `.env` agar tidak terulang kembali.
+3. Tambahkan IP tersebut ke variabel `PASAK_IP_WHITELIST` di berkas `.env` agar tidak terulang kembali.

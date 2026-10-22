@@ -9,13 +9,13 @@ Seluruh fungsionalitas manajemen paket **`robyajo/pasak`** diekspos melalui anta
 Secara default, seluruh endpoint berada di bawah prefix:
 
 ```
-/api/security/*
+/api/pasak/*
 ```
 
 Prefix ini dapat diubah melalui berkas `.env` menggunakan variabel:
 
 ```dotenv
-SECURITY_ROUTES_PREFIX=api/v1/security
+PASAK_ROUTES_PREFIX=api/pasak
 ```
 
 ---

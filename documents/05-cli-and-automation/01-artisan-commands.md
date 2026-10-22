@@ -28,6 +28,7 @@ php artisan pasak:install [options]
 
 ### Opsi:
 
+- `--migrate`: Menjalankan migrasi database dan menyemai pengaturan bawaan ke `pasak_settings` secara otomatis (cocok untuk alur otomatis/CI).
 - `--force`: Menimpa seluruh berkas konfigurasi, migrasi, `nginx.conf`, dan `public/.htaccess` dengan template bawaan.
 - `--lang=`: Bahasa wizard (`id` | `en`).
 - `--api-only`: Jalan pintas — API ya, Web tidak (inti + keamanan saja, tanpa halaman/dashboard).
