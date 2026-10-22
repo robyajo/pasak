@@ -6,6 +6,7 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 use Internal\Pasak\Models\PasakTrustedIp;
 use Internal\Pasak\Models\PasakUserLogin;
@@ -24,6 +25,13 @@ class PasakSessionController extends Controller
         $query = PasakUserLogin::query()->with('user')->latest('id');
 
         $search = (string) $request->query('search', '');
+        $dateFrom = (string) $request->query('date_from', '');
+        $dateTo = (string) $request->query('date_to', '');
+        $perPage = (int) $request->query('per_page', 25);
+
+        if (! in_array($perPage, [10, 25, 50, 100], true)) {
+            $perPage = 25;
+        }
 
         if ($search !== '') {
             $query->where(function ($q) use ($search): void {
@@ -38,14 +46,39 @@ class PasakSessionController extends Controller
             });
         }
 
+        if ($dateFrom !== '') {
+            try {
+                $from = Carbon::parse($dateFrom)->startOfDay();
+                $query->where(function ($q) use ($from): void {
+                    $q->where('login_at', '>=', $from)
+                        ->orWhere('created_at', '>=', $from);
+                });
+            } catch (\Throwable) {
+            }
+        }
+
+        if ($dateTo !== '') {
+            try {
+                $to = Carbon::parse($dateTo)->endOfDay();
+                $query->where(function ($q) use ($to): void {
+                    $q->where('login_at', '<=', $to)
+                        ->orWhere('created_at', '<=', $to);
+                });
+            } catch (\Throwable) {
+            }
+        }
+
         return $this->dashboardResponse(
             'pages.pasak.sessions',
             [
-                'logins' => $query->paginate(20)->withQueryString(),
+                'logins' => $query->paginate($perPage)->withQueryString(),
                 'trustedIps' => PasakTrustedIp::query()->with('user')->latest('id')->get(),
                 'onlineCount' => PasakUserLogin::query()->active(5)->count(),
                 'filters' => [
                     'search' => $search,
+                    'date_from' => $dateFrom,
+                    'date_to' => $dateTo,
+                    'per_page' => $perPage,
                 ],
                 'urls' => [
                     'index' => route('pasak.dashboard.sessions'),

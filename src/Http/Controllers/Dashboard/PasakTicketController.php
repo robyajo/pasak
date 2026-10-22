@@ -6,6 +6,7 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Carbon;
 use Internal\Pasak\Models\PasakIpUnblockRequest;
 use Internal\Pasak\Models\PasakLog;
 use Internal\Pasak\Services\PasakService;
@@ -23,6 +24,13 @@ class PasakTicketController extends Controller
 
         $search = (string) $request->query('search', '');
         $status = (string) $request->query('status', '');
+        $dateFrom = (string) $request->query('date_from', '');
+        $dateTo = (string) $request->query('date_to', '');
+        $perPage = (int) $request->query('per_page', 25);
+
+        if (! in_array($perPage, [10, 25, 50, 100], true)) {
+            $perPage = 25;
+        }
 
         if ($status !== '') {
             $query->where('status', $status);
@@ -37,10 +45,24 @@ class PasakTicketController extends Controller
             });
         }
 
+        if ($dateFrom !== '') {
+            try {
+                $query->where('created_at', '>=', Carbon::parse($dateFrom)->startOfDay());
+            } catch (\Throwable) {
+            }
+        }
+
+        if ($dateTo !== '') {
+            try {
+                $query->where('created_at', '<=', Carbon::parse($dateTo)->endOfDay());
+            } catch (\Throwable) {
+            }
+        }
+
         return $this->dashboardResponse(
             'pages.pasak.tickets',
             [
-                'tickets' => $query->paginate(20)->withQueryString(),
+                'tickets' => $query->paginate($perPage)->withQueryString(),
                 'stats' => [
                     'pending' => PasakIpUnblockRequest::query()->pending()->count(),
                     'approved' => PasakIpUnblockRequest::query()->approved()->count(),
@@ -49,6 +71,9 @@ class PasakTicketController extends Controller
                 'filters' => [
                     'search' => $search,
                     'status' => $status,
+                    'date_from' => $dateFrom,
+                    'date_to' => $dateTo,
+                    'per_page' => $perPage,
                 ],
                 'urls' => [
                     'index' => route('pasak.dashboard.tickets'),

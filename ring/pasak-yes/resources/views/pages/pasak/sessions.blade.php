@@ -21,17 +21,34 @@
 </div>
 
 <div class="sec-card">
-    <form method="GET" action="{{ route('pasak.dashboard.sessions') }}" class="sec-toolbar">
-        <div class="sec-toolbar-group">
-            <input type="text" name="search" value="{{ $filters['search'] ?? '' }}" placeholder="{{ __('Search IP, browser, user...') }}" class="sec-input" style="min-width: 220px;">
+    <form method="GET" action="{{ route('pasak.dashboard.sessions') }}" class="sec-toolbar" style="margin-bottom: 0;">
+        <div class="sec-toolbar-group" style="flex: 1;">
+            <input type="text" name="search" value="{{ $filters['search'] ?? '' }}" placeholder="{{ __('Search IP, browser, user...') }}" class="sec-input" style="min-width: 200px; flex: 1;">
+            <div style="display: inline-flex; align-items: center; gap: 6px;">
+                <label for="filter_date_from" style="font-size: 12px; color: var(--sec-text-muted); font-weight: 500;">{{ __('From') }}:</label>
+                <input id="filter_date_from" type="date" name="date_from" value="{{ $filters['date_from'] ?? '' }}" class="sec-input" style="font-size: 13px;">
+            </div>
+            <div style="display: inline-flex; align-items: center; gap: 6px;">
+                <label for="filter_date_to" style="font-size: 12px; color: var(--sec-text-muted); font-weight: 500;">{{ __('To') }}:</label>
+                <input id="filter_date_to" type="date" name="date_to" value="{{ $filters['date_to'] ?? '' }}" class="sec-input" style="font-size: 13px;">
+            </div>
+            <div style="display: inline-flex; align-items: center; gap: 6px;">
+                <label for="filter_per_page" style="font-size: 12px; color: var(--sec-text-muted); font-weight: 500;">{{ __('Show') }}:</label>
+                <select id="filter_per_page" name="per_page" class="sec-select" onchange="this.form.submit()" style="font-size: 13px;">
+                    @foreach ([10, 25, 50, 100] as $n)
+                        <option value="{{ $n }}" @selected(($filters['per_page'] ?? 25) == $n)>{{ $n }} / {{ __('page') }}</option>
+                    @endforeach
+                </select>
+            </div>
             <button type="submit" class="sec-btn sec-btn-primary">{{ __('Filter') }}</button>
+            <a href="{{ route('pasak.dashboard.sessions') }}" class="sec-btn sec-btn-secondary">{{ __('Reset') }}</a>
         </div>
     </form>
 </div>
 
 <div class="sec-card sec-card-flush">
     <div class="sec-card-header">
-        <h3 class="sec-card-title">{{ __('Login history') }}</h3>
+        <h3 class="sec-card-title">{{ __('Login history') }} ({{ number_format($logins->total()) }})</h3>
     </div>
     <div class="sec-table-wrap">
         <table class="sec-table">
@@ -73,6 +90,20 @@
                 @endforelse
             </tbody>
         </table>
+    </div>
+    <div class="sec-datatable-footer">
+        <div>
+            @if ($logins->total() > 0)
+                {{ __('Showing') }} <span style="font-weight: 600; color: var(--sec-text);">{{ $logins->firstItem() }}</span>
+                {{ __('to') }} <span style="font-weight: 600; color: var(--sec-text);">{{ $logins->lastItem() }}</span>
+                {{ __('of') }} <span style="font-weight: 600; color: var(--sec-text);">{{ number_format($logins->total()) }}</span> {{ __('entries') }}
+            @else
+                {{ __('Showing 0 entries') }}
+            @endif
+        </div>
+        <div>
+            {{ $logins->links('pages.pasak.pagination') }}
+        </div>
     </div>
 </div>
 

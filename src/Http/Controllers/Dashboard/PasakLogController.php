@@ -6,6 +6,7 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Carbon;
 use Internal\Pasak\Models\PasakBlockedIp;
 use Internal\Pasak\Models\PasakLog;
 
@@ -23,6 +24,13 @@ class PasakLogController extends Controller
         $search = (string) $request->query('search', '');
         $level = (string) $request->query('level', '');
         $eventType = (string) $request->query('event_type', '');
+        $dateFrom = (string) $request->query('date_from', '');
+        $dateTo = (string) $request->query('date_to', '');
+        $perPage = (int) $request->query('per_page', 25);
+
+        if (! in_array($perPage, [10, 25, 50, 100], true)) {
+            $perPage = 25;
+        }
 
         if ($search !== '') {
             $query->where(function ($q) use ($search): void {
@@ -42,10 +50,24 @@ class PasakLogController extends Controller
             $query->where('event_type', $eventType);
         }
 
+        if ($dateFrom !== '') {
+            try {
+                $query->where('created_at', '>=', Carbon::parse($dateFrom)->startOfDay());
+            } catch (\Throwable) {
+            }
+        }
+
+        if ($dateTo !== '') {
+            try {
+                $query->where('created_at', '<=', Carbon::parse($dateTo)->endOfDay());
+            } catch (\Throwable) {
+            }
+        }
+
         return $this->dashboardResponse(
             'pages.pasak.logs',
             [
-                'logs' => $query->paginate(25)->withQueryString(),
+                'logs' => $query->paginate($perPage)->withQueryString(),
                 'levels' => PasakLog::LEVELS,
                 'eventTypes' => PasakLog::query()
                     ->select('event_type')
@@ -57,6 +79,9 @@ class PasakLogController extends Controller
                     'search' => $search,
                     'level' => $level,
                     'event_type' => $eventType,
+                    'date_from' => $dateFrom,
+                    'date_to' => $dateTo,
+                    'per_page' => $perPage,
                 ],
                 'urls' => [
                     'index' => route('pasak.dashboard.logs'),

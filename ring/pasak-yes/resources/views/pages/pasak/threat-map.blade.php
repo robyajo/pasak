@@ -15,7 +15,7 @@
                 data-map-fullscreen
                 title="{{ __('Full screen') }}"
                 aria-pressed="false"
-            >⛶ {{ __('Full screen') }}</button>
+            >⛶ <span class="threat-fullscreen-text">{{ __('Full screen') }}</span></button>
             <div class="threat-map-offline" data-map-offline hidden>
                 <div>
                     <strong>{{ __('Globe tidak tersedia') }}</strong>
@@ -25,25 +25,27 @@
         </div>
 
         <aside class="threat-map-side">
-            <div class="threat-panel">
+            <div class="threat-panel threat-panel-stats">
                 <h3 class="threat-panel-title">{{ __('World status') }}</h3>
-                <div class="threat-stat">
-                    <span class="threat-stat-label">{{ __('Firewall status') }}</span>
-                    <span class="threat-stat-value {{ empty($payloadData['enforcement']) ? 'is-muted' : 'is-success' }}">
-                        ● {{ ($payloadData['enforcement'] ?? false) ? __('Blocking active') : __('Monitoring only') }}
-                    </span>
-                </div>
-                <div class="threat-stat">
-                    <span class="threat-stat-label">{{ __('Protected server') }}</span>
-                    <span class="threat-stat-value is-cyan" data-map-target>{{ $payloadData['target']['name'] }}</span>
-                </div>
-                <div class="threat-stat">
-                    <span class="threat-stat-label">{{ __('Attacks logged (today)') }}</span>
-                    <span class="threat-stat-value is-danger" data-map-attacks>{{ number_format($s['logs_today'] ?? 0) }}</span>
-                </div>
-                <div class="threat-stat" style="margin-bottom: 0;">
-                    <span class="threat-stat-label">{{ __('Active quarantines') }}</span>
-                    <span class="threat-stat-value">{{ number_format($s['active_blocks'] ?? 0) }}</span>
+                <div class="threat-stats-grid">
+                    <div class="threat-stat">
+                        <span class="threat-stat-label">{{ __('Firewall status') }}</span>
+                        <span class="threat-stat-value {{ empty($payloadData['enforcement']) ? 'is-muted' : 'is-success' }}">
+                            ● {{ ($payloadData['enforcement'] ?? false) ? __('Blocking active') : __('Monitoring only') }}
+                        </span>
+                    </div>
+                    <div class="threat-stat">
+                        <span class="threat-stat-label">{{ __('Protected server') }}</span>
+                        <span class="threat-stat-value is-cyan" data-map-target>{{ $payloadData['target']['name'] }}</span>
+                    </div>
+                    <div class="threat-stat">
+                        <span class="threat-stat-label">{{ __('Attacks logged (today)') }}</span>
+                        <span class="threat-stat-value is-danger" data-map-attacks>{{ number_format($s['logs_today'] ?? 0) }}</span>
+                    </div>
+                    <div class="threat-stat">
+                        <span class="threat-stat-label">{{ __('Active quarantines') }}</span>
+                        <span class="threat-stat-value">{{ number_format($s['active_blocks'] ?? 0) }}</span>
+                    </div>
                 </div>
             </div>
 
@@ -56,10 +58,19 @@
 </div>
 
 <style>
+    .threat-map-card {
+        border-radius: 12px;
+        overflow: hidden;
+        border: 1px solid #1e293b;
+        background: #020813;
+    }
+
     .threat-map-card .threat-map-wrap {
         display: flex;
-        height: 560px;
+        flex-direction: row;
+        height: 600px;
         background: #020813;
+        position: relative;
     }
 
     /* Tombol mode layar penuh, kanan atas kanvas. */
@@ -68,20 +79,28 @@
         top: 12px;
         right: 12px;
         z-index: 4;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
         padding: 6px 12px;
         border: 1px solid rgba(6, 182, 212, 0.4);
         border-radius: 6px;
-        background: rgba(3, 11, 23, 0.75);
+        background: rgba(3, 11, 23, 0.8);
         color: #06b6d4;
         font-size: 11px;
         font-weight: 700;
         letter-spacing: 0.05em;
         text-transform: uppercase;
         cursor: pointer;
-        backdrop-filter: blur(2px);
+        backdrop-filter: blur(4px);
+        transition: background 0.2s ease, border-color 0.2s ease, transform 0.1s ease;
     }
     .threat-fullscreen-btn:hover {
-        background: rgba(6, 182, 212, 0.15);
+        background: rgba(6, 182, 212, 0.2);
+        border-color: #06b6d4;
+    }
+    .threat-fullscreen-btn:active {
+        transform: scale(0.97);
     }
 
     /* Mode layar penuh: kartu dipin di seluruh jendela, skrol halaman ditahan. */
@@ -93,23 +112,56 @@
         height: 100vh;
         margin: 0;
         border-radius: 0;
+        border: none;
     }
     .threat-map-card.is-fullscreen .threat-map-wrap {
         height: 100%;
     }
+    .threat-map-card.is-fullscreen .threat-map-side {
+        width: 360px;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+    .threat-map-card.is-fullscreen .threat-stats-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+    }
+    .threat-map-card.is-fullscreen .threat-stat {
+        padding: 6px 8px;
+    }
+    .threat-map-card.is-fullscreen .threat-stat-label {
+        font-size: 9px;
+    }
+    .threat-map-card.is-fullscreen .threat-stat-value {
+        font-size: 12px;
+    }
+    .threat-map-card.is-fullscreen .threat-panel-log {
+        flex: 1;
+        min-height: 0;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+    .threat-map-card.is-fullscreen .threat-log-scroll {
+        flex: 1;
+        min-height: 0;
+        max-height: none !important;
+        overflow-y: auto;
+    }
     body.pasak-threat-fs {
         overflow: hidden !important;
     }
-    .threat-panel-log {
-        flex: 1;
-        min-height: 0;
-    }
+
     .threat-map-canvas-holder {
         position: relative;
         flex: 1;
         min-width: 0;
+        min-height: 0;
         cursor: grab;
         overflow: hidden;
+        touch-action: none;
     }
     .threat-map-canvas-holder:active { cursor: grabbing; }
     .threat-map-canvas-holder canvas {
@@ -127,12 +179,18 @@
         justify-content: center;
         text-align: center;
         color: #94a3b8;
+        background: rgba(2, 8, 19, 0.85);
+        backdrop-filter: blur(4px);
+    }
+    .threat-map-offline[hidden] {
+        display: none !important;
     }
     .threat-map-offline strong { color: #e2e8f0; font-size: 16px; }
     .threat-map-offline p { margin: 6px 0 0; font-size: 13px; }
 
+    /* Panel Samping (Sidebar) */
     .threat-map-side {
-        width: 330px;
+        width: 340px;
         flex-shrink: 0;
         display: flex;
         flex-direction: column;
@@ -143,10 +201,12 @@
         overflow: hidden;
     }
     .threat-panel {
-        border: 1px solid rgba(6, 182, 212, 0.3);
+        border: 1px solid rgba(6, 182, 212, 0.25);
         border-radius: 8px;
         background: rgba(4, 15, 30, 0.85);
         padding: 14px;
+        display: flex;
+        flex-direction: column;
     }
     .threat-panel-title {
         font-size: 11px;
@@ -154,34 +214,58 @@
         text-transform: uppercase;
         letter-spacing: 1.5px;
         margin: 0 0 12px;
-        border-bottom: 1px solid rgba(6, 182, 212, 0.3);
+        border-bottom: 1px solid rgba(6, 182, 212, 0.25);
         padding-bottom: 6px;
+        font-weight: 700;
     }
-    .threat-stat { margin-bottom: 10px; }
-    .threat-stat:last-child { margin-bottom: 0; }
+    .threat-stats-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+    .threat-stat {
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        border-radius: 6px;
+        padding: 8px 10px;
+        transition: background 0.15s ease, border-color 0.15s ease;
+    }
+    .threat-stat:hover {
+        background: rgba(255, 255, 255, 0.04);
+        border-color: rgba(6, 182, 212, 0.25);
+    }
     .threat-stat-label {
         display: block;
         font-size: 10px;
         color: #94a3b8;
         text-transform: uppercase;
         letter-spacing: 0.05em;
-        margin-bottom: 2px;
+        margin-bottom: 3px;
+        font-weight: 600;
+        line-height: 1.2;
     }
     .threat-stat-value {
-        font-size: 14px;
+        font-size: 13px;
         font-weight: 700;
         color: #e2e8f0;
         word-break: break-word;
+        line-height: 1.3;
     }
     .threat-stat-value.is-cyan { color: #06b6d4; }
     .threat-stat-value.is-danger { color: #ef4444; }
     .threat-stat-value.is-success { color: #10b981; }
     .threat-stat-value.is-muted { color: #94a3b8; }
 
+    .threat-panel-log {
+        flex: 1;
+        min-height: 0;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
     .threat-log-scroll {
         flex: 1;
-        min-height: 200px;
-        max-height: 430px;
+        min-height: 0;
         overflow-y: auto;
         display: flex;
         flex-direction: column;
@@ -226,12 +310,181 @@
         to { opacity: 1; transform: translateX(0); }
     }
 
-    @media (max-width: 900px) {
-        .threat-map-card .threat-map-wrap { flex-direction: column; height: auto; }
-        .threat-map-card.is-fullscreen .threat-map-wrap { height: 100vh; }
-        .threat-map-side { width: 100%; order: -1; border-left: none; border-bottom: 1px solid #1e293b; }
-        .threat-map-side { max-height: 45vh; }
-        .threat-map-canvas-holder { min-height: 380px; }
+    /* ================= Responsive Layout ================= */
+    /* Tablet & Desktop Kecil (< 1024px) */
+    @media (max-width: 1023px) {
+        .threat-map-card .threat-map-wrap {
+            flex-direction: column;
+            height: auto;
+        }
+        .threat-map-canvas-holder {
+            height: 420px;
+            min-height: 420px;
+            width: 100%;
+            order: 1;
+        }
+        .threat-map-side {
+            width: 100%;
+            order: 2;
+            border-left: none;
+            border-top: 1px solid #1e293b;
+            padding: 16px;
+            overflow: visible;
+        }
+        .threat-stats-grid {
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+        .threat-log-scroll {
+            max-height: 300px;
+        }
+
+        /* Fullscreen di Tablet */
+        .threat-map-card.is-fullscreen .threat-map-wrap {
+            height: 100vh;
+            overflow: hidden;
+            flex-direction: column;
+        }
+        .threat-map-card.is-fullscreen .threat-map-canvas-holder {
+            flex: 1;
+            min-height: 0;
+            height: auto;
+        }
+        .threat-map-card.is-fullscreen .threat-map-side {
+            height: 48vh;
+            max-height: 48vh;
+            overflow: hidden;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            padding: 12px;
+            gap: 10px;
+        }
+        .threat-map-card.is-fullscreen .threat-panel-stats {
+            padding: 10px 12px;
+            flex-shrink: 0;
+        }
+        .threat-map-card.is-fullscreen .threat-panel-stats .threat-panel-title {
+            margin-bottom: 6px;
+            padding-bottom: 4px;
+        }
+        .threat-map-card.is-fullscreen .threat-stats-grid {
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+        }
+        .threat-map-card.is-fullscreen .threat-stat {
+            padding: 6px 8px;
+        }
+        .threat-map-card.is-fullscreen .threat-stat-label {
+            font-size: 9px;
+            margin-bottom: 2px;
+        }
+        .threat-map-card.is-fullscreen .threat-stat-value {
+            font-size: 11px;
+        }
+        .threat-map-card.is-fullscreen .threat-panel-log {
+            flex: 1;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            padding: 10px 12px;
+        }
+        .threat-map-card.is-fullscreen .threat-panel-log .threat-panel-title {
+            margin-bottom: 6px;
+            padding-bottom: 4px;
+        }
+        .threat-map-card.is-fullscreen .threat-log-scroll {
+            flex: 1;
+            min-height: 0;
+            max-height: none;
+            overflow-y: auto;
+        }
+    }
+
+    /* Ponsel / Mobile (< 768px) */
+    @media (max-width: 767px) {
+        .threat-map-canvas-holder {
+            height: 320px;
+            min-height: 320px;
+        }
+        .threat-stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+        }
+        .threat-stat {
+            padding: 8px 10px;
+        }
+        .threat-stat-value {
+            font-size: 12px;
+        }
+        .threat-map-side {
+            padding: 12px;
+            gap: 10px;
+        }
+        .threat-panel {
+            padding: 12px;
+        }
+        .threat-log-scroll {
+            max-height: 260px;
+        }
+
+        /* Fullscreen di Mobile */
+        .threat-map-card.is-fullscreen .threat-map-side {
+            height: 52vh;
+            max-height: 52vh;
+            padding: 10px;
+            gap: 8px;
+        }
+        .threat-map-card.is-fullscreen .threat-stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 6px;
+        }
+        .threat-map-card.is-fullscreen .threat-stat {
+            padding: 4px 6px;
+        }
+        .threat-map-card.is-fullscreen .threat-panel {
+            padding: 8px 10px;
+        }
+    }
+
+    /* Layar Landscape Pendek (Ponsel Miring) */
+    @media (max-height: 520px) and (orientation: landscape) {
+        .threat-map-card.is-fullscreen .threat-map-wrap {
+            flex-direction: row !important;
+        }
+        .threat-map-card.is-fullscreen .threat-map-side {
+            width: 320px !important;
+            height: 100% !important;
+            max-height: 100% !important;
+            border-top: none !important;
+            border-left: 1px solid #1e293b !important;
+        }
+    }
+
+    /* Ponsel Layar Kecil (< 480px) */
+    @media (max-width: 480px) {
+        .threat-map-canvas-holder {
+            height: 280px;
+            min-height: 280px;
+        }
+        .threat-fullscreen-btn {
+            padding: 5px 8px;
+            font-size: 10px;
+        }
+        .threat-fullscreen-btn .threat-fullscreen-text {
+            display: none;
+        }
+        .threat-stats-grid {
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+        }
+        .threat-stat-label {
+            font-size: 9px;
+        }
+        .threat-stat-value {
+            font-size: 11px;
+        }
     }
 </style>
 
@@ -635,9 +888,14 @@
             document.body.classList.toggle('pasak-threat-fs', active);
             if (fullButton) {
                 fullButton.setAttribute('aria-pressed', active ? 'true' : 'false');
-                fullButton.title = active
+                var text = active
                     ? '{{ __('Exit full screen') }}'
                     : '{{ __('Full screen') }}';
+                fullButton.title = text;
+                var textEl = fullButton.querySelector('.threat-fullscreen-text');
+                if (textEl) {
+                    textEl.textContent = text;
+                }
                 fullButton.blur();
             }
             resize();

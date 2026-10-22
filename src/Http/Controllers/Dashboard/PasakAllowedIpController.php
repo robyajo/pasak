@@ -6,6 +6,7 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Carbon;
 use Internal\Pasak\Models\PasakAllowedIp;
 
 class PasakAllowedIpController extends Controller
@@ -18,9 +19,16 @@ class PasakAllowedIpController extends Controller
 
         $search = (string) $request->query('search', '');
         $status = (string) $request->query('status', '');
+        $dateFrom = (string) $request->query('date_from', '');
+        $dateTo = (string) $request->query('date_to', '');
+        $perPage = (int) $request->query('per_page', 25);
+
+        if (! in_array($perPage, [10, 25, 50, 100], true)) {
+            $perPage = 25;
+        }
 
         if ($search !== '') {
-            $query->where(function ($q) use ($search) {
+            $query->where(function ($q) use ($search): void {
                 $q->where('ip_address', 'like', "%{$search}%")
                     ->orWhere('label', 'like', "%{$search}%")
                     ->orWhere('notes', 'like', "%{$search}%");
@@ -35,10 +43,24 @@ class PasakAllowedIpController extends Controller
             $query->whereNull('expires_at')->where('is_active', true);
         }
 
+        if ($dateFrom !== '') {
+            try {
+                $query->where('created_at', '>=', Carbon::parse($dateFrom)->startOfDay());
+            } catch (\Throwable) {
+            }
+        }
+
+        if ($dateTo !== '') {
+            try {
+                $query->where('created_at', '<=', Carbon::parse($dateTo)->endOfDay());
+            } catch (\Throwable) {
+            }
+        }
+
         return $this->dashboardResponse(
             'pages.pasak.allowed-ips',
             [
-                'entries' => $query->paginate(25)->withQueryString(),
+                'entries' => $query->paginate($perPage)->withQueryString(),
                 'stats' => [
                     'total' => PasakAllowedIp::query()->count(),
                     'active' => PasakAllowedIp::query()->active()->count(),
@@ -47,6 +69,9 @@ class PasakAllowedIpController extends Controller
                 'filters' => [
                     'search' => $search,
                     'status' => $status,
+                    'date_from' => $dateFrom,
+                    'date_to' => $dateTo,
+                    'per_page' => $perPage,
                 ],
                 'urls' => [
                     'index' => route('pasak.dashboard.allowed-ips'),

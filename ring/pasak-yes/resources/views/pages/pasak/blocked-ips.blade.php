@@ -46,15 +46,32 @@
 </div>
 
 <div class="sec-card">
-    <form method="GET" action="{{ route('pasak.dashboard.blocked-ips') }}" class="sec-toolbar">
-        <div class="sec-toolbar-group">
-            <input type="text" name="search" value="{{ $filters['search'] ?? '' }}" placeholder="{{ __('Search IP, device, reason...') }}" class="sec-input" style="min-width: 220px;">
+    <form method="GET" action="{{ route('pasak.dashboard.blocked-ips') }}" class="sec-toolbar" style="margin-bottom: 0;">
+        <div class="sec-toolbar-group" style="flex: 1;">
+            <input type="text" name="search" value="{{ $filters['search'] ?? '' }}" placeholder="{{ __('Search IP, device, reason...') }}" class="sec-input" style="min-width: 200px; flex: 1;">
             <select name="status" class="sec-select">
                 @foreach (['' => __('All'), 'active' => __('Active'), 'expired' => __('Expired'), 'permanent' => __('Permanent')] as $val => $label)
                     <option value="{{ $val }}" @selected(($filters['status'] ?? '') === $val)>{{ $label }}</option>
                 @endforeach
             </select>
+            <div style="display: inline-flex; align-items: center; gap: 6px;">
+                <label for="filter_date_from" style="font-size: 12px; color: var(--sec-text-muted); font-weight: 500;">{{ __('From') }}:</label>
+                <input id="filter_date_from" type="date" name="date_from" value="{{ $filters['date_from'] ?? '' }}" class="sec-input" style="font-size: 13px;">
+            </div>
+            <div style="display: inline-flex; align-items: center; gap: 6px;">
+                <label for="filter_date_to" style="font-size: 12px; color: var(--sec-text-muted); font-weight: 500;">{{ __('To') }}:</label>
+                <input id="filter_date_to" type="date" name="date_to" value="{{ $filters['date_to'] ?? '' }}" class="sec-input" style="font-size: 13px;">
+            </div>
+            <div style="display: inline-flex; align-items: center; gap: 6px;">
+                <label for="filter_per_page" style="font-size: 12px; color: var(--sec-text-muted); font-weight: 500;">{{ __('Show') }}:</label>
+                <select id="filter_per_page" name="per_page" class="sec-select" onchange="this.form.submit()" style="font-size: 13px;">
+                    @foreach ([10, 25, 50, 100] as $n)
+                        <option value="{{ $n }}" @selected(($filters['per_page'] ?? 25) == $n)>{{ $n }} / {{ __('page') }}</option>
+                    @endforeach
+                </select>
+            </div>
             <button type="submit" class="sec-btn sec-btn-primary">{{ __('Filter') }}</button>
+            <a href="{{ route('pasak.dashboard.blocked-ips') }}" class="sec-btn sec-btn-secondary">{{ __('Reset') }}</a>
         </div>
     </form>
 </div>
@@ -109,18 +126,19 @@
             </tbody>
         </table>
     </div>
-    @if ($blocks->hasPages())
-        <div style="display: flex; justify-content: space-between; align-items: center; padding: 14px 20px; border-top: 1px solid var(--sec-border); font-size: 13px; color: var(--sec-text-muted);">
-            <span>{{ __('Page :current of :last', ['current' => $blocks->currentPage(), 'last' => $blocks->lastPage()]) }}</span>
-            <div style="display: flex; gap: 8px;">
-                @if ($blocks->previousPageUrl())
-                    <a href="{{ $blocks->previousPageUrl() }}" class="sec-btn sec-btn-secondary sec-btn-sm">← {{ __('Prev') }}</a>
-                @endif
-                @if ($blocks->nextPageUrl())
-                    <a href="{{ $blocks->nextPageUrl() }}" class="sec-btn sec-btn-secondary sec-btn-sm">{{ __('Next') }} →</a>
-                @endif
-            </div>
+    <div class="sec-datatable-footer">
+        <div>
+            @if ($blocks->total() > 0)
+                {{ __('Showing') }} <span style="font-weight: 600; color: var(--sec-text);">{{ $blocks->firstItem() }}</span>
+                {{ __('to') }} <span style="font-weight: 600; color: var(--sec-text);">{{ $blocks->lastItem() }}</span>
+                {{ __('of') }} <span style="font-weight: 600; color: var(--sec-text);">{{ number_format($blocks->total()) }}</span> {{ __('entries') }}
+            @else
+                {{ __('Showing 0 entries') }}
+            @endif
         </div>
-    @endif
+        <div>
+            {{ $blocks->links('pages.pasak.pagination') }}
+        </div>
+    </div>
 </div>
 @endsection

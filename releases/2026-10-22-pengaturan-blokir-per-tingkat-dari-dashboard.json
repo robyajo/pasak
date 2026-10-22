@@ -59,6 +59,21 @@
             "type": "new",
             "id": "Peta ancaman kini punya mode layar penuh: satu tombol membawa peta memenuhi seluruh jendela layar dan tombol Esc mengembalikannya seperti semula — nyaman dipantau di layar besar.",
             "en": "The threat map now has a full screen mode: one button makes the map fill the entire window and Escape restores it — comfortable to watch on big screens."
+        },
+        {
+            "type": "fix",
+            "id": "Peta ancaman tidak lagi memunculkan pesan gagal muat saat visualisasi dunia sebenarnya aktif.",
+            "en": "Fixed an issue where the threat map displayed a failure notice even though the globe visualization rendered successfully."
+        },
+        {
+            "type": "improvement",
+            "id": "Peta ancaman kini sepenuhnya responsif di ponsel dan tablet: bola dunia tetap tampil di bagian atas dan ringkasan status tertata dalam petak kartu rapi.",
+            "en": "The threat map is now fully responsive on mobile and tablet devices: the globe stays prominent at the top and status metrics are arranged into a neat card grid."
+        },
+        {
+            "type": "improvement",
+            "id": "Tabel pemantauan kini dilengkapi penyaring rentang tanggal, pilihan jumlah baris per halaman, dan penomoran halaman lengkap dengan rincian jumlah entri.",
+            "en": "Monitoring data tables now feature date range filtering, per-page row selectors, and complete pagination with entry count details."
         }
     ],
     "project": {

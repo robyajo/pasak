@@ -2,7 +2,7 @@
 
 All notable changes to `robyajo/pasak` will be documented in this file.
 
-## [Unreleased]
+## [1.5.0] - 2026-10-22
 
 ### Added
 
@@ -13,13 +13,12 @@ All notable changes to `robyajo/pasak` will be documented in this file.
 - **Rute dashboard**: `Route::get('threat-map')` → `PasakThreatMapController::index` (halaman) + `threat-map/feed` → `feed` (JSON) pada `routes/pasak-dashboard-blade.php` dan stub `pasak-blade.php.stub`, dilindungi middleware `web`+`auth` sama seperti seluruh halaman dashboard; item navigasi sidebar dilindungi `@if (\Route::has(...))` agar aman bagi berkas layout host yang lama.
 - **Pengingat upgrade untuk menu baru**: `pasak:upgrade` kini memeriksa penanda `pasak.dashboard.threat-map` pada `layout.blade.php` terpublikasi dan memperingatkan menjalankan `--sync-views` (dengan pencadangan otomatis) bila menu Threat Map belum ada.
 - **Mode layar penuh Threat Map**: tombol `⛶ Full screen` di sudut kanan atas kanvas menyematkan kartu peta di seluruh jendela (`position:fixed; inset:0` + kelas body penahan skrol) sehingga dapat dipakai apa pun tata letak dasbor host; kanvas mematuhi ukuran baru lewat `ResizeObserver`, tombol `Escape` keluar dari mode, dan pada ponsel panel sisi dibatasi 45vh agar peta tetap dominan.
-
-### Added
-
 - **Pengaturan berbasis database dengan ambang per tingkat ancaman**: seluruh perilaku auto-block WAF kini dapat diatur langsung dari dashboard tanpa menyentuh `.env` — ambang blokir per tingkat (`critical`, `high`, `medium`, `low`, default 1/2/3/5) disimpan pada tabel `pasak_settings` dan disemai otomatis oleh seeder `PasakDefaultSettingsSeeder` saat `pasak:install` maupun `pasak:upgrade`.
 - **Lingkup blokir adaptif `auto`**: mode `'device,ip,auto'` pada pengaturan auto-block — perangkat bila identitas `device_id` eksplisit terdeteksi, fallback ke isolasi IP utuh saat fingerprint tidak tersedia (aman bagi pengguna lain di WiFi yang sama).
 - **Sanksi kombinasi**: blokir gabungan hanya bila ancaman datang dari minimal 2 tingkat berbeda dan total kejadian melampaui `auto_block.combined_threshold` (default 3) sehingga serangan satu jenis berfrekuensi rendah tidak tersapu salah.
 - **Penghalaman pengaturan dashboard diperbarui**: kartu lingkup 3 pilihan (Device/IP/Auto dengan pill "WiFi-Safe"), kartu ambang per tingkat dengan warna tingkat ancaman, pilihan durasi blokir berjenjang (6 jam s.d. 1 tahun/permanen), ambang kombinasi, modul brute-force login, mitigasi retensi log, dan kotak simulasi live auto-block — seluruhnya memakai JavaScript vanilla tanpa NPM.
+- **Data Table interaktif di seluruh tabel dashboard**: penambahan filter rentang tanggal (`date_from` dan `date_to`), selector entri per halaman (`10`, `25`, `50`, `100`), dan footer pagination lengkap dengan ringkasan entri ("Showing X to Y of Z entries") serta tombol navigasi halaman terpadu di `logs.blade.php`, `blocked-ips.blade.php`, `allowed-ips.blade.php`, `sessions.blade.php`, dan `tickets.blade.php` melalui komponen reusable `pagination.blade.php`.
+- **Visualisasi Top Attackers 24h & animasi real-time pada Overview**: panel penyerang teratas di `overview.blade.php` kini menyajikan data aktual dari `pasak_logs` dengan persentase bahaya dinamis, animasi bar CSS halus, serta rincian serangan terklasifikasi.
 - **`pasak_settings` kini menyetel throttle login & retensi log**: `PasakLoginThrottleService` membaca konfigurasi lockout dari database terlebih dahulu (fallback `.env`/config) sehingga operasional harian dapat menyetel dari dashboard.
 - **Env core-only**: `stubs/env.stub` dirampingkan hanya berisi kunci bootstrap inti (`PASAK_MONITOR_ENABLED`, `PASAK_IP_WHITELIST`, `PASAK_AUTO_REGISTER_MIDDLEWARE`, flag rute/dashboard, `PASAK_SUPPORT_EMAIL`); kunci lain lama tetap didukung sebagai fallback senyap namun tidak lagi ditulis installer.
 
@@ -31,6 +30,8 @@ All notable changes to `robyajo/pasak` will be documented in this file.
 - **Petunjuk CLI memakai rute dashboard resmi**: keluaran `pasak:scan-logs` kini mengarah ke `/pasak/logs` dan `/pasak/blocked-ips` (bukan alias lama `/security/*`), wizard `pasak:install` menyebut prefix API `/api/pasak/*`, dan hasil pemindaian access log tercatat dengan `path` rute konsisten.
 - **Halaman pengaturan gagal render karena penanganan `@json` Blade**: ekspresi `@json([...larik inline...])` dengan lebih dari 2 koma (mis. larik 4 pasang ambang per tingkat) dipangkas senyap oleh parser komma `compileJson` milik Laravel sehingga elemen terakhir hilang dan sisa tanda `]`/`)` membuat Blade error `Unclosed '['`; daftar referensi JS kini dihitung via `@php` lalu dikirim sebagai variabel (`@json($simLevels)` dst.) yang aman terhadap penyectaan koma — regresi dijaga test render halaman pengaturan.
 - **Panel serangan terbaru Threat Map mengulang data arsip alih-alih streaming**: polling tiap 8 detik mem-fetch `feed` tanpa kursor `?after=` sehingga 20 log arsip yang sama muncul kembali berulang dan jumlah serangan hari ini seolah hidup; kini JS menyemai `lastId` dari sampel payload, setiap poll memakai `?after=lastId`, dan kursor diperbarui dari `data.last_id` sehingga hanya **serangan baru sungguhan** dari `pasak_logs` yang mengalir masuk (`last_id` hanya maju, tidak pernah mundur) — sampel seed kini membawa `id` + stempel waktu ISO asli dari `logToArray($log, true)`; diverifikasi end-to-end di aplikasi real: serangan baru dari IP 198.51.100.23 menghasilkan tepat 2 baris baru saat polling `?after=8`, tanpa arsip yang dikirim ulang.
+- **Pemberitahuan kegagalan Globe CDN**: menangani kegagalan pemuatan skrip eksternal Three.js/Globe.gl secara anggun dengan antarmuka fallback yang informatif dan ramah pengguna tanpa memblokir seluruh fungsionalitas peta.
+- **Isolasi cache pengaturan `PasakService::getSetting()`**: mencegah caching nilai fallback default ke memori internal ketika nilai pada database belum tersimpan atau berubah secara dinamis, serta melengkapi metode `flushSettingsCache()`.
 
 ## [1.4.5] - 2026-10-21
 

@@ -116,7 +116,10 @@ test('waf threat detection engine inspects and blocks attack payload when instan
 });
 
 test('waf threat detection engine logs attack without blocking when instant block is disabled', function () {
-    config(['pasak.instant_block.enabled' => false]);
+    config([
+        'pasak.instant_block.enabled' => false,
+        'pasak.auto_block.enabled' => false,
+    ]);
 
     $response = $this->withServerVariables([
         'REMOTE_ADDR' => '198.51.100.101',

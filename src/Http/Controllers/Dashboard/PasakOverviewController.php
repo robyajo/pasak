@@ -5,6 +5,7 @@ namespace Internal\Pasak\Http\Controllers\Dashboard;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Internal\Pasak\Models\PasakLog;
 use Internal\Pasak\Services\PasakService;
 
 /**
@@ -29,11 +30,14 @@ class PasakOverviewController extends Controller
                 'stats' => $security->stats(),
                 'levels' => $security->levelBreakdown(),
                 'trend' => $security->attackTrend($range),
-                'attackers' => $security->topAttackers(5)
-                    ->map(fn ($row): array => (array) $row)
-                    ->all(),
+                'attackers' => $security->topAttackers(5)->all(),
+                'recentLogs' => PasakLog::query()
+                    ->latest('id')
+                    ->limit(6)
+                    ->get(),
                 'urls' => [
                     'self' => route('pasak.dashboard.overview'),
+                    'logs' => route('pasak.dashboard.logs'),
                 ],
             ]
         );

@@ -518,6 +518,76 @@
             background: var(--sec-card-hover);
         }
 
+        /* Data Table & Pagination */
+        .sec-datatable-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 20px;
+            border-top: 1px solid var(--sec-border);
+            font-size: 13px;
+            color: var(--sec-text-muted);
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .sec-pagination {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            flex-wrap: wrap;
+        }
+
+        .sec-page-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 32px;
+            height: 32px;
+            padding: 0 8px;
+            font-size: 13px;
+            font-weight: 500;
+            border-radius: var(--sec-radius-sm);
+            border: 1px solid var(--sec-border);
+            background: var(--sec-card);
+            color: var(--sec-text);
+            text-decoration: none;
+            transition: all 0.15s ease-in-out;
+            user-select: none;
+        }
+
+        .sec-page-btn:hover:not(.disabled) {
+            background: var(--sec-card-hover);
+            border-color: var(--sec-border-light);
+            color: var(--sec-text);
+        }
+
+        .sec-page-btn.active {
+            background: var(--sec-primary);
+            border-color: var(--sec-primary);
+            color: #fff;
+            font-weight: 600;
+        }
+
+        .sec-page-btn.disabled {
+            opacity: 0.35;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        .sec-page-ellipsis {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 28px;
+            height: 32px;
+            color: var(--sec-text-muted);
+            font-size: 13px;
+        }
+
         .sec-font-mono {
             font-family: var(--sec-font-mono);
         }
@@ -1175,9 +1245,9 @@
     (function () {
         var key = 'pasak-theme';
         var labels = {
-            dark: {{ json_encode(__('Dark')) }},
-            light: {{ json_encode(__('Light')) }},
-            auto: {{ json_encode(__('Auto')) }}
+            dark: {!! json_encode(__('Dark')) !!},
+            light: {!! json_encode(__('Light')) !!},
+            auto: {!! json_encode(__('Auto')) !!}
         };
 
         function stored() {

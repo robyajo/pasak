@@ -35,7 +35,7 @@ class PasakService
     /**
      * Versi paket Pasak (Bulwark).
      */
-    public const VERSION = '1.4.6';
+    public const VERSION = '1.5.0';
 
     /**
      * Rentang waktu yang didukung grafik tren serangan.
@@ -102,7 +102,24 @@ class PasakService
             // Fallback gracefully
         }
 
-        return $this->settingsMemoryCache[$key] = $default ?? config("pasak.{$key}");
+        return $default ?? config("pasak.{$key}");
+    }
+
+    /**
+     * Flush memory and persistent cache for dynamic security settings.
+     */
+    public function flushSettingsCache(?string $key = null): void
+    {
+        if ($key !== null) {
+            unset($this->settingsMemoryCache[$key]);
+
+            try {
+                Cache::forget("sec_cfg.{$key}");
+            } catch (Throwable) {
+            }
+        } else {
+            $this->settingsMemoryCache = [];
+        }
     }
 
     /**
@@ -1828,17 +1845,32 @@ class PasakService
     /**
      * Most frequent offenders within a time window.
      *
-     * @return Collection<int, PasakLog>
+     * @return Collection<int, array{ip_address: string, hits: int, level: string, last_seen: string}>
      */
     public function topAttackers(int $limit = 5, int $hours = 24)
     {
+        $weightCase = "case threat_level when 'critical' then 4 when 'high' then 3 when 'medium' then 2 else 1 end";
+
         return PasakLog::query()
-            ->selectRaw('ip_address, COUNT(*) as hits, MAX(threat_level) as level, MAX(created_at) as last_seen')
+            ->selectRaw(
+                "ip_address, COUNT(*) as hits, MAX({$weightCase}) as weight, MAX(created_at) as last_seen"
+            )
             ->where('created_at', '>=', now()->subHours($hours))
             ->groupBy('ip_address')
             ->orderByDesc('hits')
             ->limit($limit)
-            ->get();
+            ->get()
+            ->map(function ($row): array {
+                $levelMap = [4 => 'critical', 3 => 'high', 2 => 'medium', 1 => 'low'];
+                $weight = (int) ($row->weight ?? 1);
+
+                return [
+                    'ip_address' => (string) $row->ip_address,
+                    'hits' => (int) $row->hits,
+                    'level' => $levelMap[$weight] ?? 'low',
+                    'last_seen' => (string) $row->last_seen,
+                ];
+            });
     }
 
     /**
