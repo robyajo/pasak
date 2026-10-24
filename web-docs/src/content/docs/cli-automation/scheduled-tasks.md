@@ -11,20 +11,20 @@ sidebar:
 
 ## 1. Tugas Terjadwal Bawaan
 
-Jika `SECURITY_SCHEDULE_ENABLED=true` (default), tugas berikut otomatis aktif:
+Jika `PASAK_SCHEDULE_ENABLED=true` (default), tugas berikut otomatis aktif:
 
 ### A. Pembersihan Log Kedaluwarsa Harian (`pasak:prune-logs`)
-- **Jadwal**: Harian pada jam yang ditentukan oleh `SECURITY_PRUNE_SCHEDULE` (default: **02:30 pagi**).
+- **Jadwal**: Harian pada jam yang ditentukan oleh `PASAK_PRUNE_SCHEDULE` (default: **02:30 pagi**).
 - **Aksi**: Menghapus entri `pasak_logs` yang lebih tua dari `PASAK_LOG_RETENTION_DAYS` (default: 90 hari) agar ukuran database tidak membengkak seiring waktu.
 
 ### B. Scheduler Heartbeat (`security-heartbeat`)
 - **Jadwal**: Setiap menit (`everyMinute()`).
 - **Aksi**: Menuliskan stempel waktu ISO-8601 ke cache dengan key `ServerSecurityService::HEARTBEAT_KEY`.
-- **Fungsi**: Laporan audit server (`/api/security/server`) menggunakan heartbeat ini untuk mendeteksi apakah cron server Anda berjalan normal atau mati/macet.
+- **Fungsi**: Laporan audit server (`/api/pasak/server`) menggunakan heartbeat ini untuk mendeteksi apakah cron server Anda berjalan normal atau mati/macet.
 
 ### C. Pemindaian Log Akses Web Server Otomatis
 - **Jadwal**: Harian pada pukul **03:00 pagi**.
-- **Aktivasi**: Aktif jika `SECURITY_ACCESS_LOG_AUTO_SCAN=true`.
+- **Aktivasi**: Aktif jika `PASAK_ACCESS_LOG_AUTO_SCAN=true`.
 - **Aksi**: Menjalankan:
   ```bash
   php artisan pasak:scan-logs --import --min-level=high --since="24 hours ago"

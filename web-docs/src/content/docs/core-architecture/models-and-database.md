@@ -11,32 +11,37 @@ Salah satu prinsip desain fundamental dari **`robyajo/pasak`** adalah **Loose Co
 
 ## 1. Konvensi Nama Tabel Dinamis
 
-Semua model Eloquent paket meng-override metode `getTable()` untuk membaca nama tabel dari konfigurasi `config/pasak.php`:
+Semua model Eloquent paket meng-override metode `getTable()` untuk membaca nama tabel dari konfigurasi `config/pasak.php` dengan default berawalan `pasak_`:
 
 ```php
 public function getTable(): string
 {
-    return config('security.table_names.blocked_ips', parent::getTable());
+    $configured = config('pasak.table_names.blocked_ips', 'pasak_blocked_ips');
+
+    return static::resolvePasakTable('blocked_ips', $configured, 'blocked_ips', 'pasak_blocked_ips');
 }
 ```
 
 Hal ini memungkinkan Anda mengubah nama tabel di berkas `.env` jika terdapat benturan nama (*table name conflict*) dengan aplikasi eksisting Anda:
 
 ```dotenv
-SECURITY_BLOCKED_IPS_TABLE=waf_blocked_ips
-PASAK_LOGS_TABLE=waf_audit_logs
-SECURITY_LOGIN_ATTEMPTS_TABLE=auth_lockouts
-SECURITY_IP_UNBLOCK_REQUESTS_TABLE=waf_appeal_tickets
-SECURITY_USER_LOGINS_TABLE=auth_user_sessions
-SECURITY_TRUSTED_IPS_TABLE=auth_trusted_devices
+PASAK_BLOCKED_IPS_TABLE=pasak_blocked_ips
+PASAK_LOGS_TABLE=pasak_logs
+PASAK_LOGIN_ATTEMPTS_TABLE=pasak_login_attempts
+PASAK_IP_UNBLOCK_REQUESTS_TABLE=pasak_ip_unblock_requests
+PASAK_USER_LOGINS_TABLE=pasak_user_logins
+PASAK_TRUSTED_IPS_TABLE=pasak_trusted_ips
+PASAK_ALLOWED_IPS_TABLE=pasak_allowed_ips
 ```
 
 ---
 
 ## 2. Rincian Model Eloquent
 
-### A. `BlockedIp` (`Internal\Pasak\Models\BlockedIp`)
-Menyimpan data entitas yang sedang diblokir atau pernah diblokir.
+> **Kompatibilitas Penuh**: Model baru bernama `Pasak*` (`PasakBlockedIp`, `PasakLog`, `PasakLoginAttempt`, `PasakIpUnblockRequest`, `PasakUserLogin`, `PasakTrustedIp`, `PasakAllowedIp`, `PasakSetting`). Nama model lama (`BlockedIp`, `SecurityLog`, `LoginAttempt`, dll.) tetap disediakan sebagai class alias transparan sehingga proyek lama tidak terganggu.
+
+### A. `PasakBlockedIp` (Alias: `BlockedIp`) (`Internal\Pasak\Models\PasakBlockedIp`)
+Menyimpan data entitas yang sedang diblokir atau pernah diblokir. Default tabel: `pasak_blocked_ips`.
 
 | Kolom | Tipe Data | Deskripsi |
 | :--- | :--- | :--- |
@@ -134,34 +139,56 @@ Menyimpan tiket banding yang diajukan oleh pengguna publik yang terblokir.
 
 ---
 
-## 3. Integrasi Trait `HasSecurityRelations`
+### F. `PasakSetting` (`Internal\Pasak\Models\PasakSetting`)
+Menyimpan konfigurasi dinamis yang dikelola via **Dashboard Pasak → Pengaturan** (`/pasak/settings`) maupun API Admin. Default tabel: `pasak_settings`.
 
-Untuk menghubungkan model `User` aplikasi Anda dengan model-model di atas, cukup gunakan trait `Internal\Pasak\Concerns\HasSecurityRelations`:
+| Kolom | Tipe Data | Deskripsi |
+| :--- | :--- | :--- |
+| `id` | BigIncrements | Primary key |
+| `key` | String(100), unique | Kunci identifikasi pengaturan (mis. `auto_block.level_thresholds`) |
+| `value` | LongText, nullable | Nilai pengaturan (string skalar atau format JSON) |
+| `description` | Text, nullable | Penjelasan fungsi pengaturan untuk administrator |
+| `created_at` | DateTime | Waktu pembuatan entri |
+| `updated_at` | DateTime | Waktu pembaruan terakhir |
+
+Entri default diisi otomatis oleh `PasakDefaultSettingsSeeder` saat `pasak:install --migrate` atau `pasak:upgrade`.
+
+---
+
+## 3. Integrasi Trait `HasPasakSecurityRelations`
+
+Untuk menghubungkan model `User` aplikasi Anda dengan model-model di atas, cukup gunakan trait `Internal\Pasak\Concerns\HasPasakSecurityRelations`:
 
 ```php
 namespace App\Models;
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Internal\Pasak\Concerns\HasSecurityRelations;
+use Internal\Pasak\Concerns\HasPasakSecurityRelations;
 
 class User extends Authenticatable
 {
-    use HasSecurityRelations;
+    use HasPasakSecurityRelations;
 }
 ```
+
+> **Catatan Kompatibilitas**: Nama lama `HasSecurityRelations` tetap didukung secara penuh melalui alias.
 
 Metode yang tersedia:
 ```php
 $user = User::find(1);
 
-// Riwayat sesi login
+// Riwayat sesi login (HasMany ke PasakUserLogin)
 $logins = $user->logins;
 
-// Daftar IP terpercaya
+// Daftar IP terpercaya (HasMany ke PasakTrustedIp)
 $trustedIps = $user->trustedIps;
 
-// Log keamanan yang terkait
-$securityLogs = $user->securityLogs;
+// Log keamanan yang terkait (HasMany ke PasakLog)
+$pasakLogs = $user->pasakLogs;
+$securityLogs = $user->securityLogs; // alias kompatibilitas
+
+// Allowlist IP yang didaftarkan (HasMany ke PasakAllowedIp)
+$allowedIps = $user->allowedIps;
 
 // Entri IP yang diblokir oleh admin ini
 $blockedByMe = $user->blockedIps;

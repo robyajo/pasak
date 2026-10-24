@@ -75,11 +75,11 @@ Perintah ini akan secara otomatis:
 5. **Menyematkan Variabel Lingkungan ke `.env` & `.env.example`**:
     - Menambahkan blok konfigurasi lengkap (`PASAK_*`) disertai dokumentasi penjelasan fungsi berbahasa Indonesia langsung di bagian bawah berkas `.env` dan `.env.example`.
     - Menggunakan deteksi cerdas agar tidak terjadi duplikasi jika variabel sudah pernah ditambahkan sebelumnya.
-6. **Menyematkan Trait `HasSecurityRelations` ke Model User**:
-    - Secara otomatis mendeteksi model `User` (`app/Models/User.php`) dan menambahkan import `use Internal\Pasak\Concerns\HasSecurityRelations;` serta menyematkan trait `HasSecurityRelations`.
+6. **Menyematkan Trait `HasPasakSecurityRelations` ke Model User**:
+    - Secara otomatis mendeteksi model `User` (`app/Models/User.php`) dan menambahkan import `use Internal\Pasak\Concerns\HasPasakSecurityRelations;` serta menyematkan trait `HasPasakSecurityRelations`.
     - Idempotent: tidak akan menduplikasi jika trait sudah ada.
 7. **Mendaftarkan Middleware WAF ke Aplikasi Host**:
-    - Otomatis mendaftarkan `BlockIpAddress` dan `DetectSecurityThreats` ke dalam `bootstrap/app.php` (Laravel 11 & 12) atau `app/Http/Kernel.php` (Laravel 10).
+    - Otomatis mendaftarkan `PasakBlockIpAddress`, `PasakDetectSecurityThreats`, dan `PasakInjectAnnouncementBanner` ke dalam `bootstrap/app.php` (Laravel 11 & 12) atau `app/Http/Kernel.php` (Laravel 10).
     - Idempotent: memeriksa keberadaan middleware terlebih dahulu sebelum mendaftarkan.
 8. **Menyiapkan Dukungan API & Berkas Rute Kustom (`routes/`)**:
     - Memeriksa apakah berkas `routes/api.php` sudah tersedia. Jika belum (pada Laravel 11+), otomatis menjalankan `php artisan install:api` agar dukungan API aktif.
@@ -91,16 +91,16 @@ Perintah ini akan secara otomatis:
 
 | Opsi                 | Fungsi                                                                                                                    |
 | :------------------- | :------------------------------------------------------------------------------------------------------------------------ |
+| `--migrate`          | Menjalankan migrasi database dan menyemai pengaturan bawaan ke `pasak_settings` secara otomatis (cocok untuk mode CI/non-interaktif). |
 | `--force`            | Menimpa seluruh berkas konfigurasi, migrasi, `nginx.conf`, dan `public/.htaccess` dengan template bawaan paket.           |
 | `--with-dashboard` / `--with-plain` / `--with-blade` | Mempublikasikan dashboard Blade murni — jalan di semua aplikasi Laravel, tanpa dependensi frontend. |
 | `--api-only`         | Jalan pintas: API ya, Web tidak (inti + keamanan saja, tanpa halaman/dashboard).                  |
 | `--without-api`      | Melewatkan pemasangan dukungan API (tanpa rute API).                                               |
 | `--without-web`      | Melewatkan pemasangan dashboard web (tanpa halaman/dashboard).                                     |
 | `--lang=...`         | Bahasa wizard instalasi (`id` default, `en`).                                                                             |
-| `--without-user-trait` | Melewatkan penyematan otomatis trait `HasSecurityRelations` ke model User.                                               |
+| `--without-user-trait` | Melewatkan penyematan otomatis trait `HasPasakSecurityRelations` ke model User.                                               |
 | `--without-middleware` | Melewatkan pendaftaran otomatis middleware WAF di `bootstrap/app.php` / `Kernel.php`.                                    |
 | `--without-routes`   | Melewatkan pembuatan berkas rute `routes/pasak.php` dan `routes/pasak-api.php`.                                     |
-| `--without-api`      | Melewatkan pemeriksaan dan instalasi rute API (`install:api`).                                                            |
 | `--without-nginx`    | Melewatkan publikasi berkas `nginx.conf` jika server Anda tidak menggunakan web server Nginx.                             |
 | `--without-htaccess` | Melewatkan pembaruan berkas `public/.htaccess` jika Anda menggunakan Nginx murni dan tidak memerlukan Apache `.htaccess`. |
 | `--with-htaccess`    | Memaksa pembaruan berkas `public/.htaccess` dengan aturan hardening keamanan paket.                                       |
@@ -200,51 +200,55 @@ Tabel-tabel yang dibuat secara default (satu migrasi `create_pasak_tables`):
 
 ## 6. Mendaftarkan Trait ke Model User (Standar Spatie)
 
-Buka model pengguna aplikasi Anda (biasanya `app/Models/User.php`) dan sertakan trait `HasSecurityRelations`:
+Buka model pengguna aplikasi Anda (biasanya `app/Models/User.php`) dan sertakan trait `HasPasakSecurityRelations`:
 
 ```php
 namespace App\Models;
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Internal\Pasak\Concerns\HasSecurityRelations;
+use Internal\Pasak\Concerns\HasPasakSecurityRelations;
 
 class User extends Authenticatable
 {
-    use HasSecurityRelations;
+    use HasPasakSecurityRelations;
 
     // ... sisa model Anda
 }
 ```
 
+> **Catatan Kompatibilitas**: Nama lama `use Internal\Pasak\Concerns\HasSecurityRelations;` dan `use HasSecurityRelations;` tetap 100% didukung melalui alias.
+
 Metode relasi Eloquent yang otomatis tersedia:
 
-- `$user->logins()`: Mengambil seluruh riwayat login (`HasMany` ke `UserLogin`).
-- `$user->trustedIps()`: Mengambil daftar IP terpercaya milik pengguna (`HasMany` ke `TrustedIp`).
-- `$user->securityLogs()`: Mengambil audit ancaman yang diasosiasikan dengan akun ini (`HasMany` ke `SecurityLog`).
-- `$user->blockedIps()`: Mengambil daftar entri blokir yang dieksekusi oleh user admin ini (`HasMany` ke `BlockedIp`).
-- `$user->resolvedTickets()`: Mengambil daftar tiket banding yang diselesaikan oleh user admin ini (`HasMany` ke `IpUnblockRequest`).
+- `$user->logins()`: Mengambil seluruh riwayat login (`HasMany` ke `PasakUserLogin`).
+- `$user->trustedIps()`: Mengambil daftar IP terpercaya milik pengguna (`HasMany` ke `PasakTrustedIp`).
+- `$user->pasakLogs()` / `$user->securityLogs()`: Mengambil audit ancaman yang diasosiasikan dengan akun ini (`HasMany` ke `PasakLog`).
+- `$user->blockedIps()`: Mengambil daftar entri blokir yang dieksekusi oleh user admin ini (`HasMany` ke `PasakBlockedIp`).
+- `$user->allowedIps()`: Mengambil daftar IP allowlist yang didaftarkan oleh user admin ini (`HasMany` ke `PasakAllowedIp`).
+- `$user->resolvedTickets()`: Mengambil daftar tiket banding yang diselesaikan oleh user admin ini (`HasMany` ke `PasakIpUnblockRequest`).
 
 ---
 
 ## 7. Mendaftarkan Middleware Keamanan ke Core Laravel
 
-Paket menyediakan 4 middleware terisolasi:
+Paket menyediakan 5 middleware terisolasi:
 
 | Alias               | Kelas Middleware                                                 | Peran                                                                                                       |
 | :------------------ | :--------------------------------------------------------------- | :---------------------------------------------------------------------------------------------------------- |
-| `pasak.block`    | `Internal\Pasak\Http\Middleware\BlockIpAddress`        | Menolak request dari IP/perangkat yang sedang terblokir aktif (HTTP 403).                                   |
-| `pasak.detect`   | `Internal\Pasak\Http\Middleware\DetectSecurityThreats` | Menginspeksi payload request terhadap tanda-tanda serangan siber dan mengaktifkan auto-block/instant block. |
-| `pasak.admin`    | `Internal\Pasak\Http\Middleware\EnsureSecurityAdmin`   | Memastikan hanya user dengan wewenang admin yang dapat mengakses REST API admin.                            |
-| `pasak.activity` | `Internal\Pasak\Http\Middleware\TrackUserActivity`     | Memperbarui heartbeat aktivitas login pengguna di database (ter-throttle 45 detik).                         |
+| `pasak.block`    | `Internal\Pasak\Http\Middleware\PasakBlockIpAddress`        | Menolak request dari IP/perangkat yang sedang terblokir aktif (HTTP 403).                                   |
+| `pasak.detect`   | `Internal\Pasak\Http\Middleware\PasakDetectSecurityThreats` | Menginspeksi payload request terhadap tanda-tanda serangan siber dan mengaktifkan auto-block/instant block. |
+| `pasak.admin`    | `Internal\Pasak\Http\Middleware\PasakEnsureSecurityAdmin`   | Memastikan hanya user dengan wewenang admin yang dapat mengakses REST API admin.                            |
+| `pasak.activity` | `Internal\Pasak\Http\Middleware\PasakTrackUserActivity`     | Memperbarui heartbeat aktivitas login pengguna di database (ter-throttle 45 detik).                         |
+| `pasak.announce` | `Internal\Pasak\Http\Middleware\PasakInjectAnnouncementBanner` | Menyuntikkan banner dan dialog pengumuman versi di halaman host yang ditentukan.                            |
 
 ### Pendaftaran pada Laravel 11 / 12 / 13 (`bootstrap/app.php`)
 
 ```php
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Middleware;
-use Internal\Pasak\Http\Middleware\BlockIpAddress;
-use Internal\Pasak\Http\Middleware\DetectSecurityThreats;
-use Internal\Pasak\Http\Middleware\TrackUserActivity;
+use Internal\Pasak\Http\Middleware\PasakBlockIpAddress;
+use Internal\Pasak\Http\Middleware\PasakDetectSecurityThreats;
+use Internal\Pasak\Http\Middleware\PasakTrackUserActivity;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -255,8 +259,10 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         // Pasang di lapisan global
-        $middleware->append(BlockIpAddress::class);
-        $middleware->append(DetectSecurityThreats::class);
+        $middleware->append([
+            PasakBlockIpAddress::class,
+            PasakDetectSecurityThreats::class,
+        ]);
 
         // Pasang di grup web untuk pelacakan aktivitas user login
         $middleware->web(append: [
@@ -273,12 +279,12 @@ Buka `app/Http/Kernel.php` dan tambahkan ke array `$middleware`:
 ```php
 protected $middleware = [
     // ...
-    \Internal\Pasak\Http\Middleware\BlockIpAddress::class,
-    \Internal\Pasak\Http\Middleware\DetectSecurityThreats::class,
+    \Internal\Pasak\Http\Middleware\PasakBlockIpAddress::class,
+    \Internal\Pasak\Http\Middleware\PasakDetectSecurityThreats::class,
 ];
 ```
 
-> **Tips Opsi Otomatis (Zero-Touch)**: Jika Anda mengatur `SECURITY_AUTO_REGISTER_MIDDLEWARE=true` di berkas `.env`, paket akan otomatis menyuntikkan `BlockIpAddress` dan `DetectSecurityThreats` ke Kernel HTTP aplikasi secara otomatis saat booting.
+> **Tips Opsi Otomatis (Zero-Touch)**: Jika Anda mengatur `PASAK_AUTO_REGISTER_MIDDLEWARE=true` di berkas `.env`, paket akan otomatis menyuntikkan `PasakBlockIpAddress` dan `PasakDetectSecurityThreats` ke Kernel HTTP aplikasi secara otomatis saat booting.
 
 ---
 

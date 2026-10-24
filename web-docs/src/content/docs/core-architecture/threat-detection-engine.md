@@ -21,7 +21,7 @@ Setiap request diuraikan ke dalam beberapa area inspeksi spesifik (`target`):
 6. **`user_agent`**: String identifikasi browser/klien (`User-Agent` HTTP header).
 7. **`any`**: Seluruh target di atas digabungkan menjadi satu kesatuan inspeksi.
 
-> **Proteksi Batas Ukuran (`max_inspect_length`)**: Untuk mencegah serangan DoS berbasis konsumsi memori, teks yang diinspeksi dibatasi sepanjang maksimal `SECURITY_MAX_INSPECT_LENGTH` (default: 4000 karakter). Jika ukuran body melebihi batas ini, pemotongan dilakukan secara aman tanpa merusak keabsahan regex.
+> **Proteksi Batas Ukuran (`max_inspect_length`)**: Untuk mencegah serangan DoS berbasis konsumsi memori, teks yang diinspeksi dibatasi sepanjang maksimal `PASAK_MAX_INSPECT_LENGTH` (default: 4000 karakter). Jika ukuran body melebihi batas ini, pemotongan dilakukan secara aman tanpa merusak keabsahan regex.
 
 ---
 
@@ -62,7 +62,13 @@ Serangan lain seperti dugaan SQL Injection samar (`' or 1=1--`), pola XSS (`<scr
 Oleh karena itu, pola-pola ini dimasukkan ke dalam mekanisme **Progressive Sliding Window**:
 1. Setiap kali terjadi ancaman berlevel `high` atau `critical`, catatan disimpan di tabel `pasak_logs`.
 2. Sistem memeriksa berapa kali IP/perangkat tersebut memicu ancaman dalam kurun waktu `window_minutes` (default: 10 menit).
-3. Jika jumlah kejadian mencapai `threshold` (default: 3 kali), IP/perangkat secara otomatis diblokir selama `duration_hours` (default: 24 jam).
+3. Jika jumlah kejadian mencapai ambang, IP/perangkat secara otomatis diblokir selama `auto_block.duration` (default: 24 jam).
+
+> **Ambang per Tingkat (DB-backed)**: Ambang blokir kini ditentukan **per tingkat ancaman** — `auto_block.level_thresholds` default `{critical: 1, high: 2, medium: 3, low: 5}`. Blokir dipicu saat `COUNT(level) ≥ threshold(level)` untuk tingkat mana pun dalam jendela. Nilainya dapat diubah langsung dari dashboard pengaturan (disimpan pada tabel `pasak_settings`, disemai oleh seeder default); kunci env lama (`PASAK_AUTO_BLOCK_*`) tetap didukung sebagai fallback senyap namun tidak lagi menguasai perilaku setelah sebaris settings tersedia.
+>
+> **Sanksi Kombinasi**: Kegagalan "gabungan" hanya dihitung bila ancaman berasal dari **minimal 2 tingkat berbeda** dan total kejadian melampaui `auto_block.combined_threshold` (default 3) — serangan satu jenis berfrekuensi rendah tidak tersapu oleh aturan kombinasi.
+>
+> **Lingkup Adaptif `auto`**: `auto_block_scope` mendukung 3 mode: `device` (isolasi perangkat spesifik), `ip` (seluruh Network Address Translation/IP), dan `auto` — memakai blokir device bila identitas `device_id` eksplisit terdeteksi, dan fallback ke blokir IP saat fingerprint tidak tersedia.
 
 ---
 
