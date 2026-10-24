@@ -8,7 +8,23 @@
 
 import pkg from "../data/package.json";
 
-const version = pkg?.packagist?.version ?? pkg?.version ?? "1.4.1";
+function compareSemver(a?: string, b?: string): number {
+  if (!a) return b ? -1 : 0;
+  if (!b) return 1;
+  const pa = a.replace(/^v/, "").split(".").map((n) => parseInt(n, 10) || 0);
+  const pb = b.replace(/^v/, "").split(".").map((n) => parseInt(n, 10) || 0);
+  for (let i = 0; i < Math.max(pa.length, pb.length); i++) {
+    const na = pa[i] || 0;
+    const nb = pb[i] || 0;
+    if (na > nb) return 1;
+    if (na < nb) return -1;
+  }
+  return 0;
+}
+
+const v1 = pkg?.version ?? "";
+const v2 = pkg?.packagist?.version ?? "";
+const version = (compareSemver(v1, v2) >= 0 ? v1 : v2) || "1.6.1";
 
 const BANNER_ID = "psk-docs-announce-bar";
 const MODAL_ID = "psk-docs-announce-modal";

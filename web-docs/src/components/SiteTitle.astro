@@ -5,8 +5,24 @@ import { logos } from "virtual:starlight/user-images";
 import config from "virtual:starlight/user-config";
 import pkg from "../data/package.json";
 
+function compareSemver(a, b) {
+    if (!a) return b ? -1 : 0;
+    if (!b) return 1;
+    const pa = String(a).replace(/^v/, "").split(".").map((n) => parseInt(n, 10) || 0);
+    const pb = String(b).replace(/^v/, "").split(".").map((n) => parseInt(n, 10) || 0);
+    for (let i = 0; i < Math.max(pa.length, pb.length); i++) {
+        const na = pa[i] || 0;
+        const nb = pb[i] || 0;
+        if (na > nb) return 1;
+        if (na < nb) return -1;
+    }
+    return 0;
+}
+
 const { siteTitleHref } = Astro.locals.starlightRoute;
-const version = pkg?.packagist?.version ?? pkg?.version ?? "1.6.1";
+const v1 = pkg?.version ?? "";
+const v2 = pkg?.packagist?.version ?? "";
+const version = (compareSemver(v1, v2) >= 0 ? v1 : v2) || "1.6.1";
 ---
 
 <a href={siteTitleHref} class="site-title sl-flex">
@@ -49,25 +65,40 @@ const version = pkg?.packagist?.version ?? pkg?.version ?? "1.6.1";
 
 <script is:inline>
     (() => {
+        const compareSemver = (a, b) => {
+            if (!a) return b ? -1 : 0;
+            if (!b) return 1;
+            const pa = String(a).replace(/^v/, "").split(".").map((n) => parseInt(n, 10) || 0);
+            const pb = String(b).replace(/^v/, "").split(".").map((n) => parseInt(n, 10) || 0);
+            for (let i = 0; i < Math.max(pa.length, pb.length); i++) {
+                const na = pa[i] || 0;
+                const nb = pb[i] || 0;
+                if (na > nb) return 1;
+                if (na < nb) return -1;
+            }
+            return 0;
+        };
+
         const updateLiveVersion = () => {
             const badge = document.querySelector(".pkg-version");
             if (!badge) return;
 
+            const current = (badge.textContent || "").trim().replace(/^v/, "");
             const CACHE_KEY = "pasak_packagist_version";
             const CACHE_TIME_KEY = "pasak_packagist_time";
             const now = Date.now();
 
             try {
-                const cached = sessionStorage.getItem(CACHE_KEY);
+                const cached = (sessionStorage.getItem(CACHE_KEY) || "").replace(/^v/, "");
                 const cachedTime = parseInt(
                     sessionStorage.getItem(CACHE_TIME_KEY) || "0",
                     10,
                 );
-                if (cached && now - cachedTime < 600000) {
-                    badge.textContent = "v" + cached.replace(/^v/, "");
-                    badge.title =
-                        "Versi terbaru paket di Packagist: v" +
-                        cached.replace(/^v/, "");
+                if (cached && now - cachedTime < 60000) {
+                    if (compareSemver(cached, current) >= 0) {
+                        badge.textContent = "v" + cached;
+                        badge.title = "Versi terbaru paket di Packagist: v" + cached;
+                    }
                     return;
                 }
             } catch (_) {}
@@ -76,15 +107,17 @@ const version = pkg?.packagist?.version ?? pkg?.version ?? "1.6.1";
                 .then((res) => (res.ok ? res.json() : null))
                 .then((data) => {
                     if (!data?.package?.versions) return;
-                    const versions = Object.keys(data.package.versions);
-                    const stable = versions.find((v) =>
-                        /^v?\d+\.\d+\.\d+$/.test(v),
-                    );
-                    if (stable) {
-                        const clean = stable.replace(/^v/, "");
-                        badge.textContent = "v" + clean;
-                        badge.title =
-                            "Versi terbaru paket di Packagist: v" + clean;
+                    const versions = Object.keys(data.package.versions)
+                        .filter((v) => /^v?\d+\.\d+\.\d+$/.test(v))
+                        .sort(compareSemver)
+                        .reverse();
+                    const latest = versions[0];
+                    if (latest) {
+                        const clean = latest.replace(/^v/, "");
+                        if (compareSemver(clean, current) >= 0) {
+                            badge.textContent = "v" + clean;
+                            badge.title = "Versi terbaru paket di Packagist: v" + clean;
+                        }
                         try {
                             sessionStorage.setItem(CACHE_KEY, clean);
                             sessionStorage.setItem(CACHE_TIME_KEY, String(now));

@@ -80,6 +80,20 @@ function stripLeadingH1(markdown) {
 	return markdown.replace(/^#\s+.*\n+/, '');
 }
 
+function compareSemver(a, b) {
+	if (!a) return b ? -1 : 0;
+	if (!b) return 1;
+	const pa = a.replace(/^v/, "").split(".").map((n) => parseInt(n, 10) || 0);
+	const pb = b.replace(/^v/, "").split(".").map((n) => parseInt(n, 10) || 0);
+	for (let i = 0; i < Math.max(pa.length, pb.length); i++) {
+		const na = pa[i] || 0;
+		const nb = pb[i] || 0;
+		if (na > nb) return 1;
+		if (na < nb) return -1;
+	}
+	return 0;
+}
+
 function firstVersionFromChangelog(markdown) {
 	const match = markdown.match(/^##\s+\[?v?(\d+\.\d+\.\d+[^\]\s]*)\]?/m);
 
@@ -125,9 +139,12 @@ async function main() {
 	}
 
 	const previous = readJson(dataFile) ?? {};
-	const finalVersion = version ?? packagist?.version ?? previous.version ?? '0.0.0';
-	const finalPackagistVersion = packagist?.version ?? previous.packagist?.version ?? finalVersion;
-	const finalReleased = packagist?.released ?? previous.packagist?.released ?? null;
+	const localOrChangelog = version ?? (changelog ? firstVersionFromChangelog(changelog) : null);
+	const packagistVer = packagist?.version;
+	const higherVersion = compareSemver(localOrChangelog, packagistVer) >= 0 ? localOrChangelog : packagistVer;
+	const finalVersion = higherVersion ?? previous.version ?? '0.0.0';
+	const finalPackagistVersion = finalVersion;
+	const finalReleased = packagist?.released ?? previous.packagist?.released ?? new Date().toISOString().slice(0, 10);
 
 	// Pertahankan updatedAt bila versi tidak berubah agar git status tidak terus-menerus kotor
 	const isSameVersion = previous.version === finalVersion && previous.packagist?.version === finalPackagistVersion;
