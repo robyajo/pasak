@@ -96,4 +96,113 @@ const version = pkg.packagist?.version ?? pkg.version;
 </script>
 
 <style>
-	:global(.title-wrapper) {\n		gap: 0.75rem;\n		align-items: center;\n	}\n\n	.site-title {\n		align-items: center;\n		gap: var(--sl-nav-gap, 0.75rem);\n		font-size: var(--sl-text-h4, 1.05rem);\n		font-family: var(--sl-font) !important;\n		font-weight: 700 !important;\n		letter-spacing: -0.02em !important;\n		color: var(--sl-color-white) !important;\n		text-decoration: none;\n		white-space: nowrap;\n		min-width: 0;\n		transition: opacity 0.15s ease;\n	}\n\n	.site-title:hover {\n		color: var(--sl-color-accent) !important;\n	}\n\n	.site-title img {\n		height: calc(var(--sl-nav-height, 3.5rem) - 2 * var(--sl-nav-pad-y, 0.75rem));\n		width: auto;\n		max-width: 100%;\n		object-fit: contain;\n		object-position: 0 50%;\n	}\n\n	.site-title-text {\n		overflow: hidden;\n		text-overflow: ellipsis;\n		white-space: nowrap;\n	}\n\n	.title-brand {\n		display: inline;\n	}\n\n	.title-product {\n		display: inline;\n	}\n\n	.pkg-version {\n		align-self: center;\n		flex: none;\n		display: inline-flex;\n		align-items: center;\n		margin-inline-start: 0.75rem;\n		padding: 0.15rem 0.6rem;\n		border: 1px solid var(--sl-color-gray-5);\n		border-radius: 999px;\n		font-family: var(--sl-font-mono);\n		font-size: var(--sl-text-xs);\n		font-weight: 600;\n		line-height: 1.4;\n		color: var(--sl-color-text-accent);\n		background-color: var(--sl-color-gray-6);\n		text-decoration: none;\n		white-space: nowrap;\n		transition: border-color 0.15s ease, background-color 0.15s ease;\n	}\n\n	.pkg-version:hover {\n		border-color: var(--sl-color-accent);\n		background-color: var(--sl-color-accent-low);\n	}\n\n	/* Tampilan Responsif Mobile: Tampilkan Icon + \"Pasak\" */\n	@media (max-width: 50rem) {\n		:global(.title-wrapper) {\n			gap: 0.5rem !important;\n			padding: 0 !important;\n			margin: 0 !important;\n		}\n\n		.site-title {\n			gap: 0.5rem !important;\n			padding: 0.2rem 0 !important;\n			font-size: 0.95rem !important;\n			font-weight: 700 !important;\n		}\n\n		.site-title img {\n			height: 1.85rem !important;\n			width: auto !important;\n			max-height: 100% !important;\n			display: block !important;\n			object-fit: contain !important;\n		}\n\n		/* Judul \"Pasak\" yang ringkas muat dengan rapi di layar sempit */\n		.title-brand {\n			display: none !important;\n		}\n\n		.title-product {\n			display: inline !important;\n			font-weight: 700 !important;\n			color: var(--sl-color-white) !important;\n		}\n\n		.pkg-version {\n			display: none !important;\n		}\n	}\n</style>\n
+	:global(.title-wrapper) {
+		gap: 0.75rem;
+		align-items: center;
+	}
+
+	.site-title {
+		align-items: center;
+		gap: var(--sl-nav-gap, 0.75rem);
+		font-size: var(--sl-text-h4, 1.05rem);
+		font-family: var(--sl-font) !important;
+		font-weight: 700 !important;
+		letter-spacing: -0.02em !important;
+		color: var(--sl-color-white) !important;
+		text-decoration: none;
+		white-space: nowrap;
+		min-width: 0;
+		transition: opacity 0.15s ease;
+	}
+
+	.site-title:hover {
+		color: var(--sl-color-accent) !important;
+	}
+
+	.site-title img {
+		height: calc(var(--sl-nav-height, 3.5rem) - 2 * var(--sl-nav-pad-y, 0.75rem));
+		width: auto;
+		max-width: 100%;
+		object-fit: contain;
+		object-position: 0 50%;
+	}
+
+	.site-title-text {
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	.title-brand {
+		display: inline;
+	}
+
+	.title-product {
+		display: inline;
+	}
+
+	.pkg-version {
+		align-self: center;
+		flex: none;
+		display: inline-flex;
+		align-items: center;
+		margin-inline-start: 0.75rem;
+		padding: 0.15rem 0.6rem;
+		border: 1px solid var(--sl-color-gray-5);
+		border-radius: 999px;
+		font-family: var(--sl-font-mono);
+		font-size: var(--sl-text-xs);
+		font-weight: 600;
+		line-height: 1.4;
+		color: var(--sl-color-text-accent);
+		background-color: var(--sl-color-gray-6);
+		text-decoration: none;
+		white-space: nowrap;
+		transition: border-color 0.15s ease, background-color 0.15s ease;
+	}
+
+	.pkg-version:hover {
+		border-color: var(--sl-color-accent);
+		background-color: var(--sl-color-accent-low);
+	}
+
+	/* Tampilan Responsif Mobile: Tampilkan Icon + "Pasak" */
+	@media (max-width: 50rem) {
+		:global(.title-wrapper) {
+			gap: 0.5rem !important;
+			padding: 0 !important;
+			margin: 0 !important;
+		}
+
+		.site-title {
+			gap: 0.5rem !important;
+			padding: 0.2rem 0 !important;
+			font-size: 0.95rem !important;
+			font-weight: 700 !important;
+		}
+
+		.site-title img {
+			height: 1.85rem !important;
+			width: auto !important;
+			max-height: 100% !important;
+			display: block !important;
+			object-fit: contain !important;
+		}
+
+		/* Judul "Pasak" yang ringkas muat dengan rapi di layar sempit */
+		.title-brand {
+			display: none !important;
+		}
+
+		.title-product {
+			display: inline !important;
+			font-weight: 700 !important;
+			color: var(--sl-color-white) !important;
+		}
+
+		.pkg-version {
+			display: none !important;
+		}
+	}
+</style>
+
