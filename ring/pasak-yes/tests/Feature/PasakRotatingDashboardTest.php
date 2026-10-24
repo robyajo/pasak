@@ -7,51 +7,51 @@ use Internal\Pasak\Services\PasakDashboardUrlService;
 uses(RefreshDatabase::class);
 
 beforeEach(function () {
-    config()->set("pasak.dashboard.enabled", true);
-    config()->set("pasak.dashboard.prefix", "pasak");
-    config()->set("pasak.dashboard.rotating", true);
-    config()->set("pasak.dashboard.single_use", true);
-    config()->set("pasak.dashboard.grace_seconds", 120);
-    config()->set("pasak.dashboard.token_length", 16);
+    config()->set('pasak.dashboard.enabled', true);
+    config()->set('pasak.dashboard.prefix', 'pasak');
+    config()->set('pasak.dashboard.rotating', true);
+    config()->set('pasak.dashboard.single_use', true);
+    config()->set('pasak.dashboard.grace_seconds', 120);
+    config()->set('pasak.dashboard.token_length', 16);
     config()->set(
-        "pasak.dashboard.secret",
-        "WT3J5pZLlQJkVPueACpFbxzBH0g1mSoB0Gcn7yKhKVp9WTvi",
+        'pasak.dashboard.secret',
+        'WT3J5pZLlQJkVPueACpFbxzBH0g1mSoB0Gcn7yKhKVp9WTvi',
     );
 });
 
 test(
-    "pintu masuk stabil /pasak mengalihkan (302) ke URL acak milik sesi",
+    'pintu masuk stabil /pasak mengalihkan (302) ke URL acak milik sesi',
     function () {
         $user = User::factory()->create();
 
-        $response = $this->actingAs($user)->get("/pasak");
+        $response = $this->actingAs($user)->get('/pasak');
 
         $response->assertStatus(302);
-        $location = $response->headers->get("Location");
+        $location = $response->headers->get('Location');
         expect($location)->toMatch('#/pasak-[A-Za-z0-9]{12,32}/?$#');
     },
 );
 
 test(
-    "alias stabil /pasak/logs dan subpage lainnya dialihkan (302) ke slug sesi",
+    'alias stabil /pasak/logs dan subpage lainnya dialihkan (302) ke slug sesi',
     function () {
         $user = User::factory()->create();
 
-        $response = $this->actingAs($user)->get("/pasak/logs");
+        $response = $this->actingAs($user)->get('/pasak/logs');
 
         $response->assertStatus(302);
-        $location = $response->headers->get("Location");
-        expect($location)->toMatch("#/pasak-[A-Za-z0-9]{12,32}/logs#");
+        $location = $response->headers->get('Location');
+        expect($location)->toMatch('#/pasak-[A-Za-z0-9]{12,32}/logs#');
     },
 );
 
 test(
-    "slug yang valid menyajikan halaman HTML dashboard dengan status 200",
+    'slug yang valid menyajikan halaman HTML dashboard dengan status 200',
     function () {
         $user = User::factory()->create();
 
-        $entry = $this->actingAs($user)->get("/pasak");
-        $targetUrl = $entry->headers->get("Location");
+        $entry = $this->actingAs($user)->get('/pasak');
+        $targetUrl = $entry->headers->get('Location');
         $path = parse_url($targetUrl, PHP_URL_PATH);
 
         $page = $this->actingAs($user)->get($path);
@@ -60,12 +60,12 @@ test(
 );
 
 test(
-    "token diputar setiap akses halaman HTML sehingga URL baru dihasilkan",
+    'token diputar setiap akses halaman HTML sehingga URL baru dihasilkan',
     function () {
         $user = User::factory()->create();
 
-        $entry = $this->actingAs($user)->get("/pasak");
-        $firstPath = parse_url($entry->headers->get("Location"), PHP_URL_PATH);
+        $entry = $this->actingAs($user)->get('/pasak');
+        $firstPath = parse_url($entry->headers->get('Location'), PHP_URL_PATH);
 
         // Akses pertama dengan slug pertama
         $page1 = $this->actingAs($user)->get($firstPath);
@@ -76,19 +76,19 @@ test(
 
         expect($newSlug)
             ->not->toBeNull()
-            ->and("/" . $newSlug)
+            ->and('/'.$newSlug)
             ->not->toBe($firstPath);
     },
 );
 
 test(
-    "url lama di dalam masa tenggang grace period dialihkan ke url baru bukan 404",
+    'url lama di dalam masa tenggang grace period dialihkan ke url baru bukan 404',
     function () {
         $user = User::factory()->create();
 
-        $entry = $this->actingAs($user)->get("/pasak");
+        $entry = $this->actingAs($user)->get('/pasak');
         $firstPath = parse_url(
-            (string) $entry->headers->get("Location"),
+            (string) $entry->headers->get('Location'),
             PHP_URL_PATH,
         );
 
@@ -99,39 +99,39 @@ test(
         $reloadResponse = $this->actingAs($user)->get($firstPath);
         $reloadResponse->assertStatus(302);
 
-        $redirectLocation = $reloadResponse->headers->get("Location");
+        $redirectLocation = $reloadResponse->headers->get('Location');
         expect($redirectLocation)
-            ->toMatch("#/pasak-[A-Za-z0-9]{12,32}#")
+            ->toMatch('#/pasak-[A-Za-z0-9]{12,32}#')
             ->and(parse_url((string) $redirectLocation, PHP_URL_PATH))
             ->not->toBe($firstPath);
     },
 );
 
 test(
-    "slug asing atau tidak dikenal ditolak dengan 404 agar dashboard tersamar",
+    'slug asing atau tidak dikenal ditolak dengan 404 agar dashboard tersamar',
     function () {
         $user = User::factory()->create();
 
         // Akses slug acak yang bukan milik sesi pengguna saat ini
-        $response = $this->actingAs($user)->get("/pasak-fake123456789012/logs");
+        $response = $this->actingAs($user)->get('/pasak-fake123456789012/logs');
 
         $response->assertStatus(404);
     },
 );
 
 test(
-    "endpoint polling threat-map/feed tidak memutar token agar tidak balapan",
+    'endpoint polling threat-map/feed tidak memutar token agar tidak balapan',
     function () {
         $user = User::factory()->create();
 
-        $entry = $this->actingAs($user)->get("/pasak");
+        $entry = $this->actingAs($user)->get('/pasak');
         $firstPath = parse_url(
-            (string) $entry->headers->get("Location"),
+            (string) $entry->headers->get('Location'),
             PHP_URL_PATH,
         );
 
         $this->actingAs($user)
-            ->get($firstPath . "/threat-map")
+            ->get($firstPath.'/threat-map')
             ->assertStatus(200);
 
         // Ambil slug aktif dari sesi untuk feed
@@ -139,21 +139,21 @@ test(
         expect($slug)->toBeString();
 
         $feed1 = $this->actingAs($user)->getJson(
-            "/" . $slug . "/threat-map/feed",
+            '/'.$slug.'/threat-map/feed',
         );
         $feed1->assertStatus(200);
         expect(session(PasakDashboardUrlService::SESSION_KEY))->toBe($slug);
 
         $feed2 = $this->actingAs($user)->getJson(
-            "/" . $slug . "/threat-map/feed",
+            '/'.$slug.'/threat-map/feed',
         );
         $feed2->assertStatus(200);
         expect(session(PasakDashboardUrlService::SESSION_KEY))->toBe($slug);
     },
 );
 
-test("pengguna yang belum login dialihkan ke halaman login", function () {
-    $response = $this->get("/pasak");
+test('pengguna yang belum login dialihkan ke halaman login', function () {
+    $response = $this->get('/pasak');
 
-    $response->assertRedirect("/login");
+    $response->assertRedirect('/login');
 });

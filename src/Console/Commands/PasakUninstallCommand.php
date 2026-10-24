@@ -20,10 +20,13 @@ class PasakUninstallCommand extends Command
     {
         $force = (bool) $this->option('force');
 
-        if (! $force && ! $this->confirm(
-            'Hapus SELURUH instalasi Pasak dari aplikasi ini? (konfigurasi, rute, middleware, trait User, dan TABEL database)',
-            false
-        )) {
+        if (
+            ! $force &&
+            ! $this->confirm(
+                'Hapus SELURUH instalasi Pasak dari aplikasi ini? (konfigurasi, rute, middleware, trait User, dan TABEL database)',
+                false,
+            )
+        ) {
             $this->line('Pembatalan: tidak ada perubahan yang dilakukan.');
 
             return self::SUCCESS;
@@ -44,14 +47,20 @@ class PasakUninstallCommand extends Command
 
         try {
             $this->callSilent('optimize:clear');
-            $this->info('  ✓ Cache konfigurasi, rute, dan tampilan dibersihkan.');
+            $this->info(
+                '  ✓ Cache konfigurasi, rute, dan tampilan dibersihkan.',
+            );
         } catch (\Throwable) {
             // Abaikan bila tidak didukung environment tersebut.
         }
 
         $this->newLine();
-        $this->info('Pencopotan selesai. Aplikasi Anda kembali seperti sebelum Pasak dipasang.');
-        $this->line('  Disarankan: <fg=yellow>php artisan config:clear && php artisan route:clear && composer dump-autoload</>');
+        $this->info(
+            'Pencopotan selesai. Aplikasi Anda kembali seperti sebelum Pasak dipasang.',
+        );
+        $this->line(
+            '  Disarankan: <fg=yellow>php artisan config:clear && php artisan route:clear && composer dump-autoload</>',
+        );
 
         return self::SUCCESS;
     }
@@ -72,11 +81,14 @@ class PasakUninstallCommand extends Command
             config('pasak.table_names.allowed_ips', 'pasak_allowed_ips'),
             config('pasak.table_names.trusted_ips', 'pasak_trusted_ips'),
             config('pasak.table_names.user_logins', 'pasak_user_logins'),
-            config('pasak.table_names.ip_unblock_requests', 'pasak_ip_unblock_requests'),
+            config(
+                'pasak.table_names.ip_unblock_requests',
+                'pasak_ip_unblock_requests',
+            ),
             config('pasak.table_names.login_attempts', 'pasak_login_attempts'),
             config(
                 'pasak.table_names.pasak_logs',
-                config('pasak.table_names.security_logs', 'pasak_logs')
+                config('pasak.table_names.security_logs', 'pasak_logs'),
             ),
             config('pasak.table_names.blocked_ips', 'pasak_blocked_ips'),
             // Varian lama (pra-prefix) agar tidak tertinggal.
@@ -91,19 +103,27 @@ class PasakUninstallCommand extends Command
             'security_settings',
         ];
 
-        foreach (array_unique($tables) as $table) {
-            if (! is_string($table) || $table === '') {
-                continue;
-            }
-
-            try {
-                if (Schema::hasTable($table)) {
-                    Schema::dropIfExists($table);
-                    $this->info("  ✓ Tabel '{$table}' dihapus.");
+        Schema::disableForeignKeyConstraints();
+        try {
+            foreach (array_unique($tables) as $table) {
+                if (! is_string($table) || $table === '') {
+                    continue;
                 }
-            } catch (\Throwable $e) {
-                $this->warn("  ⚠ Gagal menghapus tabel '{$table}': ".$e->getMessage());
+
+                try {
+                    if (Schema::hasTable($table)) {
+                        Schema::dropIfExists($table);
+                        $this->info("  ✓ Tabel '{$table}' dihapus.");
+                    }
+                } catch (\Throwable $e) {
+                    $this->warn(
+                        "  ⚠ Gagal menghapus tabel '{$table}': ".
+                            $e->getMessage(),
+                    );
+                }
             }
+        } finally {
+            Schema::enableForeignKeyConstraints();
         }
 
         // Hapus record migrasi milik Pasak agar install ulang berjalan bersih
@@ -123,11 +143,15 @@ class PasakUninstallCommand extends Command
                     ->delete();
 
                 if ($deleted > 0) {
-                    $this->info("  ✓ {$deleted} record migrasi Pasak dibersihkan.");
+                    $this->info(
+                        "  ✓ {$deleted} record migrasi Pasak dibersihkan.",
+                    );
                 }
             }
         } catch (\Throwable $e) {
-            $this->warn('  ⚠ Gagal membersihkan record migrasi: '.$e->getMessage());
+            $this->warn(
+                '  ⚠ Gagal membersihkan record migrasi: '.$e->getMessage(),
+            );
         }
     }
 
@@ -159,10 +183,18 @@ class PasakUninstallCommand extends Command
             }
 
             $content = File::get($path);
+
+            // Bersihkan via regex untuk menangani variasi spasi (misal Pint/CS-Fixer: require __DIR__ . '/pasak.php';)
+            $cleaned = (string) preg_replace(
+                '/^[ \t]*(?:require|require_once|include|include_once)\s+__DIR__\s*\.\s*[\'"]\/(?:pasak|pasak-api|security|security-api)\.php[\'"]\s*;[ \t]*\r?\n?/m',
+                '',
+                $content,
+            );
+
             $cleaned = str_replace(
                 array_map(fn ($line) => "\n".$line, $requireLines),
                 '',
-                $content
+                $cleaned,
             );
             $cleaned = str_replace($requireLines, '', $cleaned);
 
@@ -215,17 +247,21 @@ class PasakUninstallCommand extends Command
             }
 
             $lines = explode("\n", File::get($path));
-            $filtered = array_values(array_filter(
-                $lines,
-                fn ($line) => ! $this->lineReferences($line, $markers)
-                    && ! $this->shortClassReferenced($line, $shortClassMarkers)
-            ));
+            $filtered = array_values(
+                array_filter(
+                    $lines,
+                    fn ($line) => ! $this->lineReferences($line, $markers) &&
+                        ! $this->shortClassReferenced($line, $shortClassMarkers),
+                ),
+            );
 
             foreach ($importMarkers as $marker) {
-                $filtered = array_values(array_filter(
-                    $filtered,
-                    fn ($line) => ! str_contains($line, $marker)
-                ));
+                $filtered = array_values(
+                    array_filter(
+                        $filtered,
+                        fn ($line) => ! str_contains($line, $marker),
+                    ),
+                );
             }
 
             // Bersihkan blok append yang kini kosong: "$middleware->append([\n]);"
@@ -233,19 +269,23 @@ class PasakUninstallCommand extends Command
             $content = (string) preg_replace(
                 '/(?:\$middleware\s*)?->append\(\[\s*\]\);\n?/',
                 '',
-                implode("\n", $filtered)
+                implode("\n", $filtered),
             );
 
             // Baris sisa berupa statement variabel gantung ("$middleware" / "$middleware;") -> buang.
             $content = (string) preg_replace(
                 '/^[ \t]*\$middleware[ \t]*;?[ \t]*\r?$/m',
                 '',
-                $content
+                $content,
             );
 
             if ($content !== null && $content !== File::get($path)) {
                 File::put($path, $this->normalizePhpFile($content));
-                $this->info('  ✓ Middleware Pasak dihapus dari '.basename((string) $path).'.');
+                $this->info(
+                    '  ✓ Middleware Pasak dihapus dari '.
+                        basename((string) $path).
+                        '.',
+                );
             }
         }
     }
@@ -268,7 +308,12 @@ class PasakUninstallCommand extends Command
     protected function shortClassReferenced(string $line, array $markers): bool
     {
         foreach ($markers as $marker) {
-            if (preg_match('/(^|[^A-Za-z0-9_\\\\])'.preg_quote($marker, '/').'/', $line) === 1) {
+            if (
+                preg_match(
+                    '/(^|[^A-Za-z0-9_\\\\])'.preg_quote($marker, '/').'/',
+                    $line,
+                ) === 1
+            ) {
                 return true;
             }
         }
@@ -292,10 +337,7 @@ class PasakUninstallCommand extends Command
      */
     protected function removeUserTrait(): void
     {
-        $candidates = [
-            app_path('Models/User.php'),
-            base_path('app/User.php'),
-        ];
+        $candidates = [app_path('Models/User.php'), base_path('app/User.php')];
 
         $traits = ['HasPasakSecurityRelations', 'HasSecurityRelations'];
         $imports = [
@@ -317,20 +359,22 @@ class PasakUninstallCommand extends Command
             foreach ($traits as $trait) {
                 // "use HasPasakSecurityRelations;" mandiri -> hapus barisnya.
                 $content = (string) preg_replace(
-                    '/^[ \t]*use\s+'.preg_quote($trait, '/').'\s*;[ \t]*\r?\n?/m',
+                    '/^[ \t]*use\s+'.
+                        preg_quote($trait, '/').
+                        '\s*;[ \t]*\r?\n?/m',
                     '',
-                    $content
+                    $content,
                 );
                 // Daftar gabungan "use A, HasPasakSecurityRelations, B;" -> keluarkan namanya.
                 $content = (string) preg_replace(
-                    '/,\s*'.preg_quote($trait, '/').'\b/',
+                    '/,\\s*'.preg_quote($trait, '/').'\\b/',
                     '',
-                    $content
+                    $content,
                 );
                 $content = (string) preg_replace(
-                    '/\b'.preg_quote($trait, '/').'\s*,\s*/',
+                    '/\\b'.preg_quote($trait, '/').'\\s*,\\s*/',
                     '',
-                    $content
+                    $content,
                 );
             }
 
@@ -353,7 +397,12 @@ class PasakUninstallCommand extends Command
         }
 
         $stubLines = [];
-        foreach ([__DIR__.'/../../../stubs/env.stub', dirname(__DIR__, 3).'/stubs/env.stub'] as $candidate) {
+        foreach (
+            [
+                __DIR__.'/../../../stubs/env.stub',
+                dirname(__DIR__, 3).'/stubs/env.stub',
+            ] as $candidate
+        ) {
             if (File::exists($candidate)) {
                 $stubLines = explode("\n", File::get($candidate));
                 break;
@@ -381,7 +430,11 @@ class PasakUninstallCommand extends Command
                     continue;
                 }
 
-                if ($trimmed !== '' && str_starts_with($trimmed, '#') && isset($stubComments[$trimmed])) {
+                if (
+                    $trimmed !== '' &&
+                    str_starts_with($trimmed, '#') &&
+                    isset($stubComments[$trimmed])
+                ) {
                     continue;
                 }
 
@@ -411,7 +464,11 @@ class PasakUninstallCommand extends Command
         if ($backups !== []) {
             rsort($backups);
             File::copy($backups[0], $htaccessPath);
-            $this->info('  ✓ public/.htaccess dikembalikan dari cadangan ('.basename((string) $backups[0]).').');
+            $this->info(
+                '  ✓ public/.htaccess dikembalikan dari cadangan ('.
+                    basename((string) $backups[0]).
+                    ').',
+            );
 
             return;
         }
@@ -427,7 +484,10 @@ class PasakUninstallCommand extends Command
         ];
 
         foreach ($stubCandidates as $stubPath) {
-            if (File::exists($stubPath) && File::get($htaccessPath) === File::get($stubPath)) {
+            if (
+                File::exists($stubPath) &&
+                File::get($htaccessPath) === File::get($stubPath)
+            ) {
                 File::delete($htaccessPath);
                 $this->info('  ✓ public/.htaccess (murni dari Pasak) dihapus.');
 
@@ -435,7 +495,9 @@ class PasakUninstallCommand extends Command
             }
         }
 
-        $this->line('  - public/.htaccess dibiarkan (kustom; tanpa cadangan untuk dipulihkan).');
+        $this->line(
+            '  - public/.htaccess dibiarkan (kustom; tanpa cadangan untuk dipulihkan).',
+        );
     }
 
     /**
@@ -456,19 +518,37 @@ class PasakUninstallCommand extends Command
             }
         }
 
-        foreach (glob(database_path('migrations/*_pasak_*.php')) ?: [] as $migration) {
+        foreach (
+            glob(database_path('migrations/*_pasak_*.php')) ?: [] as $migration
+        ) {
             File::delete($migration);
-            $this->info('  ✓ Dihapus: '.$this->relativePath((string) $migration));
+            $this->info(
+                '  ✓ Dihapus: '.$this->relativePath((string) $migration),
+            );
         }
-        foreach (glob(database_path('migrations/*_security_*.php')) ?: [] as $migration) {
-            if (str_contains(File::get((string) $migration), 'Internal\\Pasak')
-                || str_contains(File::get((string) $migration), 'pasak.table_names')) {
+        foreach (
+            glob(database_path('migrations/*_security_*.php')) ?: [] as $migration
+        ) {
+            if (
+                str_contains(
+                    File::get((string) $migration),
+                    'Internal\\Pasak',
+                ) ||
+                str_contains(
+                    File::get((string) $migration),
+                    'pasak.table_names',
+                )
+            ) {
                 File::delete($migration);
-                $this->info('  ✓ Dihapus: '.$this->relativePath((string) $migration));
+                $this->info(
+                    '  ✓ Dihapus: '.$this->relativePath((string) $migration),
+                );
             }
         }
 
-        foreach (['views/pages/pasak', 'js/pages/pasak', 'js/components/pasak'] as $relative) {
+        foreach (
+            ['views/pages/pasak', 'js/pages/pasak', 'js/components/pasak'] as $relative
+        ) {
             $path = resource_path($relative);
             if (File::isDirectory($path)) {
                 File::deleteDirectory($path);
@@ -476,31 +556,45 @@ class PasakUninstallCommand extends Command
             }
         }
 
-        foreach (['nginx.conf.stub' => 'nginx.conf', 'apache2.conf.stub' => 'apache2.conf'] as $stub => $target) {
+        foreach (
+            [
+                'nginx.conf.stub' => 'nginx.conf',
+                'apache2.conf.stub' => 'apache2.conf',
+            ] as $stub => $target
+        ) {
             $targetPath = base_path($target);
             if (! File::exists($targetPath)) {
                 continue;
             }
 
-            foreach ([
-                __DIR__.'/../../../stubs/'.$stub,
-                dirname(__DIR__, 2).'/stubs/'.$stub,
-            ] as $stubPath) {
-                if (File::exists($stubPath) && File::get($targetPath) === File::get($stubPath)) {
+            foreach (
+                [
+                    __DIR__.'/../../../stubs/'.$stub,
+                    dirname(__DIR__, 2).'/stubs/'.$stub,
+                ] as $stubPath
+            ) {
+                if (
+                    File::exists($stubPath) &&
+                    File::get($targetPath) === File::get($stubPath)
+                ) {
                     File::delete($targetPath);
-                    $this->info("  ✓ Berkas {$target} (murni dari Pasak) dihapus.");
+                    $this->info(
+                        "  ✓ Berkas {$target} (murni dari Pasak) dihapus.",
+                    );
                     break;
                 }
             }
         }
 
         // Hapus direktori induk yang kini kosong agar tidak ada folder yatim.
-        foreach ([
-            resource_path('views/errors'),
-            resource_path('views/pages'),
-            resource_path('js/pages'),
-            resource_path('js/components'),
-        ] as $dir) {
+        foreach (
+            [
+                resource_path('views/errors'),
+                resource_path('views/pages'),
+                resource_path('js/pages'),
+                resource_path('js/components'),
+            ] as $dir
+        ) {
             $this->removeDirectoryIfEmpty($dir);
         }
     }
@@ -520,9 +614,17 @@ class PasakUninstallCommand extends Command
         if ($entries === []) {
             try {
                 File::deleteDirectory($dir);
-                $this->info('  ✓ Direktori kosong dihapus: '.$this->relativePath($dir));
+                $this->info(
+                    '  ✓ Direktori kosong dihapus: '.
+                        $this->relativePath($dir),
+                );
             } catch (\Throwable $e) {
-                $this->warn('  ⚠ Gagal menghapus direktori '.$dir.': '.$e->getMessage());
+                $this->warn(
+                    '  ⚠ Gagal menghapus direktori '.
+                        $dir.
+                        ': '.
+                        $e->getMessage(),
+                );
             }
         }
     }
@@ -549,9 +651,17 @@ class PasakUninstallCommand extends Command
                     } else {
                         File::delete($path);
                     }
-                    $this->info('  ✓ Cadangan dihapus: '.$this->relativePath((string) $path));
+                    $this->info(
+                        '  ✓ Cadangan dihapus: '.
+                            $this->relativePath((string) $path),
+                    );
                 } catch (\Throwable $e) {
-                    $this->warn('  ⚠ Gagal menghapus cadangan '.$path.': '.$e->getMessage());
+                    $this->warn(
+                        '  ⚠ Gagal menghapus cadangan '.
+                            $path.
+                            ': '.
+                            $e->getMessage(),
+                    );
                 }
             }
         }
@@ -561,7 +671,9 @@ class PasakUninstallCommand extends Command
     {
         $base = base_path().DIRECTORY_SEPARATOR;
 
-        return str_starts_with($path, $base) ? substr($path, strlen($base)) : $path;
+        return str_starts_with($path, $base)
+            ? substr($path, strlen($base))
+            : $path;
     }
 
     /**
@@ -569,22 +681,42 @@ class PasakUninstallCommand extends Command
      */
     protected function removeComposerPackage(): void
     {
-        $composer = trim((string) shell_exec('command -v composer'));
+        $composer = $this->findComposerBinary();
 
-        if ($composer === '') {
-            $this->line('  - Composer tidak ditemukan di PATH; jalankan manual: <fg=yellow>composer remove robyajo/pasak</>');
+        if ($composer === null) {
+            $this->line(
+                '  - Composer tidak ditemukan di PATH; jalankan manual: <fg=yellow>composer remove robyajo/pasak</>',
+            );
 
             return;
         }
 
-        $this->comment('  Melepas paket via Composer (perintah ini ikut terhapus bersamanya)...');
+        $this->comment(
+            '  Melepas paket via Composer (perintah ini ikut terhapus bersamanya)...',
+        );
         $code = 0;
-        exec('composer remove robyajo/pasak --no-interaction --no-audit 2>&1', $output, $code);
+        $cmd =
+            escapeshellcmd($composer).
+            ' remove robyajo/pasak --no-interaction --no-audit 2>&1';
+        exec($cmd, $output, $code);
 
         if ($code === 0) {
             $this->info('  ✓ Paket robyajo/pasak dilepas dari composer.json.');
         } else {
-            $this->warn('  ⚠ composer remove gagal; jalankan manual: composer remove robyajo/pasak');
+            $this->warn(
+                '  ⚠ composer remove gagal; jalankan manual: composer remove robyajo/pasak',
+            );
         }
+    }
+
+    protected function findComposerBinary(): ?string
+    {
+        if (File::exists(base_path('composer.phar'))) {
+            return PHP_BINARY.' '.base_path('composer.phar');
+        }
+
+        $composer = trim((string) shell_exec('command -v composer'));
+
+        return $composer !== '' ? $composer : null;
     }
 }
