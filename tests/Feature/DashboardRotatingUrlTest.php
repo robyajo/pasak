@@ -44,7 +44,13 @@ beforeEach(function () {
                 'threat-map/feed',
                 fn () => response()->json(['ok' => true]),
             )->name('threat-map.feed');
+            Route::post(
+                'action',
+                fn () => response('ok'),
+            )->name('action');
         });
+
+    Route::getRoutes()->refreshNameLookups();
 });
 
 test('service membuat slug acak berformat pasak-token', function () {
@@ -118,10 +124,87 @@ test('reload url lama dialihkan ke url baru bukan 404', function () {
     $this->get($newPath)->assertOk();
 });
 
-test('slug asing ditolak 404 agar dashboard tersamar', function () {
-    $this->get('/pasak-zzzzzzzzzzzzzzzz/logs')->assertNotFound();
+test(
+    'reload setelah masa tenggang lewat dialihkan ke slug aktif, bukan 404',
+    function () {
+        $entry = $this->get('/pasak');
+        $firstPath = parse_url(
+            (string) $entry->headers->get('Location'),
+            PHP_URL_PATH,
+        );
+
+        $this->get($firstPath)->assertOk();
+
+        // Simulasikan halaman dibiarkan terbuka lebih dari grace_seconds.
+        session([PasakDashboardUrlService::PREV_AT_KEY => time() - 600]);
+
+        $reload = $this->get($firstPath);
+        $reload->assertRedirect();
+
+        $newPath = parse_url(
+            (string) $reload->headers->get('Location'),
+            PHP_URL_PATH,
+        );
+
+        expect((string) $newPath)
+            ->toMatch('/pasak-[A-Za-z0-9]{12,32}/')
+            ->not->toBe(trim((string) $firstPath, '/'));
+
+        $this->get($newPath)->assertOk();
+    },
+);
+
+test(
+    'slug asing pada navigasi html dialihkan ke slug aktif sesi',
+    function () {
+        $response = $this->get('/pasak-zzzzzzzzzzzzzzzz/logs');
+
+        $response->assertRedirect();
+
+        $target = (string) $response->headers->get('Location');
+
+        expect($target)->toMatch('/pasak-[A-Za-z0-9]{12,32}\\/logs/');
+
+        $this->get(parse_url($target, PHP_URL_PATH))->assertOk();
+    },
+);
+
+test('slug asing pada feed/tulisan tetap 404 agar tersamar', function () {
+    $this->get('/pasak-zzzzzzzzzzzzzzzz/threat-map/feed')->assertNotFound();
+    $this->post('/pasak-zzzzzzzzzzzzzzzz/action')->assertNotFound();
     $this->get('/pasak/logs')->assertNotFound();
 });
+
+test(
+    'mengganti secret menandatangani ulang dan URL lama tetap pulih',
+    function () {
+        config()->set('pasak.dashboard.secret', 'secret-lama-1234567890');
+
+        $entry = $this->get('/pasak');
+        $oldPath = parse_url(
+            (string) $entry->headers->get('Location'),
+            PHP_URL_PATH,
+        );
+
+        $this->get($oldPath)->assertOk();
+
+        config()->set('pasak.dashboard.secret', 'secret-baru-0987654321');
+
+        $response = $this->get($oldPath);
+        $response->assertRedirect();
+
+        $newPath = parse_url(
+            (string) $response->headers->get('Location'),
+            PHP_URL_PATH,
+        );
+
+        expect($newPath)
+            ->toMatch('/pasak-[A-Za-z0-9]{12,32}/')
+            ->not->toBe(trim((string) $oldPath, '/'));
+
+        $this->get($newPath)->assertOk();
+    },
+);
 
 test('feed polling tidak memutar token sehingga tidak balapan', function () {
     $entry = $this->get('/pasak');

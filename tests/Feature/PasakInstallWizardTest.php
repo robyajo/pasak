@@ -69,6 +69,7 @@ test('install with without-api publishes web pages but no api routes', function 
         $this->artisan('pasak:install', [
             '--without-api' => true,
             '--with-dashboard' => true,
+            '--without-env' => true,
             '--force' => true,
         ])->assertSuccessful();
 

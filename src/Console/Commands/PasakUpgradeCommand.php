@@ -5,9 +5,9 @@ namespace Internal\Pasak\Console\Commands;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\File;
-use Illuminate\Support\Str;
 use Internal\Pasak\Database\Seeders\PasakDefaultSettingsSeeder;
 use Internal\Pasak\Services\PasakVersionCheckService;
+use Internal\Pasak\Support\PasakDashboardSecret;
 use Symfony\Component\Process\Process;
 use Throwable;
 
@@ -483,22 +483,12 @@ class PasakUpgradeCommand extends Command
                 }
             }
 
-            if (
-                preg_match('/^PASAK_DASHBOARD_SECRET=\\s*$/m', $content) === 1
-            ) {
-                $content = (string) preg_replace(
-                    '/^PASAK_DASHBOARD_SECRET=\\s*$/m',
-                    'PASAK_DASHBOARD_SECRET='.Str::random(48),
-                    $content,
-                );
-            }
-
-            if (! str_contains($content, 'PASAK_DASHBOARD_SECRET=')) {
+            if (! str_contains($content, PasakDashboardSecret::ENV_KEY.'=')) {
                 $content =
                     rtrim($content).
-                    "\nPASAK_DASHBOARD_SECRET=".
-                    Str::random(48).
-                    "\n";
+                    "\n".
+                    PasakDashboardSecret::ENV_KEY.
+                    "=\n";
             }
 
             if ($content !== $original) {
@@ -507,6 +497,26 @@ class PasakUpgradeCommand extends Command
                     "  ✓ Kunci URL acak sekali pakai dashboard dilengkapi di {$envFile} (pilihan eksplisit dipertahankan).",
                 );
             }
+        }
+
+        // Nilai rahasia nyata hanya ditulis ke .env; .env.example dibiarkan
+        // kosong agar tidak ikut ter-commit.
+        $real = PasakDashboardSecret::ensureInEnvFile(
+            base_path('.env'),
+            false,
+            true,
+        );
+
+        PasakDashboardSecret::ensureInEnvFile(
+            base_path('.env.example'),
+            false,
+            false,
+        );
+
+        if ($real['generated']) {
+            $this->info(
+                '  ✓ PASAK_DASHBOARD_SECRET unik dibuat untuk berkas .env.',
+            );
         }
     }
 

@@ -2,6 +2,22 @@
 
 All notable changes to `robyajo/pasak` will be documented in this file.
 
+## [1.6.1] - 2026-10-25
+
+### Added
+
+- **Integrasi Konsol Strix AI Pentest Otonom (`ring/app-waf`)** — konsol pengujian WAF kini terintegrasi penuh dengan agent AI pentesting otonom Strix (`ghcr.io/usestrix/strix-sandbox:1.3.0`). Mendukung multi-provider LLM (Google Gemini, OpenAI ChatGPT dengan chip `gpt-5`, OpenRouter, dan OpenCode/Local AI), peluncur scan otonom dengan pembatas budget token (mulai dari $1 USD), live streaming terminal console dengan filter log dan deteksi otomatis unduhan sandbox Docker, serta tab penampil laporan kerentanan (`penetration_test_report.md` & `vulnerabilities.json`).
+- **Perintah `php artisan pasak:secret`** — membuat atau membuat ulang (`--force`) `PASAK_DASHBOARD_SECRET` pada `.env`, dengan opsi `--show` untuk menampilkan nilai dan `--path=` untuk berkas env selain `.env`. Berguna setelah deploy atau `git clone` baru: `.env.example` hanya memuat baris kosong sehingga aplikasi hasil clone belum punya rahasia; jalankan `pasak:secret` lalu `config:clear`. Didaftarkan otomatis di service provider dan didokumentasikan pada `documents/05-cli-and-automation/01-artisan-commands.md` §9.
+- **`PASAK_DASHBOARD_SECRET` kini benar-benar dipakai** — `PasakDashboardUrlService` menyimpan HMAC-SHA256 token dashboard aktif dan token "previous" di sesi, lalu memverifikasinya dengan rahasia per aplikasi. Mengganti rahasia otomatis membatalkan token lama (pengguna dialihkan mulus ke token baru, bukan 404); bila rahasia kosong (instalasi lama) validasi tetap kompatibel. Pengelola env dipusatkan di `Support\PasakDashboardSecret`.
+
+### Changed
+
+- **`pasak:install` & `pasak:upgrade` hanya menulis rahasia nyata ke `.env`** — sebelumnya nilai `PASAK_DASHBOARD_SECRET` hasil generate juga ditulis ke `.env.example` sehingga ikut ter-commit; kini `.env.example` hanya memuat baris kosong dan nilai nyata hanya ada di `.env`. `pasak:install` membuat rahasia pada setiap instalasi (selama `--without-env` tidak dipakai), termasuk saat dashboard belum diaktifkan.
+
+### Fixed
+
+- **Reload dashboard URL acak setelah masa tenggang berakhir 404** — pada mode `PASAK_DASHBOARD_ROTATING=true`, URL di address bar menjadi token "previous" segera setelah halaman disajikan, dan setelah `grace_seconds` (default 120 dtk) token itu dibuang sehingga reload beberapa menit kemudian — atau setelah 30 menit halaman dibiarkan terbuka — dijawab `404 Not Found` meski sesi login masih sah. Middleware `PasakRotatingDashboard` kini mengenali token lama milik sesi sendiri tanpa batas tenggang (via `PasakDashboardUrlService::previousSlugValue()`) lalu mengalihkan `302` ke token aktif dengan path + query dipertahankan; token asing pada navigasi HTML (mis. setelah login ulang atau sesi baru) juga dialihkan ke token aktif sesi tersebut, bukan 404. Permintaan AJAX/feed dan aksi tulis dengan token asing tetap 404 agar dashboard tetap tersamar, sedangkan aksi tulis dengan token lama yang kedaluwarsa diloloskan memakai token aktif agar formulir yang lama terbuka tidak gagal. Dijaga test regresi di paket maupun aplikasi real (`ring/pasak-yes`).
+
 ## [1.6.0] - 2026-10-24
 
 ### Added

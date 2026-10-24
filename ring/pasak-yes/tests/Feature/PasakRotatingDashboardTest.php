@@ -108,14 +108,64 @@ test(
 );
 
 test(
-    'slug asing atau tidak dikenal ditolak dengan 404 agar dashboard tersamar',
+    'reload setelah masa tenggang lewat dialihkan ke slug aktif, bukan 404',
     function () {
         $user = User::factory()->create();
 
-        // Akses slug acak yang bukan milik sesi pengguna saat ini
+        $entry = $this->actingAs($user)->get('/pasak');
+        $firstPath = parse_url(
+            (string) $entry->headers->get('Location'),
+            PHP_URL_PATH,
+        );
+
+        $this->actingAs($user)->get($firstPath)->assertStatus(200);
+
+        // Simulasikan halaman dibiarkan terbuka lebih dari grace_seconds
+        // (mis. 30 menit) lalu di-reload.
+        session([PasakDashboardUrlService::PREV_AT_KEY => time() - 1800]);
+
+        $reload = $this->actingAs($user)->get($firstPath);
+        $reload->assertStatus(302);
+
+        $location = (string) $reload->headers->get('Location');
+
+        expect($location)->toMatch('#/pasak-[A-Za-z0-9]{12,32}#');
+
+        $this->actingAs($user)
+            ->get(parse_url($location, PHP_URL_PATH))
+            ->assertStatus(200);
+    },
+);
+
+test(
+    'slug asing pada navigasi html dialihkan ke slug aktif sesi',
+    function () {
+        $user = User::factory()->create();
+
+        // Navigasi GET dengan token yang bukan milik sesi (mis. setelah
+        // login ulang / sesi baru) harus pulih, bukan berakhir 404.
         $response = $this->actingAs($user)->get('/pasak-fake123456789012/logs');
 
-        $response->assertStatus(404);
+        $response->assertStatus(302);
+
+        $location = (string) $response->headers->get('Location');
+
+        expect($location)->toMatch('#/pasak-[A-Za-z0-9]{12,32}/logs#');
+
+        $this->actingAs($user)
+            ->get(parse_url($location, PHP_URL_PATH))
+            ->assertStatus(200);
+    },
+);
+
+test(
+    'slug asing pada feed tetap 404 agar dashboard tetap tersamar',
+    function () {
+        $user = User::factory()->create();
+
+        $this->actingAs($user)
+            ->getJson('/pasak-fake123456789012/threat-map/feed')
+            ->assertStatus(404);
     },
 );
 

@@ -11,6 +11,7 @@ import ConsoleReport from "@/components/ConsoleReport";
 import PreviewModal from "@/components/PreviewModal";
 import AttackTab from "@/components/attack/AttackTab";
 import NoPasakTab from "@/components/attack/NoPasakTab";
+import StrixTab from "@/components/strix/StrixTab";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import {
     AlertDialog,
@@ -141,6 +142,10 @@ export default function App() {
             label: "Pengujian Serangan",
             badge: surface.summary.total,
         },
+        {
+            id: "strix",
+            label: "🤖 Strix AI Pentest",
+        },
     ];
 
     return (
@@ -164,12 +169,12 @@ export default function App() {
                         <AlertDescription>
                             Isi URL target dengan domain audit ber-skema{" "}
                             <code>https://</code> (mis.{" "}
-                            <code>https://dummy-api.lapeh.web.id</code>).
-                            Alur pengujian identik dengan mode lokal —
-                            termasuk verifikasi webshell tahap 4 dan
-                            eksekusi RCE (/shell). Header IP virtual
-                            hanya terbaca bila server memercayai proxy;
-                            atribusi IP bisa jatuh ke IP server.
+                            <code>https://dummy-api.lapeh.web.id</code>). Alur
+                            pengujian identik dengan mode lokal — termasuk
+                            verifikasi webshell tahap 4 dan eksekusi RCE
+                            (/shell). Header IP virtual hanya terbaca bila
+                            server memercayai proxy; atribusi IP bisa jatuh ke
+                            IP server.
                         </AlertDescription>
                     </Alert>
                 )}
@@ -218,13 +223,15 @@ export default function App() {
                             progress={waf.progress}
                         />
                     </div>
-                ) : (
+                ) : view === "attack" ? (
                     <AttackTab
                         result={waf.result}
                         findings={surface.findings}
                         sendRaw={waf.sendRaw}
                         fallbackPath={waf.form.path}
                     />
+                ) : (
+                    <StrixTab mode={mode} defaultTarget={waf.form.target} />
                 )}
 
                 <Separator className="mt-8" />
@@ -253,16 +260,19 @@ export default function App() {
                             Aktifkan mode PRODUCTION?
                         </AlertDialogTitle>
                         <AlertDialogDescription>
-                            Serangan akan mengenai server <b>NYATA</b>{" "}
-                            via <code>https://</code>. Alur pengujian
-                            sama persis seperti mode lokal. Lanjutkan
-                            hanya dengan izin audit tertulis.
+                            Serangan akan mengenai server <b>NYATA</b> via{" "}
+                            <code>https://</code>. Alur pengujian sama persis
+                            seperti mode lokal. Lanjutkan hanya dengan izin
+                            audit tertulis.
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                         <AlertDialogCancel>Batal</AlertDialogCancel>
-                        <AlertDialogAction onClick={applyProduction}>
-                            Ya, aktifkan produksi
+                        <AlertDialogAction
+                            variant="destructive"
+                            onClick={applyProduction}
+                        >
+                            Saya Punya Izin Tertulis — Lanjutkan
                         </AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>

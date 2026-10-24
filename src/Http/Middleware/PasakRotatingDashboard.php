@@ -12,10 +12,13 @@ use Symfony\Component\HttpFoundation\Response;
  *
  * - Slug aktif (current): sajikan halaman lalu putar token untuk request
  *   berikutnya (GET HTML saja) sehingga reload selalu berubah.
- * - Slug lama (previous, dalam masa tenggang): untuk GET HTML lakukan 302 ke
- *   URL aktif agar address bar ikut berubah; untuk POST/AJAX/feed cukup
- *   diloloskan tanpa rotasi agar polling & form tidak balapan.
- * - Slug asing: 404 (bukan 403) agar keberadaan dashboard tetap tersamar.
+ * - Slug lama (previous) — dalam maupun setelah masa tenggang — untuk GET HTML
+ *   lakukan 302 ke URL aktif; untuk POST/AJAX/feed cukup diloloskan tanpa
+ *   rotasi agar polling & form tidak balapan.
+ * - Slug asing pada navigasi HTML (mis. setelah login ulang / sesi baru):
+ *   302 ke token aktif sesi ini agar refresh tidak berakhir 404.
+ * - Slug asing pada AJAX/feed/aksi tulis: 404 (bukan 403) agar keberadaan
+ *   dashboard tetap tersamar.
  */
 class PasakRotatingDashboard
 {
@@ -53,8 +56,17 @@ class PasakRotatingDashboard
             return $response;
         }
 
-        if ($this->urls->isPreviousSlug($request, $slug)) {
-            $current = $this->urls->currentSlug($request);
+        // Token lama milik sesi ini — termasuk yang sudah lewat masa tenggang
+        // (mis. halaman dibiarkan terbuka lebih dari grace_seconds) — maupun
+        // token dari sesi sebelumnya (mis. setelah login ulang) harus
+        // dialihkan ke token aktif, bukan dijawab 404. Navigasi biasa tidak
+        // boleh tampak "rusak" hanya karena URL di address bar sudah basi.
+        $current = $this->urls->currentSlug($request);
+        $previous = $this->urls->previousSlugValue($request);
+
+        $isOwnPrevious = $previous !== null && hash_equals($previous, $slug);
+
+        if ($isOwnPrevious || $this->shouldRotate($request)) {
             $this->urls->applyUrlDefaults($current);
 
             if ($this->shouldRotate($request)) {

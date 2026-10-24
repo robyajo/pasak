@@ -3,6 +3,7 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
 import { createProxyHandler } from './server/proxy.js';
+import { createStrixHandler } from './server/strix.js';
 
 /**
  * Mendaftarkan proxy pengujian WAF ke dev-server (dan preview-server) Vite.
@@ -16,9 +17,11 @@ function wafTestingProxyPlugin() {
     name: 'waf-testing-proxy',
     configureServer(server) {
       server.middlewares.use(createProxyHandler());
+      server.middlewares.use(createStrixHandler());
     },
     configurePreviewServer(server) {
       server.middlewares.use(createProxyHandler());
+      server.middlewares.use(createStrixHandler());
     },
   };
 }

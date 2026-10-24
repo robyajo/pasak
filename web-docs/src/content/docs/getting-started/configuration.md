@@ -41,6 +41,8 @@ PASAK_DASHBOARD_PREFIX=pasak
 # (mis. /pasak-95856857476jdhjs5/logs lalu /pasak-634664873647jbdjshf/threat-map)
 PASAK_DASHBOARD_ROTATING=true
 PASAK_DASHBOARD_SECRET=
+# Diisi otomatis oleh `pasak:install` (hanya ke .env). Setelah clone/deploy
+# baru jalankan `php artisan pasak:secret` lalu `php artisan config:clear`.
 PASAK_DASHBOARD_TOKEN_LENGTH=16
 PASAK_DASHBOARD_SINGLE_USE=true
 PASAK_DASHBOARD_GRACE_SECONDS=120

@@ -33,6 +33,8 @@ function registerDashboardDummyRoutes(): void
     ] as $name) {
         Route::get('/__pasak_detail_'.$name, fn () => 'ok')->name('pasak.dashboard.'.$name);
     }
+
+    Route::getRoutes()->refreshNameLookups();
 }
 
 beforeEach(function () {

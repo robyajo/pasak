@@ -20,6 +20,7 @@ use Internal\Pasak\Console\Commands\PasakInstallCommand;
 use Internal\Pasak\Console\Commands\PasakPruneSecurityLogsCommand;
 use Internal\Pasak\Console\Commands\PasakPurgeInjectedDataCommand;
 use Internal\Pasak\Console\Commands\PasakScanAccessLogsCommand;
+use Internal\Pasak\Console\Commands\PasakSecretCommand;
 use Internal\Pasak\Console\Commands\PasakUnblockIpCommand;
 use Internal\Pasak\Console\Commands\PasakUninstallCommand;
 use Internal\Pasak\Console\Commands\PasakUpgradeCommand;
@@ -296,6 +297,7 @@ class PasakServiceProvider extends ServiceProvider
             PasakScanAccessLogsCommand::class,
             PasakBaselineCommand::class,
             PasakPurgeInjectedDataCommand::class,
+            PasakSecretCommand::class,
         ]);
     }
 

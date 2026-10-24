@@ -7,8 +7,8 @@ use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Str;
 use Internal\Pasak\Database\Seeders\PasakDefaultSettingsSeeder;
+use Internal\Pasak\Support\PasakDashboardSecret;
 
 class PasakInstallCommand extends Command
 {
@@ -730,12 +730,8 @@ class PasakInstallCommand extends Command
                 'PASAK_DASHBOARD_ENABLED=true',
                 $stubContent,
             );
-            // URL acak sekali pakai aktif sejak install: buat secret unik per aplikasi.
-            $stubContent = str_replace(
-                'PASAK_DASHBOARD_SECRET=',
-                'PASAK_DASHBOARD_SECRET='.Str::random(48),
-                $stubContent,
-            );
+            // Rahasia unik per aplikasi hanya ditulis ke .env (bukan
+            // .env.example) oleh PasakDashboardSecret setelah loop di bawah.
         }
 
         $stubContent =
@@ -787,11 +783,33 @@ class PasakInstallCommand extends Command
                 "  ✓ Variabel konfigurasi keamanan berhasil ditambahkan ke berkas {$envFile}.",
             );
         }
+
+        // Nilai nyata hanya untuk .env; .env.example cukup memuat baris
+        // kosong agar rahasia tidak ikut ter-commit ke repositori. Dibuat
+        // pada setiap instalasi agar deploy/clone tinggal `pasak:secret`.
+        $real = PasakDashboardSecret::ensureInEnvFile(
+            base_path('.env'),
+            false,
+            true,
+        );
+
+        PasakDashboardSecret::ensureInEnvFile(
+            base_path('.env.example'),
+            false,
+            false,
+        );
+
+        if ($real['generated']) {
+            $this->info(
+                '  ✓ PASAK_DASHBOARD_SECRET unik dibuat untuk berkas .env.',
+            );
+        }
     }
 
     /**
      * Pastikan kunci URL acak sekali pakai ada di .env lama tanpa menimpa
-     * pilihan eksplisit pengguna; secret kosong dibuatkan baru.
+     * pilihan eksplisit pengguna. Nilai secret diisi terpisah oleh
+     * PasakDashboardSecret agar hanya ditulis ke .env.
      */
     protected function ensureRotatingEnvKeys(string $content): string
     {
@@ -808,21 +826,8 @@ class PasakInstallCommand extends Command
             }
         }
 
-        if (preg_match('/^PASAK_DASHBOARD_SECRET=\s*$/m', $content) === 1) {
-            $content = (string) preg_replace(
-                '/^PASAK_DASHBOARD_SECRET=\s*$/m',
-                'PASAK_DASHBOARD_SECRET='.Str::random(48),
-                $content,
-            );
-        }
-
-        if (! str_contains($content, 'PASAK_DASHBOARD_SECRET=')) {
-            $content =
-                rtrim($content).
-                '
-PASAK_DASHBOARD_SECRET='.
-                Str::random(48).
-                "\n";
+        if (! str_contains($content, PasakDashboardSecret::ENV_KEY.'=')) {
+            $content = rtrim($content)."\n".PasakDashboardSecret::ENV_KEY."=\n";
         }
 
         return $content;

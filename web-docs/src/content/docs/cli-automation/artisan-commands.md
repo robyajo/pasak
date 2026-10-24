@@ -203,3 +203,20 @@ php artisan pasak:uninstall --force
 - `--force`: Jalankan tanpa konfirmasi interaktif.
 - `--keep-tables`: Pertahankan tabel database.
 - `--keep-env`: Pertahankan variabel `.env`.
+
+## 9. `pasak:secret`
+
+Membuat atau membuat ulang `PASAK_DASHBOARD_SECRET` pada berkas `.env`. Rahasia ini menandatangani token URL dashboard acak per aplikasi; `.env.example` sengaja dibiarkan kosong agar nilai rahasia tidak ikut ter-commit.
+
+Jalankan sekali setelah deploy atau `git clone` di server baru, lalu bersihkan cache konfigurasi:
+
+```bash
+php artisan pasak:secret
+php artisan config:clear
+```
+
+### Opsi:
+
+- `--force`: Buat ulang (regenerate) meskipun secret sudah terisi. Token dashboard lama otomatis ditandatangani ulang saat pengguna membuka `/pasak` (tidak ada 404).
+- `--show`: Tampilkan nilai secret aktif di keluaran terminal.
+- `--path=`: Berkas env tujuan selain `.env` (mis. `.env.production`).

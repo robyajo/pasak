@@ -1,3 +1,5 @@
+.env
+.env.local
 node_modules/
 dist/
 .DS_Store
@@ -7,3 +9,6 @@ dist/
 # berisi timestamp, IP acak, dan URL target — jangan masuk version control.
 report/*.json
 !report/.gitkeep
+
+# Hasil scan Strix lokal (bisa memuat temuan sensitif)
+strix_runs/

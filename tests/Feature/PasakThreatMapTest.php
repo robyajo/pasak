@@ -28,6 +28,8 @@ beforeEach(function () {
     Route::get('/__pasak_test_threat', fn () => 'ok')->name('pasak.dashboard.threat-map');
     Route::get('/__pasak_test_threat/feed', fn () => 'ok')->name('pasak.dashboard.threat-map.feed');
 
+    Route::getRoutes()->refreshNameLookups();
+
     $this->target = resource_path('views/pages/pasak');
 });
 

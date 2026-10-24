@@ -33,6 +33,8 @@ test('dashboard overview renders plain blade views when driver is blade', functi
         Route::get('/__pasak_test_'.$page, fn () => 'ok')->name('pasak.dashboard.'.$page);
     }
 
+    Route::getRoutes()->refreshNameLookups();
+
     try {
         $response = app(OverviewController::class)(
             Request::create('/__pasak_test_overview?range=week'),
@@ -71,6 +73,8 @@ test('dashboard allowed-ips page renders with entries', function () {
     Route::post('/__pasak_test_allowed', fn () => 'ok')->name('pasak.dashboard.allowed-ips.store');
     Route::patch('/__pasak_test_allowed/{id}', fn () => 'ok')->name('pasak.dashboard.allowed-ips.toggle');
     Route::delete('/__pasak_test_allowed/{id}', fn () => 'ok')->name('pasak.dashboard.allowed-ips.destroy');
+
+    Route::getRoutes()->refreshNameLookups();
 
     try {
         AllowedIp::create([
@@ -116,6 +120,8 @@ test('dashboard overview always renders blade views regardless of legacy driver 
         Route::get('/__pasak_test_'.$page, fn () => 'ok')->name('pasak.dashboard.'.$page);
     }
 
+    Route::getRoutes()->refreshNameLookups();
+
     try {
         $response = app(OverviewController::class)(
             Request::create('/__pasak_test_overview?range=week'),
@@ -144,6 +150,8 @@ test('dashboard settings page renders per-level thresholds and simulation summar
         Route::get('/__pasak_test_'.$page, fn () => 'ok')->name('pasak.dashboard.'.$page);
     }
     Route::post('/__pasak_test_settings', fn () => 'ok')->name('pasak.dashboard.settings.update');
+
+    Route::getRoutes()->refreshNameLookups();
 
     try {
         app(PasakService::class)->updateSettings([

@@ -16,7 +16,7 @@ use Internal\Pasak\Concerns\HasPasakSecurityRelations;
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, HasPasakSecurityRelations, Notifiable;
+    use HasPasakSecurityRelations, HasFactory, Notifiable;
 
     /**
      * Get the attributes that should be cast.
