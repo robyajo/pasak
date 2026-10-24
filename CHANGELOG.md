@@ -30,7 +30,7 @@ All notable changes to `robyajo/pasak` will be documented in this file.
 
 - **Threat Map — peta live lintasan penyerang menuju server**: halaman dashboard Blade baru (`/pasak/threat-map`, blindon `Threat Map` di sidebar) yang menggambar bola dunia interaktif: kulit negara memakai UNAD, panar lintasan serangan berwarna sesuai tingkat ancaman dari asal geografis IP penyerang menuju titik server yang dipantau, gelombang kejut saat kena, serta panel _real-time intrusion logs_ berisi lokasi kota/negara, IP, deskripsi aturan, path, dan status blokir dari `pasak_logs` riil 24 jam terakhir (top attacker per IP).
 - **Live feed real-time**: `GET /pasak/threat-map/feed` mengembalikan JSON log serangan terbaru (default 20) sejak id terakhir (`?after=`), rincian statistik hari ini, dan lokasi geoIP per IP; halaman memandu polling (pembacaan berulang) tiap 8 detik dan menumbuhkan arka baru seketika saat serangan masuk tanpa reload halaman.
-- **Resolver geoIP dipakai bersama**: lokasi IP penyerang memakai `PasakUserLoginService::resolveLocation()` dengan cache 30 hari yang sama seperti perekam sesi sehingga hemat panggilan API; IP lokal/intranet otomatis dipetakan ke Pekanbaru.
+- **Resolver geoIP dipakai bersama**: lokasi IP penyerang memakai `PasakUserLoginService::resolveLocation()` dengan cache 30 hari yang sama seperti perekam sesi sehingga hemat panggilan API; IP lokal/intranet otomatis dipetakan ke koordinat pusat server default.
 - **Konfigurasi peta**: kunci `pasak.dashboard.threat_map.*` + env `PASAK_DASHBOARD_TARGET_NAME|LAT|LON`, `PASAK_DASHBOARD_MAP_WINDOW_HOURS` (default 24), `PASAK_DASHBOARD_MAP_MAX_ORIGINS` (10), `PASAK_DASHBOARD_MAP_REFRESH_SECONDS` (8) untuk menyetel jendela data, jumlah asal panah, cadence polling, dan titik server.
 - **Rute dashboard**: `Route::get('threat-map')` → `PasakThreatMapController::index` (halaman) + `threat-map/feed` → `feed` (JSON) pada `routes/pasak-dashboard-blade.php` dan stub `pasak-blade.php.stub`, dilindungi middleware `web`+`auth` sama seperti seluruh halaman dashboard; item navigasi sidebar dilindungi `@if (\Route::has(...))` agar aman bagi berkas layout host yang lama.
 - **Pengingat upgrade untuk menu baru**: `pasak:upgrade` kini memeriksa penanda `pasak.dashboard.threat-map` pada `layout.blade.php` terpublikasi dan memperingatkan menjalankan `--sync-views` (dengan pencadangan otomatis) bila menu Threat Map belum ada.
@@ -183,7 +183,7 @@ All notable changes to `robyajo/pasak` will be documented in this file.
 
 ### Added
 
-- **Interactive install wizard** (`php artisan pasak:install`): language choice (ID default / EN, `--lang`), API-only mode (`--api-only`: core + security, no pages or web dashboard routes), starterkit picker (Livewire / React / both / none, skipped for API-only), environment readiness check (PHP, Laravel, DB, `.env`), optional immediate `php artisan migrate`, and numbered next steps each with a docs link to `https://security-dev.pekanbaru.go.id/`.
+- **Interactive install wizard** (`php artisan pasak:install`): language choice (ID default / EN, `--lang`), API-only mode (`--api-only`: core + security, no pages or web dashboard routes), starterkit picker (Livewire / React / both / none, skipped for API-only), environment readiness check (PHP, Laravel, DB, `.env`), optional immediate `php artisan migrate`, and numbered next steps each with a docs link to `https://pasak.is-a.dev/`.
 - New `--with-tsx`, `--with-both`, `--stack` handling unified with the wizard.
 
 ## [1.1.0] - 2026-10-11

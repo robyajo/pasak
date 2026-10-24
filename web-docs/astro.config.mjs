@@ -11,7 +11,7 @@ export default defineConfig({
     //   - Ganti 'site' dengan domain Anda (dipakai canonical + sitemap).
     //   - Untuk deploy pada sub-path (mis. https://example.com/docs/),
     //     tambahkan baris:  base: '/docs'
-    site: process.env.SITE_URL || "https://security-dev.pekanbaru.go.id",
+    site: process.env.SITE_URL || "https://pasak.is-a.dev",
 
     // Muat awal halaman tujuan saat tautan mulai terlihat (navigasi terasa instan).
     prefetch: true,
@@ -33,7 +33,7 @@ export default defineConfig({
                 root: { label: "Bahasa Indonesia", lang: "id" },
             },
             description:
-                "Dokumentasi resmi robyajo/pasak (Bulwark) — WAF mandiri, karantina perangkat, proteksi login bertingkat, dashboard monitoring Pure Vanilla CSS, pemindai webshell, dan REST API headless untuk Laravel 10–13. Keamanan Siber & Informasi Pemerintah Kota Pekanbaru (security-dev.pekanbaru.go.id).",
+                "Dokumentasi resmi robyajo/pasak (Bulwark) — WAF mandiri, karantina perangkat, proteksi login bertingkat, dashboard monitoring Pure Vanilla CSS, pemindai webshell, dan REST API headless untuk Laravel 10–13. Solusi Keamanan Siber Aplikasi Web Modern & Infrastruktur Produksi.",
             logo: { src: "./src/assets/logo.svg", alt: "Pasak" },
             favicon: "/favicon.svg",
             social: [

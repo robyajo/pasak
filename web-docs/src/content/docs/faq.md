@@ -1,6 +1,6 @@
 ---
 title: "Pertanyaan Umum (FAQ)"
-description: "Jawaban atas pertanyaan umum seputar Pasak Security, perlindungan Laravel, dan cara mengatasi serangan pada aplikasi web termasuk aplikasi pemerintah."
+description: "Jawaban atas pertanyaan umum seputar Pasak Security, perlindungan Laravel, dan cara mengatasi serangan pada aplikasi web termasuk aplikasi enterprise."
 sidebar:
   order: 99
 head:
@@ -39,10 +39,10 @@ head:
           },
           {
             "@type": "Question",
-            "name": "Bagaimana cara mengatasi serangan pada aplikasi pemerintah?",
+            "name": "Bagaimana cara mengatasi serangan pada aplikasi web enterprise?",
             "acceptedAnswer": {
               "@type": "Answer",
-              "text": "Cara mengatasi serangan pada aplikasi pemerintah dimulai dari pengerasan berlapis: WAF dan auto-block di level HTTP, proteksi akun terhadap credential stuffing, audit integritas server (baseline SHA-256 dan pemindai webshell), konfigurasi Nginx/Apache yang diperkeras, serta prosedur banding IP terblokir yang transparan. Pasak dirancang untuk pola kebutuhan keamanan aplikasi pemerintah tersebut dan dapat dipasang tanpa mengubah frontend yang sudah berjalan."
+              "text": "Cara mengatasi serangan pada aplikasi web enterprise dimulai dari pengerasan berlapis: WAF dan auto-block di level HTTP, proteksi akun terhadap credential stuffing, audit integritas server (baseline SHA-256 dan pemindai webshell), konfigurasi Nginx/Apache yang diperkeras, serta prosedur banding IP terblokir yang transparan. Pasak dirancang untuk pola kebutuhan keamanan aplikasi enterprise tersebut dan dapat dipasang tanpa mengubah frontend yang sudah berjalan."
             }
           },
           {
@@ -58,7 +58,7 @@ head:
             "name": "Apakah Pasak Security gratis?",
             "acceptedAnswer": {
               "@type": "Answer",
-              "text": "Ya. robyajo/pasak berlisensi MIT dan gratis dipakai, termasuk untuk aplikasi pemerintah dan komersial. Instalasi: composer require robyajo/pasak."
+              "text": "Ya. robyajo/pasak berlisensi MIT dan gratis dipakai, termasuk untuk aplikasi enterprise dan komersial. Instalasi: composer require robyajo/pasak."
             }
           }
         ]
@@ -71,7 +71,7 @@ Pertanyaan yang sering diajukan seputar **Pasak Security**, **perlindungan Larav
     <a href="#apa-itu-pasak-security" class="pk-chip">Apa itu Pasak?</a>
     <a href="#bagaimana-cara-mengatasi-serangan-pada-aplikasi-laravel" class="pk-chip">Serangan Laravel</a>
     <a href="#bagaimana-perlindungan-laravel-dari-serangan-brute-force" class="pk-chip">Brute Force</a>
-    <a href="#bagaimana-cara-mengatasi-serangan-pada-aplikasi-pemerintah" class="pk-chip">Aplikasi Pemerintah</a>
+    <a href="#bagaimana-cara-mengatasi-serangan-pada-aplikasi-web-enterprise" class="pk-chip">Aplikasi Enterprise</a>
     <a href="#apakah-pasak-security-gratis" class="pk-chip">Gratis?</a>
 </div>
 
@@ -94,9 +94,9 @@ Paket `robyajo/pasak` menyediakan semuanya lewat satu perintah: `php artisan pas
 
 **Perlindungan Laravel** dari brute force pada Pasak memakai *stepped login throttling*: kegagalan login beruntun memicu lockout 1 menit, 5 menit, 15 menit, 1 jam, hingga 24 jam, dikombinasikan dengan karantina IP atau perangkat otomatis. Lihat [Login Throttling Bertingkat](security-modules/stepped-login-throttling/).
 
-## Bagaimana cara mengatasi serangan pada aplikasi pemerintah?
+## Bagaimana cara mengatasi serangan pada aplikasi web enterprise?
 
-**Cara mengatasi serangan pada aplikasi pemerintah** dimulai dari pengerasan berlapis: WAF dan auto-block di level HTTP, proteksi akun terhadap credential stuffing, audit integritas server, konfigurasi Nginx/Apache yang diperkeras, serta prosedur banding IP terblokir yang transparan. Karena tanpa build step, Pasak dapat dipasang pada **aplikasi pemerintah** yang sudah berjalan tanpa mengubah frontend yang ada. Lihat [Checklist Produksi](webserver-hardening/production-checklist/).
+**Cara mengatasi serangan pada aplikasi web enterprise** dimulai dari pengerasan berlapis: WAF dan auto-block di level HTTP, proteksi akun terhadap credential stuffing, audit integritas server, konfigurasi Nginx/Apache yang diperkeras, serta prosedur banding IP terblokir yang transparan. Karena tanpa build step, Pasak dapat dipasang pada **aplikasi web produksi** yang sudah berjalan tanpa mengubah frontend yang ada. Lihat [Checklist Produksi](webserver-hardening/production-checklist/).
 
 ## Apakah Pasak cocok untuk keamanan aplikasi skala enterprise?
 
@@ -104,7 +104,7 @@ Ya. Pasak mendukung Laravel 10–13 dan PHP 8.2–8.5, siap headless (REST API m
 
 ## Apakah Pasak Security gratis?
 
-Ya. `robyajo/pasak` berlisensi MIT dan gratis dipakai, termasuk untuk aplikasi pemerintah dan komersial:
+Ya. `robyajo/pasak` berlisensi MIT dan gratis dipakai, termasuk untuk aplikasi enterprise dan komersial:
 
 ```bash
 composer require robyajo/pasak

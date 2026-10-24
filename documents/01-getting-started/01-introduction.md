@@ -2,7 +2,7 @@
 
 ## Latar Belakang
 
-Dalam pengembangan aplikasi berbasis Laravel modern di lingkungan enterprise dan instansi pemerintah, tantangan keamanan web tidak lagi terbatas pada pencegahan SQL Injection dasar. Laporan audit pentest (penetration testing) dan serangan siber nyata sering kali mengeksploitasi celah tingkat lanjut:
+Dalam pengembangan aplikasi berbasis Laravel modern di lingkungan enterprise dan aplikasi skala enterprise, tantangan keamanan web tidak lagi terbatas pada pencegahan SQL Injection dasar. Laporan audit pentest (penetration testing) dan serangan siber nyata sering kali mengeksploitasi celah tingkat lanjut:
 
 1. **Uji Penetrasi Agresif & Residual Payload**: Pentester kerap menyuntikkan payload SSTI (`{{7*7}}`), path traversal (`../../../public/`), dan probe file `.env` atau `.htaccess` yang tersimpan di basis data lalu merusak tampilan pengguna normal.
 2. **Unggahan Gambar Polyglot & Webshell**: Mengunggah berkas gambar valid (JPEG/PNG) yang disisipi tag PHP (`<?php ... ?>`) atau SVG berisi kode JavaScript XSS untuk melewati validasi `mimes:jpg,png`.

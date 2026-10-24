@@ -44,23 +44,15 @@ if (segments.length > 0 && !isHome) {
   });
 }
 
-// Daftar Kata Kunci Lengkap untuk SEO (Termasuk Kota Pekanbaru & Cybersecurity)
+// Daftar Kata Kunci Lengkap untuk SEO & Cybersecurity
 const allKeywords = [
-  // Entitas Kota Pekanbaru & Pemerintah (Kominfo)
-  'pekanbaru',
-  'kota pekanbaru',
-  'pemko pekanbaru',
-  'pemerintah kota pekanbaru',
-  'kominfo pekanbaru',
-  'diskominfo pekanbaru',
-  'dinas komunikasi informatika statistik dan persandian kota pekanbaru',
-  'security-dev.pekanbaru.go.id',
-  'keamanan siber pekanbaru',
-  'keamanan informasi pekanbaru',
-  'csirt pekanbaru',
-  'pekanbaru go id',
-  'aplikasi pekanbaru go id',
-  'portal keamanan pekanbaru',
+  // Ekosistem Keamanan Web & Laravel
+  'enterprise web security',
+  'cloud application firewall',
+  'threat prevention system',
+  'web application firewall',
+  'laravel cyber security',
+  'api security firewall',
 
   // Brand & Identitas Paket
   'pasak',
@@ -127,9 +119,9 @@ const websiteSchema = {
   '@context': 'https://schema.org',
   '@type': 'WebSite',
   name: 'Pasak',
-  alternateName: ['Bulwark', 'robyajo/pasak', 'Security Pekanbaru', 'Laravel Security Pekanbaru', 'Diskominfo Pekanbaru Security'],
+  alternateName: ['Bulwark', 'robyajo/pasak', 'Laravel WAF Security', 'Enterprise Laravel Firewall'],
   url: siteOrigin + '/',
-  description: 'Dokumentasi resmi robyajo/pasak (Bulwark) — Enterprise Headless Web Application Firewall & Audit Library untuk Laravel. Layanan Keamanan Sistem Informasi & Siber Kota Pekanbaru (security-dev.pekanbaru.go.id).',
+  description: 'Dokumentasi resmi robyajo/pasak (Bulwark) — Enterprise Headless Web Application Firewall & Audit Library untuk Laravel. Solusi Keamanan Siber Aplikasi Web Modern & Infrastruktur Produksi.',
   inLanguage: 'id-ID',
   keywords: allKeywords,
 };
@@ -239,12 +231,9 @@ const breadcrumbSchema = breadcrumbItems.length > 1 && !isNotFound ? {
   ? <meta name="robots" content="noindex, nofollow" />
   : <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />}
 
-<!-- Geo & Local SEO Tags (Kota Pekanbaru, Riau, Indonesia) -->
-<meta name="geo.region" content="ID-RI" />
-<meta name="geo.placename" content="Pekanbaru" />
-<meta name="geo.position" content="0.5071;101.4478" />
-<meta name="ICBM" content="0.5071, 101.4478" />
-<meta name="coverage" content="Indonesia, Kota Pekanbaru, Riau" />
+<!-- Global Distribution Tags -->
+<meta name="geo.region" content="ID" />
+<meta name="coverage" content="Worldwide" />
 <meta name="distribution" content="Global" />
 
 <!-- Structured Data (Schema.org JSON-LD) -->

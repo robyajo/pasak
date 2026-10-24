@@ -6,4 +6,4 @@ User-agent: *
 Allow: /
 
 # Directives for search engine optimization
-Sitemap: https://security-dev.pekanbaru.go.id/sitemap-index.xml
+Sitemap: https://pasak.is-a.dev/sitemap-index.xml

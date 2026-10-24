@@ -19,9 +19,9 @@ Memungkinkan klien yang terblokir mengajukan permohonan banding kepada administr
     ```json
     {
         "name": "Budi Santoso",
-        "email": "budi.santoso@pekanbaru.go.id",
+        "email": "budi.santoso@example.com",
         "phone": "081234567890",
-        "reason": "Saya sedang mencoba mengunggah dokumen PDF laporan dinas, namun tiba-tiba koneksi terputus dan muncul pesan terblokir dengan referensi SEC-9A8B7C6D."
+        "reason": "Saya sedang mencoba mengunggah dokumen PDF laporan kerja, namun tiba-tiba koneksi terputus dan muncul pesan terblokir dengan referensi SEC-9A8B7C6D."
     }
     ```
 
@@ -44,7 +44,7 @@ Memungkinkan klien yang terblokir mengajukan permohonan banding kepada administr
         "ticket_number": "TKT-AB82C71E",
         "ip_address": "103.11.22.45",
         "name": "Budi Santoso",
-        "email": "budi.santoso@pekanbaru.go.id",
+        "email": "budi.santoso@example.com",
         "status": "pending",
         "created_at": "2026-10-02T00:20:00.000000Z"
     }

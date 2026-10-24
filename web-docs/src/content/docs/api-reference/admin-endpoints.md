@@ -237,7 +237,7 @@ Allowlist global yang dikelola admin: IP, wildcard (`192.168.1.*`), atau CIDR (`
   ```json
   {
       "action": "approve",
-      "admin_notes": "Blokir dibuka setelah validasi identitas via WhatsApp dinas."
+      "admin_notes": "Blokir dibuka setelah validasi identitas via saluran bantuan resmi."
   }
   ```
 - **Aksi Otomatis**: Jika `action` adalah `approve`, sistem langsung memanggil `unblockIp()` untuk membuka karantina pada IP/perangkat terkait.

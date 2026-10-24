@@ -12,7 +12,7 @@ Salah satu kelemahan terbesar sistem WAF dan fail2ban tradisional adalah keterga
 ## 1. Masalah IP Bersama (Shared NAT Problem)
 
 Bayangkan skenario berikut:
-- Sebuah kantor dinas memiliki 300 staf yang bekerja menggunakan satu router internet bersama dengan IP publik `103.11.22.33`.
+- Sebuah kantor cabang memiliki 300 staf yang bekerja menggunakan satu router internet bersama dengan IP publik `103.11.22.33`.
 - Salah satu komputer staf terinfeksi malware atau seorang pengguna nakal mencoba melakukan scanning kerentanan (`sqlmap`).
 - WAF konvensional mendeteksi serangan dari IP `103.11.22.33` dan memblokirnya.
 - **Dampak Fatal**: 299 staf lainnya yang sedang melayani masyarakat tiba-tiba terputus dari sistem (*collateral damage*).

@@ -1,6 +1,6 @@
 ---
 title: "Indeks Topik & Kata Kunci"
-description: "Indeks topik dokumentasi Pasak Security: perlindungan Laravel, cara mengatasi serangan siber, keamanan aplikasi pemerintah, WAF, brute force, webshell, dan REST API."
+description: "Indeks topik dokumentasi Pasak Security: perlindungan Laravel, cara mengatasi serangan siber, keamanan aplikasi enterprise, WAF, brute force, webshell, dan REST API."
 sidebar:
   order: 98
 ---
@@ -10,7 +10,7 @@ Jelajahi dokumentasi **Pasak Security** berdasarkan topik. Setiap kata kunci men
 <div class="pk-chip-row">
     <a href="#laravel-security--pasak-security" class="pk-chip pk-chip-sky">Laravel Security</a>
     <a href="#perlindungan-laravel--keamanan-aplikasi" class="pk-chip pk-chip-emerald">Perlindungan Laravel</a>
-    <a href="#cara-mengatasi-serangan--aplikasi-pemerintah" class="pk-chip pk-chip-amber">Cara Mengatasi Serangan</a>
+    <a href="#cara-mengatasi-serangan--aplikasi-enterprise" class="pk-chip pk-chip-amber">Cara Mengatasi Serangan</a>
     <a href="#integrasi--otomasi" class="pk-chip pk-chip-indigo">Integrasi &amp; Otomasi</a>
 </div>
 
@@ -30,9 +30,9 @@ Jelajahi dokumentasi **Pasak Security** berdasarkan topik. Setiap kata kunci men
 - [Keamanan Server & Webshell](security-modules/server-security-and-webshells/) — baseline SHA-256 dan pemindai webshell untuk **keamanan aplikasi**.
 - [Sesi & Aktivitas](security-modules/session-and-activity-tracking/) — pantau pengguna aktif dan cabut sesi.
 
-## Cara Mengatasi Serangan & Aplikasi Pemerintah
+## Cara Mengatasi Serangan & Aplikasi Enterprise
 
-- [Checklist Produksi](webserver-hardening/production-checklist/) — langkah peluncuran aman untuk **aplikasi pemerintah**.
+- [Checklist Produksi](webserver-hardening/production-checklist/) — langkah peluncuran aman untuk **aplikasi web enterprise**.
 - [Hardening Nginx](webserver-hardening/nginx-hardened-waf/) — rate limit dan eksekusi PHP ketat.
 - [Hardening Apache](webserver-hardening/apache-htaccess-hardening/) — pertahanan webshell dan double extension.
 - [Access Log Streaming](security-modules/access-log-streaming/) — **cara mengatasi serangan** yang tidak sampai ke PHP.

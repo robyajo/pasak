@@ -50,7 +50,7 @@ Authorization: Bearer <admin-token>
             "user": {
                 "id": 4,
                 "name": "Budi Santoso",
-                "email": "budi@pekanbaru.go.id"
+                "email": "budi.santoso@example.com"
             }
         }
     ]

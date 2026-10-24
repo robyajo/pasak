@@ -4,7 +4,7 @@
 > headless untuk Laravel (PHP ^8.2–^8.5, Laravel ^10–^13). 100% Pure PHP, tanpa NPM.
 > Paket: robyajo/pasak (MIT). Bahasa: Indonesia.
 
-- Situs: https://security-dev.pekanbaru.go.id/
+- Situs: https://pasak.is-a.dev/
 - GitHub: https://github.com/robyajo/pasak
 - Packagist: https://packagist.org/packages/robyajo/pasak
 - Instalasi: `composer require robyajo/pasak` lalu `php artisan pasak:install`
@@ -12,36 +12,36 @@
 ## Panduan
 
 - Memulai:
-  - https://security-dev.pekanbaru.go.id/getting-started/introduction/
-  - https://security-dev.pekanbaru.go.id/getting-started/installation/
-  - https://security-dev.pekanbaru.go.id/getting-started/configuration/
+  - https://pasak.is-a.dev/getting-started/introduction/
+  - https://pasak.is-a.dev/getting-started/installation/
+  - https://pasak.is-a.dev/getting-started/configuration/
 - Arsitektur inti:
-  - https://security-dev.pekanbaru.go.id/core-architecture/threat-detection-engine/
-  - https://security-dev.pekanbaru.go.id/core-architecture/device-quarantine/
-  - https://security-dev.pekanbaru.go.id/core-architecture/reverse-proxy-resolution/
-  - https://security-dev.pekanbaru.go.id/core-architecture/models-and-database/
+  - https://pasak.is-a.dev/core-architecture/threat-detection-engine/
+  - https://pasak.is-a.dev/core-architecture/device-quarantine/
+  - https://pasak.is-a.dev/core-architecture/reverse-proxy-resolution/
+  - https://pasak.is-a.dev/core-architecture/models-and-database/
 - Modul keamanan:
-  - https://security-dev.pekanbaru.go.id/security-modules/stepped-login-throttling/
-  - https://security-dev.pekanbaru.go.id/security-modules/server-security-and-webshells/
-  - https://security-dev.pekanbaru.go.id/security-modules/access-log-streaming/
-  - https://security-dev.pekanbaru.go.id/security-modules/appeal-tickets-system/
-  - https://security-dev.pekanbaru.go.id/security-modules/session-and-activity-tracking/
+  - https://pasak.is-a.dev/security-modules/stepped-login-throttling/
+  - https://pasak.is-a.dev/security-modules/server-security-and-webshells/
+  - https://pasak.is-a.dev/security-modules/access-log-streaming/
+  - https://pasak.is-a.dev/security-modules/appeal-tickets-system/
+  - https://pasak.is-a.dev/security-modules/session-and-activity-tracking/
 - REST API:
-  - https://security-dev.pekanbaru.go.id/api-reference/api-overview/
-  - https://security-dev.pekanbaru.go.id/api-reference/public-endpoints/
-  - https://security-dev.pekanbaru.go.id/api-reference/user-endpoints/
-  - https://security-dev.pekanbaru.go.id/api-reference/admin-endpoints/
+  - https://pasak.is-a.dev/api-reference/api-overview/
+  - https://pasak.is-a.dev/api-reference/public-endpoints/
+  - https://pasak.is-a.dev/api-reference/user-endpoints/
+  - https://pasak.is-a.dev/api-reference/admin-endpoints/
 - CLI & otomasi:
-  - https://security-dev.pekanbaru.go.id/cli-automation/artisan-commands/
-  - https://security-dev.pekanbaru.go.id/cli-automation/scheduled-tasks/
+  - https://pasak.is-a.dev/cli-automation/artisan-commands/
+  - https://pasak.is-a.dev/cli-automation/scheduled-tasks/
 - Hardening web server:
-  - https://security-dev.pekanbaru.go.id/webserver-hardening/nginx-hardened-waf/
-  - https://security-dev.pekanbaru.go.id/webserver-hardening/apache-htaccess-hardening/
-  - https://security-dev.pekanbaru.go.id/webserver-hardening/production-checklist/
+  - https://pasak.is-a.dev/webserver-hardening/nginx-hardened-waf/
+  - https://pasak.is-a.dev/webserver-hardening/apache-htaccess-hardening/
+  - https://pasak.is-a.dev/webserver-hardening/production-checklist/
 - Integrasi:
-  - https://security-dev.pekanbaru.go.id/integration-guides/frontend-react-inertia/
-  - https://security-dev.pekanbaru.go.id/integration-guides/frontend-blade-livewire/
-  - https://security-dev.pekanbaru.go.id/integration-guides/custom-rules-and-whitelist/
-- Changelog: https://security-dev.pekanbaru.go.id/changelog/
-- Indeks kata kunci: https://security-dev.pekanbaru.go.id/keywords/
-- FAQ (Pasak Security, perlindungan Laravel, cara mengatasi serangan): https://security-dev.pekanbaru.go.id/faq/
+  - https://pasak.is-a.dev/integration-guides/frontend-react-inertia/
+  - https://pasak.is-a.dev/integration-guides/frontend-blade-livewire/
+  - https://pasak.is-a.dev/integration-guides/custom-rules-and-whitelist/
+- Changelog: https://pasak.is-a.dev/changelog/
+- Indeks kata kunci: https://pasak.is-a.dev/keywords/
+- FAQ (Pasak Security, perlindungan Laravel, cara mengatasi serangan): https://pasak.is-a.dev/faq/

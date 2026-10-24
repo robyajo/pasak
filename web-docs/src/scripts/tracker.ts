@@ -5,7 +5,7 @@
  *   POST /api/master/visitors
  *
  * Konfigurasi (opsional via env web):
- *   PUBLIC_VISITOR_API_URL  = URL endpoint API (default: https://superapp-api.pekanbaru.go.id/api/master/visitors)
+ *   PUBLIC_VISITOR_API_URL  = URL endpoint API (default: )
  *   PUBLIC_VISITOR_SITE_ID  = Identifier situs (default: pasak)
  */
 
@@ -16,9 +16,7 @@ interface VisitorPayload {
   device?: 'desktop' | 'mobile' | 'tablet' | 'bot' | 'unknown';
 }
 
-const DEFAULT_API_URL =
-  import.meta.env.PUBLIC_VISITOR_API_URL ||
-  'https://superapp-api.pekanbaru.go.id/api/master/visitors';
+const DEFAULT_API_URL = import.meta.env.PUBLIC_VISITOR_API_URL || '';
 
 const SITE_ID =
   import.meta.env.PUBLIC_VISITOR_SITE_ID || 'pasak';

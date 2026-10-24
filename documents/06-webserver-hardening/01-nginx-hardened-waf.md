@@ -220,7 +220,7 @@ add_header Permissions-Policy "camera=(), microphone=(), geolocation=()" always;
 
 ## 10. Konfigurasi Lengkap Produksi
 
-Template siap pakai di atas telah dikemas secara terintegrasi di dalam [`stubs/nginx.conf.stub`](file:///Users/robykartis/Documents/KOMINFO/GITHUB/PHP/laravel-security/pasak/stubs/nginx.conf.stub) dan dapat dipublikasikan ke aplikasi Laravel Anda melalui:
+Template siap pakai di atas telah dikemas secara terintegrasi di dalam [`stubs/nginx.conf.stub`](stubs/nginx.conf.stub) dan dapat dipublikasikan ke aplikasi Laravel Anda melalui:
 
 ```bash
 php artisan pasak:install

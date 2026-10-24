@@ -166,7 +166,7 @@ export const AppealTicketModal: React.FC<{
             </div>
             <div>
                 <label className="block text-xs font-medium">
-                    Email Dinas / Aktif
+                    Email Kerja / Aktif
                 </label>
                 <input
                     required
