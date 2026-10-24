@@ -2,11 +2,17 @@
 
 All notable changes to `robyajo/pasak` will be documented in this file.
 
+## [1.6.0] - 2026-10-24
+
+### Added
+
+- **URL dashboard acak sekali pakai (moving-target, berubah tiap reload)**: saat dashboard dipasang, `pasak:install` kini mengaktifkan `PASAK_DASHBOARD_ROTATING=true` + membangkitkan `PASAK_DASHBOARD_SECRET` unik per aplikasi. Pintu stabil `/pasak` selalu 302 ke `/pasak-{token}/` milik sesi tiap pengguna (mis. `http://localhost:8000/pasak-95856857476jdhjs5/logs`, lalu `http://localhost:8000/pasak-634664873647jbdjshf/threat-map`); token 16 karakter diputar setiap halaman HTML sehingga reload browser selalu berganti URL. URL lama hidup selama masa tenggang `PASAK_DASHBOARD_GRACE_SECONDS` (120 dtk, agar polling `threat-map/feed` & submit form tidak balapan) lalu dialihkan ke URL baru; slug asing dijawab 404 agar dashboard tersamar. Seluruh `route('pasak.dashboard.*')` di Blade otomatis memakai token terbaru tanpa mengubah view (via `URL::defaults`). Kunci baru `pasak.dashboard.{rotating,secret,token_length,single_use,grace_seconds}` + env `PASAK_DASHBOARD_*`, middleware `pasak.rotating` (`PasakRotatingDashboard`), layanan `PasakDashboardUrlService`, dan kontroler pintu masuk `PasakDashboardEntryController`; host berkas rute lama memperolehnya via `pasak:upgrade --sync-routes`. Nonaktifkan (`PASAK_DASHBOARD_ROTATING=false`) untuk kembali ke prefix statis.
+
 ## [1.5.0] - 2026-10-22
 
 ### Added
 
-- **Threat Map — peta live lintasan penyerang menuju server**: halaman dashboard Blade baru (`/pasak/threat-map`, blindon `Threat Map` di sidebar) yang menggambar bola dunia interaktif: kulit negara memakai UNAD, panar lintasan serangan berwarna sesuai tingkat ancaman dari asal geografis IP penyerang menuju titik server yang dipantau, gelombang kejut saat kena, serta panel *real-time intrusion logs* berisi lokasi kota/negara, IP, deskripsi aturan, path, dan status blokir dari `pasak_logs` riil 24 jam terakhir (top attacker per IP).
+- **Threat Map — peta live lintasan penyerang menuju server**: halaman dashboard Blade baru (`/pasak/threat-map`, blindon `Threat Map` di sidebar) yang menggambar bola dunia interaktif: kulit negara memakai UNAD, panar lintasan serangan berwarna sesuai tingkat ancaman dari asal geografis IP penyerang menuju titik server yang dipantau, gelombang kejut saat kena, serta panel _real-time intrusion logs_ berisi lokasi kota/negara, IP, deskripsi aturan, path, dan status blokir dari `pasak_logs` riil 24 jam terakhir (top attacker per IP).
 - **Live feed real-time**: `GET /pasak/threat-map/feed` mengembalikan JSON log serangan terbaru (default 20) sejak id terakhir (`?after=`), rincian statistik hari ini, dan lokasi geoIP per IP; halaman memandu polling (pembacaan berulang) tiap 8 detik dan menumbuhkan arka baru seketika saat serangan masuk tanpa reload halaman.
 - **Resolver geoIP dipakai bersama**: lokasi IP penyerang memakai `PasakUserLoginService::resolveLocation()` dengan cache 30 hari yang sama seperti perekam sesi sehingga hemat panggilan API; IP lokal/intranet otomatis dipetakan ke Pekanbaru.
 - **Konfigurasi peta**: kunci `pasak.dashboard.threat_map.*` + env `PASAK_DASHBOARD_TARGET_NAME|LAT|LON`, `PASAK_DASHBOARD_MAP_WINDOW_HOURS` (default 24), `PASAK_DASHBOARD_MAP_MAX_ORIGINS` (10), `PASAK_DASHBOARD_MAP_REFRESH_SECONDS` (8) untuk menyetel jendela data, jumlah asal panah, cadence polling, dan titik server.
@@ -310,7 +316,7 @@ All notable changes to `robyajo/pasak` will be documented in this file.
   - Added dedicated Security Settings dashboard page accessible via `/security/settings` in both Livewire (`pages/security/settings.blade.php`) and React (`pages/security/settings.tsx`).
   - Added Settings link (⚙️) to the sidebar navigation in both Blade and React dashboard layouts.
   - Interactive radio cards allowing administrators to configure blocking scope with clear visual guidance:
-    - **Isolasi Perangkat Saja (`device`)** *(Default / Rekomendasi)*: Only quarantines the offending device based on Device ID / Fingerprint / LAN IP, keeping innocent users sharing the same WiFi or NAT router completely safe.
+    - **Isolasi Perangkat Saja (`device`)** _(Default / Rekomendasi)_: Only quarantines the offending device based on Device ID / Fingerprint / LAN IP, keeping innocent users sharing the same WiFi or NAT router completely safe.
     - **Seluruh IP Router Publik (`ip`)**: Quarantines the entire public router IP address.
   - Dynamic configuration controls for:
     - Automatic blocking scope (`auto_block_scope`: `device` or `ip`)
@@ -410,6 +416,7 @@ All notable changes to `robyajo/pasak` will be documented in this file.
   `/api/security/captcha` endpoints, the `security.captcha` config block, and
   the `CAPTCHA_*` environment variables. Login brute-force protection is still
   provided by the multi-tier stepped login lockout.
+
 ## [1.1.3] - 2026-10-03
 
 ### Added

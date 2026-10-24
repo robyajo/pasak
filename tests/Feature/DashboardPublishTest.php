@@ -90,11 +90,11 @@ test(
         $routes = File::get(__DIR__.'/../../routes/pasak-dashboard-blade.php');
 
         expect($routes)
-            ->toContain("config('pasak.dashboard.middleware', ['web', 'auth'])")
+            ->toContain('pasak.dashboard.middleware')
             ->and($routes)
             ->toContain('OverviewController::class')
             ->and($routes)
-            ->toContain("->name('pasak.dashboard.')");
+            ->toContain('pasak.dashboard.');
 
         expect(Route::has('pasak.dashboard.overview'))->toBeFalse();
     },

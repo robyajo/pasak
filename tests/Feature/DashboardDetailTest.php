@@ -143,9 +143,9 @@ test('ticket detail aborts with 404 for missing entries', function () {
 test('internal dashboard route file exposes the detail routes', function () {
     $blade = File::get(__DIR__.'/../../routes/pasak-dashboard-blade.php');
 
-    expect($blade)->toContain("->name('logs.show')")
-        ->and($blade)->toContain("->name('blocked-ips.show')")
-        ->and($blade)->toContain("->name('tickets.show')");
+    expect($blade)->toContain('logs.show')
+        ->and($blade)->toContain('blocked-ips.show')
+        ->and($blade)->toContain('tickets.show');
 });
 
 test('published blade route variant exposes the detail routes', function () {

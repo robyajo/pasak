@@ -1,7 +1,6 @@
 <?php
 
 return [
-
     /*
     |--------------------------------------------------------------------------
     | Security Monitor
@@ -13,7 +12,10 @@ return [
     |
     */
 
-    'enabled' => (bool) env('PASAK_MONITOR_ENABLED', env('SECURITY_MONITOR_ENABLED', true)),
+    'enabled' => (bool) env(
+        'PASAK_MONITOR_ENABLED',
+        env('SECURITY_MONITOR_ENABLED', true),
+    ),
 
     /*
     |--------------------------------------------------------------------------
@@ -26,7 +28,10 @@ return [
     |
     */
 
-    'block_enforcement' => (bool) env('PASAK_BLOCK_ENFORCEMENT', env('SECURITY_BLOCK_ENFORCEMENT', true)),
+    'block_enforcement' => (bool) env(
+        'PASAK_BLOCK_ENFORCEMENT',
+        env('SECURITY_BLOCK_ENFORCEMENT', true),
+    ),
 
     /*
     |--------------------------------------------------------------------------
@@ -39,7 +44,10 @@ return [
     |
     */
 
-    'blocked_log_interval' => (int) env('PASAK_BLOCKED_LOG_INTERVAL', env('SECURITY_BLOCKED_LOG_INTERVAL', 10)),
+    'blocked_log_interval' => (int) env(
+        'PASAK_BLOCKED_LOG_INTERVAL',
+        env('SECURITY_BLOCKED_LOG_INTERVAL', 10),
+    ),
 
     /*
     |--------------------------------------------------------------------------
@@ -53,21 +61,51 @@ return [
     */
 
     'auto_block' => [
-        'enabled' => (bool) env('PASAK_AUTO_BLOCK_ENABLED', env('SECURITY_AUTO_BLOCK_ENABLED', false)),
-        'threshold' => (int) env('PASAK_AUTO_BLOCK_THRESHOLD', env('SECURITY_AUTO_BLOCK_THRESHOLD', 3)),
-        'window_minutes' => (int) env('PASAK_AUTO_BLOCK_WINDOW', env('SECURITY_AUTO_BLOCK_WINDOW', 10)),
-        'duration_hours' => (int) env('PASAK_AUTO_BLOCK_DURATION', env('SECURITY_AUTO_BLOCK_DURATION', 24)),
-        'levels' => array_values(array_filter(array_map(
-            'trim',
-            explode(',', (string) env('PASAK_AUTO_BLOCK_LEVELS', env('SECURITY_AUTO_BLOCK_LEVELS', 'high,critical')))
-        ))),
+        'enabled' => (bool) env(
+            'PASAK_AUTO_BLOCK_ENABLED',
+            env('SECURITY_AUTO_BLOCK_ENABLED', false),
+        ),
+        'threshold' => (int) env(
+            'PASAK_AUTO_BLOCK_THRESHOLD',
+            env('SECURITY_AUTO_BLOCK_THRESHOLD', 3),
+        ),
+        'window_minutes' => (int) env(
+            'PASAK_AUTO_BLOCK_WINDOW',
+            env('SECURITY_AUTO_BLOCK_WINDOW', 10),
+        ),
+        'duration_hours' => (int) env(
+            'PASAK_AUTO_BLOCK_DURATION',
+            env('SECURITY_AUTO_BLOCK_DURATION', 24),
+        ),
+        'levels' => array_values(
+            array_filter(
+                array_map(
+                    'trim',
+                    explode(
+                        ',',
+                        (string) env(
+                            'PASAK_AUTO_BLOCK_LEVELS',
+                            env('SECURITY_AUTO_BLOCK_LEVELS', 'high,critical'),
+                        ),
+                    ),
+                ),
+            ),
+        ),
         // Lingkup pemblokiran otomatis: 'device' (hanya isolasi perangkat penyerang, aman untuk IP
         // publik/WiFi NAT bersama), 'ip' (seluruh IP router publik), atau 'auto' (blokir perangkat
         // bila fingerprint perangkat terdeteksi; bila tidak terdeteksi sama sekali, blokir IP).
-        'scope' => env('PASAK_AUTO_BLOCK_SCOPE', env('SECURITY_AUTO_BLOCK_SCOPE', 'device')),
+        'scope' => env(
+            'PASAK_AUTO_BLOCK_SCOPE',
+            env('SECURITY_AUTO_BLOCK_SCOPE', 'device'),
+        ),
         // Ambang per tingkat ancaman: jumlah insiden level tersebut dalam satu jendela waktu
         // memicu blokir otomatis langsung, tanpa menunggu ambang gabungan.
-        'level_thresholds' => ['critical' => 1, 'high' => 2, 'medium' => 3, 'low' => 5],
+        'level_thresholds' => [
+            'critical' => 1,
+            'high' => 2,
+            'medium' => 3,
+            'low' => 5,
+        ],
         // Ambang kombinasi/fallback: total insiden lintas tingkat (dari level yang dihitung)
         // yang dicampur mencapai angka ini juga memicu blokir meski tiap tingkat belum kena.
         'combined_threshold' => 3,
@@ -94,9 +132,18 @@ return [
     */
 
     'instant_block' => [
-        'enabled' => (bool) env('PASAK_INSTANT_BLOCK_ENABLED', env('SECURITY_INSTANT_BLOCK_ENABLED', false)),
-        'duration_hours' => (int) env('PASAK_INSTANT_BLOCK_DURATION', env('SECURITY_INSTANT_BLOCK_DURATION', 720)),
-        'scope' => env('PASAK_INSTANT_BLOCK_SCOPE', env('SECURITY_INSTANT_BLOCK_SCOPE', 'device')),
+        'enabled' => (bool) env(
+            'PASAK_INSTANT_BLOCK_ENABLED',
+            env('SECURITY_INSTANT_BLOCK_ENABLED', false),
+        ),
+        'duration_hours' => (int) env(
+            'PASAK_INSTANT_BLOCK_DURATION',
+            env('SECURITY_INSTANT_BLOCK_DURATION', 720),
+        ),
+        'scope' => env(
+            'PASAK_INSTANT_BLOCK_SCOPE',
+            env('SECURITY_INSTANT_BLOCK_SCOPE', 'device'),
+        ),
         'skip_whitelisted' => true,
         'signatures' => [
             [
@@ -109,7 +156,7 @@ return [
                     // wne.php.jpg  /  shell.phtml.png  /  wne.php;.jpg
                     // Kelas karakter tunggal (bukan "\s*[;.\s]*") agar tidak ada
                     // ambiguitas kuantifier yang bisa memperlambat regex.
-                    '/\.(php|php[0-9]|phtml|pht|phar|phps|asp|aspx|ashx|asmx|jsp|jspx|cgi|pl|py|rb|sh|bash|exe|dll|htaccess)[\s;.]*\.(jpe?g|png|gif|bmp|svg|webp|ico|pdf|txt|zip|rar|docx?|xlsx?)\b/i',
+                    "/\.(php|php[0-9]|phtml|pht|phar|phps|asp|aspx|ashx|asmx|jsp|jspx|cgi|pl|py|rb|sh|bash|exe|dll|htaccess)[\s;.]*\.(jpe?g|png|gif|bmp|svg|webp|ico|pdf|txt|zip|rar|docx?|xlsx?)\b/i",
                     // .php.jpg  /  .php.  /  .php::$DATA
                     '/\.(php|php[0-9]|phtml|pht|phar)\s*[;:.](\s|$|\?|%2e)/i',
                     '/(\$\_POST|\$\_GET|\$\_REQUEST|\$\_FILES|\$\_SERVER|\$GLOBALS)\s*\[/i',
@@ -120,7 +167,7 @@ return [
                 'label' => 'Nama berkas unggahan mengandung ekstensi berbahaya',
                 'target' => 'filename',
                 'patterns' => [
-                    '/\.(php|php[0-9]|phtml|pht|phar|phps|asp|aspx|ashx|asmx|jsp|jspx|cgi|pl|py|rb|sh|bash|exe|dll|bat|cmd|scr|js|html?|htaccess)\b/i',
+                    "/\.(php|php[0-9]|phtml|pht|phar|phps|asp|aspx|ashx|asmx|jsp|jspx|cgi|pl|py|rb|sh|bash|exe|dll|bat|cmd|scr|js|html?|htaccess)\b/i",
                     '/(%00|\x00)/',
                     // ".." hanya berbahaya sebagai KOMPONEN path (../../x.jpg),
                     // bukan dua titik di tengah nama berkas (Laporan..2026.pdf).
@@ -132,8 +179,8 @@ return [
                 'label' => 'Akses nama berkas webshell yang dikenal',
                 'target' => 'path',
                 'patterns' => [
-                    '/(^|\/)(wne|wso|c99|r57|b374k|indoxploit|webshell|web-shell|shell|backdoor|defacer|hacked|alfa|kingsman|symlink|gags)\d*\.(php[0-9]?|phtml|phar|txt|jpg|png|gif|zip)\b/i',
-                    '/(^|\/)(adminer|mysql-admin|sqlbuddy|phpspy|p0wny|weevely|antSword)\b/i',
+                    "/(^|\/)(wne|wso|c99|r57|b374k|indoxploit|webshell|web-shell|shell|backdoor|defacer|hacked|alfa|kingsman|symlink|gags)\d*\.(php[0-9]?|phtml|phar|txt|jpg|png|gif|zip)\b/i",
+                    "/(^|\/)(adminer|mysql-admin|sqlbuddy|phpspy|p0wny|weevely|antSword)\b/i",
                 ],
             ],
             [
@@ -141,16 +188,16 @@ return [
                 'label' => 'Percobaan path traversal menuju folder publik',
                 'target' => 'any',
                 'patterns' => [
-                    '/(\.\.\/){2,}/',
-                    '/(\.\.\\\\){2,}/',
-                    '/(%2e%2e(\/|%2f|\\\\|%5c)){2,}/i',
+                    "/(\.\.\/){2,}/",
+                    "/(\.\.\\\\){2,}/",
+                    "/(%2e%2e(\/|%2f|\\\\|%5c)){2,}/i",
                     '/(\.\.\/)+(public|storage|vendor|config|resources|bootstrap|app)(\/|$)/i',
                     // Catatan: "var/www" sengaja TIDAK dipakai walau terlihat
                     // seperti path sistem, karena folder itulah document root
                     // aplikasi ini (/var/www/your-app/public/...)
                     // sehingga sering muncul di konten admin yang sah. Probe ke
                     // sana tetap tertangkap oleh pola traversal di atas.
-                    '/\b(etc\/passwd|etc\/shadow|proc\/self|windows\/win\.ini|boot\.ini)\b/i',
+                    "/\b(etc\/passwd|etc\/shadow|proc\/self|windows\/win\.ini|boot\.ini)\b/i",
                 ],
             ],
             [
@@ -158,9 +205,9 @@ return [
                 'label' => 'Percobaan akses berkas konfigurasi / rahasia',
                 'target' => 'path',
                 'patterns' => [
-                    '/\.(env|env\.[a-z]+|htaccess|htpasswd|user\.ini|git|svn|hg|bzr|aws|ssh)\b/i',
-                    '/(^|\/)(web\.config|php\.ini|composer\.(json|lock)|artisan|\.npmrc|\.dockerignore|Dockerfile|docker-compose\.ya?ml|id_rsa|id_dsa|\.my\.cnf|\.netrc)\b/i',
-                    '/(^|\/)(backup|dump|database|db|data|www)\.(sql|sql\.gz|tar|tar\.gz|zip|bak|old|orig|save|swp)\b/i',
+                    "/\.(env|env\.[a-z]+|htaccess|htpasswd|user\.ini|git|svn|hg|bzr|aws|ssh)\b/i",
+                    "/(^|\/)(web\.config|php\.ini|composer\.(json|lock)|artisan|\.npmrc|\.dockerignore|Dockerfile|docker-compose\.ya?ml|id_rsa|id_dsa|\.my\.cnf|\.netrc)\b/i",
+                    "/(^|\/)(backup|dump|database|db|data|www)\.(sql|sql\.gz|tar|tar\.gz|zip|bak|old|orig|save|swp)\b/i",
                 ],
             ],
             [
@@ -174,13 +221,13 @@ return [
                     '/\{\{\s*[\d\'"a-z_]+(\s*[*+\/]\s*[\d\'"a-z_]+)+\s*\}\}/i',
                     // {{7-7}} / {{49-1}} — pengurangan hanya bila kedua sisi angka/kutip
                     '/\{\{\s*[\d\'"]+\s*-\s*[\d\'"]+\s*\}\}/i',
-                    '/\{\{\s*(7\s*[*x]\s*7|49)\s*\}\}/i',
+                    "/\{\{\s*(7\s*[*x]\s*7|49)\s*\}\}/i",
                     '/\$\{\s*[\d\'"a-z_]+(\s*[*+\/]\s*[\d\'"a-z_]+)+\s*\}/i',
                     '/\$\{\s*[\d\'"]+\s*-\s*[\d\'"]+\s*\}/i',
                     '/<%=\s*[\d\'"a-z_]+(\s*[*+.\-\/]\s*[\d\'"a-z_]+)+\s*%>/i',
-                    '/\{\{\s*(self|config|app|_self|_context|request|globals)\b/i',
-                    '/\b(ssti|twig|jinja2?|freemarker|velocity)\b[\s._-]*(id|env|key|uname|phpinfo|payload|inc)\b/i',
-                    '/(\bphpinfo\s*\(|\buname\s+-\w+|;\s*(whoami|\bid)\b|\|\s*(whoami|\bid)\b)/i',
+                    "/\{\{\s*(self|config|app|_self|_context|request|globals)\b/i",
+                    "/\b(ssti|twig|jinja2?|freemarker|velocity)\b[\s._-]*(id|env|key|uname|phpinfo|payload|inc)\b/i",
+                    "/(\bphpinfo\s*\(|\buname\s+-\w+|;\s*(whoami|\bid)\b|\|\s*(whoami|\bid)\b)/i",
                 ],
             ],
             [
@@ -188,7 +235,7 @@ return [
                 'label' => 'Kode PHP disuntikkan melalui parameter / form',
                 'target' => 'input',
                 'patterns' => [
-                    '/<\?(php|=|\s)/i',
+                    "/<\?(php|=|\s)/i",
                     '/<\?\s*\$|\?>.*<\?/',
                     '/(system|shell_exec|passthru|popen|proc_open|exec|eval|assert|create_function|base64_decode|gzinflate|str_rot13|preg_replace\s*\(\s*[\'"].*\/e)\s*\(\s*\$?/',
                     '/(include|require)(_once)?\s*\(?\s*[\'"][^\'"]*\.\.\//i',
@@ -204,7 +251,7 @@ return [
                     // OPD) sehingga blokir instan 30 hari akan salah sasaran.
                     // Keduanya tetap tertangkap secara perilaku (probe .env,
                     // wp-admin, dll) oleh signature lain.
-                    '/\b(sqlmap|nikto|nmap|masscan|nessus|openvas|acunetix|netsparker|appscan|webinspect|burp|dirbuster|gobuster|feroxbuster|ffuf|fuzz\s+faster\s+u\s+fool|wfuzz|dirsearch|wpscan|joomscan|droopescan|nuclei|zgrab|hydra|medusa|metasploit|havij|arachni|skipfish|w3af|commix|jaeles|xray|zaproxy|zap|whatweb|wafw00f|subfinder|gospider|fimap|xsstrike|dalfox|tplmap|ysoserial)\b/i',
+                    "/\b(sqlmap|nikto|nmap|masscan|nessus|openvas|acunetix|netsparker|appscan|webinspect|burp|dirbuster|gobuster|feroxbuster|ffuf|fuzz\s+faster\s+u\s+fool|wfuzz|dirsearch|wpscan|joomscan|droopescan|nuclei|zgrab|hydra|medusa|metasploit|havij|arachni|skipfish|w3af|commix|jaeles|xray|zaproxy|zap|whatweb|wafw00f|subfinder|gospider|fimap|xsstrike|dalfox|tplmap|ysoserial)\b/i",
                 ],
             ],
             [
@@ -212,9 +259,9 @@ return [
                 'label' => 'Percobaan membaca kredensial / secret aplikasi',
                 'target' => 'any',
                 'patterns' => [
-                    '/(APP_KEY|DB_PASSWORD|DB_USERNAME|MAIL_PASSWORD|AWS_SECRET|SECRET_KEY|PRIVATE_KEY)\s*=/i',
-                    '/-----BEGIN\s+(RSA|OPENSSH|PGP|EC|DSA)?\s*PRIVATE KEY-----/i',
-                    '/\b(AKIA[0-9A-Z]{16}|ghp_[A-Za-z0-9]{20,}|sk-[A-Za-z0-9]{20,})\b/',
+                    "/(APP_KEY|DB_PASSWORD|DB_USERNAME|MAIL_PASSWORD|AWS_SECRET|SECRET_KEY|PRIVATE_KEY)\s*=/i",
+                    "/-----BEGIN\s+(RSA|OPENSSH|PGP|EC|DSA)?\s*PRIVATE KEY-----/i",
+                    "/\b(AKIA[0-9A-Z]{16}|ghp_[A-Za-z0-9]{20,}|sk-[A-Za-z0-9]{20,})\b/",
                 ],
             ],
             [
@@ -247,10 +294,20 @@ return [
     |
     */
 
-    'whitelist' => array_values(array_filter(array_map(
-        'trim',
-        explode(',', (string) env('PASAK_IP_WHITELIST', env('SECURITY_IP_WHITELIST', '127.0.0.1,::1')))
-    ))),
+    'whitelist' => array_values(
+        array_filter(
+            array_map(
+                'trim',
+                explode(
+                    ',',
+                    (string) env(
+                        'PASAK_IP_WHITELIST',
+                        env('SECURITY_IP_WHITELIST', '127.0.0.1,::1'),
+                    ),
+                ),
+            ),
+        ),
+    ),
 
     /*
     |--------------------------------------------------------------------------
@@ -271,8 +328,8 @@ return [
                 '/\b(union\b[^\n]{0,20}\bselect|select\b[^\n]{0,40}\bfrom|insert\b[^\n]{0,20}\binto|delete\b[^\n]{0,15}\bfrom|drop\b\s+(table|database)|alter\b\s+table)\b/i',
                 '/\b(or|and)\b\s+[\'"]?\d+[\'"]?\s*=\s*[\'"]?\d+/i',
                 '/(\'\s*(or|and)\s*\'|"\s*(or|and)\s*")/i',
-                '/(\bsleep\s*\(|\bbenchmark\s*\(|\bwaitfor\s+delay\b|\bpg_sleep\s*\()/i',
-                '/(\bxp_cmdshell\b|\binformation_schema\b|\bsysobjects\b|\bload_file\s*\(|\binto\s+outfile\b)/i',
+                "/(\bsleep\s*\(|\bbenchmark\s*\(|\bwaitfor\s+delay\b|\bpg_sleep\s*\()/i",
+                "/(\bxp_cmdshell\b|\binformation_schema\b|\bsysobjects\b|\bload_file\s*\(|\binto\s+outfile\b)/i",
                 // Komentar SQL: kutip sebelum "--", "--" di akhir nilai, atau
                 // "--" di awal nilai. Pola lebar "/--\s/" dibuang karena
                 // teks Indonesia memakai "--" sebagai pemisah
@@ -285,11 +342,11 @@ return [
             'label' => 'Indikasi Cross Site Scripting (XSS)',
             'level' => 'high',
             'patterns' => [
-                '/<\s*script\b|<\s*\/\s*script\s*>/i',
-                '/<\s*(iframe|object|embed|svg|img|body|link|meta)\b[^>]{0,80}(on\w+\s*=|javascript:|data:text\/html)/i',
-                '/\bon(error|load|mouseover|focus|click|submit|animationstart)\s*=/i',
-                '/javascript\s*:\s*[a-z(]/i',
-                '/(document\.(cookie|domain|write)|window\.location\s*=|\balert\s*\(\s*\d*\s*\))/i',
+                "/<\s*script\b|<\s*\/\s*script\s*>/i",
+                "/<\s*(iframe|object|embed|svg|img|body|link|meta)\b[^>]{0,80}(on\w+\s*=|javascript:|data:text\/html)/i",
+                "/\bon(error|load|mouseover|focus|click|submit|animationstart)\s*=/i",
+                "/javascript\s*:\s*[a-z(]/i",
+                "/(document\.(cookie|domain|write)|window\.location\s*=|\balert\s*\(\s*\d*\s*\))/i",
                 '/(%3cscript|&lt;script|\\u003cscript)/i',
             ],
         ],
@@ -298,8 +355,8 @@ return [
             'label' => 'Indikasi Path Traversal',
             'level' => 'critical',
             'patterns' => [
-                '/(\.\.\/|\.\.\\\\|%2e%2e%2f|%2e%2e\/|\.\.%2f)/i',
-                '/(\/etc\/(passwd|shadow|hosts)|\/proc\/self\/environ|\bboot\.ini\b|\bwin\.ini\b|\bsystem32\\\\)/i',
+                "/(\.\.\/|\.\.\\\\|%2e%2e%2f|%2e%2e\/|\.\.%2f)/i",
+                "/(\/etc\/(passwd|shadow|hosts)|\/proc\/self\/environ|\bboot\.ini\b|\bwin\.ini\b|\bsystem32\\\\)/i",
             ],
         ],
         [
@@ -316,8 +373,8 @@ return [
             'label' => 'Indikasi Code / File Inclusion',
             'level' => 'critical',
             'patterns' => [
-                '/(php:\/\/|data:\/\/|expect:\/\/|zip:\/\/|phar:\/\/|glob:\/\/)/i',
-                '/(\beval\s*\(|\bassert\s*\(|\bsystem\s*\(|\bshell_exec\s*\(|\bpassthru\s*\(|\bexec\s*\(|\bpopen\s*\(|\bbase64_decode\s*\()/i',
+                "/(php:\/\/|data:\/\/|expect:\/\/|zip:\/\/|phar:\/\/|glob:\/\/)/i",
+                "/(\beval\s*\(|\bassert\s*\(|\bsystem\s*\(|\bshell_exec\s*\(|\bpassthru\s*\(|\bexec\s*\(|\bpopen\s*\(|\bbase64_decode\s*\()/i",
             ],
         ],
         [
@@ -327,19 +384,16 @@ return [
             'patterns' => [
                 // Hanya "{{ ... }}" yang memuat operator/kurung (ciri ekspresi
                 // template), bukan placeholder biasa seperti {{nama}}.
-                '/\{\{[^}]{0,60}[(){}.|*+\/][^}]{0,60}\}\}/',
-                '/<%=?\s*[a-z_]/i',
-                '/(\bclass\.forname\b|\bruntime\.getruntime\b|\bprocessbuilder\b|\bjava\.lang\.)/i',
+                "/\{\{[^}]{0,60}[(){}.|*+\/][^}]{0,60}\}\}/",
+                "/<%=?\s*[a-z_]/i",
+                "/(\bclass\.forname\b|\bruntime\.getruntime\b|\bprocessbuilder\b|\bjava\.lang\.)/i",
             ],
         ],
         [
             'id' => 'null_byte',
             'label' => 'Null Byte / Encoding Anomali',
             'level' => 'medium',
-            'patterns' => [
-                '/(%00|\x00|%2500)/i',
-                '/(\.\.%00|\/\.\.%2f)/i',
-            ],
+            'patterns' => ['/(%00|\x00|%2500)/i', "/(\.\.%00|\/\.\.%2f)/i"],
         ],
     ],
 
@@ -503,7 +557,10 @@ return [
     |
     */
 
-    'max_inspect_length' => (int) env('PASAK_MAX_INSPECT_LENGTH', env('SECURITY_MAX_INSPECT_LENGTH', 4000)),
+    'max_inspect_length' => (int) env(
+        'PASAK_MAX_INSPECT_LENGTH',
+        env('SECURITY_MAX_INSPECT_LENGTH', 4000),
+    ),
 
     /*
     |--------------------------------------------------------------------------
@@ -517,13 +574,12 @@ return [
     |
     */
 
-    'block_suspicious_requests' => (bool) env('PASAK_BLOCK_SUSPICIOUS', env('SECURITY_BLOCK_SUSPICIOUS', false)),
+    'block_suspicious_requests' => (bool) env(
+        'PASAK_BLOCK_SUSPICIOUS',
+        env('SECURITY_BLOCK_SUSPICIOUS', false),
+    ),
 
-    'exclude_paths' => [
-        'up',
-        'build/*',
-        'favicon.ico',
-    ],
+    'exclude_paths' => ['up', 'build/*', 'favicon.ico'],
 
     /*
     |--------------------------------------------------------------------------
@@ -535,7 +591,10 @@ return [
     |
     */
 
-    'retention_days' => (int) env('PASAK_LOG_RETENTION_DAYS', env('SECURITY_LOG_RETENTION_DAYS', 90)),
+    'retention_days' => (int) env(
+        'PASAK_LOG_RETENTION_DAYS',
+        env('SECURITY_LOG_RETENTION_DAYS', 90),
+    ),
 
     /*
     |--------------------------------------------------------------------------
@@ -554,16 +613,27 @@ return [
     */
 
     'access_log' => [
-        'paths' => array_values(array_filter(array_map(
-            'trim',
-            explode(',', (string) env(
-                'PASAK_ACCESS_LOG_PATHS',
-                env('SECURITY_ACCESS_LOG_PATHS',
-                    '/var/log/nginx/access.log,/var/log/nginx/*access.log,/var/log/apache2/access.log'
-                )
-            ))
-        ))),
-        'max_lines' => (int) env('PASAK_ACCESS_LOG_MAX_LINES', env('SECURITY_ACCESS_LOG_MAX_LINES', 500000)),
+        'paths' => array_values(
+            array_filter(
+                array_map(
+                    'trim',
+                    explode(
+                        ',',
+                        (string) env(
+                            'PASAK_ACCESS_LOG_PATHS',
+                            env(
+                                'SECURITY_ACCESS_LOG_PATHS',
+                                '/var/log/nginx/access.log,/var/log/nginx/*access.log,/var/log/apache2/access.log',
+                            ),
+                        ),
+                    ),
+                ),
+            ),
+        ),
+        'max_lines' => (int) env(
+            'PASAK_ACCESS_LOG_MAX_LINES',
+            env('SECURITY_ACCESS_LOG_MAX_LINES', 500000),
+        ),
 
         /*
         | Tugas harian opsional: memindai access log dan menyimpan temuan ke
@@ -572,8 +642,14 @@ return [
         | "php artisan security:scan-logs --block" setelah hasilnya ditinjau,
         | supaya baris log lama tidak memblokir IP yang kini sudah bersih.
         */
-        'auto_scan_enabled' => (bool) env('PASAK_ACCESS_LOG_AUTO_SCAN', env('SECURITY_ACCESS_LOG_AUTO_SCAN', false)),
-        'auto_scan_since_hours' => (int) env('PASAK_ACCESS_LOG_AUTO_SCAN_HOURS', env('SECURITY_ACCESS_LOG_AUTO_SCAN_HOURS', 24)),
+        'auto_scan_enabled' => (bool) env(
+            'PASAK_ACCESS_LOG_AUTO_SCAN',
+            env('SECURITY_ACCESS_LOG_AUTO_SCAN', false),
+        ),
+        'auto_scan_since_hours' => (int) env(
+            'PASAK_ACCESS_LOG_AUTO_SCAN_HOURS',
+            env('SECURITY_ACCESS_LOG_AUTO_SCAN_HOURS', 24),
+        ),
     ],
 
     /*
@@ -597,11 +673,26 @@ return [
     */
 
     'login_lockout' => [
-        'enabled' => (bool) env('PASAK_LOGIN_LOCKOUT_ENABLED', env('SECURITY_LOGIN_LOCKOUT_ENABLED', true)),
-        'threshold' => (int) env('PASAK_LOGIN_LOCKOUT_THRESHOLD', env('SECURITY_LOGIN_LOCKOUT_THRESHOLD', 3)),
-        'base_minutes' => (int) env('PASAK_LOGIN_LOCKOUT_BASE_MINUTES', env('SECURITY_LOGIN_LOCKOUT_BASE_MINUTES', 1)),
-        'max_minutes' => (int) env('PASAK_LOGIN_LOCKOUT_MAX_MINUTES', env('SECURITY_LOGIN_LOCKOUT_MAX_MINUTES', 30)),
-        'decay_minutes' => (int) env('PASAK_LOGIN_LOCKOUT_DECAY_MINUTES', env('SECURITY_LOGIN_LOCKOUT_DECAY_MINUTES', 60)),
+        'enabled' => (bool) env(
+            'PASAK_LOGIN_LOCKOUT_ENABLED',
+            env('SECURITY_LOGIN_LOCKOUT_ENABLED', true),
+        ),
+        'threshold' => (int) env(
+            'PASAK_LOGIN_LOCKOUT_THRESHOLD',
+            env('SECURITY_LOGIN_LOCKOUT_THRESHOLD', 3),
+        ),
+        'base_minutes' => (int) env(
+            'PASAK_LOGIN_LOCKOUT_BASE_MINUTES',
+            env('SECURITY_LOGIN_LOCKOUT_BASE_MINUTES', 1),
+        ),
+        'max_minutes' => (int) env(
+            'PASAK_LOGIN_LOCKOUT_MAX_MINUTES',
+            env('SECURITY_LOGIN_LOCKOUT_MAX_MINUTES', 30),
+        ),
+        'decay_minutes' => (int) env(
+            'PASAK_LOGIN_LOCKOUT_DECAY_MINUTES',
+            env('SECURITY_LOGIN_LOCKOUT_DECAY_MINUTES', 60),
+        ),
     ],
 
     /*
@@ -620,13 +711,34 @@ return [
     */
 
     'server_scan' => [
-        'cache_minutes' => (int) env('PASAK_SERVER_SCAN_CACHE_MINUTES', env('SECURITY_SERVER_SCAN_CACHE_MINUTES', 10)),
-        'max_files_scanned' => (int) env('PASAK_SERVER_SCAN_MAX_FILES', env('SECURITY_SERVER_SCAN_MAX_FILES', 20000)),
-        'recent_changes_days' => (int) env('PASAK_RECENT_CHANGES_DAYS', env('SECURITY_RECENT_CHANGES_DAYS', 7)),
-        'disk_warning_percent' => (int) env('PASAK_DISK_WARNING_PERCENT', env('SECURITY_DISK_WARNING_PERCENT', 20)),
-        'disk_critical_percent' => (int) env('PASAK_DISK_CRITICAL_PERCENT', env('SECURITY_DISK_CRITICAL_PERCENT', 10)),
-        'max_admin_accounts' => (int) env('PASAK_MAX_ADMIN_ACCOUNTS', env('SECURITY_MAX_ADMIN_ACCOUNTS', 5)),
-        'log_size_warning_mb' => (int) env('PASAK_LOG_SIZE_WARNING_MB', env('SECURITY_LOG_SIZE_WARNING_MB', 100)),
+        'cache_minutes' => (int) env(
+            'PASAK_SERVER_SCAN_CACHE_MINUTES',
+            env('SECURITY_SERVER_SCAN_CACHE_MINUTES', 10),
+        ),
+        'max_files_scanned' => (int) env(
+            'PASAK_SERVER_SCAN_MAX_FILES',
+            env('SECURITY_SERVER_SCAN_MAX_FILES', 20000),
+        ),
+        'recent_changes_days' => (int) env(
+            'PASAK_RECENT_CHANGES_DAYS',
+            env('SECURITY_RECENT_CHANGES_DAYS', 7),
+        ),
+        'disk_warning_percent' => (int) env(
+            'PASAK_DISK_WARNING_PERCENT',
+            env('SECURITY_DISK_WARNING_PERCENT', 20),
+        ),
+        'disk_critical_percent' => (int) env(
+            'PASAK_DISK_CRITICAL_PERCENT',
+            env('SECURITY_DISK_CRITICAL_PERCENT', 10),
+        ),
+        'max_admin_accounts' => (int) env(
+            'PASAK_MAX_ADMIN_ACCOUNTS',
+            env('SECURITY_MAX_ADMIN_ACCOUNTS', 5),
+        ),
+        'log_size_warning_mb' => (int) env(
+            'PASAK_LOG_SIZE_WARNING_MB',
+            env('SECURITY_LOG_SIZE_WARNING_MB', 100),
+        ),
 
         // Dibaca oleh audit aplikasi (ServerSecurityService::applicationChecks()).
         'public_api_key' => env('PUBLIC_API_KEY'),
@@ -677,7 +789,10 @@ return [
     | Model yang merepresentasikan entitas Pengguna/User di aplikasi host.
     |
     */
-    'user_model' => env('PASAK_USER_MODEL', env('SECURITY_USER_MODEL', 'App\\Models\\User')),
+    'user_model' => env(
+        'PASAK_USER_MODEL',
+        env('SECURITY_USER_MODEL', 'App\\Models\\User'),
+    ),
 
     /*
     |--------------------------------------------------------------------------
@@ -688,13 +803,37 @@ return [
     |
     */
     'table_names' => [
-        'users' => env('PASAK_USERS_TABLE', env('SECURITY_USERS_TABLE', 'users')),
-        'blocked_ips' => env('PASAK_BLOCKED_IPS_TABLE', env('SECURITY_BLOCKED_IPS_TABLE', 'pasak_blocked_ips')),
-        'pasak_logs' => env('PASAK_LOGS_TABLE', env('SECURITY_LOGS_TABLE', 'pasak_logs')),
-        'login_attempts' => env('PASAK_LOGIN_ATTEMPTS_TABLE', env('SECURITY_LOGIN_ATTEMPTS_TABLE', 'pasak_login_attempts')),
-        'ip_unblock_requests' => env('PASAK_IP_UNBLOCK_REQUESTS_TABLE', env('SECURITY_IP_UNBLOCK_REQUESTS_TABLE', 'pasak_ip_unblock_requests')),
-        'user_logins' => env('PASAK_USER_LOGINS_TABLE', env('SECURITY_USER_LOGINS_TABLE', 'pasak_user_logins')),
-        'trusted_ips' => env('PASAK_TRUSTED_IPS_TABLE', env('SECURITY_TRUSTED_IPS_TABLE', 'pasak_trusted_ips')),
+        'users' => env(
+            'PASAK_USERS_TABLE',
+            env('SECURITY_USERS_TABLE', 'users'),
+        ),
+        'blocked_ips' => env(
+            'PASAK_BLOCKED_IPS_TABLE',
+            env('SECURITY_BLOCKED_IPS_TABLE', 'pasak_blocked_ips'),
+        ),
+        'pasak_logs' => env(
+            'PASAK_LOGS_TABLE',
+            env('SECURITY_LOGS_TABLE', 'pasak_logs'),
+        ),
+        'login_attempts' => env(
+            'PASAK_LOGIN_ATTEMPTS_TABLE',
+            env('SECURITY_LOGIN_ATTEMPTS_TABLE', 'pasak_login_attempts'),
+        ),
+        'ip_unblock_requests' => env(
+            'PASAK_IP_UNBLOCK_REQUESTS_TABLE',
+            env(
+                'SECURITY_IP_UNBLOCK_REQUESTS_TABLE',
+                'pasak_ip_unblock_requests',
+            ),
+        ),
+        'user_logins' => env(
+            'PASAK_USER_LOGINS_TABLE',
+            env('SECURITY_USER_LOGINS_TABLE', 'pasak_user_logins'),
+        ),
+        'trusted_ips' => env(
+            'PASAK_TRUSTED_IPS_TABLE',
+            env('SECURITY_TRUSTED_IPS_TABLE', 'pasak_trusted_ips'),
+        ),
         'allowed_ips' => env('PASAK_ALLOWED_IPS_TABLE', 'pasak_allowed_ips'),
         'settings' => env('PASAK_SETTINGS_TABLE', 'pasak_settings'),
     ],
@@ -708,11 +847,19 @@ return [
     |
     */
     'routes' => [
-        'enabled' => (bool) env('PASAK_ROUTES_ENABLED', env('SECURITY_ROUTES_ENABLED', true)),
-        'prefix' => env('PASAK_ROUTES_PREFIX', env('SECURITY_ROUTES_PREFIX', 'api/pasak')),
+        'enabled' => (bool) env(
+            'PASAK_ROUTES_ENABLED',
+            env('SECURITY_ROUTES_ENABLED', true),
+        ),
+        'prefix' => env(
+            'PASAK_ROUTES_PREFIX',
+            env('SECURITY_ROUTES_PREFIX', 'api/pasak'),
+        ),
         'middleware' => ['api'],
         'auth_middleware' => ['auth'],
-        'admin_middleware' => ['Internal\\Pasak\\Http\\Middleware\\PasakEnsureSecurityAdmin'],
+        'admin_middleware' => [
+            'Internal\\Pasak\\Http\\Middleware\\PasakEnsureSecurityAdmin',
+        ],
     ],
 
     /*
@@ -740,24 +887,72 @@ return [
     |
     */
     'dashboard' => [
-        'enabled' => (bool) env('PASAK_DASHBOARD_ENABLED', env('SECURITY_DASHBOARD_ENABLED', false)),
-        'driver' => env('PASAK_DASHBOARD_DRIVER', env('SECURITY_DASHBOARD_DRIVER', 'blade')),
-        'prefix' => env('PASAK_DASHBOARD_PREFIX', env('SECURITY_DASHBOARD_PREFIX', 'pasak')),
+        'enabled' => (bool) env(
+            'PASAK_DASHBOARD_ENABLED',
+            env('SECURITY_DASHBOARD_ENABLED', false),
+        ),
+        'driver' => env(
+            'PASAK_DASHBOARD_DRIVER',
+            env('SECURITY_DASHBOARD_DRIVER', 'blade'),
+        ),
+        'prefix' => env(
+            'PASAK_DASHBOARD_PREFIX',
+            env('SECURITY_DASHBOARD_PREFIX', 'pasak'),
+        ),
+        // URL acak sekali pakai (moving-target): bila true, pintu stabil
+        // "/pasak" selalu 302 ke "/pasak-{token}/" milik sesi pengguna.
+        // Token diputar setiap akses HTML sehingga reload selalu berubah,
+        // mis. /pasak-95856857476jdhjs5/logs lalu /pasak-634664873647jbdjshf/logs.
+        // URL lama hanya hidup selama "grace_seconds" dan dialihkan ke URL baru.
+        // Butuh middleware "web" (sesi) + auth; nonaktifkan bila memakai route:cache
+        // kustom tanpa sesi atau bila lebih suka prefix statis yang mudah ditandai.
+        'rotating' => (bool) env(
+            'PASAK_DASHBOARD_ROTATING',
+            env('SECURITY_DASHBOARD_ROTATING', false),
+        ),
+        'secret' => env(
+            'PASAK_DASHBOARD_SECRET',
+            env('SECURITY_DASHBOARD_SECRET'),
+        ),
+        'token_length' => (int) env(
+            'PASAK_DASHBOARD_TOKEN_LENGTH',
+            env('SECURITY_DASHBOARD_TOKEN_LENGTH', 16),
+        ),
+        'single_use' => (bool) env(
+            'PASAK_DASHBOARD_SINGLE_USE',
+            env('SECURITY_DASHBOARD_SINGLE_USE', true),
+        ),
+        'grace_seconds' => (int) env(
+            'PASAK_DASHBOARD_GRACE_SECONDS',
+            env('SECURITY_DASHBOARD_GRACE_SECONDS', 120),
+        ),
         'middleware' => ['web', 'auth'],
-        'admin_middleware' => env('PASAK_DASHBOARD_ADMIN_ONLY', env('SECURITY_DASHBOARD_ADMIN_ONLY', false))
+        'admin_middleware' => env(
+            'PASAK_DASHBOARD_ADMIN_ONLY',
+            env('SECURITY_DASHBOARD_ADMIN_ONLY', false),
+        )
             ? ['Internal\\Pasak\\Http\\Middleware\\PasakEnsureSecurityAdmin']
             : [],
-        'admin_only' => (bool) env('PASAK_DASHBOARD_ADMIN_ONLY', env('SECURITY_DASHBOARD_ADMIN_ONLY', false)),
+        'admin_only' => (bool) env(
+            'PASAK_DASHBOARD_ADMIN_ONLY',
+            env('SECURITY_DASHBOARD_ADMIN_ONLY', false),
+        ),
 
         // Peta ancaman (Threat Map): titik server yang dipantau + jendela
         // data serangan yang digambar.
         'threat_map' => [
-            'target_name' => env('PASAK_DASHBOARD_TARGET_NAME', 'Pekanbaru, Riau (ID)'),
+            'target_name' => env(
+                'PASAK_DASHBOARD_TARGET_NAME',
+                'Pekanbaru, Riau (ID)',
+            ),
             'target_lat' => (float) env('PASAK_DASHBOARD_TARGET_LAT', 0.5071),
             'target_lon' => (float) env('PASAK_DASHBOARD_TARGET_LON', 101.4478),
             'window_hours' => (int) env('PASAK_DASHBOARD_MAP_WINDOW_HOURS', 24),
             'max_origins' => (int) env('PASAK_DASHBOARD_MAP_MAX_ORIGINS', 10),
-            'refresh_seconds' => (int) env('PASAK_DASHBOARD_MAP_REFRESH_SECONDS', 8),
+            'refresh_seconds' => (int) env(
+                'PASAK_DASHBOARD_MAP_REFRESH_SECONDS',
+                8,
+            ),
         ],
     ],
 
@@ -786,8 +981,14 @@ return [
     |
     */
     'schedule' => [
-        'enabled' => (bool) env('PASAK_SCHEDULE_ENABLED', env('SECURITY_SCHEDULE_ENABLED', true)),
-        'prune_at' => env('PASAK_PRUNE_SCHEDULE', env('SECURITY_PRUNE_SCHEDULE', '02:30')),
+        'enabled' => (bool) env(
+            'PASAK_SCHEDULE_ENABLED',
+            env('SECURITY_SCHEDULE_ENABLED', true),
+        ),
+        'prune_at' => env(
+            'PASAK_PRUNE_SCHEDULE',
+            env('SECURITY_PRUNE_SCHEDULE', '02:30'),
+        ),
     ],
 
     /*
@@ -798,7 +999,13 @@ return [
     | Alamat email bantuan untuk ditampilkan saat IP diblokir.
     |
     */
-    'support_email' => env('PASAK_SUPPORT_EMAIL', env('SECURITY_SUPPORT_EMAIL', env('MAIL_FROM_ADDRESS', 'security@example.com'))),
+    'support_email' => env(
+        'PASAK_SUPPORT_EMAIL',
+        env(
+            'SECURITY_SUPPORT_EMAIL',
+            env('MAIL_FROM_ADDRESS', 'security@example.com'),
+        ),
+    ),
 
     /*
     |--------------------------------------------------------------------------
@@ -809,7 +1016,10 @@ return [
     | BlockIpAddress dan DetectSecurityThreats ke HTTP Kernel global.
     |
     */
-    'auto_register_middleware' => (bool) env('PASAK_AUTO_REGISTER_MIDDLEWARE', env('SECURITY_AUTO_REGISTER_MIDDLEWARE', false)),
+    'auto_register_middleware' => (bool) env(
+        'PASAK_AUTO_REGISTER_MIDDLEWARE',
+        env('SECURITY_AUTO_REGISTER_MIDDLEWARE', false),
+    ),
 
     /*
     |--------------------------------------------------------------------------
@@ -823,7 +1033,13 @@ return [
     |
     */
     'version_check' => [
-        'enabled' => (bool) env('PASAK_VERSION_CHECK_ENABLED', env('SECURITY_VERSION_CHECK_ENABLED', true)),
-        'cache_ttl' => (int) env('PASAK_VERSION_CHECK_CACHE_TTL', env('SECURITY_VERSION_CHECK_CACHE_TTL', 3600)),
+        'enabled' => (bool) env(
+            'PASAK_VERSION_CHECK_ENABLED',
+            env('SECURITY_VERSION_CHECK_ENABLED', true),
+        ),
+        'cache_ttl' => (int) env(
+            'PASAK_VERSION_CHECK_CACHE_TTL',
+            env('SECURITY_VERSION_CHECK_CACHE_TTL', 3600),
+        ),
     ],
 ];

@@ -5,6 +5,7 @@ namespace Internal\Pasak\Console\Commands;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Str;
 use Internal\Pasak\Database\Seeders\PasakDefaultSettingsSeeder;
 use Internal\Pasak\Services\PasakVersionCheckService;
 use Symfony\Component\Process\Process;
@@ -25,7 +26,9 @@ class PasakUpgradeCommand extends Command
     public function handle(PasakVersionCheckService $versionChecker): int
     {
         $this->newLine();
-        $this->line('  <bg=blue;fg=white;options=bold> BULWARK SECURITY UPGRADE </>');
+        $this->line(
+            '  <bg=blue;fg=white;options=bold> BULWARK SECURITY UPGRADE </>',
+        );
         $this->newLine();
 
         $this->comment('Memeriksa ketersediaan versi terbaru...');
@@ -34,7 +37,12 @@ class PasakUpgradeCommand extends Command
         $latest = $versionChecker->getLatestVersion(true); // segarkan dari sumber rilis
 
         $this->line("  Versi Terpasang : <options=bold;fg=cyan>v{$current}</>");
-        $this->line('  Versi Terbaru   : '.($latest ? "<options=bold;fg=green>v{$latest}</>" : '<comment>Tidak dapat menjangkau repositori rilis (offline/timeout)</comment>'));
+        $this->line(
+            '  Versi Terbaru   : '.
+                ($latest
+                    ? "<options=bold;fg=green>v{$latest}</>"
+                    : '<comment>Tidak dapat menjangkau repositori rilis (offline/timeout)</comment>'),
+        );
         $this->newLine();
 
         $hasUpdate = $latest && version_compare($latest, $current, '>');
@@ -42,19 +50,30 @@ class PasakUpgradeCommand extends Command
         if ($this->option('check')) {
             if ($hasUpdate) {
                 $this->warn("  Tersedia pembaruan: v{$current} → v{$latest}");
-                $this->line('  Jalankan <info>php artisan pasak:upgrade</info> untuk memperbarui.');
+                $this->line(
+                    '  Jalankan <info>php artisan pasak:upgrade</info> untuk memperbarui.',
+                );
             } else {
-                $this->info("  ✓ Package sudah berada pada versi terbaru (v{$current}).");
+                $this->info(
+                    "  ✓ Package sudah berada pada versi terbaru (v{$current}).",
+                );
             }
 
             return 0;
         }
 
         if (! $hasUpdate && ! $this->option('force')) {
-            $this->info("  ✓ Package sudah berada pada versi terbaru (v{$current}).");
+            $this->info(
+                "  ✓ Package sudah berada pada versi terbaru (v{$current}).",
+            );
 
             if ($this->input->isInteractive()) {
-                if (! $this->confirm('Apakah Anda ingin tetap menyinkronkan aset (migrasi database, rute, dan tampilan)?', false)) {
+                if (
+                    ! $this->confirm(
+                        'Apakah Anda ingin tetap menyinkronkan aset (migrasi database, rute, dan tampilan)?',
+                        false,
+                    )
+                ) {
                     return 0;
                 }
             } else {
@@ -69,7 +88,11 @@ class PasakUpgradeCommand extends Command
         if (! $this->option('no-composer')) {
             $this->comment('1/5. Memperbarui package via Composer...');
             $composer = $this->findComposer();
-            $cmd = array_merge($composer, ['update', 'robyajo/pasak', '--with-all-dependencies']);
+            $cmd = array_merge($composer, [
+                'update',
+                'robyajo/pasak',
+                '--with-all-dependencies',
+            ]);
 
             if (function_exists('proc_open')) {
                 try {
@@ -80,20 +103,33 @@ class PasakUpgradeCommand extends Command
                     });
 
                     if (! $process->isSuccessful()) {
-                        $this->warn('  Peringatan: Composer update selesai dengan kode non-nol. Melanjutkan sinkronisasi aset lokal...');
+                        $this->warn(
+                            '  Peringatan: Composer update selesai dengan kode non-nol. Melanjutkan sinkronisasi aset lokal...',
+                        );
                     } else {
-                        $this->info('  ✓ Composer package berhasil diperbarui.');
+                        $this->info(
+                            '  ✓ Composer package berhasil diperbarui.',
+                        );
                     }
                 } catch (Throwable $e) {
-                    $this->warn('  Gagal menjalankan Composer otomatis: '.$e->getMessage());
-                    $this->line('  Silakan jalankan <info>composer update robyajo/pasak</info> secara manual jika diperlukan.');
+                    $this->warn(
+                        '  Gagal menjalankan Composer otomatis: '.
+                            $e->getMessage(),
+                    );
+                    $this->line(
+                        '  Silakan jalankan <info>composer update robyajo/pasak</info> secara manual jika diperlukan.',
+                    );
                 }
             } else {
-                $this->warn('  Fungsi proc_open dinonaktifkan di server. Silakan jalankan composer update secara manual.');
+                $this->warn(
+                    '  Fungsi proc_open dinonaktifkan di server. Silakan jalankan composer update secara manual.',
+                );
             }
             $this->newLine();
         } else {
-            $this->line('  (1/5. Pembaruan Composer dilewati via --no-composer).');
+            $this->line(
+                '  (1/5. Pembaruan Composer dilewati via --no-composer).',
+            );
             $this->newLine();
         }
 
@@ -114,9 +150,15 @@ class PasakUpgradeCommand extends Command
             $seededKeys = app(PasakDefaultSettingsSeeder::class)->run();
 
             if ($seededKeys === []) {
-                $this->line('  ✓ Pengaturan keamanan bawaan sudah lengkap di database.');
+                $this->line(
+                    '  ✓ Pengaturan keamanan bawaan sudah lengkap di database.',
+                );
             } else {
-                $this->info('  ✓ '.count($seededKeys).' pengaturan keamanan baru ditanam ke database (atur dari dashboard /pasak/settings).');
+                $this->info(
+                    '  ✓ '.
+                        count($seededKeys).
+                        ' pengaturan keamanan baru ditanam ke database (atur dari dashboard /pasak/settings).',
+                );
             }
         } catch (Throwable $e) {
             $this->comment(
@@ -143,9 +185,13 @@ class PasakUpgradeCommand extends Command
                 '--tag' => 'pasak-routes',
                 '--force' => (bool) $this->option('sync-routes'),
             ]);
-            $this->info('  ✓ Berkas routes/pasak.php dan routes/pasak-api.php telah disinkronkan.');
+            $this->info(
+                '  ✓ Berkas routes/pasak.php dan routes/pasak-api.php telah disinkronkan.',
+            );
         } else {
-            $this->line('  (Rute internal paket aktif secara otomatis, berkas rute lokal tidak ditemukan).');
+            $this->line(
+                '  (Rute internal paket aktif secara otomatis, berkas rute lokal tidak ditemukan).',
+            );
         }
         $this->newLine();
 
@@ -161,18 +207,20 @@ class PasakUpgradeCommand extends Command
                 '--tag' => 'plain-views',
                 '--force' => (bool) $this->option('sync-views'),
             ]);
-            $this->info('  ✓ Tampilan dashboard Blade murni telah disinkronkan.');
-            $this->warnIfViewsOutdated(
-                resource_path('views/pages/pasak/layout.blade.php'),
-                'pasakAnnounce'
+            $this->info(
+                '  ✓ Tampilan dashboard Blade murni telah disinkronkan.',
             );
             $this->warnIfViewsOutdated(
                 resource_path('views/pages/pasak/layout.blade.php'),
-                'pasak.dashboard.threat-map'
+                'pasakAnnounce',
+            );
+            $this->warnIfViewsOutdated(
+                resource_path('views/pages/pasak/layout.blade.php'),
+                'pasak.dashboard.threat-map',
             );
             $this->warnIfViewsOutdated(
                 resource_path('views/pages/pasak/settings.blade.php'),
-                'auto_block_level_thresholds'
+                'auto_block_level_thresholds',
             );
         }
 
@@ -181,12 +229,16 @@ class PasakUpgradeCommand extends Command
                 '--tag' => 'pasak-views',
                 '--force' => (bool) $this->option('sync-views'),
             ]);
-            $this->info('  ✓ Halaman error blokir (errors/blocked.blade.php) telah disinkronkan.');
+            $this->info(
+                '  ✓ Halaman error blokir (errors/blocked.blade.php) telah disinkronkan.',
+            );
         }
         $this->newLine();
 
         // 5. Clear Caches & Refresh
-        $this->comment('5/5. Membersihkan cache konfigurasi, rute, dan tampilan...');
+        $this->comment(
+            '5/5. Membersihkan cache konfigurasi, rute, dan tampilan...',
+        );
         try {
             $this->callSilent('optimize:clear');
         } catch (Throwable) {
@@ -197,7 +249,9 @@ class PasakUpgradeCommand extends Command
         $this->newLine();
 
         $refreshedVersion = $versionChecker->getCurrentVersion();
-        $this->info("  🎉 Pasak berhasil diperbarui dan disinkronkan (v{$refreshedVersion})!");
+        $this->info(
+            "  🎉 Pasak berhasil diperbarui dan disinkronkan (v{$refreshedVersion})!",
+        );
         $this->newLine();
 
         return 0;
@@ -211,16 +265,24 @@ class PasakUpgradeCommand extends Command
     protected function migrateLegacyHostFiles(): void
     {
         // Berkas rute era lama -> nama baru (beserta require di web.php/api.php).
-        foreach ([
-            ['routes/security.php', 'routes/pasak.php', 'routes/web.php'],
-            ['routes/security-api.php', 'routes/pasak-api.php', 'routes/api.php'],
-        ] as [$legacy, $current, $wiring]) {
+        foreach (
+            [
+                ['routes/security.php', 'routes/pasak.php', 'routes/web.php'],
+                [
+                    'routes/security-api.php',
+                    'routes/pasak-api.php',
+                    'routes/api.php',
+                ],
+            ] as [$legacy, $current, $wiring]
+        ) {
             $legacyPath = base_path($legacy);
             $currentPath = base_path($current);
 
             if (File::exists($legacyPath) && ! File::exists($currentPath)) {
                 File::move($legacyPath, $currentPath);
-                $this->info("  ✓ Berkas {$legacy} dipindahkan ke {$current} (kustomisasi dipertahankan).");
+                $this->info(
+                    "  ✓ Berkas {$legacy} dipindahkan ke {$current} (kustomisasi dipertahankan).",
+                );
             }
 
             $wiringPath = base_path($wiring);
@@ -229,28 +291,37 @@ class PasakUpgradeCommand extends Command
                 $updated = str_replace(
                     ["require __DIR__.'/".basename($legacy)."';"],
                     ["require __DIR__.'/".basename($current)."';"],
-                    $content
+                    $content,
                 );
 
                 if ($updated !== $content) {
                     File::put($wiringPath, $updated);
-                    $this->info("  ✓ Referensi rute di {$wiring} diperbarui ke {$current}.");
+                    $this->info(
+                        "  ✓ Referensi rute di {$wiring} diperbarui ke {$current}.",
+                    );
                 }
             }
         }
 
         // Direktori dashboard era lama -> lokasi baru (bila target belum ada).
-        foreach ([
-            'views/pages/security' => 'views/pages/pasak',
-            'js/pages/security' => 'js/pages/pasak',
-            'js/components/security' => 'js/components/pasak',
-        ] as $legacy => $current) {
+        foreach (
+            [
+                'views/pages/security' => 'views/pages/pasak',
+                'js/pages/security' => 'js/pages/pasak',
+                'js/components/security' => 'js/components/pasak',
+            ] as $legacy => $current
+        ) {
             $legacyPath = resource_path($legacy);
             $currentPath = resource_path($current);
 
-            if (File::isDirectory($legacyPath) && ! File::isDirectory($currentPath)) {
+            if (
+                File::isDirectory($legacyPath) &&
+                ! File::isDirectory($currentPath)
+            ) {
                 File::moveDirectory($legacyPath, $currentPath);
-                $this->info("  ✓ Direktori resources/{$legacy} dipindahkan ke resources/{$current}.");
+                $this->info(
+                    "  ✓ Direktori resources/{$legacy} dipindahkan ke resources/{$current}.",
+                );
             }
         }
 
@@ -260,10 +331,14 @@ class PasakUpgradeCommand extends Command
 
         if (File::exists($legacyConfig) && ! File::exists($currentConfig)) {
             File::copy($legacyConfig, $currentConfig);
-            $this->info('  ✓ config/security.php disalin ke config/pasak.php (asli dibiarkan sebagai cadangan).');
+            $this->info(
+                '  ✓ config/security.php disalin ke config/pasak.php (asli dibiarkan sebagai cadangan).',
+            );
         }
 
-        $this->line('  ✓ Kunci config baru dicakup bawaan paket (tidak ada kustomisasi yang ditimpa).');
+        $this->line(
+            '  ✓ Kunci config baru dicakup bawaan paket (tidak ada kustomisasi yang ditimpa).',
+        );
     }
 
     /**
@@ -290,14 +365,24 @@ class PasakUpgradeCommand extends Command
             $append = '';
 
             foreach ($stubKeys as $pasakKey) {
-                if (preg_match('/^'.preg_quote($pasakKey, '/').'=.*/m', $content)) {
+                if (
+                    preg_match(
+                        '/^'.preg_quote($pasakKey, '/').'=.*/m',
+                        $content,
+                    )
+                ) {
                     continue;
                 }
 
                 $legacyKey = preg_replace('/^PASAK_/', 'SECURITY_', $pasakKey);
 
-                if ($legacyKey !== $pasakKey
-                    && preg_match('/^'.preg_quote($legacyKey, '/').'=(.*)$/m', $content, $m)
+                if (
+                    $legacyKey !== $pasakKey &&
+                    preg_match(
+                        '/^'.preg_quote($legacyKey, '/').'=(.*)$/m',
+                        $content,
+                        $m,
+                    )
                 ) {
                     $append .= "\n{$pasakKey}=".trim($m[1]);
                 }
@@ -305,30 +390,48 @@ class PasakUpgradeCommand extends Command
 
             if ($append !== '') {
                 File::append($path, "\n".$append."\n");
-                $this->info("  ✓ Nilai lama SECURITY_* disalin ke kunci PASAK_* di {$envFile} (asli dipertahankan).");
+                $this->info(
+                    "  ✓ Nilai lama SECURITY_* disalin ke kunci PASAK_* di {$envFile} (asli dipertahankan).",
+                );
             }
         }
+
+        // 1b. URL dashboard acak sekali pakai: lengkapi kunci yang belum ada
+        // bila dashboard aktif, tanpa menimpa pilihan eksplisit pengguna.
+        $this->ensureRotatingEnvKeys();
 
         // 2. config/pasak.php host versi lama: migrasikan default table_names ke prefix pasak_
         //    (kunci baru otomatis diisi dari bawaan paket saat runtime via mergeConfigFrom).
         $this->migrateLegacyTableNamesInConfig();
-        $this->line('  ✓ Kunci config baru dicakup bawaan paket (tidak ada kustomisasi yang ditimpa).');
+        // 2b. config/pasak.php host versi lama: sisipkan kunci URL dashboard acak
+        // sekali pakai (nested, tidak tercakup mergeConfigFrom yang dangkal).
+        $this->migrateDashboardRotatingKeysInConfig();
+        $this->line(
+            '  ✓ Kunci config baru dicakup bawaan paket (tidak ada kustomisasi yang ditimpa).',
+        );
 
         // 3. Sidecar .htaccess.pasak untuk standar baru (tidak menyentuh milik user).
         $sidecar = public_path('.htaccess.pasak');
 
         if (! File::exists($sidecar)) {
-            foreach ([
-                __DIR__.'/../../../stubs/htaccess.stub',
-                dirname(__DIR__, 2).'/stubs/htaccess.stub',
-            ] as $stubPath) {
+            foreach (
+                [
+                    __DIR__.'/../../../stubs/htaccess.stub',
+                    dirname(__DIR__, 2).'/stubs/htaccess.stub',
+                ] as $stubPath
+            ) {
                 if (File::exists($stubPath)) {
                     try {
                         File::ensureDirectoryExists(dirname($sidecar));
                         File::copy($stubPath, $sidecar);
-                        $this->info('  ✓ Berkas tinjauan public/.htaccess.pasak dibuat (milik Anda tidak diubah).');
+                        $this->info(
+                            '  ✓ Berkas tinjauan public/.htaccess.pasak dibuat (milik Anda tidak diubah).',
+                        );
                     } catch (Throwable $e) {
-                        $this->warn('  ⚠ Gagal membuat public/.htaccess.pasak: '.$e->getMessage());
+                        $this->warn(
+                            '  ⚠ Gagal membuat public/.htaccess.pasak: '.
+                                $e->getMessage(),
+                        );
                     }
                     break;
                 }
@@ -336,10 +439,124 @@ class PasakUpgradeCommand extends Command
         }
 
         // 4. Normalisasi driver dashboard warisan ke 'blade' (satu-satunya driver).
-        $driver = strtolower((string) config('pasak.dashboard.driver', 'blade'));
+        $driver = strtolower(
+            (string) config('pasak.dashboard.driver', 'blade'),
+        );
 
         if (! in_array($driver, ['blade', 'plain'], true)) {
-            $this->warn("  ⚠ Driver dashboard '{$driver}' tidak lagi didukung (dashboard kini Blade murni). Gunakan PASAK_DASHBOARD_DRIVER=blade.");
+            $this->warn(
+                "  ⚠ Driver dashboard '{$driver}' tidak lagi didukung (dashboard kini Blade murni). Gunakan PASAK_DASHBOARD_DRIVER=blade.",
+            );
+        }
+    }
+
+    /**
+     * Lengkapi kunci URL dashboard acak sekali pakai pada .env lama bila
+     * dashboard aktif, tanpa menimpa pilihan eksplisit pengguna.
+     */
+    protected function ensureRotatingEnvKeys(): void
+    {
+        if (! (bool) config('pasak.dashboard.enabled', false)) {
+            return;
+        }
+
+        $defaults = [
+            'PASAK_DASHBOARD_ROTATING' => 'true',
+            'PASAK_DASHBOARD_TOKEN_LENGTH' => '16',
+            'PASAK_DASHBOARD_SINGLE_USE' => 'true',
+            'PASAK_DASHBOARD_GRACE_SECONDS' => '120',
+        ];
+
+        foreach (['.env', '.env.example'] as $envFile) {
+            $path = base_path($envFile);
+
+            if (! File::exists($path)) {
+                continue;
+            }
+
+            $content = File::get($path);
+            $original = $content;
+
+            foreach ($defaults as $key => $value) {
+                if (! str_contains($content, $key.'=')) {
+                    $content = rtrim($content)."\n{$key}={$value}\n";
+                }
+            }
+
+            if (
+                preg_match('/^PASAK_DASHBOARD_SECRET=\\s*$/m', $content) === 1
+            ) {
+                $content = (string) preg_replace(
+                    '/^PASAK_DASHBOARD_SECRET=\\s*$/m',
+                    'PASAK_DASHBOARD_SECRET='.Str::random(48),
+                    $content,
+                );
+            }
+
+            if (! str_contains($content, 'PASAK_DASHBOARD_SECRET=')) {
+                $content =
+                    rtrim($content).
+                    "\nPASAK_DASHBOARD_SECRET=".
+                    Str::random(48).
+                    "\n";
+            }
+
+            if ($content !== $original) {
+                File::put($path, $content);
+                $this->info(
+                    "  ✓ Kunci URL acak sekali pakai dashboard dilengkapi di {$envFile} (pilihan eksplisit dipertahankan).",
+                );
+            }
+        }
+    }
+
+    /**
+     * Sisipkan kunci URL dashboard acak sekali pakai ke config/pasak.php host
+     * versi lama bila belum ada. Kunci nested tidak tercakup mergeConfigFrom
+     * (dangkal), jadi tanpa ini env PASAK_DASHBOARD_ROTATING diabaikan.
+     * Kustomisasi pengguna tidak disentuh (hanya sisip bila belum ada).
+     */
+    protected function migrateDashboardRotatingKeysInConfig(): void
+    {
+        $configPath = config_path('pasak.php');
+
+        if (! File::exists($configPath)) {
+            return;
+        }
+
+        $content = File::get($configPath);
+
+        if (str_contains($content, "'rotating' =>")) {
+            return;
+        }
+
+        $anchor =
+            "'prefix' => env('PASAK_DASHBOARD_PREFIX', env('SECURITY_DASHBOARD_PREFIX', 'pasak')),";
+
+        if (! str_contains($content, $anchor)) {
+            return;
+        }
+
+        $block = <<<'PHP'
+        'prefix' => env('PASAK_DASHBOARD_PREFIX', env('SECURITY_DASHBOARD_PREFIX', 'pasak')),
+                // URL acak sekali pakai (moving-target): bila true, pintu stabil
+                // "/pasak" selalu 302 ke "/pasak-{token}/" milik sesi pengguna.
+                // Token diputar setiap akses HTML sehingga reload selalu berubah,
+                // mis. /pasak-95856857476jdhjs5/logs lalu /pasak-634664873647jbdjshf/logs.
+                'rotating' => (bool) env('PASAK_DASHBOARD_ROTATING', env('SECURITY_DASHBOARD_ROTATING', false)),
+                'secret' => env('PASAK_DASHBOARD_SECRET', env('SECURITY_DASHBOARD_SECRET')),
+                'token_length' => (int) env('PASAK_DASHBOARD_TOKEN_LENGTH', env('SECURITY_DASHBOARD_TOKEN_LENGTH', 16)),
+                'single_use' => (bool) env('PASAK_DASHBOARD_SINGLE_USE', env('SECURITY_DASHBOARD_SINGLE_USE', true)),
+                'grace_seconds' => (int) env('PASAK_DASHBOARD_GRACE_SECONDS', env('SECURITY_DASHBOARD_GRACE_SECONDS', 120)),
+        PHP;
+
+        $updated = str_replace($anchor, $block, $content);
+
+        if ($updated !== $content) {
+            File::put($configPath, $updated);
+            $this->info(
+                '  ✓ Kunci URL acak sekali pakai disisipkan ke config/pasak.php (kustomisasi Anda dipertahankan).',
+            );
         }
     }
 
@@ -370,11 +587,17 @@ class PasakUpgradeCommand extends Command
             "'allowed_ips' => env('PASAK_ALLOWED_IPS_TABLE', 'allowed_ips')" => "'allowed_ips' => env('PASAK_ALLOWED_IPS_TABLE', 'pasak_allowed_ips')",
         ];
 
-        $updated = str_replace(array_keys($replacements), array_values($replacements), $content);
+        $updated = str_replace(
+            array_keys($replacements),
+            array_values($replacements),
+            $content,
+        );
 
         if ($updated !== $content) {
             File::put($configPath, $updated);
-            $this->info('  ✓ Nilai default nama tabel di config/pasak.php diperbarui ke prefix pasak_ (kustomisasi Anda dipertahankan).');
+            $this->info(
+                '  ✓ Nilai default nama tabel di config/pasak.php diperbarui ke prefix pasak_ (kustomisasi Anda dipertahankan).',
+            );
         }
     }
 
@@ -383,10 +606,12 @@ class PasakUpgradeCommand extends Command
      */
     protected function stubEnvKeys(): array
     {
-        foreach ([
-            __DIR__.'/../../../stubs/env.stub',
-            dirname(__DIR__, 2).'/stubs/env.stub',
-        ] as $stubPath) {
+        foreach (
+            [
+                __DIR__.'/../../../stubs/env.stub',
+                dirname(__DIR__, 2).'/stubs/env.stub',
+            ] as $stubPath
+        ) {
             if (! File::exists($stubPath)) {
                 continue;
             }
@@ -396,30 +621,34 @@ class PasakUpgradeCommand extends Command
             // Kunci perilaku legacy di luar stub inti tetap didukung sebagai
             // override manual, jadi migrasi SECURITY_* -> PASAK_* harus tetap
             // mencakup semuanya.
-            return array_values(array_unique(array_merge($m[1], [
-                'PASAK_AUTO_BLOCK_ENABLED',
-                'PASAK_AUTO_BLOCK_THRESHOLD',
-                'PASAK_AUTO_BLOCK_WINDOW',
-                'PASAK_AUTO_BLOCK_DURATION',
-                'PASAK_AUTO_BLOCK_LEVELS',
-                'PASAK_AUTO_BLOCK_SCOPE',
-                'PASAK_AUTO_BLOCK_LEVEL_THRESHOLDS',
-                'PASAK_AUTO_BLOCK_COMBINED_THRESHOLD',
-                'PASAK_INSTANT_BLOCK_ENABLED',
-                'PASAK_INSTANT_BLOCK_DURATION',
-                'PASAK_INSTANT_BLOCK_SCOPE',
-                'PASAK_LOGIN_LOCKOUT_ENABLED',
-                'PASAK_LOGIN_LOCKOUT_THRESHOLD',
-                'PASAK_LOGIN_LOCKOUT_BASE_MINUTES',
-                'PASAK_LOGIN_LOCKOUT_MAX_MINUTES',
-                'PASAK_LOGIN_LOCKOUT_DECAY_MINUTES',
-                'PASAK_LOG_RETENTION_DAYS',
-                'PASAK_BLOCK_ENFORCEMENT',
-                'PASAK_MONITOR_ENABLED',
-                'PASAK_ANNOUNCEMENT_ENABLED',
-                'PASAK_VERSION_CHECK_ENABLED',
-                'PASAK_DASHBOARD_DRIVER',
-            ])));
+            return array_values(
+                array_unique(
+                    array_merge($m[1], [
+                        'PASAK_AUTO_BLOCK_ENABLED',
+                        'PASAK_AUTO_BLOCK_THRESHOLD',
+                        'PASAK_AUTO_BLOCK_WINDOW',
+                        'PASAK_AUTO_BLOCK_DURATION',
+                        'PASAK_AUTO_BLOCK_LEVELS',
+                        'PASAK_AUTO_BLOCK_SCOPE',
+                        'PASAK_AUTO_BLOCK_LEVEL_THRESHOLDS',
+                        'PASAK_AUTO_BLOCK_COMBINED_THRESHOLD',
+                        'PASAK_INSTANT_BLOCK_ENABLED',
+                        'PASAK_INSTANT_BLOCK_DURATION',
+                        'PASAK_INSTANT_BLOCK_SCOPE',
+                        'PASAK_LOGIN_LOCKOUT_ENABLED',
+                        'PASAK_LOGIN_LOCKOUT_THRESHOLD',
+                        'PASAK_LOGIN_LOCKOUT_BASE_MINUTES',
+                        'PASAK_LOGIN_LOCKOUT_MAX_MINUTES',
+                        'PASAK_LOGIN_LOCKOUT_DECAY_MINUTES',
+                        'PASAK_LOG_RETENTION_DAYS',
+                        'PASAK_BLOCK_ENFORCEMENT',
+                        'PASAK_MONITOR_ENABLED',
+                        'PASAK_ANNOUNCEMENT_ENABLED',
+                        'PASAK_VERSION_CHECK_ENABLED',
+                        'PASAK_DASHBOARD_DRIVER',
+                    ]),
+                ),
+            );
         }
 
         return [];
@@ -436,8 +665,14 @@ class PasakUpgradeCommand extends Command
         }
 
         if (! str_contains(File::get($path), $marker)) {
-            $this->warn("  ⚠ Tampilan terpublish kedaluwarsa ({$this->relativeHostPath($path)} tidak memuat fitur terbaru).");
-            $this->line('    Jalankan <fg=yellow>php artisan pasak:upgrade --sync-views</fg=yellow> untuk memperbarui (kustomisasi dicadangkan dulu).');
+            $this->warn(
+                "  ⚠ Tampilan terpublish kedaluwarsa ({$this->relativeHostPath(
+                    $path,
+                )} tidak memuat fitur terbaru).",
+            );
+            $this->line(
+                '    Jalankan <fg=yellow>php artisan pasak:upgrade --sync-views</fg=yellow> untuk memperbarui (kustomisasi dicadangkan dulu).',
+            );
         }
     }
 
@@ -445,7 +680,9 @@ class PasakUpgradeCommand extends Command
     {
         $base = base_path().DIRECTORY_SEPARATOR;
 
-        return str_starts_with($path, $base) ? substr($path, strlen($base)) : $path;
+        return str_starts_with($path, $base)
+            ? substr($path, strlen($base))
+            : $path;
     }
 
     /**
@@ -471,7 +708,9 @@ class PasakUpgradeCommand extends Command
                 }
                 $this->line("  ℹ Cadangan kustomisasi disimpan di: {$backup}");
             } catch (Throwable $e) {
-                $this->warn('  ⚠ Gagal mencadangkan '.$path.': '.$e->getMessage());
+                $this->warn(
+                    '  ⚠ Gagal mencadangkan '.$path.': '.$e->getMessage(),
+                );
             }
         }
     }

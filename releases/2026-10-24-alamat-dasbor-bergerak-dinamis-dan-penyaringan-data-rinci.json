@@ -1,0 +1,29 @@
+{
+    "date": "2026-10-24",
+    "type": "feature",
+    "title": {
+        "id": "Alamat Dasbor Bergerak Dinamis dan Penyaringan Data Rinci",
+        "en": "Dynamic Rotating Dashboard Address and Detailed Data Filtering"
+    },
+    "body": {
+        "id": "Peningkatan keamanan panel kendali melalui tautan akses yang berubah secara dinamis setiap kali dimuat ulang, disertai fitur penyaringan data dan penomoran halaman yang lebih mudah digunakan.",
+        "en": "Enhanced control panel security with dynamically rotating access links on each reload, alongside intuitive data filtering and table pagination."
+    },
+    "items": [
+        {
+            "type": "new",
+            "id": "Pengacakan Alamat Panel Kendali: Tautan halaman administrasi kini berganti secara otomatis di setiap kunjungan baru guna mencegah upaya pelacakan dan pengintaian pihak luar tanpa mengganggu kenyamanan navigasi.",
+            "en": "Dynamic Control Panel Addresses: Administration page links now rotate automatically on each visit to disguise access paths from reconnaissance without hindering navigation."
+        },
+        {
+            "type": "new",
+            "id": "Penyaringan dan Penomoran Riwayat: Pengelola sistem kini dapat membatasi data berdasarkan rentang tanggal serta memilih jumlah baris tampilan pada tabel riwayat keamanan dan tiket bantuan.",
+            "en": "Data Filtering and Pagination: Administrators can now filter security logs and assistance tickets by date range and customize page sizes effortlessly."
+        },
+        {
+            "type": "improvement",
+            "id": "Ketahanan Sesi Administrasi: Tautan lama yang dibuka kembali tetap dialihkan dengan mulus ke alamat aktif terbaru tanpa menampilkan halaman kesalahan.",
+            "en": "Seamless Session Redirection: Previously accessed bookmarks and links smoothly redirect to the latest active address without encountering error pages."
+        }
+    ]
+}

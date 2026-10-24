@@ -7,3 +7,6 @@ composer.lock
 
 # Sandbox aplikasi Laravel uji (tidak ikut rilis paket)
 /laravel-test
+
+# Alias direktori skills sistem ACP (diarahkan ke .agents/skills)
+/skills

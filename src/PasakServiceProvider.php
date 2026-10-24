@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 use Internal\Pasak\Console\Commands\PasakBaselineCommand;
 use Internal\Pasak\Console\Commands\PasakInstallCommand;
@@ -26,6 +27,8 @@ use Internal\Pasak\Http\Middleware\PasakBlockIpAddress;
 use Internal\Pasak\Http\Middleware\PasakDetectSecurityThreats;
 use Internal\Pasak\Http\Middleware\PasakEnsureSecurityAdmin;
 use Internal\Pasak\Http\Middleware\PasakInjectAnnouncementBanner;
+use Internal\Pasak\Http\Middleware\PasakRotatingDashboard;
+use Internal\Pasak\Http\Middleware\PasakShareDashboardSlug;
 use Internal\Pasak\Http\Middleware\PasakTrackUserActivity;
 use Internal\Pasak\Listeners\PasakLogFailedLoginAttempt;
 use Internal\Pasak\Listeners\PasakRecordUserLogin;
@@ -61,7 +64,10 @@ class PasakServiceProvider extends ServiceProvider
                 }
             }
             // Keep the legacy key in sync so old config('security.*') calls keep working.
-            config()->set('security', array_replace($legacyConfig, config('pasak')));
+            config()->set(
+                'security',
+                array_replace($legacyConfig, config('pasak')),
+            );
         } else {
             config()->set('security', config('pasak'));
         }
@@ -70,37 +76,58 @@ class PasakServiceProvider extends ServiceProvider
             return new PasakService;
         });
 
-        $this->app->singleton(PasakLoginThrottleService::class, function ($app) {
+        $this->app->singleton(PasakLoginThrottleService::class, function (
+            $app,
+        ) {
             return new PasakLoginThrottleService(
                 $app->make(PasakService::class),
             );
         });
-        $this->app->alias(PasakLoginThrottleService::class, LoginThrottleService::class);
+        $this->app->alias(
+            PasakLoginThrottleService::class,
+            LoginThrottleService::class,
+        );
 
         $this->app->singleton(PasakUserLoginService::class, function ($app) {
             return new PasakUserLoginService;
         });
-        $this->app->alias(PasakUserLoginService::class, UserLoginService::class);
+        $this->app->alias(
+            PasakUserLoginService::class,
+            UserLoginService::class,
+        );
 
-        $this->app->singleton(PasakServerSecurityService::class, function ($app) {
+        $this->app->singleton(PasakServerSecurityService::class, function (
+            $app,
+        ) {
             return new PasakServerSecurityService(
                 $app->make(PasakService::class),
                 $app->make(PasakLoginThrottleService::class),
             );
         });
-        $this->app->alias(PasakServerSecurityService::class, ServerSecurityService::class);
+        $this->app->alias(
+            PasakServerSecurityService::class,
+            ServerSecurityService::class,
+        );
 
-        $this->app->singleton(PasakAccessLogScannerService::class, function ($app) {
+        $this->app->singleton(PasakAccessLogScannerService::class, function (
+            $app,
+        ) {
             return new PasakAccessLogScannerService(
                 $app->make(PasakService::class),
             );
         });
-        $this->app->alias(PasakAccessLogScannerService::class, AccessLogScannerService::class);
+        $this->app->alias(
+            PasakAccessLogScannerService::class,
+            AccessLogScannerService::class,
+        );
 
         $this->app->singleton(PasakVersionCheckService::class, function () {
             return new PasakVersionCheckService;
         });
-        $this->app->alias(PasakVersionCheckService::class, VersionCheckService::class);
+        $this->app->alias(
+            PasakVersionCheckService::class,
+            VersionCheckService::class,
+        );
 
         $this->app->alias(PasakService::class, 'pasak');
         $this->app->alias(PasakVersionCheckService::class, 'pasak.version');
@@ -116,6 +143,7 @@ class PasakServiceProvider extends ServiceProvider
         $this->registerListeners();
         $this->registerRoutes();
         $this->registerDashboardRoutes();
+        $this->registerDashboardUrlDefaults();
         $this->registerSchedule();
         $this->registerGate();
         $this->registerMiddleware();
@@ -131,9 +159,7 @@ class PasakServiceProvider extends ServiceProvider
         // Config
         $this->publishes(
             [
-                __DIR__.'/../config/pasak.php' => config_path(
-                    'pasak.php',
-                ),
+                __DIR__.'/../config/pasak.php' => config_path('pasak.php'),
             ],
             'pasak-config',
         );
@@ -189,9 +215,7 @@ class PasakServiceProvider extends ServiceProvider
         // Publish All Assets (Config, Migrations, Nginx, Apache2, Htaccess, Blocked View)
         $this->publishes(
             [
-                __DIR__.'/../config/pasak.php' => config_path(
-                    'pasak.php',
-                ),
+                __DIR__.'/../config/pasak.php' => config_path('pasak.php'),
                 __DIR__.'/../database/migrations' => database_path(
                     'migrations',
                 ),
@@ -246,10 +270,9 @@ class PasakServiceProvider extends ServiceProvider
                 'views/pages/pasak',
             ),
         ];
-        $dashboardAssets = array_merge(
-            $bladeViews,
-            [__DIR__.'/../config/pasak.php' => config_path('pasak.php')],
-        );
+        $dashboardAssets = array_merge($bladeViews, [
+            __DIR__.'/../config/pasak.php' => config_path('pasak.php'),
+        ]);
 
         $this->publishes($dashboardAssets, 'pasak-dashboard');
         $this->publishes($dashboardAssets, 'plain-views');
@@ -343,6 +366,36 @@ class PasakServiceProvider extends ServiceProvider
         $this->loadRoutesFrom(__DIR__.'/../routes/pasak-dashboard-blade.php');
     }
 
+    /**
+     * Sediakan fallback URL::defaults agar route() dashboard tidak fatal di
+     * luar konteks dashboard (view host, API, console, mail). URL stabil
+     * yang dihasilkan ditangani alias redirect ke slug aktif.
+     */
+    protected function registerDashboardUrlDefaults(): void
+    {
+        if (! (bool) config('pasak.dashboard.rotating', false)) {
+            return;
+        }
+
+        $base = trim((string) config('pasak.dashboard.prefix', 'pasak'), '/');
+
+        if ($base === '') {
+            $base = 'pasak';
+        }
+
+        URL::defaults(['pasakSlug' => $base]);
+
+        try {
+            $router = $this->app->make(Router::class);
+            $router->pushMiddlewareToGroup(
+                'web',
+                PasakShareDashboardSlug::class,
+            );
+        } catch (\Throwable) {
+            // Abaikan bila grup web tidak tersedia.
+        }
+    }
+
     protected function registerSchedule(): void
     {
         if (! config('pasak.schedule.enabled', true)) {
@@ -428,14 +481,31 @@ class PasakServiceProvider extends ServiceProvider
     protected function registerMiddleware(): void
     {
         $router = $this->app->make(Router::class);
-        $router->aliasMiddleware('pasak.admin', PasakEnsureSecurityAdmin::class);
+        $router->aliasMiddleware(
+            'pasak.admin',
+            PasakEnsureSecurityAdmin::class,
+        );
         $router->aliasMiddleware('pasak.block', PasakBlockIpAddress::class);
         $router->aliasMiddleware(
             'pasak.detect',
             PasakDetectSecurityThreats::class,
         );
-        $router->aliasMiddleware('pasak.activity', PasakTrackUserActivity::class);
-        $router->aliasMiddleware('pasak.announce', PasakInjectAnnouncementBanner::class);
+        $router->aliasMiddleware(
+            'pasak.activity',
+            PasakTrackUserActivity::class,
+        );
+        $router->aliasMiddleware(
+            'pasak.announce',
+            PasakInjectAnnouncementBanner::class,
+        );
+        $router->aliasMiddleware(
+            'pasak.rotating',
+            PasakRotatingDashboard::class,
+        );
+        $router->aliasMiddleware(
+            'pasak.share-slug',
+            PasakShareDashboardSlug::class,
+        );
 
         if (config('pasak.auto_register_middleware', false)) {
             $this->app->booted(function (): void {
@@ -444,7 +514,9 @@ class PasakServiceProvider extends ServiceProvider
                 if ($kernel instanceof HttpKernel) {
                     $kernel->pushMiddleware(PasakBlockIpAddress::class);
                     $kernel->pushMiddleware(PasakDetectSecurityThreats::class);
-                    $kernel->pushMiddleware(PasakInjectAnnouncementBanner::class);
+                    $kernel->pushMiddleware(
+                        PasakInjectAnnouncementBanner::class,
+                    );
                 }
             });
         }
@@ -464,13 +536,17 @@ class PasakServiceProvider extends ServiceProvider
             return;
         }
 
-        Event::listen(CommandStarting::class, function (CommandStarting $event): void {
+        Event::listen(CommandStarting::class, function (
+            CommandStarting $event,
+        ): void {
             if (! in_array($event->command, ['serve', 'dev'], true)) {
                 return;
             }
 
             try {
-                $versionChecker = $this->app->make(PasakVersionCheckService::class);
+                $versionChecker = $this->app->make(
+                    PasakVersionCheckService::class,
+                );
                 $versionChecker->notifyIfUpdateAvailable($event->output);
             } catch (\Throwable) {
                 // Abaikan kesalahan agar tidak pernah mengganggu server dev
