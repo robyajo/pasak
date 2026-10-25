@@ -13,6 +13,10 @@
 @php($simLevels = ['critical' => __('Critical'), 'high' => __('High'), 'medium' => __('Medium'), 'low' => __('Low')])
 @php($simOrder = ['critical', 'high', 'medium', 'low'])
 
+<form method="POST" action="{{ route('pasak.dashboard.settings.update') }}" id="pasak-settings-form" data-sec-confirm="{{ __('Simpan seluruh perubahan konfigurasi WAF dan penegakan keamanan ke database?') }}" data-confirm-title="{{ __('Konfirmasi Simpan Pengaturan') }}" data-confirm-type="primary" data-confirm-btn="{{ __('Ya, Simpan Pengaturan') }}">
+    @csrf
+    <input type="hidden" name="auto_block_duration" id="auto_block_duration" value="{{ $s['auto_block_duration'] ?? 24 }}">
+
 <div class="sec-card">
     <div style="display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap;">
         <div>
@@ -21,7 +25,8 @@
         </div>
         <label class="sec-switch-wrap">
             <span class="sec-switch">
-                <input type="checkbox" name="auto_block_enabled" id="auto_block_switch" value="1" form="pasak-settings-form" @checked(! empty($s['auto_block_enabled']))>
+                <input type="hidden" name="auto_block_enabled" value="0">
+                <input type="checkbox" name="auto_block_enabled" id="auto_block_switch" value="1" @checked(! empty($s['auto_block_enabled']))>
                 <span class="sec-switch-track"></span>
             </span>
             @php($autoOn = ! empty($s['auto_block_enabled']))
@@ -29,11 +34,6 @@
         </label>
     </div>
 </div>
-
-<form method="POST" action="{{ route('pasak.dashboard.settings.update') }}" id="pasak-settings-form">
-    @csrf
-    <input type="hidden" name="auto_block_enabled" value="0">
-    <input type="hidden" name="auto_block_duration" id="auto_block_duration" value="{{ $s['auto_block_duration'] ?? 24 }}">
 
     <div class="sec-card">
         <div style="display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap;">
@@ -149,6 +149,7 @@
             @php($instantOn = ! empty($s['instant_block_enabled']))
             <label class="sec-switch-wrap">
                 <span class="sec-switch">
+                    <input type="hidden" name="instant_block_enabled" value="0">
                     <input type="checkbox" name="instant_block_enabled" id="instant_block_switch" value="1" @checked($instantOn)>
                     <span class="sec-switch-track"></span>
                 </span>
@@ -169,6 +170,7 @@
             </div>
             <div>
                 <label class="sec-label">
+                    <input type="hidden" name="block_enforcement" value="0">
                     <input type="checkbox" name="block_enforcement" value="1" @checked(! empty($s['block_enforcement']))>
                     {{ __('Enforce blocks (return HTTP 403)') }}
                 </label>
@@ -217,20 +219,20 @@
     <div style="height: 20px;"></div>
 
     <div class="sec-card" style="background: var(--sec-warning-bg); border-color: var(--sec-warning-border);">
-        <span style="display: inline-flex; align-items: center; gap: 8px; font-weight: 700; color: #78350f;">
+        <span style="display: inline-flex; align-items: center; gap: 8px; font-weight: 700; color: var(--sec-warning);">
             ⚠ {{ __('Ringkasan Simulasi Kebijakan Auto-Blokir Aktif:') }}
         </span>
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; margin-top: 12px;">
-            <div style="border: 1px solid var(--sec-warning-border); border-radius: var(--sec-radius-sm); background: rgba(255, 255, 255, 0.55); padding: 12px 14px;">
-                <span style="font-size: 11px; font-weight: 700; color: #92400e; text-transform: uppercase;">{{ __('Cakupan Keamanan:') }}</span>
+            <div style="border: 1px solid var(--sec-warning-border); border-radius: var(--sec-radius-sm); background: var(--sec-card); padding: 12px 14px;">
+                <span style="font-size: 11px; font-weight: 700; color: var(--sec-warning); text-transform: uppercase;">{{ __('Cakupan Keamanan:') }}</span>
                 <div id="pasak-sim-scope" style="font-weight: 700; font-size: 14px; margin-top: 4px; color: var(--sec-text);">—</div>
             </div>
-            <div style="border: 1px solid var(--sec-warning-border); border-radius: var(--sec-radius-sm); background: rgba(255, 255, 255, 0.55); padding: 12px 14px;">
-                <span style="font-size: 11px; font-weight: 700; color: #92400e; text-transform: uppercase;">{{ __('Durasi Sanksi Blokir:') }}</span>
+            <div style="border: 1px solid var(--sec-warning-border); border-radius: var(--sec-radius-sm); background: var(--sec-card); padding: 12px 14px;">
+                <span style="font-size: 11px; font-weight: 700; color: var(--sec-warning); text-transform: uppercase;">{{ __('Durasi Sanksi Blokir:') }}</span>
                 <div id="pasak-sim-duration" style="font-weight: 700; font-size: 14px; margin-top: 4px; color: var(--sec-text);">—</div>
             </div>
         </div>
-        <p id="pasak-sim-summary" style="font-size: 13px; margin: 12px 0 8px 0; color: #78350f;">—</p>
+        <p id="pasak-sim-summary" style="font-size: 13px; margin: 12px 0 8px 0; color: var(--sec-warning);">—</p>
         <div id="pasak-sim-chips" style="display: flex; gap: 8px; flex-wrap: wrap;"></div>
     </div>
 

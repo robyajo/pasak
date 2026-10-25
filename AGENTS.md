@@ -18,7 +18,7 @@ This repository is **`robyajo/pasak`** (Bulwark), an enterprise-grade, standalon
     3. **Core Auth Event Hooks**: Listens to native `\Illuminate\Auth\Events\Failed` and `Login` events automatically.
     4. **Core HTTP Kernel & Middleware**: Aliased as `'pasak.block'`, `'pasak.detect'`, `'pasak.admin'`, `'pasak.activity'`, with optional zero-touch auto-registration (`PASAK_AUTO_REGISTER_MIDDLEWARE=true`).
     5. **Core Authorization Gate**: Registers `Gate::define('manage-pasak')`.
-    6. **Core Artisan Commands**: 8 commands automatically available under `php artisan pasak:*` (`install`, `scan-logs`, `baseline`, `unblock-ip`, `prune-logs`, `purge-injected-data`, `upgrade`, `uninstall`).
+    6. **Core Artisan Commands**: 10 commands automatically available under `php artisan pasak:*` (`install`, `scan-logs`, `baseline`, `unblock-ip`, `prune-logs`, `purge-injected-data`, `upgrade`, `uninstall`, `secret`, `deploy`).
     7. **Core Task Scheduler**: Hooks daily log pruning and heartbeat directly into `Schedule`.
     8. **Core Validation Rules**: Implements `ValidationRule` (`SafeImageFile`, `SafeAssetPath`).
 - **Universal Applicability**: Once installed, developers are free to apply it anywhere across their application: pure Blade views, headless APIs, Livewire, Filament/Nova admin panels, Inertia/React/Vue, or console microservices without restriction.

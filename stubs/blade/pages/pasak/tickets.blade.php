@@ -78,18 +78,18 @@
                         <td style="text-align: right; white-space: nowrap;">
                             <a href="{{ route('pasak.dashboard.tickets.show', $ticket->id) }}" class="sec-btn sec-btn-ghost sec-btn-sm">{{ __('Detail') }}</a>
                             @if ($ticket->status === 'pending')
-                                <form method="POST" action="{{ route('pasak.dashboard.tickets.respond', $ticket->id) }}" style="display: inline;">
+                                <form method="POST" action="{{ route('pasak.dashboard.tickets.respond', $ticket->id) }}" style="display: inline;" data-sec-confirm="{{ __('Setujui permohonan banding dan buka blokir IP ini secara otomatis?') }}" data-confirm-title="{{ __('Konfirmasi Persetujuan Banding') }}" data-confirm-type="primary" data-confirm-btn="{{ __('Ya, Setujui & Buka') }}">
                                     @csrf
                                     <input type="hidden" name="action" value="approve">
                                     <button type="submit" class="sec-btn sec-btn-primary sec-btn-sm">{{ __('Approve') }}</button>
                                 </form>
-                                <form method="POST" action="{{ route('pasak.dashboard.tickets.respond', $ticket->id) }}" style="display: inline;">
+                                <form method="POST" action="{{ route('pasak.dashboard.tickets.respond', $ticket->id) }}" style="display: inline;" data-sec-confirm="{{ __('Tolak permohonan banding pembukaan blokir ini?') }}" data-confirm-title="{{ __('Konfirmasi Penolakan Banding') }}" data-confirm-type="warning" data-confirm-btn="{{ __('Ya, Tolak Banding') }}">
                                     @csrf
                                     <input type="hidden" name="action" value="reject">
                                     <button type="submit" class="sec-btn sec-btn-secondary sec-btn-sm">{{ __('Reject') }}</button>
                                 </form>
                             @endif
-                            <form method="POST" action="{{ route('pasak.dashboard.tickets.destroy', $ticket->id) }}" style="display: inline;" onsubmit="return confirm({{ json_encode(__('Delete this ticket?')) }})">
+                            <form method="POST" action="{{ route('pasak.dashboard.tickets.destroy', $ticket->id) }}" style="display: inline;" data-sec-confirm="{{ __('Hapus tiket banding ini dari sistem?') }}" data-confirm-title="{{ __('Konfirmasi Hapus Tiket') }}" data-confirm-type="danger" data-confirm-btn="{{ __('Ya, Hapus') }}">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="sec-btn sec-btn-ghost sec-btn-sm">🗑️</button>

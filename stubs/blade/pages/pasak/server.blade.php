@@ -42,12 +42,12 @@
                 </p>
             </div>
             <div style="display: flex; gap: 8px;">
-                <form method="POST" action="{{ route('pasak.dashboard.server.baseline') }}" onsubmit="return confirm({{ json_encode(__('Create a new integrity baseline from current files?')) }})">
+                <form method="POST" action="{{ route('pasak.dashboard.server.baseline') }}" data-sec-confirm="{{ __('Buat atau perbarui SHA-256 integrity baseline untuk seluruh berkas aplikasi sekarang?') }}" data-confirm-title="{{ __('Konfirmasi Buat Baseline') }}" data-confirm-type="primary" data-confirm-btn="{{ __('Ya, Buat Baseline') }}">
                     @csrf
                     <button type="submit" class="sec-btn sec-btn-secondary sec-btn-sm">{{ __('Create') }}</button>
                 </form>
                 @if ($baseline['exists'] ?? false)
-                    <form method="POST" action="{{ route('pasak.dashboard.server.baseline.destroy') }}" onsubmit="return confirm({{ json_encode(__('Delete the stored baseline?')) }})">
+                    <form method="POST" action="{{ route('pasak.dashboard.server.baseline.destroy') }}" data-sec-confirm="{{ __('Hapus berkas SHA-256 integrity baseline yang tersimpan?') }}" data-confirm-title="{{ __('Konfirmasi Hapus Baseline') }}" data-confirm-type="danger" data-confirm-btn="{{ __('Ya, Hapus') }}">
                         @csrf
                         @method('DELETE')
                         <button type="submit" class="sec-btn sec-btn-danger sec-btn-sm">{{ __('Delete') }}</button>
@@ -66,7 +66,7 @@
                 <div style="font-size: 11px; font-weight: 600; color: var(--sec-text-muted);">{{ __('Missing') }}</div>
             </div>
             <div style="padding: 12px; background: rgba(56, 189, 248, 0.1); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: var(--sec-radius-sm);">
-                <div style="font-size: 20px; font-weight: 700; color: #0284c7;">{{ count($integrity['added'] ?? []) }}</div>
+                <div style="font-size: 20px; font-weight: 700; color: var(--sec-primary);">{{ count($integrity['added'] ?? []) }}</div>
                 <div style="font-size: 11px; font-weight: 600; color: var(--sec-text-muted);">{{ __('New') }}</div>
             </div>
         </div>
@@ -125,7 +125,7 @@
                         <td style="max-width: 280px; font-size: 12px; color: var(--sec-text-muted);" title="{{ $file['reason'] ?? '' }}">{{ \Illuminate\Support\Str::limit((string) ($file['reason'] ?? ''), 60) }}</td>
                         <td style="text-align: right; font-size: 12px;" class="sec-font-mono">{{ $file['size'] ?? '-' }}</td>
                         <td style="text-align: right;">
-                            <form method="POST" action="{{ route('pasak.dashboard.server.suspicious-files.destroy') }}" onsubmit="return confirm({{ json_encode(__('Permanently delete this file?')) }})">
+                            <form method="POST" action="{{ route('pasak.dashboard.server.suspicious-files.destroy') }}" data-sec-confirm="{{ __('PERINGATAN: Berkas mencurigakan ini akan dihapus secara permanen dari server. Lanjutkan?') }}" data-confirm-title="{{ __('Konfirmasi Hapus Berkas') }}" data-confirm-type="danger" data-confirm-btn="{{ __('Ya, Hapus Berkas') }}">
                                 @csrf
                                 @method('DELETE')
                                 <input type="hidden" name="file_path" value="{{ $file['path'] ?? '' }}">
@@ -167,7 +167,7 @@
                             <td><span class="sec-badge sec-badge-high">{{ $lockout['lockout_level'] ?? '-' }}</span></td>
                             <td style="font-size: 12px; color: var(--sec-text-muted);">{{ $lockout['remaining'] ?? '-' }}s</td>
                             <td style="text-align: right;">
-                                <form method="POST" action="{{ route('pasak.dashboard.lockouts.destroy', $lockout['id']) }}">
+                                <form method="POST" action="{{ route('pasak.dashboard.lockouts.destroy', $lockout['id']) }}" data-sec-confirm="{{ __('Buka kunci lockout login untuk akun/IP ini?') }}" data-confirm-title="{{ __('Konfirmasi Buka Lockout') }}" data-confirm-type="primary" data-confirm-btn="{{ __('Ya, Buka Lockout') }}">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="sec-btn sec-btn-secondary sec-btn-sm">{{ __('Release') }}</button>

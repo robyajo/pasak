@@ -85,7 +85,7 @@ class PasakTicketController extends Controller
         );
     }
 
-    public function show(int $id): View
+    public function show(int|string $id): View
     {
         $ticket = PasakIpUnblockRequest::query()->find($id);
 
@@ -114,7 +114,7 @@ class PasakTicketController extends Controller
         );
     }
 
-    public function respond(Request $request, int $id, PasakService $security): RedirectResponse
+    public function respond(Request $request, int|string $id, PasakService $security): RedirectResponse
     {
         $ticket = PasakIpUnblockRequest::query()->find($id);
 
@@ -150,7 +150,7 @@ class PasakTicketController extends Controller
         ]);
     }
 
-    public function destroy(int $id): RedirectResponse
+    public function destroy(int|string $id): RedirectResponse
     {
         PasakIpUnblockRequest::query()->whereKey($id)->delete();
 

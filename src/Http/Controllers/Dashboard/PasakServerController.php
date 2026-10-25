@@ -98,7 +98,7 @@ class PasakServerController extends Controller
     }
 
     public function releaseLockout(
-        int $id,
+        int|string $id,
         PasakServerSecurityService $server,
     ): RedirectResponse {
         $attempt = PasakLoginAttempt::query()->find($id);

@@ -48,6 +48,14 @@ beforeEach(function () {
                 'action',
                 fn () => response('ok'),
             )->name('action');
+            Route::get(
+                'blocked-ips',
+                fn () => response('blocked-ips: '.json_encode(session('toast'))),
+            )->name('blocked-ips');
+            Route::patch(
+                'blocked-ips/{id}/toggle',
+                [\Internal\Pasak\Http\Controllers\Dashboard\PasakBlockedIpController::class, 'toggle'],
+            )->name('blocked-ips.toggle');
         });
 
     Route::getRoutes()->refreshNameLookups();
@@ -223,4 +231,49 @@ test('feed polling tidak memutar token sehingga tidak balapan', function () {
 
     $this->get('/'.$current.'/threat-map/feed')->assertOk();
     $this->get('/'.$current.'/threat-map/feed')->assertOk();
+});
+
+test('rute berparameter seperti toggle blocked-ip menerima id sebenarnya bukan pasakSlug', function () {
+    $block = \Internal\Pasak\Models\PasakBlockedIp::create([
+        'ip_address' => '198.51.100.77',
+        'is_active' => true,
+    ]);
+
+    $this->get('/pasak');
+    $current = session(PasakDashboardUrlService::SESSION_KEY);
+
+    $toggleUrl = '/'.$current.'/blocked-ips/'.$block->id.'/toggle';
+
+    $response = $this->patch($toggleUrl);
+    $response->assertSessionHas('toast.type', 'success');
+
+    $block->refresh();
+    expect($block->is_active)->toBeFalse();
+
+    // Toggle kembali menjadi true
+    $response2 = $this->patch($toggleUrl);
+    $response2->assertSessionHas('toast.type', 'success');
+
+    $block->refresh();
+    expect($block->is_active)->toBeTrue();
+});
+
+test('flash toast bertahan melewati pengalihan ganda url acak berputar', function () {
+    $block = \Internal\Pasak\Models\PasakBlockedIp::create([
+        'ip_address' => '198.51.100.88',
+        'is_active' => true,
+    ]);
+
+    $this->get('/pasak');
+    $current = session(PasakDashboardUrlService::SESSION_KEY);
+
+    $this->get('/'.$current.'/blocked-ips');
+    $newer = session(PasakDashboardUrlService::SESSION_KEY);
+
+    $response = $this->patch('/'.$current.'/blocked-ips/'.$block->id.'/toggle');
+    $response->assertRedirect('/'.$current.'/blocked-ips');
+
+    $landing = $this->followRedirects($response);
+    $landing->assertOk();
+    expect($landing->getContent())->toContain('disabled');
 });

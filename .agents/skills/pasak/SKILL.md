@@ -143,6 +143,8 @@ All endpoints use prefix `/api/security` (configurable in `config/security.php`)
 | `pasak:purge-injected-data {--force}` | Scan & clean residual pentest payloads from application database tables.                            |
 | `pasak:upgrade {--check,--force,--no-composer,--no-migrate,--sync-routes,--sync-views}` | Update via Composer without overwriting host customizations (auto-backup on forced sync). |
 | `pasak:uninstall {--force,--keep-tables,--keep-env}` | Remove all package traces from host apps (config, routes, middleware, trait, tables, files). |
+| `pasak:secret {--force,--show,--path=}` | Generate or regenerate `PASAK_DASHBOARD_SECRET` HMAC signing key in `.env`. |
+| `pasak:deploy {--force,--reset-settings,--reset-tables,--force-secret,--no-migrate}` | Safe automated VPS/production deployment: ensure dashboard secret, sync migrations, and seed default settings without duplicating data. |
 
 ---
 

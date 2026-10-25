@@ -93,7 +93,7 @@ class PasakBlockedIpController extends Controller
         );
     }
 
-    public function show(int $id): View
+    public function show(int|string $id): View
     {
         $block = PasakBlockedIp::query()->find($id);
 
@@ -180,7 +180,7 @@ class PasakBlockedIpController extends Controller
         ]);
     }
 
-    public function toggle(int $id): RedirectResponse
+    public function toggle(int|string $id): RedirectResponse
     {
         $block = PasakBlockedIp::query()->find($id);
 
@@ -202,7 +202,7 @@ class PasakBlockedIpController extends Controller
         ]);
     }
 
-    public function destroy(int $id): RedirectResponse
+    public function destroy(int|string $id): RedirectResponse
     {
         $block = PasakBlockedIp::query()->find($id);
 

@@ -118,7 +118,7 @@ class PasakAllowedIpController extends Controller
         return back()->with('security_message', __('IP :ip berhasil diizinkan.', ['ip' => $pattern]));
     }
 
-    public function toggle(int $id): RedirectResponse
+    public function toggle(int|string $id): RedirectResponse
     {
         $allowed = PasakAllowedIp::query()->find($id);
 
@@ -138,7 +138,7 @@ class PasakAllowedIpController extends Controller
         );
     }
 
-    public function destroy(int $id): RedirectResponse
+    public function destroy(int|string $id): RedirectResponse
     {
         $allowed = PasakAllowedIp::query()->find($id);
 

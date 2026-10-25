@@ -44,7 +44,7 @@
 <div class="sec-card sec-card-flush">
     <div class="sec-card-header">
         <h3 class="sec-card-title">{{ __('Entries') }} ({{ number_format($logs->total()) }})</h3>
-        <form method="POST" action="{{ route('pasak.dashboard.logs.clear') }}" onsubmit="return confirm({{ json_encode(__('Clear ALL security logs? This cannot be undone.')) }})">
+        <form method="POST" action="{{ route('pasak.dashboard.logs.clear') }}" data-sec-confirm="{{ __('Kosongkan seluruh riwayat log keamanan? Tindakan ini tidak dapat dibatalkan.') }}" data-confirm-title="{{ __('Konfirmasi Bersihkan Log') }}" data-confirm-type="danger" data-confirm-btn="{{ __('Ya, Kosongkan Semua') }}">
             @csrf
             @method('DELETE')
             <button type="submit" class="sec-btn sec-btn-danger sec-btn-sm">{{ __('Clear all') }}</button>
@@ -74,7 +74,7 @@
                         <td>{{ $log->was_blocked ? __('Yes') : __('No') }}</td>
                         <td style="text-align: right; white-space: nowrap;">
                             <a href="{{ route('pasak.dashboard.logs.show', $log->id) }}" class="sec-btn sec-btn-ghost sec-btn-sm">{{ __('Detail') }}</a>
-                            <form method="POST" action="{{ route('pasak.dashboard.logs.destroy', $log->id) }}" onsubmit="return confirm({{ json_encode(__('Delete this log entry?')) }})" style="display: inline;">
+                            <form method="POST" action="{{ route('pasak.dashboard.logs.destroy', $log->id) }}" style="display: inline;" data-sec-confirm="{{ __('Hapus entri log ancaman ini secara permanen?') }}" data-confirm-title="{{ __('Konfirmasi Hapus Log') }}" data-confirm-type="danger" data-confirm-btn="{{ __('Ya, Hapus') }}">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="sec-btn sec-btn-ghost sec-btn-sm">🗑️</button>

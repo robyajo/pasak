@@ -128,12 +128,12 @@
 @endif
 
 <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-    <form method="POST" action="{{ $urls['toggle'] }}">
+    <form method="POST" action="{{ $urls['toggle'] }}" data-sec-confirm="{{ $block->is_active ? __('Nonaktifkan status blokir untuk IP ini?') : __('Aktifkan kembali pemblokiran untuk IP ini?') }}" data-confirm-title="{{ __('Konfirmasi Ubah Status') }}" data-confirm-type="warning" data-confirm-btn="{{ $block->is_active ? __('Ya, Nonaktifkan') : __('Ya, Aktifkan') }}">
         @csrf
         @method('PATCH')
         <button type="submit" class="sec-btn sec-btn-secondary sec-btn-sm">{{ $block->is_active ? __('Disable block') : __('Re-enable block') }}</button>
     </form>
-    <form method="POST" action="{{ $urls['destroy'] }}" onsubmit="return confirm({{ json_encode(__('Unblock this IP?')) }})">
+    <form method="POST" action="{{ $urls['destroy'] }}" data-sec-confirm="{{ __('Buka blokir dan hapus status karantina untuk IP ini?') }}" data-confirm-title="{{ __('Konfirmasi Buka Blokir') }}" data-confirm-type="danger" data-confirm-btn="{{ __('Ya, Buka Blokir') }}">
         @csrf
         @method('DELETE')
         <button type="submit" class="sec-btn sec-btn-danger sec-btn-sm">{{ __('Unblock') }}</button>

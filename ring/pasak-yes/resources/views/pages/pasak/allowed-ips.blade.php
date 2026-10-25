@@ -18,7 +18,7 @@
 
 <div class="sec-card">
     <h3 class="sec-card-title" style="margin-bottom: 14px;">{{ __('Allow an IP, wildcard, or CIDR') }}</h3>
-    <form method="POST" action="{{ route('pasak.dashboard.allowed-ips.store') }}">
+    <form method="POST" action="{{ route('pasak.dashboard.allowed-ips.store') }}" data-sec-confirm="{{ __('Tambahkan IP / subnet ini ke daftar izin resmi WAF?') }}" data-confirm-title="{{ __('Konfirmasi Tambah Allowed IP') }}" data-confirm-type="primary" data-confirm-btn="{{ __('Ya, Izinkan') }}">
         @csrf
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; align-items: flex-end;">
             <div>
@@ -99,12 +99,12 @@
                             </span>
                         </td>
                         <td style="text-align: right; white-space: nowrap;">
-                            <form method="POST" action="{{ route('pasak.dashboard.allowed-ips.toggle', $entry->id) }}" style="display: inline;">
+                            <form method="POST" action="{{ route('pasak.dashboard.allowed-ips.toggle', $entry->id) }}" style="display: inline;" data-sec-confirm="{{ $entry->is_active ? __('Nonaktifkan izin untuk IP ini?') : __('Aktifkan kembali izin untuk IP ini?') }}" data-confirm-title="{{ __('Konfirmasi Ubah Status') }}" data-confirm-type="warning" data-confirm-btn="{{ $entry->is_active ? __('Ya, Nonaktifkan') : __('Ya, Aktifkan') }}">
                                 @csrf
                                 @method('PATCH')
                                 <button type="submit" class="sec-btn sec-btn-secondary sec-btn-sm">{{ $entry->is_active ? __('Disable') : __('Enable') }}</button>
                             </form>
-                            <form method="POST" action="{{ route('pasak.dashboard.allowed-ips.destroy', $entry->id) }}" style="display: inline;" onsubmit="return confirm({{ json_encode(__('Remove this allow entry?')) }})">
+                            <form method="POST" action="{{ route('pasak.dashboard.allowed-ips.destroy', $entry->id) }}" style="display: inline;" data-sec-confirm="{{ __('Hapus IP ini dari daftar izin?') }}" data-confirm-title="{{ __('Konfirmasi Hapus Izin') }}" data-confirm-type="danger" data-confirm-btn="{{ __('Ya, Hapus') }}">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="sec-btn sec-btn-ghost sec-btn-sm">🗑️</button>

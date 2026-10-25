@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 use Internal\Pasak\Console\Commands\PasakBaselineCommand;
+use Internal\Pasak\Console\Commands\PasakDeployCommand;
 use Internal\Pasak\Console\Commands\PasakInstallCommand;
 use Internal\Pasak\Console\Commands\PasakPruneSecurityLogsCommand;
 use Internal\Pasak\Console\Commands\PasakPurgeInjectedDataCommand;
@@ -298,6 +299,7 @@ class PasakServiceProvider extends ServiceProvider
             PasakBaselineCommand::class,
             PasakPurgeInjectedDataCommand::class,
             PasakSecretCommand::class,
+            PasakDeployCommand::class,
         ]);
     }
 

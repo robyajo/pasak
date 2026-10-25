@@ -21,6 +21,10 @@ class PasakDashboardEntryController extends Controller
         $slug = $urls->currentSlug($request);
         $urls->applyUrlDefaults($slug);
 
+        if ($request->hasSession()) {
+            $request->session()->reflash();
+        }
+
         $query = $request->getQueryString();
 
         return redirect()->to(url($slug).($query !== null && $query !== '' ? '?'.$query : ''), 302);

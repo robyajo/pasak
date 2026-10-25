@@ -152,7 +152,7 @@
 @endif
 
 <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-    <form method="POST" action="{{ $urls['destroy'] }}" onsubmit="return confirm({{ json_encode(__('Delete this log entry?')) }})">
+    <form method="POST" action="{{ $urls['destroy'] }}" data-sec-confirm="{{ __('Hapus entri log ancaman ini secara permanen?') }}" data-confirm-title="{{ __('Konfirmasi Hapus Log') }}" data-confirm-type="danger" data-confirm-btn="{{ __('Ya, Hapus') }}">
         @csrf
         @method('DELETE')
         <button type="submit" class="sec-btn sec-btn-danger sec-btn-sm">{{ __('Delete entry') }}</button>

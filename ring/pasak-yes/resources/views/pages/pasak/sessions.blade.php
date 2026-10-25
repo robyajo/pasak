@@ -14,7 +14,7 @@
 
 <div class="sec-card">
     <h3 class="sec-card-title" style="margin-bottom: 14px;">{{ __('Trust my current IP') }}</h3>
-    <form method="POST" action="{{ route('pasak.dashboard.trusted-ips.store-my-ip') }}">
+    <form method="POST" action="{{ route('pasak.dashboard.trusted-ips.store-my-ip') }}" data-sec-confirm="{{ __('Simpan IP saat ini sebagai IP terpercaya untuk akun Anda?') }}" data-confirm-title="{{ __('Konfirmasi Simpan IP') }}" data-confirm-type="primary" data-confirm-btn="{{ __('Ya, Simpan IP') }}">
         @csrf
         <button type="submit" class="sec-btn sec-btn-primary">{{ __('Save my IP') }}</button>
     </form>
@@ -70,13 +70,13 @@
                         <td style="font-size: 12px; color: var(--sec-text-muted);">{{ $login->last_activity_at }}</td>
                         <td style="text-align: right; white-space: nowrap;">
                             @if ($login->session_id)
-                                <form method="POST" action="{{ route('pasak.dashboard.sessions.destroy', $login->session_id) }}" style="display: inline;" onsubmit="return confirm({{ json_encode(__('Terminate this session?')) }})">
+                                <form method="POST" action="{{ route('pasak.dashboard.sessions.destroy', $login->session_id) }}" style="display: inline;" data-sec-confirm="{{ __('Paksa keluar (logout) sesi pengguna ini sekarang?') }}" data-confirm-title="{{ __('Konfirmasi Putus Sesi') }}" data-confirm-type="warning" data-confirm-btn="{{ __('Ya, Logout Sesi') }}">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="sec-btn sec-btn-secondary sec-btn-sm">{{ __('Logout') }}</button>
                                 </form>
                             @endif
-                            <form method="POST" action="{{ route('pasak.dashboard.user-sessions.destroy', $login->id) }}" style="display: inline;" onsubmit="return confirm({{ json_encode(__('Delete this session record?')) }})">
+                            <form method="POST" action="{{ route('pasak.dashboard.user-sessions.destroy', $login->id) }}" style="display: inline;" data-sec-confirm="{{ __('Hapus rekaman sesi login ini secara permanen?') }}" data-confirm-title="{{ __('Konfirmasi Hapus Riwayat') }}" data-confirm-type="danger" data-confirm-btn="{{ __('Ya, Hapus') }}">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="sec-btn sec-btn-ghost sec-btn-sm">🗑️</button>
@@ -128,7 +128,7 @@
                         <td class="sec-font-mono" style="font-weight: 600;">{{ $ip->ip_address }}</td>
                         <td style="font-size: 12px;">{{ $ip->device_name ?? '-' }}</td>
                         <td style="text-align: right;">
-                            <form method="POST" action="{{ route('pasak.dashboard.trusted-ips.destroy', $ip->id) }}" onsubmit="return confirm({{ json_encode(__('Remove this trusted IP?')) }})">
+                            <form method="POST" action="{{ route('pasak.dashboard.trusted-ips.destroy', $ip->id) }}" data-sec-confirm="{{ __('Hapus IP ini dari daftar IP terpercaya?') }}" data-confirm-title="{{ __('Konfirmasi Hapus IP Terpercaya') }}" data-confirm-type="danger" data-confirm-btn="{{ __('Ya, Hapus') }}">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="sec-btn sec-btn-ghost sec-btn-sm">🗑️</button>

@@ -9,36 +9,28 @@
         (function () {
             try {
                 var mode = localStorage.getItem('pasak-theme') || 'auto';
-                if (mode === 'dark' || (mode !== 'light' && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                var isDark = mode === 'dark' || (mode !== 'light' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+                if (mode === 'dark') {
                     document.documentElement.setAttribute('data-theme', 'dark');
+                    document.documentElement.classList.add('dark');
                 } else if (mode === 'light') {
                     document.documentElement.setAttribute('data-theme', 'light');
+                    document.documentElement.classList.remove('dark');
+                } else {
+                    document.documentElement.removeAttribute('data-theme');
+                    if (isDark) {
+                        document.documentElement.classList.add('dark');
+                    } else {
+                        document.documentElement.classList.remove('dark');
+                    }
                 }
             } catch (e) { /* abaikan: tetap ikuti sistem */ }
         })();
     </script>
     <style>
-        :root {
-            color-scheme: light dark;
-        }
-
-        body.sec-body {
-            background: #f8fafc;
-        }
-
-        @media (prefers-color-scheme: dark) {
-            body.sec-body {
-                background: #090d16;
-            }
-        }
-
-        html[data-theme="light"] body.sec-body {
-            background: #f8fafc;
-        }
-
-        html[data-theme="dark"] body.sec-body {
-            background: #090d16;
-        }
+        :root,
+        html,
+        body.sec-body,
         .sec-root {
             --sec-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
             --sec-font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
@@ -67,15 +59,31 @@
             --sec-radius-sm: 6px;
             --sec-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.07), 0 1px 2px -1px rgba(0, 0, 0, 0.05);
             --sec-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+            color-scheme: light;
+        }
 
+        body.sec-body {
+            background: var(--sec-bg);
+            color: var(--sec-text);
+            font-family: var(--sec-font);
+            margin: 0;
+            transition: background-color 0.2s ease, color 0.2s ease;
+        }
+
+        .sec-root {
             font-family: var(--sec-font);
             color: var(--sec-text);
             width: 100%;
             box-sizing: border-box;
         }
 
+        /* Mode Gelap Otomatis dari Sistem OS (hanya berlaku jika pengguna memilih 'auto' / tanpa data-theme="light") */
         @media (prefers-color-scheme: dark) {
-            .sec-root {
+            :root:not([data-theme="light"]),
+            html:not([data-theme="light"]),
+            html:not([data-theme="light"]) body.sec-body,
+            html:not([data-theme="light"]) .sec-root {
+                color-scheme: dark;
                 --sec-bg: #090d16;
                 --sec-card: #111827;
                 --sec-card-hover: #1e293b;
@@ -99,27 +107,66 @@
             }
         }
 
-        .dark .sec-root, [data-theme="dark"] .sec-root {
-            --sec-bg: #090d16;
-            --sec-card: #111827;
-            --sec-card-hover: #1e293b;
-            --sec-border: #1e293b;
-            --sec-border-light: #162032;
-            --sec-text: #f9fafb;
-            --sec-text-muted: #9ca3af;
-            --sec-text-subtle: #6b7280;
-            --sec-primary: #3b82f6;
-            --sec-primary-hover: #2563eb;
-            --sec-danger: #f87171;
-            --sec-danger-bg: rgba(239, 68, 68, 0.15);
-            --sec-danger-border: rgba(239, 68, 68, 0.3);
-            --sec-warning: #fbbf24;
-            --sec-warning-bg: rgba(245, 158, 11, 0.15);
-            --sec-warning-border: rgba(245, 158, 11, 0.3);
-            --sec-success: #34d399;
-            --sec-success-bg: rgba(16, 185, 129, 0.15);
-            --sec-success-border: rgba(16, 185, 129, 0.3);
-            --sec-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.3);
+        /* Override Mode Terang Eksplisit */
+        html[data-theme="light"],
+        html[data-theme="light"] body.sec-body,
+        html[data-theme="light"] .sec-root,
+        [data-theme="light"] {
+            color-scheme: light !important;
+            --sec-bg: #f8fafc !important;
+            --sec-card: #ffffff !important;
+            --sec-card-hover: #f1f5f9 !important;
+            --sec-border: #e2e8f0 !important;
+            --sec-border-light: #f1f5f9 !important;
+            --sec-text: #0f172a !important;
+            --sec-text-muted: #64748b !important;
+            --sec-text-subtle: #94a3b8 !important;
+            --sec-primary: #2563eb !important;
+            --sec-primary-hover: #1d4ed8 !important;
+            --sec-primary-fg: #ffffff !important;
+            --sec-danger: #ef4444 !important;
+            --sec-danger-bg: #fef2f2 !important;
+            --sec-danger-border: #fecaca !important;
+            --sec-danger-hover: #dc2626 !important;
+            --sec-warning: #f59e0b !important;
+            --sec-warning-bg: #fffbeb !important;
+            --sec-warning-border: #fde68a !important;
+            --sec-success: #10b981 !important;
+            --sec-success-bg: #ecfdf5 !important;
+            --sec-success-border: #a7f3d0 !important;
+            --sec-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.07), 0 1px 2px -1px rgba(0, 0, 0, 0.05) !important;
+            --sec-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -2px rgba(0, 0, 0, 0.05) !important;
+        }
+
+        /* Override Mode Gelap Eksplisit */
+        html[data-theme="dark"],
+        html[data-theme="dark"] body.sec-body,
+        html[data-theme="dark"] .sec-root,
+        html.dark,
+        html.dark body.sec-body,
+        html.dark .sec-root,
+        [data-theme="dark"] {
+            color-scheme: dark !important;
+            --sec-bg: #090d16 !important;
+            --sec-card: #111827 !important;
+            --sec-card-hover: #1e293b !important;
+            --sec-border: #1e293b !important;
+            --sec-border-light: #162032 !important;
+            --sec-text: #f9fafb !important;
+            --sec-text-muted: #9ca3af !important;
+            --sec-text-subtle: #6b7280 !important;
+            --sec-primary: #3b82f6 !important;
+            --sec-primary-hover: #2563eb !important;
+            --sec-danger: #f87171 !important;
+            --sec-danger-bg: rgba(239, 68, 68, 0.15) !important;
+            --sec-danger-border: rgba(239, 68, 68, 0.3) !important;
+            --sec-warning: #fbbf24 !important;
+            --sec-warning-bg: rgba(245, 158, 11, 0.15) !important;
+            --sec-warning-border: rgba(245, 158, 11, 0.3) !important;
+            --sec-success: #34d399 !important;
+            --sec-success-bg: rgba(16, 185, 129, 0.15) !important;
+            --sec-success-border: rgba(16, 185, 129, 0.3) !important;
+            --sec-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.3) !important;
         }
 
         .sec-root * {
@@ -592,6 +639,125 @@
             font-family: var(--sec-font-mono);
         }
 
+        /* Floating Toast Notifications */
+        .sec-toast-stack {
+            position: fixed;
+            top: 24px;
+            right: 24px;
+            z-index: 100000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-width: 420px;
+            width: calc(100vw - 48px);
+            pointer-events: none;
+        }
+
+        .sec-toast {
+            pointer-events: auto;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 14px 16px;
+            border-radius: var(--sec-radius);
+            background: var(--sec-card);
+            border: 1px solid var(--sec-border);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+            color: var(--sec-text);
+            font-size: 13.5px;
+            line-height: 1.45;
+            animation: sec-toast-slide 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            transition: opacity 0.2s ease, transform 0.2s ease;
+        }
+
+        .sec-toast.sec-toast-hiding {
+            opacity: 0;
+            transform: translateX(30px);
+        }
+
+        @keyframes sec-toast-slide {
+            from {
+                opacity: 0;
+                transform: translateY(-16px) scale(0.96);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .sec-toast-icon {
+            width: 24px;
+            height: 24px;
+            flex-shrink: 0;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .sec-toast-success .sec-toast-icon {
+            background: var(--sec-success-bg);
+            color: var(--sec-success);
+            border: 1px solid var(--sec-success-border);
+        }
+
+        .sec-toast-error .sec-toast-icon,
+        .sec-toast-danger .sec-toast-icon {
+            background: var(--sec-danger-bg);
+            color: var(--sec-danger);
+            border: 1px solid var(--sec-danger-border);
+        }
+
+        .sec-toast-warning .sec-toast-icon {
+            background: var(--sec-warning-bg);
+            color: var(--sec-warning);
+            border: 1px solid var(--sec-warning-border);
+        }
+
+        .sec-toast-info .sec-toast-icon {
+            background: rgba(37, 99, 235, 0.1);
+            color: var(--sec-primary);
+            border: 1px solid rgba(37, 99, 235, 0.25);
+        }
+
+        .sec-toast-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .sec-toast-title {
+            font-weight: 700;
+            font-size: 13.5px;
+            margin-bottom: 2px;
+            color: var(--sec-text);
+        }
+
+        .sec-toast-message {
+            font-size: 13px;
+            color: var(--sec-text-muted);
+            word-break: break-word;
+        }
+
+        .sec-toast-close {
+            background: transparent;
+            border: none;
+            color: var(--sec-text-subtle);
+            font-size: 18px;
+            line-height: 1;
+            cursor: pointer;
+            padding: 2px 4px;
+            margin: -2px -4px 0 0;
+            border-radius: 4px;
+            transition: color 0.15s;
+        }
+
+        .sec-toast-close:hover {
+            color: var(--sec-text);
+        }
+
         /* Notification / Toast */
         .sec-alert {
             padding: 12px 16px;
@@ -946,7 +1112,7 @@
             background: var(--sec-warning-bg);
             border-radius: var(--sec-radius);
             padding: 14px 16px;
-            color: #78350f;
+            color: var(--sec-warning);
         }
         .sec-sim-chip {
             display: inline-flex;
@@ -1097,6 +1263,27 @@
     </style>
 </head>
 <body class="sec-body" style="margin: 0;">
+    <!-- Floating Toast Notifications -->
+    <div class="sec-toast-stack" id="pasakToastStack" aria-live="polite" aria-atomic="true"></div>
+
+    <!-- Alert-Dialog Confirm Modal -->
+    <div class="sec-modal-backdrop" id="pasakConfirmModal" hidden>
+        <div class="sec-modal-box" role="dialog" aria-modal="true" aria-labelledby="pasakConfirmTitle" style="max-width: 460px;">
+            <div class="sec-modal-header" style="display: flex; align-items: center; gap: 12px; padding: 16px 20px;">
+                <div id="pasakConfirmIcon" style="width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0;"></div>
+                <div style="min-width: 0; flex: 1;">
+                    <h3 class="sec-card-title" id="pasakConfirmTitle" style="font-size: 16px; margin: 0;">{{ __('Konfirmasi Tindakan') }}</h3>
+                </div>
+            </div>
+            <div class="sec-modal-body" style="padding: 18px 20px; font-size: 13.5px; color: var(--sec-text); line-height: 1.55;">
+                <p id="pasakConfirmMessage" style="margin: 0;"></p>
+            </div>
+            <div class="sec-modal-footer" style="padding: 14px 20px; display: flex; justify-content: flex-end; gap: 10px; background: var(--sec-card-hover);">
+                <button type="button" class="sec-btn sec-btn-secondary" id="pasakConfirmCancel">{{ __('Batal') }}</button>
+                <button type="button" class="sec-btn" id="pasakConfirmOk">{{ __('Lanjutkan') }}</button>
+            </div>
+        </div>
+    </div>
 <div class="sec-root">
     <div class="sec-container" style="max-width: 1600px; margin: 0 auto; padding: 24px 20px;">
         <!-- Sidebar Navigation -->
@@ -1181,6 +1368,41 @@
 
 
         <main class="sec-main">
+            @php
+                $flashToasts = [];
+                if (session()->has('toast')) {
+                    $t = session('toast');
+                    if (is_array($t)) {
+                        $flashToasts[] = [
+                            'type' => $t['type'] ?? 'success',
+                            'title' => $t['title'] ?? (($t['type'] ?? 'success') === 'error' ? __('Gagal') : __('Berhasil')),
+                            'message' => (string) ($t['message'] ?? ''),
+                        ];
+                    } else {
+                        $flashToasts[] = ['type' => 'success', 'title' => __('Berhasil'), 'message' => (string) $t];
+                    }
+                }
+                if (session()->has('security_message')) {
+                    $flashToasts[] = ['type' => 'success', 'title' => __('Berhasil'), 'message' => (string) session('security_message')];
+                }
+                if (session()->has('success')) {
+                    $flashToasts[] = ['type' => 'success', 'title' => __('Berhasil'), 'message' => (string) session('success')];
+                }
+                if (session()->has('error')) {
+                    $flashToasts[] = ['type' => 'error', 'title' => __('Gagal'), 'message' => (string) session('error')];
+                }
+                if (session()->has('status') && ! session()->has('toast')) {
+                    $flashToasts[] = ['type' => 'info', 'title' => __('Status'), 'message' => (string) session('status')];
+                }
+                if (session()->has('message') && ! session()->has('toast')) {
+                    $flashToasts[] = ['type' => 'info', 'title' => __('Informasi'), 'message' => (string) session('message')];
+                }
+                if (isset($errors) && $errors->any()) {
+                    foreach ($errors->all() as $err) {
+                        $flashToasts[] = ['type' => 'error', 'title' => __('Gagal Validasi'), 'message' => (string) $err];
+                    }
+                }
+            @endphp
             @if (session()->has('security_message'))
                 <div class="sec-alert sec-alert-success">
                     <span>{{ session('security_message') }}</span>
@@ -1215,7 +1437,7 @@
                     <div class="sec-modal-body" style="font-size: 14px; color: var(--sec-text-muted); line-height: 1.6;">
                         <div>🛡️ {{ __('Bawaan instalasi adalah monitoring saja: ancaman dideteksi dan dicatat tanpa blokir otomatis.') }}</div>
                         <div>⚙️ {{ __('Siap karantina otomatis? Atur di halaman Settings atau via API.') }}</div>
-                        <div>📖 {{ __('Panduan lengkap:') }} <a href="https://security-dev.pekanbaru.go.id/" target="_blank" rel="noopener" style="color: var(--sec-primary);">security-dev.pekanbaru.go.id</a></div>
+                        <div>📖 {{ __('Panduan lengkap:') }} <a href="https://github.com/robyajo/pasak" target="_blank" rel="noopener" style="color: var(--sec-primary);">github.com/robyajo/pasak</a></div>
                     </div>
                     <div class="sec-modal-footer">
                         <button type="button" class="sec-btn sec-btn-primary" data-pasak-announce-close>{{ __('Mengerti') }}</button>
@@ -1280,6 +1502,12 @@
                 root.setAttribute('data-theme', mode);
             }
 
+            if (dark) {
+                root.classList.add('dark');
+            } else {
+                root.classList.remove('dark');
+            }
+
             document.querySelectorAll('[data-sec-theme-toggle]').forEach(function (btn) {
                 var moon = btn.querySelector('[data-sec-theme-icon="moon"]');
                 var sun = btn.querySelector('[data-sec-theme-icon="sun"]');
@@ -1316,6 +1544,214 @@
 
         paint();
     })();
+</script>
+<script>
+window.PasakToasts = @json($flashToasts ?? []);
+
+(function () {
+    // 1. Toast Notification System
+    window.pasakToast = function (message, type, title) {
+        if (!message) return;
+        type = type || 'success';
+        var stack = document.getElementById('pasakToastStack');
+        if (!stack) return;
+
+        var toast = document.createElement('div');
+        toast.className = 'sec-toast sec-toast-' + type;
+
+        var icons = {
+            success: '✓',
+            error: '✕',
+            danger: '✕',
+            warning: '⚠',
+            info: 'ℹ'
+        };
+
+        var defaultTitles = {
+            success: {!! json_encode(__('Berhasil')) !!},
+            error: {!! json_encode(__('Gagal')) !!},
+            danger: {!! json_encode(__('Gagal')) !!},
+            warning: {!! json_encode(__('Peringatan')) !!},
+            info: {!! json_encode(__('Informasi')) !!}
+        };
+
+        var displayTitle = title || defaultTitles[type] || '';
+
+        toast.innerHTML = 
+            '<div class="sec-toast-icon">' + (icons[type] || 'ℹ') + '</div>' +
+            '<div class="sec-toast-content">' +
+                (displayTitle ? '<div class="sec-toast-title">' + displayTitle + '</div>' : '') +
+                '<div class="sec-toast-message">' + message + '</div>' +
+            '</div>' +
+            '<button type="button" class="sec-toast-close" aria-label="' + {!! json_encode(__('Tutup')) !!} + '">&times;</button>';
+
+        stack.appendChild(toast);
+
+        var removeToast = function () {
+            toast.classList.add('sec-toast-hiding');
+            setTimeout(function () {
+                if (toast.parentNode) toast.parentNode.removeChild(toast);
+            }, 200);
+        };
+
+        toast.querySelector('.sec-toast-close').addEventListener('click', removeToast);
+
+        var timer = setTimeout(removeToast, 5000);
+        toast.addEventListener('mouseenter', function () { clearTimeout(timer); });
+        toast.addEventListener('mouseleave', function () { timer = setTimeout(removeToast, 3000); });
+    };
+
+    if (window.PasakToasts && Array.isArray(window.PasakToasts)) {
+        window.PasakToasts.forEach(function (t, i) {
+            setTimeout(function () {
+                window.pasakToast(t.message, t.type, t.title);
+            }, i * 150);
+        });
+    }
+
+    // 2. Alert-Dialog Confirm System
+    var modal = document.getElementById('pasakConfirmModal');
+    if (!modal) return;
+
+    var titleEl = document.getElementById('pasakConfirmTitle');
+    var msgEl = document.getElementById('pasakConfirmMessage');
+    var iconEl = document.getElementById('pasakConfirmIcon');
+    var okBtn = document.getElementById('pasakConfirmOk');
+    var cancelBtn = document.getElementById('pasakConfirmCancel');
+
+    function showConfirm(options, onConfirm) {
+        titleEl.textContent = options.title || {!! json_encode(__('Konfirmasi Tindakan')) !!};
+        msgEl.textContent = options.message || {!! json_encode(__('Apakah Anda yakin ingin melanjutkan tindakan ini?')) !!};
+        okBtn.textContent = options.btnText || {!! json_encode(__('Ya, Lanjutkan')) !!};
+
+        var type = options.type || 'primary';
+        okBtn.className = 'sec-btn ' + (type === 'danger' ? 'sec-btn-danger' : (type === 'warning' ? 'sec-btn-danger' : 'sec-btn-primary'));
+
+        if (type === 'danger') {
+            iconEl.textContent = '🚨';
+            iconEl.style.background = 'var(--sec-danger-bg)';
+            iconEl.style.color = 'var(--sec-danger)';
+            iconEl.style.border = '1px solid var(--sec-danger-border)';
+        } else if (type === 'warning') {
+            iconEl.textContent = '⚠';
+            iconEl.style.background = 'var(--sec-warning-bg)';
+            iconEl.style.color = 'var(--sec-warning)';
+            iconEl.style.border = '1px solid var(--sec-warning-border)';
+        } else {
+            iconEl.textContent = '🛡️';
+            iconEl.style.background = 'rgba(37, 99, 235, 0.1)';
+            iconEl.style.color = 'var(--sec-primary)';
+            iconEl.style.border = '1px solid rgba(37, 99, 235, 0.25)';
+        }
+
+        modal.hidden = false;
+        okBtn.focus();
+
+        var cleanup = function () {
+            modal.hidden = true;
+            okBtn.onclick = null;
+            cancelBtn.onclick = null;
+            document.removeEventListener('keydown', handleKey);
+        };
+
+        var handleKey = function (e) {
+            if (e.key === 'Escape') cleanup();
+        };
+
+        cancelBtn.onclick = cleanup;
+        modal.onclick = function (e) {
+            if (e.target === modal) cleanup();
+        };
+
+        okBtn.onclick = function () {
+            cleanup();
+            if (onConfirm) onConfirm();
+        };
+
+        document.addEventListener('keydown', handleKey);
+    }
+
+    // Intercept form submissions
+    document.addEventListener('submit', function (e) {
+        var form = e.target;
+        if (!form || (form.method && form.method.toLowerCase() === 'get')) return;
+        if (form.dataset.pasakConfirmed === 'true') {
+            form.removeAttribute('data-pasak-confirmed');
+            return;
+        }
+
+        var submitBtn = e.submitter;
+
+        var confirmMsg = form.getAttribute('data-sec-confirm');
+        if (submitBtn && submitBtn.getAttribute('data-sec-confirm')) {
+            confirmMsg = submitBtn.getAttribute('data-sec-confirm');
+        }
+
+        var title = form.getAttribute('data-confirm-title');
+        if (submitBtn && submitBtn.getAttribute('data-confirm-title')) {
+            title = submitBtn.getAttribute('data-confirm-title');
+        }
+
+        var btnText = form.getAttribute('data-confirm-btn');
+        if (submitBtn && submitBtn.getAttribute('data-confirm-btn')) {
+            btnText = submitBtn.getAttribute('data-confirm-btn');
+        }
+
+        var type = form.getAttribute('data-confirm-type');
+        if (submitBtn && submitBtn.getAttribute('data-confirm-type')) {
+            type = submitBtn.getAttribute('data-confirm-type');
+        }
+
+        if (!confirmMsg) {
+            var isDelete = form.querySelector('input[name="_method"][value="DELETE"]') ||
+                (submitBtn && (submitBtn.classList.contains('sec-btn-danger') || (submitBtn.textContent && submitBtn.textContent.indexOf('🗑️') !== -1)));
+            var isPatch = form.querySelector('input[name="_method"][value="PATCH"]');
+            var btnLabel = submitBtn ? submitBtn.textContent.trim().toLowerCase() : '';
+
+            if (isDelete) {
+                confirmMsg = {!! json_encode(__('Apakah Anda yakin ingin menghapus data ini secara permanen?')) !!};
+                title = title || {!! json_encode(__('Konfirmasi Hapus')) !!};
+                type = type || 'danger';
+                btnText = btnText || {!! json_encode(__('Ya, Hapus')) !!};
+            } else if (isPatch || btnLabel.indexOf('disable') !== -1 || btnLabel.indexOf('enable') !== -1 || btnLabel.indexOf('nonaktifkan') !== -1 || btnLabel.indexOf('aktifkan') !== -1) {
+                confirmMsg = {!! json_encode(__('Apakah Anda yakin ingin mengubah status data ini?')) !!};
+                title = title || {!! json_encode(__('Konfirmasi Pengubahan Status')) !!};
+                type = type || 'warning';
+                btnText = btnText || {!! json_encode(__('Ya, Ubah Status')) !!};
+            } else if (form.id === 'pasak-settings-form') {
+                confirmMsg = {!! json_encode(__('Simpan seluruh perubahan konfigurasi WAF ke database?')) !!};
+                title = title || {!! json_encode(__('Konfirmasi Simpan Pengaturan')) !!};
+                type = type || 'primary';
+                btnText = btnText || {!! json_encode(__('Ya, Simpan')) !!};
+            } else {
+                return;
+            }
+        }
+
+        e.preventDefault();
+
+        showConfirm({
+            title: title || {!! json_encode(__('Konfirmasi Tindakan')) !!},
+            message: confirmMsg,
+            type: type || 'primary',
+            btnText: btnText || {!! json_encode(__('Ya, Lanjutkan')) !!}
+        }, function () {
+            form.dataset.pasakConfirmed = 'true';
+            if (submitBtn && submitBtn.name) {
+                var hidden = document.createElement('input');
+                hidden.type = 'hidden';
+                hidden.name = submitBtn.name;
+                hidden.value = submitBtn.value;
+                form.appendChild(hidden);
+            }
+            if (form.requestSubmit) {
+                form.requestSubmit(submitBtn);
+            } else {
+                form.submit();
+            }
+        });
+    });
+})();
 </script>
 </body>
 </html>

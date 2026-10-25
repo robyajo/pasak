@@ -13,6 +13,23 @@ use Illuminate\Contracts\View\View;
 trait RespondsWithPasakDashboard
 {
     /**
+     * Execute an action on the controller.
+     *
+     * Menghapus parameter {pasakSlug} dari URL berotasi agar controller
+     * menerima parameter rute yang sebenarnya (mis. $id) tanpa tergeser.
+     *
+     * @param  string  $method
+     * @param  array<string, mixed>  $parameters
+     * @return mixed
+     */
+    public function callAction($method, $parameters)
+    {
+        unset($parameters['pasakSlug']);
+
+        return parent::callAction($method, $parameters);
+    }
+
+    /**
      * @param  array<string, mixed>  $data
      */
     protected function dashboardResponse(string $blade, array $data): View

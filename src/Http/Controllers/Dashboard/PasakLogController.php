@@ -104,7 +104,7 @@ class PasakLogController extends Controller
         ]);
     }
 
-    public function show(int $id): View
+    public function show(int|string $id): View
     {
         $log = PasakLog::query()->find($id);
 
@@ -136,7 +136,7 @@ class PasakLogController extends Controller
         );
     }
 
-    public function destroy(int $id): RedirectResponse
+    public function destroy(int|string $id): RedirectResponse
     {
         PasakLog::query()->whereKey($id)->delete();
 

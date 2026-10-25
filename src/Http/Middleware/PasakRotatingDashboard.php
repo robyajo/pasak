@@ -46,6 +46,11 @@ class PasakRotatingDashboard
                 $this->urls->applyUrlDefaults($fresh);
             }
 
+            $route = $request->route();
+            if ($route instanceof \Illuminate\Routing\Route) {
+                $route->forgetParameter('pasakSlug');
+            }
+
             /** @var Response $response */
             $response = $next($request);
 
@@ -70,7 +75,16 @@ class PasakRotatingDashboard
             $this->urls->applyUrlDefaults($current);
 
             if ($this->shouldRotate($request)) {
+                if ($request->hasSession()) {
+                    $request->session()->reflash();
+                }
+
                 return redirect()->to($this->samePathWithSlug($request, $current), 302);
+            }
+
+            $route = $request->route();
+            if ($route instanceof \Illuminate\Routing\Route) {
+                $route->forgetParameter('pasakSlug');
             }
 
             return $next($request);

@@ -236,7 +236,7 @@ class PasakService
      *
      * @return array<int, string> keys that were newly created
      */
-    public function seedDefaultSettings(): array
+    public function seedDefaultSettings(bool $overwrite = false): array
     {
         $created = [];
 
@@ -250,7 +250,7 @@ class PasakService
 
         foreach ($this->defaultSettings() as $key => $default) {
             try {
-                if (PasakSetting::query()->where('key', $key)->exists()) {
+                if (! $overwrite && PasakSetting::query()->where('key', $key)->exists()) {
                     continue;
                 }
                 $this->setSetting($key, $default);

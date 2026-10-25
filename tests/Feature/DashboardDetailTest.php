@@ -176,3 +176,25 @@ test('blade detail pages exist for logs, blocks, and tickets', function () {
     expect(File::get(__DIR__.'/../../stubs/blade/pages/pasak/log-detail.blade.php'))->toContain('sec-code-block')
         ->and(File::get(__DIR__.'/../../stubs/blade/pages/pasak/ticket-detail.blade.php'))->toContain('Approve &');
 });
+
+test('blocked ip controller accepts string ID for toggle and destroy', function () {
+    $block = BlockedIp::create([
+        'ip_address' => '198.51.100.99',
+        'reason' => 'Testing toggle with string id',
+        'is_active' => true,
+    ]);
+
+    $response = app(BlockedIpController::class)->toggle((string) $block->id);
+    expect($response)->toBeInstanceOf(\Illuminate\Http\RedirectResponse::class);
+
+    $block->refresh();
+    expect($block->is_active)->toBeFalse();
+
+    app(BlockedIpController::class)->toggle((string) $block->id);
+    $block->refresh();
+    expect($block->is_active)->toBeTrue();
+
+    $destroyResponse = app(BlockedIpController::class)->destroy((string) $block->id);
+    expect($destroyResponse)->toBeInstanceOf(\Illuminate\Http\RedirectResponse::class);
+    expect(BlockedIp::query()->find($block->id))->toBeNull();
+});

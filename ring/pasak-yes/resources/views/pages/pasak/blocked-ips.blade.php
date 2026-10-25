@@ -22,7 +22,7 @@
 
 <div class="sec-card">
     <h3 class="sec-card-title" style="margin-bottom: 14px;">{{ __('Block an IP manually') }}</h3>
-    <form method="POST" action="{{ route('pasak.dashboard.blocked-ips.store') }}">
+    <form method="POST" action="{{ route('pasak.dashboard.blocked-ips.store') }}" data-sec-confirm="{{ __('Tambahkan pemblokiran manual untuk IP ini?') }}" data-confirm-title="{{ __('Konfirmasi Pemblokiran IP') }}" data-confirm-type="danger" data-confirm-btn="{{ __('Ya, Blokir IP') }}">
         @csrf
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; align-items: flex-end;">
             <div>
@@ -106,12 +106,12 @@
                         </td>
                         <td style="text-align: right; white-space: nowrap;">
                             <a href="{{ route('pasak.dashboard.blocked-ips.show', $block->id) }}" class="sec-btn sec-btn-ghost sec-btn-sm">{{ __('Detail') }}</a>
-                            <form method="POST" action="{{ route('pasak.dashboard.blocked-ips.toggle', $block->id) }}" style="display: inline;">
+                            <form method="POST" action="{{ route('pasak.dashboard.blocked-ips.toggle', $block->id) }}" style="display: inline;" data-sec-confirm="{{ $block->is_active ? __('Nonaktifkan status blokir untuk IP ini?') : __('Aktifkan kembali pemblokiran untuk IP ini?') }}" data-confirm-title="{{ __('Konfirmasi Ubah Status') }}" data-confirm-type="warning" data-confirm-btn="{{ $block->is_active ? __('Ya, Nonaktifkan') : __('Ya, Aktifkan') }}">
                                 @csrf
                                 @method('PATCH')
                                 <button type="submit" class="sec-btn sec-btn-secondary sec-btn-sm">{{ $block->is_active ? __('Disable') : __('Enable') }}</button>
                             </form>
-                            <form method="POST" action="{{ route('pasak.dashboard.blocked-ips.destroy', $block->id) }}" style="display: inline;" onsubmit="return confirm({{ json_encode(__('Remove this block entirely?')) }})">
+                            <form method="POST" action="{{ route('pasak.dashboard.blocked-ips.destroy', $block->id) }}" style="display: inline;" data-sec-confirm="{{ __('Hapus catatan blokir IP ini secara permanen dari database?') }}" data-confirm-title="{{ __('Konfirmasi Hapus Blokir') }}" data-confirm-type="danger" data-confirm-btn="{{ __('Ya, Hapus') }}">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="sec-btn sec-btn-ghost sec-btn-sm">🗑️</button>

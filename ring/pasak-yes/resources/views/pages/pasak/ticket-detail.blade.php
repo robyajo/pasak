@@ -131,14 +131,14 @@
                     <textarea id="admin_notes" name="admin_notes" rows="3" class="sec-textarea" placeholder="{{ __('Reason for approval or rejection...') }}"></textarea>
                 </div>
                 <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                    <button type="submit" name="action" value="approve" class="sec-btn sec-btn-primary">{{ __('Approve & unblock') }}</button>
-                    <button type="submit" name="action" value="reject" class="sec-btn sec-btn-danger" onclick="return confirm({{ json_encode(__('Reject this appeal?')) }})">{{ __('Reject') }}</button>
+                    <button type="submit" name="action" value="approve" class="sec-btn sec-btn-primary" data-sec-confirm="{{ __('Setujui permohonan banding dan buka blokir IP ini secara otomatis?') }}" data-confirm-title="{{ __('Konfirmasi Persetujuan Banding') }}" data-confirm-type="primary" data-confirm-btn="{{ __('Ya, Setujui & Buka') }}">{{ __('Approve & unblock') }}</button>
+                    <button type="submit" name="action" value="reject" class="sec-btn sec-btn-danger" data-sec-confirm="{{ __('Tolak permohonan banding pembukaan blokir ini?') }}" data-confirm-title="{{ __('Konfirmasi Penolakan Banding') }}" data-confirm-type="warning" data-confirm-btn="{{ __('Ya, Tolak Banding') }}">{{ __('Reject') }}</button>
                 </div>
             </form>
         </div>
     </div>
 @else
-    <form method="POST" action="{{ $urls['destroy'] }}" onsubmit="return confirm({{ json_encode(__('Delete this ticket?')) }})">
+    <form method="POST" action="{{ $urls['destroy'] }}" data-sec-confirm="{{ __('Hapus tiket banding ini secara permanen?') }}" data-confirm-title="{{ __('Konfirmasi Hapus Tiket') }}" data-confirm-type="danger" data-confirm-btn="{{ __('Ya, Hapus') }}">
         @csrf
         @method('DELETE')
         <button type="submit" class="sec-btn sec-btn-danger sec-btn-sm">{{ __('Delete ticket') }}</button>

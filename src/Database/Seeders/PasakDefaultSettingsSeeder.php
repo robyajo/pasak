@@ -10,23 +10,22 @@ use Internal\Pasak\Services\PasakService;
  * table so every tunable knob lives in the database and can be adjusted
  * from the Pasak dashboard without editing .env.
  *
- * Idempotent: existing setting rows are never overwritten.
+ * Idempotent: existing setting rows are never overwritten unless $overwrite is true.
  *
  * Manual usage:  php artisan db:seed --class=Internal\Pasak\Database\Seeders\PasakDefaultSettingsSeeder --force
  */
 class PasakDefaultSettingsSeeder extends Seeder
 {
-    public function __construct(
-        protected PasakService $security,
-    ) {}
+    public function __construct(protected PasakService $security) {}
 
     /**
      * Run the seeding.
      *
-     * @return array<int, string> newly created setting keys
+     * @param  bool  $overwrite  Whether to overwrite existing settings with defaults
+     * @return array<int, string> newly created or updated setting keys
      */
-    public function run(): array
+    public function run(bool $overwrite = false): array
     {
-        return $this->security->seedDefaultSettings();
+        return $this->security->seedDefaultSettings($overwrite);
     }
 }

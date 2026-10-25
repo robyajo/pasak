@@ -320,3 +320,20 @@ Panel tersedia di `/pasak` dan berisi tujuh modul: **Overview**, **Security Logs
         'admin_middleware' => ['Internal\\Pasak\\Http\\Middleware\\EnsureSecurityAdmin'],
     ],
     ```
+
+---
+
+## 9. Otomasi Deployment Server (VPS / Production)
+
+Saat melakukan deployment di VPS, git clone baru, atau menjalankan alur CI/CD produksi, gunakan perintah satu langkah:
+
+```bash
+php artisan pasak:deploy --force
+```
+
+Perintah ini otomatis:
+1. Menghasilkan dan mengamankan `PASAK_DASHBOARD_SECRET` di `.env` (tanpa menimpa jika sudah ada).
+2. Mempublikasikan dan menjalankan migrasi tabel-tabel khusus Pasak.
+3. Menanam pengaturan keamanan bawaan ke tabel `pasak_settings` secara aman tanpa menduplikasi data (*idempotent*).
+4. Menyegarkan seluruh cache framework.
+5. **Menjamin keamanan data produksi**: hanya menyentuh tabel Pasak dan tidak pernah menyentuh atau merusak tabel host aplikasi seperti `users`.

@@ -220,3 +220,50 @@ php artisan config:clear
 - `--force`: Buat ulang (regenerate) meskipun secret sudah terisi. Token dashboard lama otomatis ditandatangani ulang saat pengguna membuka `/pasak` (tidak ada 404).
 - `--show`: Tampilkan nilai secret aktif di keluaran terminal.
 - `--path=`: Berkas env tujuan selain `.env` (mis. `.env.production`).
+
+## 10. `pasak:deploy`
+
+Perintah satu langkah untuk otomasi deployment di server VPS / produksi atau dalam pipeline CI/CD.
+
+Perintah ini dirancang agar **aman dijalankan berulang kali (idempotent)** dan **hanya berfokus pada tabel khusus paket Pasak** (`pasak_*`), sehingga tidak akan menduplikasi data (*no double data*) dan sama sekali tidak menyentuh tabel pengguna (`users`) atau data aplikasi utama Anda.
+
+```bash
+php artisan pasak:deploy [options]
+```
+
+### Alur Eksekusi Otomatis:
+
+1. **Memastikan `PASAK_DASHBOARD_SECRET`**:
+   - Membaca berkas `.env` dan memastikan baris `PASAK_DASHBOARD_SECRET` terisi string rahasia 48 karakter acak kriptografis.
+   - Jika sudah terisi, nilai dipertahankan agar token sesi aktif tidak terputus (kecuali diberikan `--force-secret`).
+   - Memastikan berkas `.env.example` memiliki baris kosong `PASAK_DASHBOARD_SECRET=` agar aman saat di-clone ke server lain.
+2. **Sinkronisasi Migrasi Khusus Pasak**:
+   - Mempublikasikan berkas migrasi paket dan mengeksekusi `migrate --force`.
+3. **Seeder Pengaturan Bawaan (`PasakDefaultSettingsSeeder`)**:
+   - Menanam pengaturan keamanan bawaan ke tabel `pasak_settings` secara aman tanpa menduplikasi data.
+4. **Pembersihan Cache Framework**:
+   - Menjalankan penyegaran cache framework (`config:clear`, `route:clear`, `view:clear`) dan membersihkan cache versi paket.
+
+### Opsi:
+
+- _(tanpa opsi)_: Deployment standar aman (cek secret, migrasi pasak, seeder bawaan tanpa duplikasi data, dan bersihkan cache).
+- `--reset-settings`: Menyetel ulang seluruh pengaturan di tabel `pasak_settings` kembali ke nilai bawaan pabrik tanpa menghapus riwayat log atau blokir.
+- `--reset-tables`: Mengosongkan (*truncate/delete*) seluruh tabel khusus paket Pasak untuk memulai status bersih di VPS, **tetap membiarkan tabel host seperti `users` 100% aman**.
+- `--force-secret`: Memaksa membuat ulang nilai `PASAK_DASHBOARD_SECRET` di berkas `.env`.
+- `--no-migrate`: Melewati eksekusi migrasi database (misalnya jika migrasi dijalankan terpisah di alur CI/CD).
+- `--no-cache-clear`: Melewati pembersihan cache framework.
+- `--force`: Menjalankan proses tanpa meminta konfirmasi interaktif (wajib untuk script otomatis / CI/CD).
+- `--env-path=`: Menentukan lokasi berkas `.env` khusus (default: `.env`).
+
+### Contoh Penggunaan di VPS:
+
+```bash
+# 1. Jalankan rutin setiap deploy ulang di VPS
+php artisan pasak:deploy --force
+
+# 2. Setel ulang pengaturan WAF ke bawaan jika ada anomali konfigurasi
+php artisan pasak:deploy --reset-settings --force
+
+# 3. Mulai ulang tabel Pasak dari nol di staging tanpa merusak data user host
+php artisan pasak:deploy --reset-tables --force
+```

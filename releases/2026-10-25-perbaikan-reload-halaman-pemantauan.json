@@ -2,63 +2,58 @@
     "date": "2026-10-25",
     "type": "feature",
     "title": {
-        "id": "Pemulihan Koneksi Layanan dan Halaman Pemantauan",
-        "en": "Improved Service Connections and Monitoring Page Reliability"
+        "id": "Dialog Konfirmasi Interaktif, Notifikasi Mengambang, dan Keandalan Dasbor Keamanan",
+        "en": "Interactive Confirmation Dialogs, Floating Notifications, and Dashboard Reliability"
     },
     "body": {
-        "id": "Halaman pemantauan keamanan kini tetap dapat dibuka kembali setelah dibiarkan lama atau setelah masuk ulang, koneksi ke layanan tambahan tetap berfungsi meski nama layanannya memakai spasi, dan konsol pengujian dilengkapi simulasi audit keamanan otonom.",
-        "en": "The security monitoring page can now be reopened after being left idle or after signing in again, connections to additional services work even when their names contain spaces, and the testing console gains an autonomous security audit simulation."
+        "id": "Peningkatan menyeluruh pada panel pemantauan keamanan: penambahan dialog konfirmasi modern dan notifikasi mengambang waktu-nyata, perbaikan peralihan status blokir IP, keselarasan mode gelap dan terang di seluruh komponen, keandalan tautan dinamis saat memuat ulang, modul audit keamanan otonom, dan perintah otomasi penerapan aman di server.",
+        "en": "Comprehensive enhancements to the security monitoring panel: modern interactive confirmation dialogs, real-time floating toast notifications, dependable IP block status toggling, complete dark and light mode harmonization, resilient dynamic links on reload, autonomous security audit simulation, and safe server deployment automation."
     },
     "items": [
         {
-            "type": "fix",
-            "id": "Memuat ulang alamat pemantauan yang sudah lama terbuka kini otomatis mengantar pengguna ke alamat aktif, bukan halaman tidak ditemukan.",
-            "en": "Reloading a monitoring address that has been open for a while now automatically brings the user to the active address instead of a page-not-found screen."
-        },
-        {
-            "type": "fix",
-            "id": "Membuka kembali alamat pemantauan lama setelah masuk ulang tetap berfungsi dan mempertahankan halaman yang dituju.",
-            "en": "Reopening an older monitoring address after signing in again still works and keeps the intended page."
-        },
-        {
-            "type": "improvement",
-            "id": "Formulir yang sudah lama terbuka kini tetap dapat dikirim tanpa gagal karena alamat sesi kedaluwarsa.",
-            "en": "Forms left open for a long time can now still be submitted without failing due to an expired session address."
+            "type": "new",
+            "id": "Dialog Konfirmasi Interaktif: Setiap tindakan penting (seperti menghapus riwayat, memutus sesi, atau menyimpan konfigurasi) kini disertai jendela konfirmasi modern yang ramah pengguna untuk mencegah kesalahan klik.",
+            "en": "Interactive Confirmation Dialogs: Sensitive operations (such as clearing logs, terminating sessions, or saving settings) now prompt with modern confirmation modals to prevent accidental changes."
         },
         {
             "type": "new",
-            "id": "Tersedia perintah khusus untuk membuat atau membuat ulang rahasia alamat pemantauan saat pemasangan baru di server, lengkap dengan opsi menampilkan nilai dan memilih berkas konfigurasi.",
-            "en": "A dedicated command is available to create or regenerate the monitoring address secret on fresh server deployments, with options to show the value and choose the configuration file."
-        },
-        {
-            "type": "improvement",
-            "id": "Rahasia alamat pemantauan kini benar-benar mengikat alamat aktif; membuat ulang rahasia otomatis membatalkan alamat lama dan mengantar pengguna ke alamat baru tanpa gangguan.",
-            "en": "The monitoring address secret now genuinely binds the active address; regenerating it automatically revokes old addresses and guides users to the new one without disruption."
-        },
-        {
-            "type": "security",
-            "id": "Nilai rahasia hanya disimpan di konfigurasi server dan tidak lagi ikut tersalin ke contoh konfigurasi yang biasa dibagikan ke repositori, termasuk membersihkan nilai lama yang mungkin sudah ikut tersebar.",
-            "en": "The secret value is stored only in the server configuration and is no longer copied into the sample configuration commonly shared to repositories, including clearing any legacy value that may already have been exposed there."
+            "id": "Notifikasi Mengambang Waktu-Nyata: Informasi keberhasilan atau kegagalan tindakan kini muncul otomatis di pojok layar dengan animasi halus, durasi tayang yang nyaman, dan dapat ditutup kapan saja.",
+            "en": "Real-Time Floating Notifications: Immediate success or error feedback now appears gracefully in the screen corner with smooth transitions, comfortable display duration, and easy dismissal."
         },
         {
             "type": "fix",
-            "id": "Koneksi ke layanan tambahan yang memakai nama dengan spasi kini dapat dibuat tanpa mengubah nama aslinya bagi pengguna.",
-            "en": "Connections to additional services with names containing spaces can now be created without changing the name users see."
-        },
-        {
-            "type": "new",
-            "id": "Konsol pengujian kini dilengkapi modul audit otonom: simulasi penyerangan berbasis agen kecerdasan buatan untuk menguji ketahanan pelindung aplikasi secara mandiri dengan anggaran terkendali dan rekaman log waktu-nyata.",
-            "en": "The testing console now features an autonomous audit module: an intelligent agent-driven attack simulation to independently stress-test application defenses with controlled budgets and real-time log streaming."
-        },
-        {
-            "type": "new",
-            "id": "Laporan audit dan penjelajah kerentanan otomatis: menyajikan rincian temuan celah keamanan lengkap dengan tingkat keparahan, bukti konsep, dan rekomendasi perbaikan yang dapat diunduh.",
-            "en": "Automated audit reports and vulnerability explorer: presents discovered security gaps complete with severity rankings, proof-of-concept steps, and downloadable remediation advice."
+            "id": "Peralihan Status Pemblokiran Akurat: Pengaktifan atau penonaktifan penanganan alamat secara manual kini langsung diterapkan dengan tepat dan status tombol langsung diperbarui seketika.",
+            "en": "Accurate Quarantine Status Toggling: Manually enabling or disabling address enforcement now executes accurately with immediate visual button state updates."
         },
         {
             "type": "improvement",
-            "id": "Dukungan multi-penyedia kecerdasan buatan pada konsol audit: pengguna dapat beralih langsung antar model analitik terkemuka, model penalaran cepat, maupun model lokal mandiri dengan pengelolaan kunci akses terpadu.",
-            "en": "Multi-provider intelligent analytics support on the audit console: users can seamlessly switch between leading analytical models, rapid reasoning engines, and self-hosted local models with unified credential management."
+            "id": "Harmonisasi Mode Gelap dan Terang: Seluruh tata letak, kotak dialog, formulir, dan notifikasi kini menyesuaikan warna secara serasi dan konsisten saat pengguna beralih antara tema gelap dan terang.",
+            "en": "Harmonized Dark and Light Modes: All page layouts, modals, forms, and floating cards dynamically adjust colors with seamless contrast across dark and light themes."
+        },
+        {
+            "type": "fix",
+            "id": "Ketahanan Notifikasi Antar Halaman: Pesan pemberitahuan hasil tindakan tetap tersampaikan dengan utuh meskipun terjadi pengalihan halaman pengamanan otomatis.",
+            "en": "Resilient Cross-Page Notifications: Action result messages remain fully preserved and displayed even across automated security page redirections."
+        },
+        {
+            "type": "new",
+            "id": "Perintah Otomasi Penerapan Aman (Deploy): Alat bantu otomatis untuk memastikan penerapan konfigurasi keamanan di server berjalan mulus tanpa risiko duplikasi maupun gangguan pada data utama.",
+            "en": "Safe Server Deployment Automation: Streamlined automated command ensuring server security configuration, table synchronization, and defaults setup without duplicates or affecting main data."
+        },
+        {
+            "type": "fix",
+            "id": "Keandalan Tautan Pemantauan Bergerak: Memuat ulang halaman dasbor yang telah terbuka lama kini otomatis mengantar pengguna ke alamat aktif terbaru tanpa menampilkan halaman galat.",
+            "en": "Resilient Dynamic Monitoring Links: Reloading dashboard tabs that have remained open automatically guides users to the fresh active address without landing on error pages."
+        },
+        {
+            "type": "new",
+            "id": "Konsol Uji Ketahanan Mandiri: Simulasi audit keamanan cerdas untuk menguji kesiapan perlindungan aplikasi secara berkala dengan anggaran terkontrol dan laporan temuan terperinci.",
+            "en": "Autonomous Resilience Testing Console: Intelligent audit simulation to evaluate application defenses on demand with controlled budgets and comprehensive vulnerability insights."
+        },
+        {
+            "type": "improvement",
+            "id": "Konektivitas Layanan Fleksibel: Dukungan penghubung ke berbagai model analitik cerdas dan layanan tambahan dengan penamaan bebas tanpa kendala teknis.",
+            "en": "Flexible Service Connectivity: Seamless integration with diverse analytical intelligence engines and auxiliary services supporting custom naming without disruptions."
         }
     ]
 }

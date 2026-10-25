@@ -23,6 +23,10 @@ class PasakDashboardAliasController extends Controller
         $slug = $urls->currentSlug($request);
         $urls->applyUrlDefaults($slug);
 
+        if ($request->hasSession()) {
+            $request->session()->reflash();
+        }
+
         $any = trim((string) ($request->route('any') ?? ''), '/');
         $url = url($slug.($any === '' ? '' : '/'.$any));
         $query = $request->getQueryString();

@@ -91,7 +91,7 @@ class PasakSessionController extends Controller
         );
     }
 
-    public function destroyLogin(int $id): RedirectResponse
+    public function destroyLogin(int|string $id): RedirectResponse
     {
         PasakUserLogin::query()->whereKey($id)->delete();
 
@@ -111,7 +111,7 @@ class PasakSessionController extends Controller
         ]);
     }
 
-    public function destroyTrusted(int $id): RedirectResponse
+    public function destroyTrusted(int|string $id): RedirectResponse
     {
         $trusted = PasakTrustedIp::query()->find($id);
         $ip = $trusted?->ip_address;
