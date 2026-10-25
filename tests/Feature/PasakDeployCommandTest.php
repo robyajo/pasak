@@ -228,6 +228,6 @@ test(
         expect($dedicated)
             ->not->toContain($usersTable)
             ->not->toContain('users')
-            ->toContain((new PasakSetting())->getTable());
+            ->toContain((new PasakSetting)->getTable());
     },
 );
