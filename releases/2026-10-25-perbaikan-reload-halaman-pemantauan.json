@@ -6,8 +6,8 @@
         "en": "Interactive Confirmation Dialogs, Floating Notifications, and Dashboard Reliability"
     },
     "body": {
-        "id": "Peningkatan menyeluruh pada panel pemantauan keamanan: penambahan dialog konfirmasi modern dan notifikasi mengambang waktu-nyata, perbaikan peralihan status blokir IP, keselarasan mode gelap dan terang di seluruh komponen, keandalan tautan dinamis saat memuat ulang, modul audit keamanan otonom, dan perintah otomasi penerapan aman di server.",
-        "en": "Comprehensive enhancements to the security monitoring panel: modern interactive confirmation dialogs, real-time floating toast notifications, dependable IP block status toggling, complete dark and light mode harmonization, resilient dynamic links on reload, autonomous security audit simulation, and safe server deployment automation."
+        "id": "Peningkatan menyeluruh pada panel pemantauan keamanan: penambahan dialog konfirmasi modern dan notifikasi mengambang waktu-nyata, perbaikan peralihan status blokir IP, keselarasan mode gelap dan terang di seluruh komponen, keandalan tautan dinamis saat memuat ulang, modul audit keamanan otonom, informasi pengembang dan kebijakan privasi terpadu, perintah otomasi penerapan aman di server, serta penyempurnaan gerbang mutu pengujian otomatis.",
+        "en": "Comprehensive enhancements to the security monitoring panel: modern interactive confirmation dialogs, real-time floating toast notifications, dependable IP block status toggling, complete dark and light mode harmonization, resilient dynamic links on reload, autonomous security audit simulation, integrated developer credentials and transparent privacy terms, safe server deployment automation, and refined automated quality testing gates."
     },
     "items": [
         {
@@ -19,6 +19,11 @@
             "type": "new",
             "id": "Notifikasi Mengambang Waktu-Nyata: Informasi keberhasilan atau kegagalan tindakan kini muncul otomatis di pojok layar dengan animasi halus, durasi tayang yang nyaman, dan dapat ditutup kapan saja.",
             "en": "Real-Time Floating Notifications: Immediate success or error feedback now appears gracefully in the screen corner with smooth transitions, comfortable display duration, and easy dismissal."
+        },
+        {
+            "type": "new",
+            "id": "Informasi Pengembang & Kebijakan Privasi Terpadu: Penambahan identitas pengembang resmi, rujukan dokumentasi publik, dan dialog kebijakan privasi transparan mengenai etika pengujian serta perlindungan data lokal pengguna pada aplikasi konsol pengujian.",
+            "en": "Unified Developer Profile & Transparent Privacy Policy: Added official developer credentials, public documentation references, and transparent privacy terms covering ethical testing boundaries and local data protection on the testing console."
         },
         {
             "type": "fix",
@@ -44,6 +49,11 @@
             "type": "fix",
             "id": "Keandalan Tautan Pemantauan Bergerak: Memuat ulang halaman dasbor yang telah terbuka lama kini otomatis mengantar pengguna ke alamat aktif terbaru tanpa menampilkan halaman galat.",
             "en": "Resilient Dynamic Monitoring Links: Reloading dashboard tabs that have remained open automatically guides users to the fresh active address without landing on error pages."
+        },
+        {
+            "type": "fix",
+            "id": "Gerbang Mutu Pengujian Otomatis Berkelanjutan: Penyelarasan format kode dan penyempurnaan deteksi rujukan internal sehingga seluruh alur pengujian mutu pada repositori berjalan hijau tanpa kendala.",
+            "en": "Automated Continuous Quality Assurance: Standardized code formatting and perfected internal reference detection, ensuring all automated quality assurance test pipelines run completely green."
         },
         {
             "type": "new",

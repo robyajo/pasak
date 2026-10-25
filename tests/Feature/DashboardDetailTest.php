@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Contracts\View\View;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Route;
 use Internal\Pasak\Http\Controllers\Dashboard\BlockedIpController;
@@ -185,7 +186,7 @@ test('blocked ip controller accepts string ID for toggle and destroy', function 
     ]);
 
     $response = app(BlockedIpController::class)->toggle((string) $block->id);
-    expect($response)->toBeInstanceOf(\Illuminate\Http\RedirectResponse::class);
+    expect($response)->toBeInstanceOf(RedirectResponse::class);
 
     $block->refresh();
     expect($block->is_active)->toBeFalse();
@@ -195,6 +196,6 @@ test('blocked ip controller accepts string ID for toggle and destroy', function 
     expect($block->is_active)->toBeTrue();
 
     $destroyResponse = app(BlockedIpController::class)->destroy((string) $block->id);
-    expect($destroyResponse)->toBeInstanceOf(\Illuminate\Http\RedirectResponse::class);
+    expect($destroyResponse)->toBeInstanceOf(RedirectResponse::class);
     expect(BlockedIp::query()->find($block->id))->toBeNull();
 });

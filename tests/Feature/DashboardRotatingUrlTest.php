@@ -2,8 +2,10 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use Internal\Pasak\Http\Controllers\Dashboard\PasakBlockedIpController;
 use Internal\Pasak\Http\Controllers\Dashboard\PasakDashboardEntryController;
 use Internal\Pasak\Http\Middleware\PasakRotatingDashboard;
+use Internal\Pasak\Models\PasakBlockedIp;
 use Internal\Pasak\Services\PasakDashboardUrlService;
 
 beforeEach(function () {
@@ -54,7 +56,7 @@ beforeEach(function () {
             )->name('blocked-ips');
             Route::patch(
                 'blocked-ips/{id}/toggle',
-                [\Internal\Pasak\Http\Controllers\Dashboard\PasakBlockedIpController::class, 'toggle'],
+                [PasakBlockedIpController::class, 'toggle'],
             )->name('blocked-ips.toggle');
         });
 
@@ -234,7 +236,7 @@ test('feed polling tidak memutar token sehingga tidak balapan', function () {
 });
 
 test('rute berparameter seperti toggle blocked-ip menerima id sebenarnya bukan pasakSlug', function () {
-    $block = \Internal\Pasak\Models\PasakBlockedIp::create([
+    $block = PasakBlockedIp::create([
         'ip_address' => '198.51.100.77',
         'is_active' => true,
     ]);
@@ -259,7 +261,7 @@ test('rute berparameter seperti toggle blocked-ip menerima id sebenarnya bukan p
 });
 
 test('flash toast bertahan melewati pengalihan ganda url acak berputar', function () {
-    $block = \Internal\Pasak\Models\PasakBlockedIp::create([
+    $block = PasakBlockedIp::create([
         'ip_address' => '198.51.100.88',
         'is_active' => true,
     ]);

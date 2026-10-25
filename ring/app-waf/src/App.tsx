@@ -151,8 +151,8 @@ export default function App() {
     return (
         <div className={`${theme} min-h-screen bg-background text-foreground`}>
             <AppHeader
-                title="WAF Test Console"
-                subtitle="Laravel Security Monitor · Bulwark"
+                title="WAF Test PASAK"
+                subtitle="PASAK · Bulwark"
                 mode={mode}
                 onModeChange={changeMode}
                 theme={theme}

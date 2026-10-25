@@ -44,6 +44,29 @@ class PasakDashboardUrlService
         return $prefix === '' ? 'pasak' : $prefix;
     }
 
+    /**
+     * URL pintu masuk stabil dashboard (misal: "http://localhost:8000/pasak").
+     */
+    public function entryUrl(string $path = ''): string
+    {
+        $prefix = $this->basePrefix();
+        $trimmedPath = ltrim($path, '/');
+        $target = $trimmedPath === '' ? $prefix : $prefix.'/'.$trimmedPath;
+
+        return url($target);
+    }
+
+    /**
+     * Path pintu masuk stabil dashboard (misal: "/pasak").
+     */
+    public function entryPath(string $path = ''): string
+    {
+        $prefix = $this->basePrefix();
+        $trimmedPath = ltrim($path, '/');
+
+        return '/'.($trimmedPath === '' ? $prefix : $prefix.'/'.$trimmedPath);
+    }
+
     public function tokenLength(): int
     {
         return max(

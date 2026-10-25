@@ -4,6 +4,7 @@ namespace Internal\Pasak\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Route;
 use Internal\Pasak\Services\PasakDashboardUrlService;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -47,7 +48,7 @@ class PasakRotatingDashboard
             }
 
             $route = $request->route();
-            if ($route instanceof \Illuminate\Routing\Route) {
+            if ($route instanceof Route) {
                 $route->forgetParameter('pasakSlug');
             }
 
@@ -83,7 +84,7 @@ class PasakRotatingDashboard
             }
 
             $route = $request->route();
-            if ($route instanceof \Illuminate\Routing\Route) {
+            if ($route instanceof Route) {
                 $route->forgetParameter('pasakSlug');
             }
 
