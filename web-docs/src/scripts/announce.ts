@@ -24,7 +24,7 @@ function compareSemver(a?: string, b?: string): number {
 
 const v1 = pkg?.version ?? "";
 const v2 = pkg?.packagist?.version ?? "";
-const version = (compareSemver(v1, v2) >= 0 ? v1 : v2) || "1.6.1";
+const version = (compareSemver(v1, v2) >= 0 ? v1 : v2) || "1.6.2";
 
 const BANNER_ID = "psk-docs-announce-bar";
 const MODAL_ID = "psk-docs-announce-modal";

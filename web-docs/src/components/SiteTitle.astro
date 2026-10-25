@@ -22,7 +22,7 @@ function compareSemver(a, b) {
 const { siteTitleHref } = Astro.locals.starlightRoute;
 const v1 = pkg?.version ?? "";
 const v2 = pkg?.packagist?.version ?? "";
-const version = (compareSemver(v1, v2) >= 0 ? v1 : v2) || "1.6.1";
+const version = (compareSemver(v1, v2) >= 0 ? v1 : v2) || "1.6.2";
 ---
 
 <a href={siteTitleHref} class="site-title sl-flex">

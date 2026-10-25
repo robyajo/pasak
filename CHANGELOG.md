@@ -2,6 +2,20 @@
 
 All notable changes to `robyajo/pasak` will be documented in this file.
 
+## [1.6.2] - 2026-10-25
+
+### Added
+
+- **Perintah Otomatisasi Deployment VPS Ramah Produksi (`php artisan pasak:deploy`)** — perintah deploy idempoten yang dirancang khusus untuk deployment di server/VPS produksi tanpa risiko merusak atau menduplikasi data aplikasi yang sudah padat. Otomatis memastikan `PASAK_DASHBOARD_SECRET` siap di `.env`, mengeksekusi migrasi tabel Pasak secara terisolasi (`--only-package`), menyemai default knobs ke `pasak_settings` tanpa penumpukan data (`seedDefaultSettings()`), dan membersihkan stale cache/views. Dilengkapi opsi `--clean-views`, `--skip-settings`, `--force`, dan `--dry-run`.
+- **Modern Alert-Dialog Konfirmasi Interaktif** — seluruh aksi berbahaya dan mutasi data pada dasbor Blade (`allowed-ips`, `blocked-ips`, `server`, `sessions`, `settings`, `tickets`) kini dilindungi modal konfirmasi bertema (Danger, Warning, Success) sebelum formulir dikirimkan, menggantikan default browser dialog atau pengiriman tanpa konfirmasi.
+- **Sistem Notifikasi Floating Toast Real-time** — komponen toast modern otomatis muncul di pojok kanan bawah antarmuka dasbor saat aksi berhasil atau gagal, lengkap dengan auto-dismiss, progress timer bar, dan integrasi penuh dengan session flash Laravel.
+
+### Fixed
+
+- **Preservasi Session Flash pada Rotating Dashboard** — memperbaiki hilangnya flash message notifikasi saat terjadi rotasi token URL atau redirect 302 ganda menggunakan `session()->reflash()` di middleware `PasakRotatingDashboard` dan helper trait `RespondsWithPasakDashboard`.
+- **Penanganan Route Parameter pada Model Route Binding** — memperbaiki parameter shifting ketika `{pasakSlug}` hadir pada rute detail/aksi dasbor (`blocked-ips/{id}`, `tickets/{id}`, dsb.).
+- **Harmonisasi Tampilan Mode Gelap & Terang** — merapikan pewarnaan latar belakang, border, dan teks pada seluruh halaman dasbor Blade menggunakan variabel CSS terpusat (`--sec-bg`, `--sec-card`, `--sec-text`, `--sec-border`) sehingga transisi tema konsisten di seluruh elemen visual.
+
 ## [1.6.1] - 2026-10-25
 
 ### Added
