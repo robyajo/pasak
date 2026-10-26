@@ -89,7 +89,10 @@ table{font-size:.78rem}
 <a href="{{ route('categories.index') }}" class="{{ request()->routeIs('categories.*') ? 'active' : '' }}">Kategori</a>
 <a href="{{ route('tags.index') }}" class="{{ request()->routeIs('tags.*') ? 'active' : '' }}">Tags</a>
 <a href="{{ route('contacts.index') }}" class="{{ request()->routeIs('contacts.*') ? 'active' : '' }}">Kontak</a>
-@if(Route::has('pasak.dashboard.overview'))<a href="{{ route('pasak.dashboard.overview') }}" class="{{ request()->routeIs('pasak.dashboard.*') ? 'active' : '' }}">🛡️ Dasbor Pasak</a>@endif
+@if(Route::has('pasak.dashboard.overview'))<a href="{{ route('pasak.dashboard.overview') }}" class="{{ request()->routeIs('pasak.dashboard.*') ? 'active' : '' }}">🛡️ Dasbor Bawaan</a>@endif
+@auth
+@if(Route::has('keamanan.index'))<a href="{{ route('keamanan.index') }}" class="{{ request()->routeIs('keamanan.*') ? 'active' : '' }}">🛡️ Keamanan Kustom</a>@endif
+@endauth
 <span class="nav-auth">
 @auth
 <span class="meta">👤 {{ auth()->user()->name }}</span>

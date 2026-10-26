@@ -2,6 +2,18 @@
 
 All notable changes to `robyajo/pasak` will be documented in this file.
 
+## [1.6.3] - 2026-10-26
+
+### Added
+
+- **Dukungan Kustomisasi Mandiri Tanpa Mengubah Vendor** — panduan resmi dan implementasi arsitektur headless yang memungkinkan pengembang aplikasi host membangun tampilan monitoring Blade kustom (selaras dengan layout utama aplikasi `@extends('layouts.app')`) dan REST API JSON mandiri menggunakan Facade `Internal\Pasak\Facades\Pasak` dan Model resmi `PasakLog`, `PasakBlockedIp`.
+- **Penyelarasan Kontrak Facade Pasak** — penambahan method `isEnabled()`, `isBlockEnforcementEnabled()`, dan `blockIp(string $ip, ?string $reason = null, ?int $durationHours = null, ...)` pada `PasakService` untuk menyempurnakan pemanggilan skalar yang dideklarasikan pada Facade `Pasak`.
+- **Bab Dokumentasi Integrasi 04 (`documents/07-integration-guides/04-custom-dashboard-dan-api-tanpa-ubah-vendor.md`)** — panduan komprehensif mengenai kebijakan Zero-Vendor-Edit, pemisahan zona aman aplikasi host vs zona terlindung `vendor/`, serta tutorial lengkap pembuatan controller kustom.
+
+### Changed
+
+- **Pembersihan Distribusi Pustaka Vendor (`.gitattributes`)** — mengeksklusikan direktori `releases/` dan `skills/` dari arsip Composer (`export-ignore`) sehingga instalasi pengguna lebih bersih, ramping, dan bebas dari berkas catatan pengembangan internal.
+
 ## [1.6.2] - 2026-10-25
 
 ### Added

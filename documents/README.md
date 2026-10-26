@@ -57,6 +57,7 @@ Dokumentasi ini disusun secara modular ke dalam 7 bagian utama:
 - [01. Integrasi Frontend React / Inertia](./07-integration-guides/01-frontend-react-inertia.md) — Axios interceptor penanganan HTTP 403 dan modal permohonan buka blokir.
 - [02. Integrasi Frontend Blade & Livewire](./07-integration-guides/02-frontend-blade-livewire.md) — Dashboard Blade murni, visualisasi Threat Map (peta globe live), Data Table interaktif (filter tanggal & per-page), dan kustomisasi `errors/blocked.blade.php`.
 - [03. Pembuatan Aturan Kustom & Whitelist Subnet](./07-integration-guides/03-custom-rules-and-whitelist.md) — Menambahkan signature kustom, whitelist subnet CIDR kantor, dan kustomisasi skema.
+- [04. Kustomisasi Aman (Blade & API) Tanpa Mengubah Vendor](./07-integration-guides/04-custom-dashboard-dan-api-tanpa-ubah-vendor.md) — Kebijakan Zero-Vendor-Edit, batas arsitektur `vendor/` vs aplikasi host, panduan membangun controller Blade & REST API JSON kustom.
 
 ---
 

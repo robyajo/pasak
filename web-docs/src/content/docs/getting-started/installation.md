@@ -175,6 +175,98 @@ Perintah ini menyalin tujuh halaman Blade ke `resources/views/pages/pasak/` (CSS
 
 ---
 
+## 4.5. Batas Wilayah & Struktur Berkas di `vendor/robyajo/pasak/`
+
+Paket ini menganut kebijakan **Zero-Vendor-Edit Policy** yang ketat. Ketika pengguna menjalankan `composer require robyajo/pasak`, berkas pengujian dan aset internal otomatis dieksklusikan melalui `.gitattributes` sehingga hanya pustaka runtime murni yang diterima di folder `vendor/`.
+
+### Struktur Lengkap yang Diterima di `vendor/robyajo/pasak/`:
+
+```text
+vendor/robyajo/pasak/
+├── config/
+│   └── pasak.php                          # Sumber konfigurasi bawaan (dipublikasikan ke config/pasak.php)
+├── database/migrations/
+│   ├── 2026_01_01_000001_create_pasak_tables.php       # Skema utama (logs, blocks, tickets, dll.)
+│   ├── 2026_10_13_000001_create_pasak_allowed_ips_table.php # Tabel whitelist IP global
+│   └── 2026_10_21_000001_prefix_pasak_tables.php       # Migrasi otomatis prefixing tabel
+├── routes/
+│   ├── pasak.php                          # Rute internal dashboard web
+│   ├── pasak-api.php                      # Rute internal headless REST API
+│   └── pasak-dashboard-blade.php          # Rute internal dashboard Blade murni
+├── src/
+│   ├── PasakServiceProvider.php           # Service Provider Laravel (Auto-discovery, Gate, Aliases)
+│   ├── compat.php                         # Backward-compatibility alias
+│   ├── Concerns/
+│   │   ├── HasPasakSecurityRelations.php  # [PUBLIC API] Trait Eloquent untuk Model User
+│   │   └── ResolvesPasakTable.php         # Helper resolusi nama tabel dinamis
+│   ├── Console/Commands/
+│   │   ├── PasakInstallCommand.php        # php artisan pasak:install
+│   │   ├── PasakUpgradeCommand.php        # php artisan pasak:upgrade
+│   │   ├── PasakUninstallCommand.php      # php artisan pasak:uninstall
+│   │   ├── PasakBaselineCommand.php       # php artisan pasak:baseline
+│   │   ├── PasakScanAccessLogsCommand.php # php artisan pasak:scan-logs
+│   │   ├── PasakUnblockIpCommand.php      # php artisan pasak:unblock-ip
+│   │   └── PasakPruneSecurityLogsCommand.php # php artisan pasak:prune-logs
+│   ├── Facades/
+│   │   └── Pasak.php                      # [PUBLIC API] Facade resmi Pasak (Pasak::stats(), dll.)
+│   ├── Http/
+│   │   ├── Controllers/Api/               # Controller headless REST API internal
+│   │   ├── Controllers/Dashboard/         # Controller Blade dashboard internal
+│   │   └── Middleware/
+│   │       ├── PasakBlockIpAddress.php    # Middleware pencekal 403 untuk IP/Device terblokir
+│   │       ├── PasakDetectSecurityThreats.php # Middleware inspeksi muatan ancaman (WAF Engine)
+│   │       ├── PasakEnsureSecurityAdmin.php   # Middleware otorisasi admin
+│   │       ├── PasakInjectAnnouncementBanner.php # Middleware injeksi pengumuman darurat
+│   │       └── PasakTrackUserActivity.php # Middleware pelacak sesi & heartbeat
+│   ├── Listeners/
+│   │   ├── LogFailedLoginAttempt.php      # Event listener: pencatatan login gagal & lockout
+│   │   ├── RecordUserLogin.php            # Event listener: pencatatan login berhasil
+│   │   └── ResetLoginAttempts.php         # Event listener: reset percobaan login
+│   ├── Models/                            # [PUBLIC API] Model Eloquent resmi
+│   │   ├── PasakLog.php                   # Model log ancaman WAF
+│   │   ├── PasakBlockedIp.php             # Model IP/perangkat yang diblokir
+│   │   ├── PasakAllowedIp.php             # Model whitelist IP
+│   │   ├── PasakIpUnblockRequest.php      # Model tiket banding unblock
+│   │   ├── PasakUserLogin.php             # Model histori sesi login pengguna
+│   │   ├── PasakLoginAttempt.php          # Model upaya login gagal
+│   │   ├── PasakSetting.php               # Model konfigurasi dinamis runtime
+│   │   └── PasakTrustedIp.php             # Model IP terpercaya pengguna
+│   ├── Rules/                             # [PUBLIC API] Validasi Laravel
+│   │   ├── PasakSafeImageFile.php         # Validasi gambar anti-polyglot/webshell
+│   │   └── PasakSafeAssetPath.php         # Validasi path anti-traversal
+│   ├── Services/
+│   │   ├── PasakService.php               # [CORE ENGINE] Mesin regex WAF ReDoS-immune
+│   │   ├── ServerSecurityService.php      # [CORE ENGINE] Audit integritas server & webshell
+│   │   └── AccessLogStreamer.php          # [CORE ENGINE] Streaming parser log web server
+│   └── Support/
+│       └── DashboardView.php              # Helper render tampilan
+├── stubs/                                 # [CETAK BIRU] Disalin ke host saat pasak:install
+│   ├── nginx.conf.stub                    # Template vhost Nginx WAF hardened
+│   ├── htaccess.stub                      # Template Apache .htaccess hardened
+│   ├── apache2.conf.stub                  # Template vhost Apache 2
+│   ├── blocked.blade.php                  # Template tampilan 403 kustom bawaan
+│   ├── env.stub                           # Blok konfigurasi PASAK_* untuk .env
+│   ├── routes/                            # Stub rute publishable
+│   └── blade/pages/pasak/                 # Stub tampilan Blade monitoring bawaan
+├── composer.json                          # Metadata paket Composer & auto-discovery
+├── LICENSE                                # Lisensi lisensi MIT
+├── README.md                              # Dokumentasi ringkas paket
+├── SECURITY.md                            # Kebijakan pelaporan kerentanan
+└── CHANGELOG.md                           # Catatan riwayat versi rilis
+```
+
+### Kategori Hak Akses Berkas bagi Developer:
+
+| Kategori | Lokasi Berkas | Hak Akses Developer | Keterangan |
+| :--- | :--- | :--- | :--- |
+| 🟢 **Public API** | `src/Facades/Pasak.php`, `src/Models/*`, `src/Rules/*`, `src/Concerns/*` | **Dapat & Dianjurkan Dipanggil** | Komponen resmi yang dirancang untuk diimpor ke dalam Controller, Model, dan Form Request aplikasi host Anda. |
+| 🟡 **Stubs (Cetak Biru)** | `stubs/*`, `config/pasak.php` | **Disalin ke Aplikasi Host** | Sumber cetak biru yang disalin ke aplikasi Anda saat menjalankan `php artisan pasak:install`. Anda bebas mengedit salinannya di aplikasi host. |
+| 🔴 **Core Engine** | `src/Services/*`, `src/Http/Middleware/*`, `database/migrations/*` | **DILARANG KERAS DIUBAH** | Berjalan secara otomatis di latar belakang. Modifikasi pada folder vendor akan **hilang permanen** saat `composer update` dan berisiko merusak perlindungan WAF. |
+
+Panduan membuat tampilan dan API kustom tanpa mengubah vendor tersedia di [Panduan Kustomisasi Aman (Blade & API)](../07-integration-guides/04-custom-dashboard-dan-api-tanpa-ubah-vendor.md).
+
+---
+
 ## 5. Menjalankan Migrasi Database
 
 Jalankan perintah migrasi Laravel untuk membuat tabel-tabel pendukung paket:

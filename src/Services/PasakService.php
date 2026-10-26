@@ -70,9 +70,19 @@ class PasakService
         return (bool) $this->getSetting('enabled', config('pasak.enabled', true));
     }
 
+    public function isEnabled(): bool
+    {
+        return $this->enabled();
+    }
+
     public function enforcementEnabled(): bool
     {
         return $this->enabled() && (bool) $this->getSetting('block_enforcement', config('pasak.block_enforcement', true));
+    }
+
+    public function isBlockEnforcementEnabled(): bool
+    {
+        return $this->enforcementEnabled();
     }
 
     /**
@@ -797,6 +807,32 @@ class PasakService
         $this->blockCache[$cacheKey] = $block;
 
         return $block;
+    }
+
+    /**
+     * Block an IP address with convenient scalar arguments (matching Pasak facade).
+     */
+    public function blockIp(
+        string $ip,
+        ?string $reason = null,
+        ?int $durationHours = null,
+        string $source = 'manual',
+        ?int $userId = null,
+        ?string $deviceId = null,
+        ?string $localIp = null,
+        string $scope = 'ip'
+    ): bool {
+        $block = $this->block($ip, [
+            'reason' => $reason,
+            'duration_hours' => $durationHours,
+            'source' => $source,
+            'blocked_by' => $userId,
+            'device_id' => $deviceId,
+            'local_ip' => $localIp,
+            'block_scope' => $scope,
+        ]);
+
+        return (bool) $block->is_active;
     }
 
     /**

@@ -10,23 +10,22 @@
  * Jalankan:
  *   php documents/generate.php
  */
-
 $base = __DIR__;
-$version = "1.5.0";
+$version = '1.5.0';
 
 $docs = [];
 
-$directories = glob($base . "/*", GLOB_ONLYDIR) ?: [];
+$directories = glob($base.'/*', GLOB_ONLYDIR) ?: [];
 sort($directories);
 
 foreach ($directories as $directory) {
-    $files = glob($directory . "/*.md") ?: [];
+    $files = glob($directory.'/*.md') ?: [];
     sort($files);
 
     foreach ($files as $file) {
         $filename = basename($file);
 
-        if ($filename === "README.md") {
+        if ($filename === 'README.md') {
             continue;
         }
 
@@ -38,10 +37,10 @@ foreach ($directories as $directory) {
         }
 
         $docs[] = [
-            "section" => basename($directory),
-            "filename" => $filename,
-            "title" => $title,
-            "content" => $content,
+            'section' => basename($directory),
+            'filename' => $filename,
+            'title' => $title,
+            'content' => $content,
         ];
     }
 }
@@ -279,14 +278,14 @@ $template = <<<'HTML'
 HTML;
 
 $html = str_replace(
-    ["__DOCS_DATA__", "__VERSION__"],
+    ['__DOCS_DATA__', '__VERSION__'],
     [$payload, $version],
     $template,
 );
 
-file_put_contents($base . "/index.html", $html);
+file_put_contents($base.'/index.html', $html);
 
-echo "Generated documents/index.html with " .
-    count($docs) .
-    " chapters." .
+echo 'Generated documents/index.html with '.
+    count($docs).
+    ' chapters.'.
     PHP_EOL;

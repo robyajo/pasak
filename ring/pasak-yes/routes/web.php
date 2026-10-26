@@ -4,6 +4,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\KeamananController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\TagController;
 use App\Models\Category;
@@ -32,5 +33,12 @@ Route::get('/dashboard', [DashboardController::class, 'index'])->middleware('aut
 Route::resource('posts', PostController::class);
 Route::resource('categories', CategoryController::class)->except(['show']);
 Route::resource('tags', TagController::class)->except(['show']);
+
+Route::middleware('auth')->prefix('keamanan')->name('keamanan.')->group(function () {
+    Route::get('/', [KeamananController::class, 'index'])->name('index');
+    Route::post('/block', [KeamananController::class, 'blockIp'])->name('block');
+    Route::post('/unblock/{ip}', [KeamananController::class, 'unblockIp'])->name('unblock');
+    Route::delete('/logs', [KeamananController::class, 'clearLogs'])->name('logs.clear');
+});
 
 require __DIR__.'/pasak.php';

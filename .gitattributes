@@ -1,5 +1,7 @@
 # Dev-only assets: excluded from the Composer/Packagist distribution archive
 .agents/        export-ignore
+skills/         export-ignore
+releases/       export-ignore
 AGENTS.md      export-ignore
 CONTRIBUTING.md export-ignore
 DOCS/           export-ignore
