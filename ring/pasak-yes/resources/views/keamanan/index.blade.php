@@ -70,28 +70,16 @@
 .badge-level.high { background: #78350d; color: #fef08a; }
 .badge-level.medium { background: #1e3a8a; color: #bfdbfe; }
 .badge-level.low { background: #374151; color: #e5e7eb; }
-.filter-bar {
-    display: flex;
-    gap: .75rem;
-    margin-bottom: 1rem;
-    flex-wrap: wrap;
-    align-items: center;
-}
-.filter-bar input, .filter-bar select {
-    width: auto;
-    min-width: 180px;
-}
 .table-responsive {
     overflow-x: auto;
 }
 </style>
 
+@include('keamanan._nav')
+
 <div class="sec-header">
     <div>
-        <h1 style="margin: 0 0 .25rem 0; font-size: 1.75rem;">🛡️ Pusat Keamanan Kustom</h1>
-        <p style="margin: 0; color: #9ca3af; font-size: .9rem;">
-            Tampilan custom aplikasi host menggunakan API & Facade <code>robyajo/pasak</code>.
-        </p>
+        <h2 style="margin: 0; font-size: 1.25rem;">📊 Ringkasan Keamanan Sistem</h2>
     </div>
     <div class="sec-badges">
         <span class="pill {{ $wafEnabled ? 'active' : 'inactive' }}">
@@ -152,11 +140,14 @@
 
     {{-- Daftar IP yang Sedang Diblokir --}}
     <div class="card">
-        <h3 style="margin-top:0;">📋 IP yang Sedang Diblokir ({{ count($blockedIps) }})</h3>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:.5rem;">
+            <h3 style="margin:0;">📋 IP Diblokir Terbaru ({{ count($recentBlocks) }})</h3>
+            <a href="{{ route('keamanan.blocked-ips') }}" class="btn" style="font-size:.75rem; padding:.2rem .5rem;">Lihat Semua →</a>
+        </div>
         <p style="color:#9ca3af; font-size:.85rem; margin-top:-.25rem;">
             Daftar IP yang langsung di-block 403 saat mengakses situs.
         </p>
-        @if($blockedIps->isEmpty())
+        @if($recentBlocks->isEmpty())
             <p style="color: #9ca3af; font-size: .85rem; font-style: italic;">
                 Belum ada IP yang diblokir saat ini.
             </p>
@@ -167,25 +158,25 @@
                         <tr>
                             <th>Alamat IP</th>
                             <th>Alasan</th>
-                            <th>Aksi</th>
+                            <th style="text-align:right;">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach($blockedIps as $item)
+                        @foreach($recentBlocks as $item)
                         <tr>
                             <td>
                                 <code>{{ $item->ip_address }}</code>
-                                @if($item->expires_at)
-                                    <div class="meta" style="font-size: .7rem;">Hingga: {{ $item->expires_at->diffForHumans() }}</div>
+                                @if($item->blocked_until)
+                                    <div class="meta" style="font-size: .7rem;">Hingga: {{ $item->blocked_until->diffForHumans() }}</div>
                                 @else
                                     <div class="meta" style="font-size: .7rem;">Permanen</div>
                                 @endif
                             </td>
                             <td>
                                 <span style="font-size: .8rem;">{{ $item->reason ?? 'Manual Block' }}</span>
-                                <div class="meta" style="font-size: .7rem;">Hits: {{ $item->hit_count }}</div>
+                                <div class="meta" style="font-size: .7rem;">Hits: {{ $item->hit_count ?? 0 }}</div>
                             </td>
-                            <td>
+                            <td style="text-align:right;">
                                 <form method="POST" action="{{ route('keamanan.unblock', $item->ip_address) }}" onsubmit="return confirm('Buka blokir untuk IP ini?')">
                                     @csrf
                                     <button type="submit" class="btn" style="padding: .2rem .5rem; font-size: .75rem;">Buka</button>
@@ -207,30 +198,17 @@
             <h3 style="margin: 0;">📜 Riwayat Deteksi WAF Terbaru</h3>
             <span class="meta">Data langsung dari tabel <code>{{ (new \Internal\Pasak\Models\PasakLog)->getTable() }}</code></span>
         </div>
-        @if($logs->isNotEmpty())
-        <form method="POST" action="{{ route('keamanan.logs.clear') }}" onsubmit="return confirm('Apakah Anda yakin ingin mengosongkan semua riwayat log ancaman?')">
-            @csrf
-            @method('DELETE')
-            <button type="submit" class="btn" style="font-size: .8rem; background: #27272a;">🗑️ Bersihkan Semua Log</button>
-        </form>
-        @endif
+        <div style="display:flex; gap:.5rem; align-items:center;">
+            @if($recentLogs->isNotEmpty())
+            <form method="POST" action="{{ route('keamanan.logs.clear') }}" onsubmit="return confirm('Apakah Anda yakin ingin mengosongkan semua riwayat log ancaman?')">
+                @csrf
+                @method('DELETE')
+                <button type="submit" class="btn" style="font-size: .8rem; background: #27272a;">🗑️ Bersihkan Semua Log</button>
+            </form>
+            @endif
+            <a href="{{ route('keamanan.logs') }}" class="btn primary" style="font-size: .8rem;">Semua Log →</a>
+        </div>
     </div>
-
-    {{-- Filter Bar --}}
-    <form method="GET" action="{{ route('keamanan.index') }}" class="filter-bar">
-        <select name="level" onchange="this.form.submit()">
-            <option value="">-- Semua Tingkat Keparahan --</option>
-            <option value="critical" {{ $filterLevel === 'critical' ? 'selected' : '' }}>🔴 Critical</option>
-            <option value="high" {{ $filterLevel === 'high' ? 'selected' : '' }}>🟠 High</option>
-            <option value="medium" {{ $filterLevel === 'medium' ? 'selected' : '' }}>🔵 Medium</option>
-            <option value="low" {{ $filterLevel === 'low' ? 'selected' : '' }}>⚪ Low</option>
-        </select>
-        <input type="text" name="search" value="{{ $filterSearch }}" placeholder="Cari IP, URI, atau Rule...">
-        <button type="submit" class="btn">Filter</button>
-        @if($filterLevel || $filterSearch)
-            <a href="{{ route('keamanan.index') }}" class="btn" style="background: transparent;">Reset</a>
-        @endif
-    </form>
 
     <div class="table-responsive">
         <table>
@@ -245,14 +223,14 @@
                 </tr>
             </thead>
             <tbody>
-                @forelse($logs as $log)
+                @forelse($recentLogs as $log)
                 <tr>
                     <td style="white-space: nowrap;">
                         <span style="font-size: .8rem;">{{ $log->created_at?->format('H:i:s') }}</span>
                         <div class="meta" style="font-size: .7rem;">{{ $log->created_at?->diffForHumans() }}</div>
                     </td>
                     <td>
-                        <span class="badge-level {{ $log->threat_level }}">
+                        <span class="badge-level {{ strtolower($log->threat_level ?? 'low') }}">
                             {{ $log->threat_level }}
                         </span>
                     </td>
@@ -265,9 +243,9 @@
                     </td>
                     <td>
                         <b style="font-size: .8rem; color: #fca5a5;">{{ $log->rule_label ?? $log->event_type }}</b>
-                        @if($log->evidence)
+                        @if(!empty($log->evidence))
                             <div class="meta" style="font-size: .7rem; max-width: 250px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-                                {{ $log->evidence }}
+                                {{ is_string($log->evidence) ? $log->evidence : json_encode($log->evidence) }}
                             </div>
                         @endif
                     </td>
@@ -288,10 +266,6 @@
                 @endforelse
             </tbody>
         </table>
-    </div>
-
-    <div style="margin-top: 1rem;">
-        {{ $logs->links() }}
     </div>
 </div>
 @endsection

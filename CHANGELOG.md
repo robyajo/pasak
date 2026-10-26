@@ -2,6 +2,16 @@
 
 All notable changes to `robyajo/pasak` will be documented in this file.
 
+## [1.6.4] - 2026-10-26
+
+### Added
+
+- **Penyediaan Otomatis AI Agent Skill (`pasak-skills`)** — saat instalasi (`php artisan pasak:install`), paket kini otomatis mempublikasikan skill asisten cerdas (`stubs/skills/pasak/SKILL.md`) ke direktori host `.agents/skills/pasak/SKILL.md`. Skill ini membekali agent AI dengan pemahaman menyeluruh tentang aturan Zero-Vendor-Edit, Facade `Pasak`, Model Eloquent berawalan dinamis, audit keamanan server, reverse proxy, serta pengujian keamanan.
+- **Injeksi Panduan Idempoten ke `AGENTS.md` & `CLAUDE.md`** — `pasak:install` dan `pasak:upgrade` otomatis menyematkan blok panduan terstruktur berbatas komentar aman (`<!-- pasak-guidelines:start -->` ... `<!-- pasak-guidelines:end -->`) pada berkas `AGENTS.md` (dan `CLAUDE.md`) di root proyek pengguna tanpa merusak panduan host yang sudah ada.
+- **Pelepasan Bersih Skill pada `pasak:uninstall`** — perintah uninstall kini membersihkan berkas skill dan menghapus blok panduan dari `AGENTS.md` serta `CLAUDE.md`, dengan opsi `--keep-skills` bila pengguna ingin mempertahankan skill tersebut.
+- **Integrasi Penuh Portal Dokumentasi Resmi (`https://pasak.is-a.dev/`)** — skill AI, installer wizard, dan panduan agent kini terhubung langsung dengan bab-bab dokumentasi resmi di https://pasak.is-a.dev/ (Instalasi, Konfigurasi, Deteksi ReDoS, Karantina Perangkat, Audit Server, Streaming Log, REST API, dan Hardening Server).
+- **Implementasi Percontohan 8 Modul Dasbor & API Kustom Host** — modul lengkap di aplikasi host percontohan (`ring/pasak-yes/`) mencakup Controller Web & REST API untuk Ringkasan, Log Deteksi, Blokir IP, Daftar Putih, Audit Server, Sesi Pengguna Masuk, Tiket Banding, dan Pengaturan Runtime beserta 42 pengujian fitur hijau.
+
 ## [1.6.3] - 2026-10-26
 
 ### Added

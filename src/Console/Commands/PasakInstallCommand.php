@@ -14,7 +14,7 @@ class PasakInstallCommand extends Command
 {
     protected string $wizardLang = 'id';
 
-    protected const DOCS_BASE = 'https://security-dev.pekanbaru.go.id';
+    protected const DOCS_BASE = 'https://pasak.is-a.dev';
 
     protected function t(string $id, string $en): string
     {
@@ -45,6 +45,7 @@ class PasakInstallCommand extends Command
                             {--with-plain : Alias --with-dashboard (Blade murni)}
                             {--with-blade : Alias --with-dashboard (Blade murni)}
                             {--with-htaccess : Paksa perbarui berkas public/.htaccess dengan aturan hardening}
+                            {--without-skills : Jangan pasang skill AI (.agents/skills/pasak) dan panduan AGENTS.md}
                             {--migrate : Jalankan migrasi database sekarang (untuk mode non-interaktif script)}';
 
     protected $description = 'Instalasi dan publikasi aset Pasak (konfigurasi, migrasi, Nginx, Apache .htaccess, halaman blokir, dashboard Blade, trait User, middleware WAF, rute web & API kustom, dan .env)';
@@ -62,6 +63,7 @@ class PasakInstallCommand extends Command
         $withoutRoutes = (bool) $this->option('without-routes');
         $withoutApi = (bool) $this->option('without-api');
         $withoutWeb = (bool) $this->option('without-web');
+        $withoutSkills = (bool) $this->option('without-skills');
         $withDashboard =
             (bool) ($this->option('with-dashboard') ||
                 $this->option('with-plain') ||
@@ -261,6 +263,17 @@ class PasakInstallCommand extends Command
                 'Menyematkan variabel konfigurasi dan panduan ke berkas .env...',
             );
             $this->appendEnvironmentVariables($withDashboard);
+        }
+
+        // 12. Setup AI Agent Skills (.agents/skills/pasak/SKILL.md) & AGENTS.md guidelines
+        if (! $withoutSkills) {
+            $this->comment(
+                $this->t(
+                    'Menyiapkan skill AI (.agents/skills/pasak) dan panduan AGENTS.md...',
+                    'Setting up AI agent skills (.agents/skills/pasak) and AGENTS.md guidelines...',
+                ),
+            );
+            $this->setupAgentSkillsAndGuidelines($force);
         }
 
         $this->newLine();
@@ -1296,5 +1309,125 @@ class PasakInstallCommand extends Command
                 }
             }
         }
+    }
+
+    /**
+     * Siapkan skill AI (.agents/skills/pasak/SKILL.md) dan sematkan aturan ke AGENTS.md.
+     */
+    protected function setupAgentSkillsAndGuidelines(bool $force = false): void
+    {
+        $stubSkill = __DIR__.'/../../../stubs/skills/pasak/SKILL.md';
+        $targetSkillDir = base_path('.agents/skills/pasak');
+        $targetSkillFile = $targetSkillDir.'/SKILL.md';
+
+        if (File::exists($stubSkill)) {
+            File::ensureDirectoryExists($targetSkillDir);
+            if (! File::exists($targetSkillFile) || $force) {
+                File::copy($stubSkill, $targetSkillFile);
+                $this->line(
+                    $this->t(
+                        '  ✓ Skill agen AI (.agents/skills/pasak/SKILL.md) berhasil dipasang.',
+                        '  ✓ AI agent skill (.agents/skills/pasak/SKILL.md) installed.',
+                    )
+                );
+            } else {
+                $this->line(
+                    $this->t(
+                        '  ℹ Skill agen AI (.agents/skills/pasak/SKILL.md) sudah ada.',
+                        '  ℹ AI agent skill (.agents/skills/pasak/SKILL.md) already exists.',
+                    )
+                );
+            }
+        }
+
+        $guidelinesBlock = $this->agentGuidelinesBlock();
+        $this->syncAgentFile(base_path('AGENTS.md'), $guidelinesBlock);
+
+        $claudeFile = base_path('CLAUDE.md');
+        if (File::exists($claudeFile) && ! is_link($claudeFile)) {
+            $this->syncAgentFile($claudeFile, $guidelinesBlock);
+        }
+    }
+
+    protected function agentGuidelinesBlock(): string
+    {
+        return <<<'MARKDOWN'
+<!-- pasak-guidelines:start -->
+## Pasak WAF & Security Guidelines (`robyajo/pasak`)
+
+This application is protected by **`robyajo/pasak`** (Bulwark), a standalone headless Web Application Firewall (WAF) and security toolkit for Laravel.
+
+- **Official Online Documentation**: https://pasak.is-a.dev/
+
+### 1. Skills Activation
+- Activate the **`pasak`** skill (`.agents/skills/pasak/SKILL.md`) whenever writing, refactoring, or testing WAF rules, IP blocking, custom security dashboards, REST APIs, or server audits.
+
+### 2. Zero-Vendor-Edit Policy
+- **NEVER modify files in `vendor/robyajo/pasak/`**. Any custom dashboard, controller, view, or API endpoint must be built inside the host application (`app/Http/Controllers/`, `resources/views/`, `routes/web.php`, `routes/api.php`).
+
+### 3. Core Facade & Service Usage
+- Always interact via `Internal\Pasak\Facades\Pasak`:
+  - `Pasak::isBlocked($ip)` — Check if an IP is currently blocked.
+  - `Pasak::blockIp($ip, $reason, $durationHours, $source, $userId, $scope)` — Block an IP or specific device.
+  - `Pasak::unblockIp($ip)` — Lift an IP block.
+  - `Pasak::stats()` — Retrieve threat and blocking statistics.
+  - `Pasak::getSettings()` / `Pasak::updateSettings($array)` — Runtime database settings.
+- Server security audits & SHA-256 integrity: use `Internal\Pasak\Services\PasakServerSecurityService`.
+
+### 4. Testing & Verification
+- Test all security endpoints with Pest/PHPUnit. Run `php artisan test` or `./vendor/bin/pest`.
+<!-- pasak-guidelines:end -->
+MARKDOWN;
+    }
+
+    protected function syncAgentFile(string $filePath, string $guidelinesBlock): void
+    {
+        $rel = $this->relativePath($filePath);
+
+        if (! File::exists($filePath)) {
+            File::put($filePath, $guidelinesBlock.PHP_EOL);
+            $this->line(
+                $this->t(
+                    "  ✓ Berkas {$rel} dibuat dengan panduan Pasak.",
+                    "  ✓ File {$rel} created with Pasak guidelines.",
+                )
+            );
+
+            return;
+        }
+
+        $content = File::get($filePath);
+        $pattern = '/<!-- pasak-guidelines:start -->.*?<!-- pasak-guidelines:end -->/s';
+
+        if (preg_match($pattern, $content)) {
+            $newContent = preg_replace($pattern, trim($guidelinesBlock), $content);
+            if ($newContent !== null && $newContent !== $content) {
+                File::put($filePath, $newContent);
+                $this->line(
+                    $this->t(
+                        "  ✓ Panduan Pasak di {$rel} diperbarui.",
+                        "  ✓ Pasak guidelines in {$rel} updated.",
+                    )
+                );
+            }
+        } else {
+            $separator = str_ends_with($content, "\n") ? "\n" : "\n\n";
+            File::put($filePath, $content.$separator.trim($guidelinesBlock).PHP_EOL);
+            $this->line(
+                $this->t(
+                    "  ✓ Panduan Pasak disematkan ke {$rel}.",
+                    "  ✓ Pasak guidelines appended to {$rel}.",
+                )
+            );
+        }
+    }
+
+    protected function relativePath(string $path): string
+    {
+        $base = base_path().DIRECTORY_SEPARATOR;
+
+        return str_starts_with($path, $base)
+            ? substr($path, strlen($base))
+            : $path;
     }
 }

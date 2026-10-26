@@ -280,6 +280,16 @@ class PasakServiceProvider extends ServiceProvider
         $this->publishes($dashboardAssets, 'plain-views');
         $this->publishes($bladeViews, 'pasak-dashboard-views');
 
+        // AI Agent Skills (.agents/skills/pasak/SKILL.md)
+        $this->publishes(
+            [
+                __DIR__.'/../stubs/skills/pasak/SKILL.md' => base_path(
+                    '.agents/skills/pasak/SKILL.md',
+                ),
+            ],
+            'pasak-skills',
+        );
+
         $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
     }
 

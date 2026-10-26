@@ -12,7 +12,8 @@ class PasakUninstallCommand extends Command
     protected $signature = 'pasak:uninstall
                             {--force : Jalankan tanpa konfirmasi interaktif}
                             {--keep-tables : Jangan hapus tabel database milik Pasak}
-                            {--keep-env : Jangan hapus variabel PASAK_* dari .env}';
+                            {--keep-env : Jangan hapus variabel PASAK_* dari .env}
+                            {--keep-skills : Jangan hapus skill AI (.agents/skills/pasak) dan panduan AGENTS.md}';
 
     protected $description = 'Hapus seluruh jejak Pasak dari aplikasi host (konfigurasi, rute, middleware, trait, tabel, dan berkas publikasi) tanpa merusak aplikasi';
 
@@ -42,6 +43,9 @@ class PasakUninstallCommand extends Command
         $this->removeEnvironmentVariables((bool) $this->option('keep-env'));
         $this->restoreHtaccess();
         $this->removePublishedFiles();
+        if (! (bool) $this->option('keep-skills')) {
+            $this->removeAgentSkillsAndGuidelines();
+        }
         $this->removeBackupFiles();
         $this->removeComposerPackage();
 
@@ -596,6 +600,42 @@ class PasakUninstallCommand extends Command
             ] as $dir
         ) {
             $this->removeDirectoryIfEmpty($dir);
+        }
+    }
+
+    /**
+     * Hapus skill AI (.agents/skills/pasak/SKILL.md) dan bersihkan blok panduan di AGENTS.md.
+     */
+    protected function removeAgentSkillsAndGuidelines(): void
+    {
+        $skillFile = base_path('.agents/skills/pasak/SKILL.md');
+        if (File::exists($skillFile)) {
+            File::delete($skillFile);
+            $this->info('  ✓ Dihapus: '.$this->relativePath($skillFile));
+            $this->removeDirectoryIfEmpty(base_path('.agents/skills/pasak'));
+            $this->removeDirectoryIfEmpty(base_path('.agents/skills'));
+            $this->removeDirectoryIfEmpty(base_path('.agents'));
+        }
+
+        foreach (['AGENTS.md', 'CLAUDE.md'] as $agentFileName) {
+            $agentFile = base_path($agentFileName);
+            if (! File::exists($agentFile) || is_link($agentFile)) {
+                continue;
+            }
+
+            $content = File::get($agentFile);
+            $pattern = '/\s*<!-- pasak-guidelines:start -->.*?<!-- pasak-guidelines:end -->\s*/s';
+
+            if (preg_match($pattern, $content)) {
+                $cleaned = trim(preg_replace($pattern, '', $content));
+                if ($cleaned === '') {
+                    File::delete($agentFile);
+                    $this->info("  ✓ Berkas {$agentFileName} yang dibuat oleh Pasak dihapus.");
+                } else {
+                    File::put($agentFile, $cleaned.PHP_EOL);
+                    $this->info("  ✓ Panduan Pasak dibersihkan dari {$agentFileName}.");
+                }
+            }
         }
     }
 

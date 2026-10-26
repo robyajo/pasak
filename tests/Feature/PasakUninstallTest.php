@@ -102,6 +102,20 @@ beforeEach(function () use (&$uninstallDir) {
         true,
         true,
     );
+    File::makeDirectory(
+        $uninstallDir.'/.agents/skills/pasak',
+        0755,
+        true,
+        true,
+    );
+    File::put(
+        $uninstallDir.'/.agents/skills/pasak/SKILL.md',
+        'skill content',
+    );
+    File::put(
+        $uninstallDir.'/AGENTS.md',
+        "# Host Guidelines\n\n<!-- pasak-guidelines:start -->\nPasak Guidelines\n<!-- pasak-guidelines:end -->\n",
+    );
 });
 
 afterEach(function () use (&$uninstallDir) {
@@ -190,7 +204,15 @@ test(
             )
             ->toBeFalse()
             ->and(File::isDirectory($uninstallDir.'/resources/views/pages'))
-            ->toBeFalse();
+            ->toBeFalse()
+            ->and(File::exists($uninstallDir.'/.agents/skills/pasak/SKILL.md'))
+            ->toBeFalse()
+            ->and(File::isDirectory($uninstallDir.'/.agents/skills/pasak'))
+            ->toBeFalse()
+            ->and(File::get($uninstallDir.'/AGENTS.md'))
+            ->toBe("# Host Guidelines\n")
+            ->and(File::get($uninstallDir.'/AGENTS.md'))
+            ->not->toContain('pasak-guidelines');
     },
 );
 

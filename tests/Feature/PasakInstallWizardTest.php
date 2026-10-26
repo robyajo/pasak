@@ -140,3 +140,32 @@ test('install does not duplicate route require lines on re-run', function () {
         @unlink(base_path('routes/pasak-api.php'));
     }
 });
+
+test('install automatically publishes ai agent skill and updates AGENTS.md', function () {
+    $skillFile = base_path('.agents/skills/pasak/SKILL.md');
+    $agentsFile = base_path('AGENTS.md');
+    $hadAgents = File::exists($agentsFile);
+    $origAgents = $hadAgents ? File::get($agentsFile) : null;
+
+    @unlink($skillFile);
+
+    try {
+        $this->artisan('pasak:install', ['--force' => true])->assertSuccessful();
+
+        expect(File::exists($skillFile))->toBeTrue()
+            ->and(File::get($skillFile))->toContain('name: pasak')
+            ->and(File::exists($agentsFile))->toBeTrue()
+            ->and(File::get($agentsFile))->toContain('<!-- pasak-guidelines:start -->')
+            ->and(File::get($agentsFile))->toContain('<!-- pasak-guidelines:end -->');
+    } finally {
+        @unlink($skillFile);
+        if (File::isDirectory(base_path('.agents/skills/pasak'))) {
+            @rmdir(base_path('.agents/skills/pasak'));
+        }
+        if ($hadAgents) {
+            File::put($agentsFile, $origAgents);
+        } else {
+            @unlink($agentsFile);
+        }
+    }
+});

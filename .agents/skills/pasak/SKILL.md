@@ -10,7 +10,18 @@ metadata:
 
 `robyajo/pasak` (Bulwark) is an enterprise-grade, headless self-hosted Web Application Firewall (WAF), threat detection engine, and security auditing toolkit for Laravel applications.
 
-> **Authoritative Documentation**: Complete 25-chapter guides and an interactive offline portal are located in [`documents/`](../../documents/) and [`documents/index.html`](../../documents/index.html).
+> 📖 **Authoritative Documentation**: Complete 26-chapter guides and interactive portal at [https://pasak.is-a.dev/](https://pasak.is-a.dev/) and offline in [`documents/`](../../documents/) and [`documents/index.html`](../../documents/index.html).
+>
+> **Direct Documentation Chapters (`https://pasak.is-a.dev/`)**:
+> - 🚀 [Installation & Quickstart](https://pasak.is-a.dev/getting-started/installation/)
+> - ⚙️ [Configuration Guide](https://pasak.is-a.dev/getting-started/configuration/)
+> - 🛡️ [Threat Detection Engine](https://pasak.is-a.dev/core-architecture/threat-detection-engine/)
+> - 📱 [Device Quarantine & Proxies](https://pasak.is-a.dev/core-architecture/device-quarantine/)
+> - 🔒 [Server Security & Webshell Scanning](https://pasak.is-a.dev/security-modules/server-security-and-webshells/)
+> - 📊 [Access Log Streaming](https://pasak.is-a.dev/security-modules/access-log-streaming/)
+> - 🌐 [REST API Reference](https://pasak.is-a.dev/api-reference/api-overview/)
+> - 🎨 [Custom Host Dashboard & API (Zero Vendor Edit)](https://pasak.is-a.dev/integration-guides/custom-dashboard-dan-api-tanpa-ubah-vendor/)
+> - 🧱 [Nginx Hardening](https://pasak.is-a.dev/webserver-hardening/nginx-hardened-waf/) & [Apache .htaccess Hardening](https://pasak.is-a.dev/webserver-hardening/apache-htaccess-hardening/)
 
 ---
 

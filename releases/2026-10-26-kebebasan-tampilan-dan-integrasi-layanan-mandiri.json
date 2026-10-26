@@ -2,12 +2,12 @@
     "date": "2026-10-26",
     "type": "feature",
     "title": {
-        "id": "Kebebasan Kustomisasi Tampilan Dasbor, Layanan API Mandiri, dan Pengamanan Pemasangan Bersih",
-        "en": "Custom Dashboard View Freedom, Headless Integration API, and Clean Installation Isolation"
+        "id": "Kebebasan Kustomisasi Tampilan Dasbor, Layanan API Mandiri, dan Penyediaan Asisten Cerdas Terpadu",
+        "en": "Custom Dashboard View Freedom, Headless Integration API, and Automated Intelligent Assistant Integration"
     },
     "body": {
-        "id": "Penyediaan kebebasan penuh bagi pengguna untuk merancang antarmuka pemantauan keamanan dengan tampilan kustom yang selaras dengan tema sistem utama, ketersediaan antarmuka data terstruktur (API) untuk integrasi aplikasi eksternal dan mobile, pengamanan distribusi instalasi agar ruang kerja pengguna tetap bersih tanpa berkas pengembangan internal, serta penyempurnaan panduan integrasi aman.",
-        "en": "Empowering users with full flexibility to design custom security monitoring interfaces matching their own application themes, providing structured data endpoints for seamless mobile and external system integrations, strictly isolating package distribution to keep user project environments clean from internal development assets, and comprehensive safe customization guides."
+        "id": "Penyediaan kebebasan penuh bagi pengguna untuk merancang antarmuka pemantauan keamanan dengan tampilan kustom yang selaras dengan tema sistem utama, ketersediaan antarmuka data terstruktur (API) untuk integrasi aplikasi eksternal dan mobile, pengamanan distribusi instalasi bersih, serta penyediaan otomatis panduan dan keterampilan asisten cerdas yang terhubung ke portal dokumentasi resmi.",
+        "en": "Empowering users with full flexibility to design custom security monitoring interfaces matching their own application themes, providing structured data endpoints for seamless mobile and external system integrations, strictly isolating clean package distribution, and automatically equipping projects with intelligent assistant skills linked directly to the official documentation portal."
     },
     "items": [
         {
@@ -19,6 +19,11 @@
             "type": "new",
             "id": "Dukungan Integrasi Layanan Data Mandiri: Tersedia saluran data terstruktur yang memungkinkan aplikasi mobile, panel eksternal, atau sistem pemantau terpusat untuk memantau status perlindungan dan mengelola penanganan ancaman secara otomatis.",
             "en": "Headless Service Integration Support: Structured data communication channels enabling mobile apps, external admin portals, or centralized monitoring services to inspect protection status and automate threat responses."
+        },
+        {
+            "type": "new",
+            "id": "Penyediaan Otomatis Keterampilan Asisten Cerdas & Rujukan Dokumentasi: Pemasangan dan pembaruan kini secara otomatis melengkapi proyek pengguna dengan panduan asisten cerdas dan rujukan cepat terpadu ke portal dokumentasi resmi.",
+            "en": "Automated Assistant Skills & Documentation References: Installations and upgrades now automatically equip projects with built-in assistant skills and integrated quick references to the official documentation portal."
         },
         {
             "type": "improvement",
