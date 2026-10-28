@@ -166,7 +166,9 @@ test('blade layout ships the dark mode toggle and detail styles', function () {
     expect($bladeLayout)->toContain('data-sec-theme-toggle')
         ->and($bladeLayout)->toContain('sec-code-block')
         ->and($bladeLayout)->toContain('color-scheme')
-        ->and($bladeLayout)->toContain('sec-detail-grid');
+        ->and($bladeLayout)->toContain('sec-detail-grid')
+        ->and($bladeLayout)->toContain('sec-sidebar-version')
+        ->and($bladeLayout)->toContain('\Internal\Pasak\Services\PasakService::VERSION');
 });
 
 test('blade detail pages exist for logs, blocks, and tickets', function () {

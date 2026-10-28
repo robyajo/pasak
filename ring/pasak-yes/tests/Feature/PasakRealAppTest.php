@@ -99,6 +99,8 @@ test('dashboard overview route renders for authenticated users', function () {
     $response = $this->actingAs($user)->followingRedirects()->get('/pasak');
 
     $response->assertStatus(200);
+    $response->assertSee('sec-sidebar-version');
+    $response->assertSee('v'.\Internal\Pasak\Services\PasakService::VERSION);
 });
 
 test(

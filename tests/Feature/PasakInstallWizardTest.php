@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\File;
 use Internal\Pasak\Console\Commands\SecurityInstallCommand;
+use Internal\Pasak\Services\PasakService;
 
 test('install command registers wizard options', function () {
     $definition = $this->app->make(SecurityInstallCommand::class)->getDefinition();
@@ -189,7 +190,7 @@ test('install command aligns composer.json version constraint to full semver', f
         $this->artisan('pasak:install', ['--force' => true])->assertSuccessful();
 
         $updated = File::get($composerFile);
-        $expectedVersion = \Internal\Pasak\Services\PasakService::VERSION;
+        $expectedVersion = PasakService::VERSION;
         expect($updated)->toContain("\"robyajo/pasak\": \"^{$expectedVersion}\"");
     } finally {
         if ($hadComposer) {

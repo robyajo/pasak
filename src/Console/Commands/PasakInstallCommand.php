@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Schema;
 use Internal\Pasak\Database\Seeders\PasakDefaultSettingsSeeder;
+use Internal\Pasak\Services\PasakService;
 use Internal\Pasak\Support\PasakDashboardSecret;
 
 class PasakInstallCommand extends Command
@@ -86,7 +87,7 @@ class PasakInstallCommand extends Command
             $this->wizardLang = $langChoice === 'en' ? 'en' : 'id';
         }
 
-        $version = \Internal\Pasak\Services\PasakService::VERSION;
+        $version = PasakService::VERSION;
         $this->info(
             $this->t(
                 "Memulai instalasi Pasak (Bulwark) v{$version}...",
@@ -588,7 +589,7 @@ class PasakInstallCommand extends Command
             ),
         );
 
-        $version = \Internal\Pasak\Services\PasakService::VERSION;
+        $version = PasakService::VERSION;
 
         $checks = [];
 

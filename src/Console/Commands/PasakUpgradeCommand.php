@@ -6,6 +6,7 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\File;
 use Internal\Pasak\Database\Seeders\PasakDefaultSettingsSeeder;
+use Internal\Pasak\Services\PasakService;
 use Internal\Pasak\Services\PasakVersionCheckService;
 use Internal\Pasak\Support\PasakDashboardSecret;
 use Symfony\Component\Process\Process;
@@ -133,7 +134,7 @@ class PasakUpgradeCommand extends Command
             $this->newLine();
         }
 
-        $this->syncComposerConstraint(\Internal\Pasak\Services\PasakService::VERSION);
+        $this->syncComposerConstraint(PasakService::VERSION);
 
         // 2. Publish & Run Migrations
         $this->comment('2/5. Menyinkronkan dan menerapkan migrasi database...');
@@ -219,6 +220,10 @@ class PasakUpgradeCommand extends Command
             $this->warnIfViewsOutdated(
                 resource_path('views/pages/pasak/layout.blade.php'),
                 'pasak.dashboard.threat-map',
+            );
+            $this->warnIfViewsOutdated(
+                resource_path('views/pages/pasak/layout.blade.php'),
+                'sec-sidebar-version',
             );
             $this->warnIfViewsOutdated(
                 resource_path('views/pages/pasak/settings.blade.php'),

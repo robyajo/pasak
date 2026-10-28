@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Validator;
 use Internal\Pasak\Models\BlockedIp;
 use Internal\Pasak\Models\SecurityLog;
 use Internal\Pasak\Rules\SafeImageFile;
+use Internal\Pasak\Services\PasakServerSecurityService;
 
 beforeEach(function () {
     config()->set('pasak.enabled', true);
@@ -128,7 +129,7 @@ test('safe image file rule and server scanner accept legitimate jpeg with accide
     expect($validator->passes())->toBeTrue();
 
     // Verify ServerSecurityService inspectFileContent directly on collision payload
-    $reflection = new ReflectionClass(\Internal\Pasak\Services\PasakServerSecurityService::class);
+    $reflection = new ReflectionClass(PasakServerSecurityService::class);
     $service = $reflection->newInstanceWithoutConstructor();
     $method = $reflection->getMethod('inspectFileContent');
 
