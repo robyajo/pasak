@@ -2,6 +2,14 @@
 
 All notable changes to `robyajo/pasak` will be documented in this file.
 
+## [1.6.6] - 2026-10-28
+
+### Added
+
+- **Penyelarasan Otomatis Constraint Versi Lengkap di `composer.json` Host** — perintah `php artisan pasak:install` dan `pasak:upgrade` kini secara otomatis mendeteksi dan menyelaraskan constraint versi paket di `composer.json` proyek host ke versi semver lengkap (misal: `"robyajo/pasak": "^1.6.6"`) jika sebelumnya Composer menyederhanakannya menjadi `"^1.6"` tanpa patch.
+- **Tampilan Versi Lengkap pada CLI Wizard Instalasi** — perintah `pasak:install` kini menampilkan identitas versi rilis lengkap paket di judul instalasi (`Memulai instalasi Pasak (Bulwark) v1.6.6...`) dan pada daftar pemeriksaan kesiapan lingkungan (`Pasak Security Engine (v1.6.6)`).
+- **Rekomendasi Instalasi Versi Lengkap pada Dokumentasi** — memperbarui seluruh panduan instalasi (`README.md`, `documents/`, `web-docs/`) agar menyarankan perintah `composer require "robyajo/pasak:^1.6.6"` guna memastikan deklarasi dependensi di aplikasi pengguna selalu terdefinisi secara presisi.
+
 ## [1.6.5] - 2026-10-28
 
 ### Fixed

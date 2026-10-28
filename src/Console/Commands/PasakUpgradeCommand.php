@@ -133,6 +133,8 @@ class PasakUpgradeCommand extends Command
             $this->newLine();
         }
 
+        $this->syncComposerConstraint(\Internal\Pasak\Services\PasakService::VERSION);
+
         // 2. Publish & Run Migrations
         $this->comment('2/5. Menyinkronkan dan menerapkan migrasi database...');
         $this->call('vendor:publish', [
@@ -819,6 +821,34 @@ MARKDOWN;
             $separator = str_ends_with($content, "\n") ? "\n" : "\n\n";
             File::put($filePath, $content.$separator.trim($guidelinesBlock).PHP_EOL);
             $this->info("  ✓ Panduan Pasak disematkan ke {$rel}.");
+        }
+    }
+
+    /**
+     * Selaraskan constraint versi robyajo/pasak di composer.json ke versi lengkap (^1.6.5).
+     * Mencegah Composer hanya menuliskan constraint ringkas seperti ^1.6.
+     */
+    protected function syncComposerConstraint(string $version): void
+    {
+        $composerPath = base_path('composer.json');
+        if (! File::exists($composerPath) || ! is_writable($composerPath)) {
+            return;
+        }
+
+        $content = File::get($composerPath);
+        $pattern = '/("robyajo\/pasak"\s*:\s*")([^"]+)(")/';
+
+        if (preg_match($pattern, $content, $matches)) {
+            $current = $matches[2];
+            $target = "^{$version}";
+
+            if ($current !== $target && ! in_array($current, ['@dev', 'dev-main', '*'], true)) {
+                $newContent = preg_replace($pattern, '${1}'.$target.'${3}', $content, 1);
+                if ($newContent !== null && $newContent !== $content) {
+                    File::put($composerPath, $newContent);
+                    $this->info("  ✓ Versi robyajo/pasak di composer.json diselaraskan ke \"{$target}\".");
+                }
+            }
         }
     }
 }

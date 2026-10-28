@@ -86,10 +86,11 @@ class PasakInstallCommand extends Command
             $this->wizardLang = $langChoice === 'en' ? 'en' : 'id';
         }
 
+        $version = \Internal\Pasak\Services\PasakService::VERSION;
         $this->info(
             $this->t(
-                'Memulai instalasi Pasak (Bulwark)...',
-                'Starting Pasak (Bulwark) installation...',
+                "Memulai instalasi Pasak (Bulwark) v{$version}...",
+                "Starting Pasak (Bulwark) v{$version} installation...",
             ),
         );
         $this->newLine();
@@ -147,6 +148,9 @@ class PasakInstallCommand extends Command
 
         // 3. Cek kelengkapan lingkungan sebelum memasang apa pun.
         $this->runReadinessCheck();
+
+        // 4. Selaraskan constraint versi di composer.json ke versi lengkap (misal ^1.6 -> ^1.6.5)
+        $this->syncComposerConstraint($version);
 
         $migrated = false;
 
@@ -584,8 +588,14 @@ class PasakInstallCommand extends Command
             ),
         );
 
+        $version = \Internal\Pasak\Services\PasakService::VERSION;
+
         $checks = [];
 
+        $checks[] = [
+            true,
+            "Pasak Security Engine (v{$version})",
+        ];
         $checks[] = [
             version_compare(PHP_VERSION, '8.2.0', '>='),
             'PHP '.PHP_VERSION.' (>= 8.2)',
@@ -1429,5 +1439,38 @@ MARKDOWN;
         return str_starts_with($path, $base)
             ? substr($path, strlen($base))
             : $path;
+    }
+
+    /**
+     * Selaraskan constraint versi robyajo/pasak di composer.json ke versi lengkap (^1.6.5).
+     * Mencegah Composer hanya menuliskan constraint ringkas seperti ^1.6.
+     */
+    protected function syncComposerConstraint(string $version): void
+    {
+        $composerPath = base_path('composer.json');
+        if (! File::exists($composerPath) || ! is_writable($composerPath)) {
+            return;
+        }
+
+        $content = File::get($composerPath);
+        $pattern = '/("robyajo\/pasak"\s*:\s*")([^"]+)(")/';
+
+        if (preg_match($pattern, $content, $matches)) {
+            $current = $matches[2];
+            $target = "^{$version}";
+
+            if ($current !== $target && ! in_array($current, ['@dev', 'dev-main', '*'], true)) {
+                $newContent = preg_replace($pattern, '${1}'.$target.'${3}', $content, 1);
+                if ($newContent !== null && $newContent !== $content) {
+                    File::put($composerPath, $newContent);
+                    $this->line(
+                        $this->t(
+                            "  ✓ Versi robyajo/pasak di composer.json diselaraskan ke \"{$target}\".",
+                            "  ✓ robyajo/pasak constraint in composer.json aligned to \"{$target}\".",
+                        )
+                    );
+                }
+            }
+        }
     }
 }

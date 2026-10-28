@@ -2,12 +2,12 @@
     "date": "2026-10-28",
     "type": "fix",
     "title": {
-        "id": "Penyempurnaan Deteksi Keamanan Berkas Media dan Peniadaan Peringatan Palsu pada Foto Asli",
-        "en": "Media File Security Inspection Refinement and False Alarm Elimination on Legitimate Photos"
+        "id": "Penyempurnaan Deteksi Keamanan Berkas Media dan Penyelarasan Presisi Versi Otomatis",
+        "en": "Media File Security Inspection Refinement and Automated Version Precision Alignment"
     },
     "body": {
-        "id": "Peningkatan akurasi pemindaian berkas media untuk memastikan foto dan dokumentasi kegiatan resmi yang diunggah ke aplikasi tidak lagi salah terdeteksi sebagai ancaman keamanan, dengan tetap menjaga ketahanan penuh terhadap penyelundupan program jahat.",
-        "en": "Enhanced media file scanning precision ensuring genuine photographs and official activity documents uploaded to the application are never falsely flagged as security threats, while rigorously maintaining impenetrable defense against malicious file tampering."
+        "id": "Peningkatan akurasi pemindaian berkas media untuk memastikan foto dan dokumentasi kegiatan resmi yang diunggah ke aplikasi tidak lagi salah terdeteksi sebagai ancaman keamanan, penyelarasan otomatis deklarasi versi rilis lengkap pada proyek pengguna, serta penjaminan ketahanan penuh terhadap manipulasi berkas jahat.",
+        "en": "Enhanced media file scanning precision ensuring genuine photographs and official activity documents uploaded to the application are never falsely flagged as security threats, automated alignment of full release version constraints on user projects, and rigorous preservation of impenetrable defense against malicious file tampering."
     },
     "items": [
         {
@@ -17,9 +17,13 @@
         },
         {
             "type": "improvement",
+            "id": "Penyelarasan Presisi Versi Paket Otomatis: Wizard instalasi dan pembaruan kini secara otomatis menyelaraskan deklarasi nomor versi rilis lengkap pada konfigurasi proyek pengguna agar terdefinisi secara presisi.",
+            "en": "Automated Precise Package Version Alignment: The installation and upgrade wizard now automatically aligns the full release version constraint in user project configurations for exact specification."
+        },
+        {
+            "type": "improvement",
             "id": "Peningkatan Ketelitian Penyaringan Data Unggahan: Pemantauan keamanan kini memvalidasi struktur kode secara menyeluruh sehingga tidak mengorbankan ketahanan sistem dari ancaman penyusupan berkas ganda yang sebenarnya.",
             "en": "Enhanced Upload Inspection Precision: Security monitoring now rigorously validates code structures to prevent false positives without weakening defense against real polyglot file intrusions."
         }
     ]
 }
-

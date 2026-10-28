@@ -169,3 +169,33 @@ test('install automatically publishes ai agent skill and updates AGENTS.md', fun
         }
     }
 });
+
+test('install command aligns composer.json version constraint to full semver', function () {
+    $composerFile = base_path('composer.json');
+    $hadComposer = File::exists($composerFile);
+    $origComposer = $hadComposer ? File::get($composerFile) : null;
+
+    $dummyComposer = json_encode([
+        'name' => 'test/app',
+        'require' => [
+            'php' => '^8.2',
+            'robyajo/pasak' => '^1.6',
+        ],
+    ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+
+    File::put($composerFile, $dummyComposer);
+
+    try {
+        $this->artisan('pasak:install', ['--force' => true])->assertSuccessful();
+
+        $updated = File::get($composerFile);
+        $expectedVersion = \Internal\Pasak\Services\PasakService::VERSION;
+        expect($updated)->toContain("\"robyajo/pasak\": \"^{$expectedVersion}\"");
+    } finally {
+        if ($hadComposer) {
+            File::put($composerFile, $origComposer);
+        } else {
+            @unlink($composerFile);
+        }
+    }
+});

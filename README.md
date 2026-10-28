@@ -60,15 +60,14 @@
 ### 1. Pasang Paket via Composer
 
 ```bash
-composer require robyajo/pasak:^1.0
+composer require "robyajo/pasak:^1.6.5"
 ```
 
-> **Penting — jangan pakai `@dev` di produksi.** Menulis
-> `composer require robyajo/pasak:@dev` memaksa Composer
-> mengambil branch default `dev-main` (kode yang belum dirilis), bukan tag rilis
-> stabil. Selalu pakai constraint rilis (mis. `^1.0`) atau tanpa constraint sama
-> sekali. Flag `@dev` hanya diperlukan saat mengembangkan paket ini lewat
-> _path repository_ lokal.
+> **Penting — gunakan versi rilis lengkap.** Menjalankan
+> `composer require "robyajo/pasak:^1.6.5"` memastikan `composer.json` mencatat rilis
+> patch yang akurat (Composer secara bawaan menyingkat menjadi `^1.6` bila tanpa versi).
+> Perintah `php artisan pasak:install` juga otomatis menyelaraskan constraint di
+> `composer.json` ke versi lengkap terbaru (`^1.6.5`). Jangan gunakan `@dev` di produksi.
 
 ### 2. Publikasikan Aset Otomatis (`pasak:install`)
 
