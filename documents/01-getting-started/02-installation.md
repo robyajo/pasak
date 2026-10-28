@@ -23,11 +23,11 @@ Pastikan lingkungan server Anda memenuhi spesifikasi minimum berikut:
 Jika paket sudah diterbitkan di Packagist, cantumkan versi lengkap agar `composer.json` mencatat rilis patch yang akurat:
 
 ```bash
-composer require "robyajo/pasak:^1.6.5"
+composer require "robyajo/pasak:^1.6.7"
 ```
 
 > **Tips Constraint Versi**:
-> Jika Anda menjalankan `composer require robyajo/pasak` tanpa versi, Composer secara bawaan menyingkatnya menjadi `^1.6`. Menjalankan `php artisan pasak:install` akan secara otomatis menyelaraskan entri di `composer.json` ke versi lengkap terbaru (`^1.6.5`).
+> Jika Anda menjalankan `composer require robyajo/pasak` tanpa versi, Composer secara bawaan menyingkatnya menjadi `^1.6`. Menjalankan `php artisan pasak:install` akan secara otomatis menyelaraskan entri di `composer.json` ke versi lengkap terbaru (`^1.6.7`).
 
 ### Menggunakan Repositori Lokal / Private Git (Monorepo atau Path)
 

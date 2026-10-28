@@ -60,14 +60,14 @@
 ### 1. Pasang Paket via Composer
 
 ```bash
-composer require "robyajo/pasak:^1.6.5"
+composer require "robyajo/pasak:^1.6.7"
 ```
 
 > **Penting — gunakan versi rilis lengkap.** Menjalankan
-> `composer require "robyajo/pasak:^1.6.5"` memastikan `composer.json` mencatat rilis
+> `composer require "robyajo/pasak:^1.6.7"` memastikan `composer.json` mencatat rilis
 > patch yang akurat (Composer secara bawaan menyingkat menjadi `^1.6` bila tanpa versi).
 > Perintah `php artisan pasak:install` juga otomatis menyelaraskan constraint di
-> `composer.json` ke versi lengkap terbaru (`^1.6.5`). Jangan gunakan `@dev` di produksi.
+> `composer.json` ke versi lengkap terbaru (`^1.6.7`). Jangan gunakan `@dev` di produksi.
 
 ### 2. Publikasikan Aset Otomatis (`pasak:install`)
 

@@ -2,6 +2,14 @@
 
 All notable changes to `robyajo/pasak` will be documented in this file.
 
+## [1.6.7] - 2026-10-28
+
+### Added
+
+- **Penyematan Badge Versi Aktif & Tautan Rilis pada Sidebar Dashboard** (`stubs/blade/pages/pasak/layout.blade.php`) — menampilkan badge versi aktif paket Pasak (`v1.6.7`) berdesain modern monospace di bagian bawah navigasi sidebar (tepat di bawah tombol tema gelap/terang). Badge ini terhubung langsung ke catatan rilis resmi GitHub (`https://github.com/robyajo/pasak/releases`) dan otomatis beradaptasi dengan mode gelap/terang sistem.
+- **Deteksi Kedaluwarsa Layout pada `pasak:upgrade`** — penambahan pemeriksaan penanda `sec-sidebar-version` pada perintah `php artisan pasak:upgrade` sehingga dapat mengingatkan pengguna jika berkas tampilan `layout.blade.php` yang terpublikasi di proyek host belum memuat komponen badge versi terbaru.
+- **Sinkronisasi dan Pengujian Menyeluruh pada Host Sandbox (`ring/pasak-yes`)** — pembaruan dan pengujian integrasi tampilan dashboard pada aplikasi percontohan `ring/pasak-yes` dengan assertion render HTML yang memastikan teks versi `v1.6.7` dan selektor `.sec-sidebar-version` tersaji sempurna serta seluruh 42 tes unit/fitur tetap hijau.
+
 ## [1.6.6] - 2026-10-28
 
 ### Added

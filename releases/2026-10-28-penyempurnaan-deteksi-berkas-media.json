@@ -2,12 +2,12 @@
     "date": "2026-10-28",
     "type": "fix",
     "title": {
-        "id": "Penyempurnaan Deteksi Keamanan Berkas Media dan Penyelarasan Presisi Versi Otomatis",
-        "en": "Media File Security Inspection Refinement and Automated Version Precision Alignment"
+        "id": "Penyempurnaan Deteksi Berkas Media, Penyelarasan Presisi Versi, dan Penunjuk Versi Aktif Dasbor",
+        "en": "Media File Security Inspection Refinement, Version Precision Alignment, and Dashboard Active Version Indicator"
     },
     "body": {
-        "id": "Peningkatan akurasi pemindaian berkas media untuk memastikan foto dan dokumentasi kegiatan resmi yang diunggah ke aplikasi tidak lagi salah terdeteksi sebagai ancaman keamanan, penyelarasan otomatis deklarasi versi rilis lengkap pada proyek pengguna, serta penjaminan ketahanan penuh terhadap manipulasi berkas jahat.",
-        "en": "Enhanced media file scanning precision ensuring genuine photographs and official activity documents uploaded to the application are never falsely flagged as security threats, automated alignment of full release version constraints on user projects, and rigorous preservation of impenetrable defense against malicious file tampering."
+        "id": "Peningkatan akurasi pemindaian berkas media untuk memastikan foto dan dokumentasi kegiatan resmi yang diunggah ke aplikasi tidak lagi salah terdeteksi sebagai ancaman keamanan, penyelarasan otomatis deklarasi versi rilis lengkap pada proyek pengguna, penambahan penunjuk versi aktif pada bilah navigasi pemantauan, serta penjaminan ketahanan penuh terhadap manipulasi berkas jahat.",
+        "en": "Enhanced media file scanning precision ensuring genuine photographs and official activity documents uploaded to the application are never falsely flagged as security threats, automated alignment of full release version constraints on user projects, addition of a live version indicator on the monitoring navigation bar, and rigorous preservation of impenetrable defense against malicious file tampering."
     },
     "items": [
         {
@@ -24,6 +24,11 @@
             "type": "improvement",
             "id": "Peningkatan Ketelitian Penyaringan Data Unggahan: Pemantauan keamanan kini memvalidasi struktur kode secara menyeluruh sehingga tidak mengorbankan ketahanan sistem dari ancaman penyusupan berkas ganda yang sebenarnya.",
             "en": "Enhanced Upload Inspection Precision: Security monitoring now rigorously validates code structures to prevent false positives without weakening defense against real polyglot file intrusions."
+        },
+        {
+            "type": "improvement",
+            "id": "Penyematan Penunjuk Versi Aktif dan Akses Informasi Rilis Terpadu: Panel pemantauan kini dilengkapi penunjuk versi sistem yang aktif secara langsung beserta akses tautan dokumentasi rilis, memudahkan pengelola memverifikasi kebaruan sistem keamanan.",
+            "en": "Active Version Indicator and Integrated Release Documentation on Navigation: The monitoring console now features a live system version badge and direct link to official release notes, enabling administrators to effortlessly verify system currency."
         }
     ]
 }
