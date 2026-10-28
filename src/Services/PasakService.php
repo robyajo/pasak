@@ -35,7 +35,7 @@ class PasakService
     /**
      * Versi paket Pasak (Bulwark).
      */
-    public const VERSION = '1.6.4';
+    public const VERSION = '1.6.5';
 
     /**
      * Rentang waktu yang didukung grafik tren serangan.
@@ -1406,7 +1406,7 @@ class PasakService
                     }
 
                     // Capture snippet if dangerous tokens/tags appear.
-                    if ($content !== '' && preg_match('/(<\?|<script\b|eval\s*\(|base64_decode|system\s*\(|shell_exec|__HALT_COMPILER)/i', $content, $match)) {
+                    if ($content !== '' && preg_match('/(<\?php[\s\r\n\t;\$\/]|<\?=\s*(?:\$[a-zA-Z_\x7f-\xff]|[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*\s*\(|`|\b(?:eval|system|passthru|exec|shell_exec|assert)\b)|<\?\s*(?:\$[a-zA-Z_\x7f-\xff]|\b(?:eval|system|passthru|exec|shell_exec|assert)\b)|<script\b|eval\s*\(|base64_decode|system\s*\(|shell_exec|__HALT_COMPILER)/i', $content, $match)) {
                         $pos = strpos($content, $match[0]);
                         $start = max(0, (int) $pos - 40);
                         $snippets[] = substr($content, $start, 300);

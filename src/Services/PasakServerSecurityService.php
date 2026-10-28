@@ -2072,7 +2072,7 @@ class PasakServerSecurityService
         if (
             $isMedia &&
             preg_match(
-                '/<\?php[\s\r\n\t;\$\/]|<\?=\s*[\$a-zA-Z_0-9\'"\(]/i',
+                '/<\?php[\s\r\n\t;\$\/]|<\?=\s*(?:\$[a-zA-Z_\x7f-\xff]|[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*\s*\(|`|\b(?:eval|system|passthru|exec|shell_exec|assert|popen|proc_open|include|require)\b)|<\?\s*(?:\$[a-zA-Z_\x7f-\xff]|\b(?:eval|system|passthru|exec|shell_exec|assert|popen|proc_open)\s*\()/i',
                 $content,
                 $m,
                 PREG_OFFSET_CAPTURE,

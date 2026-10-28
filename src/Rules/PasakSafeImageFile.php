@@ -32,8 +32,9 @@ class PasakSafeImageFile implements ValidationRule
      * Dangerous tokens that must never appear anywhere in an uploaded image.
      */
     protected const DANGEROUS_PATTERNS = [
-        '/<\?(php|=|\s)/i',
-        '/<\?\s*\$/i',
+        '/<\?php[\s\r\n\t;\$\/]/i',
+        '/<\?=\s*(?:\$[a-zA-Z_\x7f-\xff]|[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*\s*\(|`|\b(?:eval|system|passthru|exec|shell_exec|assert|popen|proc_open|include|require)\b)/i',
+        '/<\?\s*(?:\$[a-zA-Z_\x7f-\xff]|\b(?:eval|system|passthru|exec|shell_exec|assert|popen|proc_open)\s*\()/i',
         '/<script\b[^>]*>/i',
         '/__HALT_COMPILER\s*\(/i',
         '/\b(system|shell_exec|passthru|popen|proc_open|eval|assert)\s*\(/i',

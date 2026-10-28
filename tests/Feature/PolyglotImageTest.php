@@ -109,3 +109,56 @@ test('safe image file rule accepts clean png and svg', function () {
 
     expect($validatorSvg->passes())->toBeTrue();
 });
+
+test('safe image file rule and server scanner accept legitimate jpeg with accidental byte collision', function () {
+    $img = imagecreatetruecolor(10, 10);
+    ob_start();
+    imagejpeg($img);
+    $jpegData = ob_get_clean();
+    imagedestroy($img);
+
+    // Accidental byte sequence "<?=k" followed by non-PHP binary bytes (common DCT/Huffman collision).
+    $binaryCollision = $jpegData."\x6c\x0f\x5a\x3c\x3f\x3d\x6b\xa3\xe8\x0f\xd9";
+    $file = UploadedFile::fake()->createWithContent('innocent_photo.jpg', $binaryCollision);
+
+    $validator = Validator::make(['icon' => $file], [
+        'icon' => [new SafeImageFile],
+    ]);
+
+    expect($validator->passes())->toBeTrue();
+
+    // Verify ServerSecurityService inspectFileContent directly on collision payload
+    $reflection = new ReflectionClass(\Internal\Pasak\Services\PasakServerSecurityService::class);
+    $service = $reflection->newInstanceWithoutConstructor();
+    $method = $reflection->getMethod('inspectFileContent');
+
+    $tempPath = tempnam(sys_get_temp_dir(), 'pasak_test_');
+    file_put_contents($tempPath, $binaryCollision);
+
+    try {
+        $result = $method->invoke($service, $tempPath, 'innocent_photo.jpg', 'jpg', strlen($binaryCollision));
+        expect($result['is_suspicious'])->toBeFalse();
+    } finally {
+        @unlink($tempPath);
+    }
+});
+
+test('safe image file rule rejects short tag webshells with variables or functions', function () {
+    $img = imagecreatetruecolor(10, 10);
+    ob_start();
+    imagejpeg($img);
+    $jpegData = ob_get_clean();
+    imagedestroy($img);
+
+    $webshellWithFunc = UploadedFile::fake()->createWithContent('shell_func.jpg', $jpegData.'<?=system($_GET["c"])?>');
+    $validator1 = Validator::make(['icon' => $webshellWithFunc], [
+        'icon' => [new SafeImageFile],
+    ]);
+    expect($validator1->fails())->toBeTrue();
+
+    $webshellWithVar = UploadedFile::fake()->createWithContent('shell_var.jpg', $jpegData.'<?=$_GET["c"]?>');
+    $validator2 = Validator::make(['icon' => $webshellWithVar], [
+        'icon' => [new SafeImageFile],
+    ]);
+    expect($validator2->fails())->toBeTrue();
+});

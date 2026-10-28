@@ -2,6 +2,14 @@
 
 All notable changes to `robyajo/pasak` will be documented in this file.
 
+## [1.6.5] - 2026-10-28
+
+### Fixed
+
+- **Pencegahan False Positive Polyglot Webshell pada Berkas Citra (JPEG/PNG/Media)** — memperketat pola pencocokan short echo tag `<?=` pada `PasakServerSecurityService`, `PasakSafeImageFile`, dan `PasakService`. Sebelumnya, tabrakan 4-byte biner acak (`3C 3F 3D 6B` / `<?=k`) yang terjadi secara alami di dalam aliran kompresi piksel DCT/Huffman pada foto berita asli (seperti dokumentasi resmi pemerintah) keliru dideteksi sebagai webshell / backdoor injeksi PHP. Pola kini mewajibkan adanya sintaks PHP yang valid (seperti variabel `$_GET`/`$_POST` atau pemanggilan fungsi eksekusi) agar tidak mengorbankan keamanan polyglot sekaligus menghilangkan peringatan palsu pada berkas foto murni.
+- **Pencegahan Anomali Null-Byte Palsu pada Ekstraksi Konten Unggahan** — menyelaraskan deteksi token awal pada `PasakService::extractUploadedFileContents` sehingga tidak lagi mengekstrak data biner mentah citra ke dalam *inspection haystacks* saat hanya terdapat karakter `<` dan `?` secara kebetulan.
+- **Penguatan Pengujian Regresi Media Aman** — penambahan rangkaian unit test pada `PolyglotImageTest` untuk memastikan foto asli dengan pola byte biner serupa tetap lolos 100% pada pemindai audit server dan aturan validasi upload, sementara webshell sungguhan tetap diblokir seketika.
+
 ## [1.6.4] - 2026-10-26
 
 ### Added

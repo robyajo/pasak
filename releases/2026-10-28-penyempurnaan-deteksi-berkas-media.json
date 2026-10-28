@@ -1,0 +1,24 @@
+{
+    "date": "2026-10-28",
+    "type": "fix",
+    "title": {
+        "id": "Penyempurnaan Deteksi Keamanan Berkas Media dan Peniadaan Peringatan Palsu pada Foto Asli",
+        "en": "Media File Security Inspection Refinement and False Alarm Elimination on Legitimate Photos"
+    },
+    "body": {
+        "id": "Peningkatan akurasi pemindaian berkas media untuk memastikan foto dan dokumentasi kegiatan resmi yang diunggah ke aplikasi tidak lagi salah terdeteksi sebagai ancaman keamanan, dengan tetap menjaga ketahanan penuh terhadap penyelundupan program jahat.",
+        "en": "Enhanced media file scanning precision ensuring genuine photographs and official activity documents uploaded to the application are never falsely flagged as security threats, while rigorously maintaining impenetrable defense against malicious file tampering."
+    },
+    "items": [
+        {
+            "type": "fix",
+            "id": "Peniadaan Peringatan Palsu pada Unggahan Berkas Gambar: Penyempurnaan pemeriksaan struktur berkas media sehingga foto asli dan dokumentasi publik yang memuat kombinasi karakter acak pada aliran kompresi piksel tidak lagi salah teridentifikasi sebagai berkas mencurigakan.",
+            "en": "False Alarm Elimination on Media Uploads: Refined inspection of media file structures ensuring authentic photos and public documentation containing coincidental byte sequences in compression streams are no longer erroneously identified as suspicious files."
+        },
+        {
+            "type": "improvement",
+            "id": "Peningkatan Ketelitian Penyaringan Data Unggahan: Pemantauan keamanan kini memvalidasi struktur kode secara menyeluruh sehingga tidak mengorbankan ketahanan sistem dari ancaman penyusupan berkas ganda yang sebenarnya.",
+            "en": "Enhanced Upload Inspection Precision: Security monitoring now rigorously validates code structures to prevent false positives without weakening defense against real polyglot file intrusions."
+        }
+    ]
+}
