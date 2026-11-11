@@ -151,3 +151,26 @@ test('authenticated user can store current ip as trusted ip', function () {
 
     expect(TrustedIp::isTrusted('203.0.113.55', $this->regularUser->id))->toBeTrue();
 });
+
+test('authenticated user can store current ip with long user agent without truncation error', function () {
+    $longUserAgent = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36';
+
+    $response = $this->actingAs($this->regularUser)
+        ->withHeaders(['User-Agent' => $longUserAgent])
+        ->withServerVariables(['REMOTE_ADDR' => '158.140.185.154'])
+        ->postJson(route('pasak.trusted-ips.store-my-ip'), [
+            'device_name' => 'Linux Workstation',
+        ]);
+
+    $response->assertOk()
+        ->assertJsonPath('success', true);
+
+    $trusted = TrustedIp::query()
+        ->where('user_id', $this->regularUser->id)
+        ->where('ip_address', '158.140.185.154')
+        ->first();
+
+    expect($trusted)->not->toBeNull()
+        ->and($trusted->operating_system)->toBe('Linux')
+        ->and($trusted->browser)->toContain('Google Chrome');
+});

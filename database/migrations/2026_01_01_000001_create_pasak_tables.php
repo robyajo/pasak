@@ -143,8 +143,8 @@ return new class extends Migration
                 $blueprint->string('device_id', 100)->nullable()->index();
                 $blueprint->text('user_agent')->nullable();
                 $blueprint->string('device_type', 50)->default('desktop');
-                $blueprint->string('operating_system', 100)->default('Unknown OS');
-                $blueprint->string('browser', 100)->default('Unknown Browser');
+                $blueprint->string('operating_system', 255)->default('Unknown OS');
+                $blueprint->string('browser', 255)->default('Unknown Browser');
                 $blueprint->string('city', 100)->nullable();
                 $blueprint->string('region', 100)->nullable();
                 $blueprint->string('country', 100)->nullable();
@@ -167,8 +167,8 @@ return new class extends Migration
                 $blueprint->string('local_ip', 45)->nullable();
                 $blueprint->string('device_id', 100)->nullable()->index();
                 $blueprint->string('device_name', 255)->nullable();
-                $blueprint->string('operating_system', 100)->nullable();
-                $blueprint->string('browser', 100)->nullable();
+                $blueprint->string('operating_system', 255)->nullable();
+                $blueprint->string('browser', 255)->nullable();
                 $blueprint->string('location', 255)->nullable();
                 $blueprint->boolean('is_active')->default(true);
                 $blueprint->timestamp('verified_at')->nullable();

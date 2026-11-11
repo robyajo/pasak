@@ -2,6 +2,7 @@
 
 use Illuminate\Auth\Events\Login;
 use Illuminate\Http\Request;
+use Internal\Pasak\Models\PasakTrustedIp;
 use Internal\Pasak\Models\TrustedIp;
 use Internal\Pasak\Models\UserLogin;
 use Internal\Pasak\Services\PasakService;
@@ -58,6 +59,35 @@ test('trustIp stores a trusted ip for the user', function () {
         ->toBe('127.0.0.1')
         ->and((int) $trusted->user_id)
         ->toBe((int) $user->id);
+});
+
+test('trustIp handles long user-agent and stores parsed OS and browser safely', function () {
+    $user = $this->createRegularUser();
+    $rawUserAgent = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36';
+
+    $trusted = app(UserLoginService::class)->trustIp(
+        user: $user,
+        ip: '158.140.185.154',
+        deviceName: null,
+        userAgent: $rawUserAgent,
+        localIp: '192.168.1.100',
+        deviceId: 'dev_2f925986fc4979a2',
+    );
+
+    expect($trusted)
+        ->toBeInstanceOf(TrustedIp::class)
+        ->and($trusted->ip_address)->toBe('158.140.185.154')
+        ->and($trusted->operating_system)->toBe('Linux')
+        ->and($trusted->browser)->toContain('Google Chrome');
+
+    // Mutator protection when raw user agent is assigned directly to operating_system attribute
+    $trustedDirect = PasakTrustedIp::query()->create([
+        'user_id' => $user->id,
+        'ip_address' => '158.140.185.155',
+        'operating_system' => $rawUserAgent,
+    ]);
+
+    expect($trustedDirect->operating_system)->toBe('Linux');
 });
 
 test('admin login automatically lifts an ip block', function () {

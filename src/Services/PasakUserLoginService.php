@@ -9,6 +9,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Str;
 use Internal\Pasak\Models\PasakTrustedIp;
 use Internal\Pasak\Models\PasakUserLogin;
 use Throwable;
@@ -40,8 +41,8 @@ class PasakUserLoginService
             'device_id' => $deviceId,
             'user_agent' => $userAgent,
             'device_type' => $clientInfo['device'],
-            'operating_system' => $clientInfo['os'],
-            'browser' => $clientInfo['browser'],
+            'operating_system' => Str::limit($clientInfo['os'], 255, ''),
+            'browser' => Str::limit($clientInfo['browser'], 255, ''),
             'city' => $geo['city'] ?? null,
             'region' => $geo['region'] ?? null,
             'country' => $geo['country'] ?? null,
@@ -326,16 +327,13 @@ class PasakUserLoginService
             'ip_address' => $ip,
         ];
 
-        if ($deviceId) {
-            $matchCriteria['device_id'] = $deviceId;
-        }
-
         return PasakTrustedIp::updateOrCreate($matchCriteria, [
             'local_ip' => $localIp,
-            'device_name' => $defaultName,
-            'operating_system' => $clientInfo['os'],
-            'browser' => $clientInfo['browser'],
-            'location' => $locationStr,
+            'device_id' => $deviceId,
+            'device_name' => Str::limit($defaultName, 255, ''),
+            'operating_system' => Str::limit($clientInfo['os'], 255, ''),
+            'browser' => Str::limit($clientInfo['browser'], 255, ''),
+            'location' => Str::limit($locationStr, 255, ''),
             'is_active' => true,
             'verified_at' => now(),
         ]);

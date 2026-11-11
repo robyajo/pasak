@@ -121,20 +121,16 @@ class PasakUserSessionApiController extends Controller
         $ip = $this->securityService->resolveClientIp($request);
         $deviceId = $this->securityService->resolveDeviceId($request);
         $localIp = $this->securityService->resolveLocalIp($request);
+        $userAgent = (string) ($request->header('User-Agent') ?? '');
+        $deviceName = $request->input('device_name');
 
-        $trusted = PasakTrustedIp::query()->updateOrCreate(
-            [
-                'user_id' => $user->getKey(),
-                'ip_address' => $ip,
-            ],
-            [
-                'local_ip' => $localIp,
-                'device_id' => $deviceId,
-                'device_name' => $request->input('device_name', 'Perangkat Saya'),
-                'operating_system' => $request->header('User-Agent'),
-                'is_active' => true,
-                'verified_at' => now(),
-            ]
+        $trusted = $this->loginService->trustIp(
+            user: $user,
+            ip: $ip,
+            deviceName: $deviceName,
+            userAgent: $userAgent,
+            localIp: $localIp,
+            deviceId: $deviceId,
         );
 
         return response()->json([

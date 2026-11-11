@@ -177,3 +177,31 @@ test('dashboard settings page renders per-level thresholds and simulation summar
         File::deleteDirectory($target);
     }
 });
+
+test('dashboard store-my-ip action stores trusted ip with parsed OS and browser safely', function () {
+    $user = $this->createAdminUser();
+    $longUserAgent = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36';
+
+    $request = Request::create('/__pasak_test_store_my_ip', 'POST', [], [], [], [
+        'REMOTE_ADDR' => '158.140.185.154',
+        'HTTP_USER_AGENT' => $longUserAgent,
+    ]);
+    $request->setUserResolver(fn () => $user);
+
+    $response = app(\Internal\Pasak\Http\Controllers\Dashboard\PasakSessionController::class)->storeMyIp(
+        $request,
+        app(PasakService::class),
+        app(\Internal\Pasak\Services\PasakUserLoginService::class),
+    );
+
+    expect($response->isRedirection())->toBeTrue();
+
+    $trusted = \Internal\Pasak\Models\TrustedIp::query()
+        ->where('user_id', $user->id)
+        ->where('ip_address', '158.140.185.154')
+        ->first();
+
+    expect($trusted)->not->toBeNull()
+        ->and($trusted->operating_system)->toBe('Linux')
+        ->and($trusted->browser)->toContain('Google Chrome');
+});

@@ -7,7 +7,6 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Str;
 use Internal\Pasak\Models\PasakTrustedIp;
 use Internal\Pasak\Models\PasakUserLogin;
 use Internal\Pasak\Services\PasakService;
@@ -136,8 +135,11 @@ class PasakSessionController extends Controller
         ]);
     }
 
-    public function storeMyIp(Request $request, PasakService $security): RedirectResponse
-    {
+    public function storeMyIp(
+        Request $request,
+        PasakService $security,
+        PasakUserLoginService $loginService,
+    ): RedirectResponse {
         $user = $request->user();
 
         if (! $user) {
@@ -148,21 +150,17 @@ class PasakSessionController extends Controller
         }
 
         $ip = $security->resolveClientIp($request);
-        $userAgent = (string) $request->userAgent();
+        $userAgent = (string) ($request->userAgent() ?? '');
+        $deviceId = $security->resolveDeviceId($request);
+        $localIp = $security->resolveLocalIp($request);
 
-        PasakTrustedIp::query()->updateOrCreate(
-            [
-                'user_id' => $user->getKey(),
-                'ip_address' => $ip,
-            ],
-            [
-                'local_ip' => $security->resolveLocalIp($request),
-                'device_id' => $security->resolveDeviceId($request),
-                'device_name' => Str::limit($userAgent, 100) ?: __('My device'),
-                'operating_system' => $userAgent,
-                'is_active' => true,
-                'verified_at' => now(),
-            ],
+        $loginService->trustIp(
+            user: $user,
+            ip: $ip,
+            deviceName: null,
+            userAgent: $userAgent,
+            localIp: $localIp,
+            deviceId: $deviceId,
         );
 
         return back()->with('toast', [

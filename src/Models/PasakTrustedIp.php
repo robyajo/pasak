@@ -6,7 +6,9 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Str;
 use Internal\Pasak\Concerns\ResolvesPasakTable;
+use Internal\Pasak\Services\PasakUserLoginService;
 
 /**
  * @property int $id
@@ -51,6 +53,32 @@ class PasakTrustedIp extends Model
         'is_active' => 'boolean',
         'verified_at' => 'datetime',
     ];
+
+    public function setOperatingSystemAttribute(?string $value): void
+    {
+        if ($value === null) {
+            $this->attributes['operating_system'] = null;
+
+            return;
+        }
+
+        if (strlen($value) > 30 && preg_match('/(Mozilla|AppleWebKit|Gecko|Chrome|Safari|Edge|Opera)/i', $value)) {
+            $parsed = app(PasakUserLoginService::class)->parseUserAgent($value);
+            $value = $parsed['os'];
+        }
+
+        $this->attributes['operating_system'] = Str::limit($value, 255, '');
+    }
+
+    public function setBrowserAttribute(?string $value): void
+    {
+        $this->attributes['browser'] = $value !== null ? Str::limit($value, 255, '') : null;
+    }
+
+    public function setDeviceNameAttribute(?string $value): void
+    {
+        $this->attributes['device_name'] = $value !== null ? Str::limit($value, 255, '') : null;
+    }
 
     /**
      * @return BelongsTo<Model, $this>
