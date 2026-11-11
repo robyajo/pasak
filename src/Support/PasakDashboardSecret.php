@@ -222,8 +222,7 @@ class PasakDashboardSecret
 
         $needsValue = $force ||
             ! $hasLine ||
-            $current === null ||
-            $current === '';
+            $current === null;
 
         if ($generate && $needsValue) {
             $secret = self::generate();
@@ -256,7 +255,7 @@ class PasakDashboardSecret
             return $result;
         }
 
-        if (! $generate && $hasLine && $current !== null) {
+        if (! $generate && $hasLine) {
             // Contoh konfigurasi tidak boleh menyimpan rahasia nyata, termasuk
             // nilai warisan instalasi lama yang mungkin sudah ter-commit.
             $content = (string) preg_replace(

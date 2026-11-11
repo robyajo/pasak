@@ -111,7 +111,7 @@ class PasakDashboardView
      */
     public static function timezone(): string
     {
-        $custom = config('pasak.dashboard.timezone') ?: env('PASAK_DASHBOARD_TIMEZONE') ?: env('APP_TIMEZONE');
+        $custom = config('pasak.dashboard.timezone') ?: config('app.timezone');
         if (! empty($custom) && in_array($custom, DateTimeZone::listIdentifiers(), true)) {
             return (string) $custom;
         }
@@ -181,7 +181,7 @@ class PasakDashboardView
     /**
      * Tampilan waktu relatif (misal: "5 menit yang lalu" atau "5 minutes ago") sesuai locale dan timezone server.
      */
-    public static function diffForHumans(mixed $date, bool $syntax = false): string
+    public static function diffForHumans(mixed $date, int|array|null $syntax = null): string
     {
         if (! $date) {
             return '—';

@@ -316,14 +316,16 @@ class PasakLoginThrottleService
             'retryUrl' => $retryUrl,
         ];
 
-        if (view()->exists('errors.pasak-login-throttle')) {
-            return response()->view('errors.pasak-login-throttle', $viewData, 429, [
+        $pasakView = (string) 'errors.pasak-login-throttle';
+        if (view()->exists($pasakView)) {
+            return response()->view($pasakView, $viewData, 429, [
                 'Retry-After' => (string) $seconds,
             ]);
         }
 
-        if (view()->exists('errors.login-throttle')) {
-            return response()->view('errors.login-throttle', $viewData, 429, [
+        $legacyView = (string) 'errors.login-throttle';
+        if (view()->exists($legacyView)) {
+            return response()->view($legacyView, $viewData, 429, [
                 'Retry-After' => (string) $seconds,
             ]);
         }

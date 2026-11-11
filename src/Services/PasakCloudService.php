@@ -34,8 +34,8 @@ class PasakCloudService
         ?bool $enabled = null,
         ?PasakSentinelBridge $sentinel = null
     ) {
-        $this->cloudKey = $cloudKey ?? config('pasak.cloud.key', env('PASAK_CLOUD_KEY'));
-        $this->cloudUrl = rtrim($cloudUrl ?? config('pasak.cloud.url', env('PASAK_CLOUD_URL', 'https://pasak-api.vercel.app')), '/');
+        $this->cloudKey = $cloudKey ?? config('pasak.cloud.key');
+        $this->cloudUrl = rtrim($cloudUrl ?? config('pasak.cloud.url', 'https://pasak-api.vercel.app'), '/');
         $this->timeout = $timeout ?? (float) config('pasak.cloud.timeout', 3.0);
         $this->enabled = $enabled ?? (bool) config('pasak.cloud.enabled', true);
         $this->sentinel = $sentinel ?? (app()->bound(PasakSentinelBridge::class) ? app(PasakSentinelBridge::class) : null);
@@ -78,7 +78,7 @@ class PasakCloudService
      */
     public function resolveNodeId(): string
     {
-        $configured = config('pasak.cloud.node_id', env('PASAK_NODE_ID'));
+        $configured = config('pasak.cloud.node_id');
         if (! empty($configured)) {
             return (string) $configured;
         }
