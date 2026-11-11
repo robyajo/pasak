@@ -1,0 +1,44 @@
+{
+  "date": "2026-11-12",
+  "type": "important",
+  "title": {
+    "id": "Profil Otomasi Penyerang, Deteksi Alat Eksploitasi, dan Ketahanan Sesi Perangkat",
+    "en": "Attacker Automation Profiling, Exploit Tool Detection, and Resilient Device Session Guard"
+  },
+  "body": {
+    "id": "Pembaruan v1.7.13 menghadirkan intelijen deteksi otomatis untuk mengidentifikasi profil penyerang (alat scanner eksploitasi, bot otomatis, script, dan perayap web), penyaringan cepat log keamanan, penguatan ketahanan penyimpanan sesi perangkat panjang, serta pengamanan bertingkat percobaan masuk.",
+    "en": "Update v1.7.13 introduces intelligent automatic classification identifying attacker profiles (exploit scanners, automated bots, scripts, and web crawlers), quick security log filtering, resilient device session handling, and stepped cooldown protection for login attempts."
+  },
+  "items": [
+    {
+      "type": "new",
+      "id": "Klasifikasi Cerdas & Profil Penyerang Otomatis: Dasbor kini secara otomatis mengenali dan menampilkan identitas alat penyerang seperti scanner eksploitasi, bot otomatis, script pengikis, perayap web, atau peramban standar lengkap dengan lencana visual informatif.",
+      "en": "Intelligent Automated Attacker Profiling: The dashboard now automatically recognizes and displays the software identities of attackers—such as exploit scanners, automated bots, scraping scripts, web crawlers, or standard browsers with informative visual badges."
+    },
+    {
+      "type": "new",
+      "id": "Filter Cepat Kategori Klien & Bot: Bilah pencarian log kini dilengkapi penyaring satu klik untuk memisahkan aktivitas scanner berbahaya, bot otomatis, perayap mesin pencari, akses anonim tanpa identitas, dan peramban biasa.",
+      "en": "One-Click Client & Bot Category Filtering: The log search toolbar now includes one-click filtering to isolate malicious scanners, automated bots, search engine crawlers, anonymized requests, and standard browsers."
+    },
+    {
+      "type": "improvement",
+      "id": "Inspeksi Karakteristik Klien pada Rincian Log & Pemblokiran: Kartu khusus pada rincian insiden dan linimasa pemblokiran menyajikan profil mendalam mengenai kategori ancaman klien, sistem operasi, serta status otomasi.",
+      "en": "Detailed Client Characteristic Inspection in Incident & Block Logs: Dedicated profile cards on incident details and block timelines present in-depth insights into client threat categories, operating environments, and automation status."
+    },
+    {
+      "type": "fix",
+      "id": "Pencegahan Pemotongan Data pada Pendaftaran Perangkat Terpercaya: Memperluas kapasitas dan penguraian identitas sistem operasi peramban panjang sehingga penyimpanan perangkat dan alamat terpercaya selalu sukses tanpa kendala pemotongan data.",
+      "en": "Prevention of Data Truncation on Trusted Device Registration: Expanded capacity and resilient parsing for lengthy browser and OS signatures, guaranteeing seamless trusted device and IP registration without data cutoff errors."
+    },
+    {
+      "type": "security",
+      "id": "Jeda Waktu Dinamis Percobaan Masuk: Menerapkan penundaan waktu bertingkat saat terjadi kesalahan sandi berulang untuk melindungi akun tanpa memblokir alamat jaringan secara tergesa-gesa.",
+      "en": "Stepped Cooldown on Login Attempts: Implemented gradual progressive time delays upon repeated password failures, safeguarding accounts without prematurely locking out legitimate network locations."
+    },
+    {
+      "type": "improvement",
+      "id": "Penyempurnaan Identitas Visual Halaman Masuk: Menampilkan logo resmi dwitema yang konsisten pada formulir otentikasi dasbor demi keselarasan pengalaman visual.",
+      "en": "Refined Visual Branding on Login Gateway: Presents consistent dual-theme official branding across dashboard authentication screens for a cohesive visual experience."
+    }
+  ]
+}
