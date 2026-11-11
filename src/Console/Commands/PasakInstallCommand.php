@@ -1295,7 +1295,7 @@ class PasakInstallCommand extends Command
                 if (! str_contains($webContent, 'pasak.php')) {
                     File::append(
                         $webRouteFile,
-                        "\nrequire __DIR__.'/pasak.php';\n",
+                        "\nif (file_exists(__DIR__.'/pasak.php')) {\n    require __DIR__.'/pasak.php';\n}\n",
                     );
                     $this->info(
                         '  ✓ Berkas routes/web.php menyertakan routes/pasak.php.',
@@ -1312,7 +1312,7 @@ class PasakInstallCommand extends Command
                 if (! str_contains($apiContent, 'pasak-api.php')) {
                     File::append(
                         $apiRouteFile,
-                        "\nrequire __DIR__.'/pasak-api.php';\n",
+                        "\nif (file_exists(__DIR__.'/pasak-api.php')) {\n    require __DIR__.'/pasak-api.php';\n}\n",
                     );
                     $this->info(
                         '  ✓ Berkas routes/api.php menyertakan routes/pasak-api.php.',

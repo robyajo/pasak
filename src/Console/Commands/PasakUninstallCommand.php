@@ -188,11 +188,18 @@ class PasakUninstallCommand extends Command
 
             $content = File::get($path);
 
-            // Bersihkan via regex untuk menangani variasi spasi (misal Pint/CS-Fixer: require __DIR__ . '/pasak.php';)
+            // Bersihkan blok if (file_exists(...)) { require ...; }
             $cleaned = (string) preg_replace(
-                '/^[ \t]*(?:require|require_once|include|include_once)\s+__DIR__\s*\.\s*[\'"]\/(?:pasak|pasak-api|security|security-api)\.php[\'"]\s*;[ \t]*\r?\n?/m',
+                "/[ \t]*if\s*\(\s*file_exists\s*\(\s*__DIR__\s*\.\s*[\x27\"]\/(?:pasak|pasak-api|security|security-api)\.php[\x27\"]\s*\)\s*\)\s*\{[ \t]*\r?\n?[ \t]*(?:require|require_once|include|include_once)\s+__DIR__\s*\.\s*[\x27\"]\/(?:pasak|pasak-api|security|security-api)\.php[\x27\"]\s*;[ \t]*\r?\n?[ \t]*\}[ \t]*\r?\n?/m",
                 '',
                 $content,
+            );
+
+            // Bersihkan via regex require standar untuk menangani variasi spasi (misal Pint/CS-Fixer: require __DIR__ . '/pasak.php';)
+            $cleaned = (string) preg_replace(
+                "/^[ \t]*(?:require|require_once|include|include_once)\s+__DIR__\s*\.\s*[\x27\"]\/(?:pasak|pasak-api|security|security-api)\.php[\x27\"]\s*;[ \t]*\r?\n?/m",
+                '',
+                $cleaned,
             );
 
             $cleaned = str_replace(

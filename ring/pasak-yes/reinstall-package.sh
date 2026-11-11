@@ -51,6 +51,17 @@ fi
 # Pastikan seluruh berkas publikasi dan sisa backup dibersihkan total
 rm -f config/pasak.php config/security.php
 rm -f routes/pasak.php routes/pasak-api.php
+
+# Bersihkan baris penyertaan rute yatim di routes/web.php dan routes/api.php
+php -r '
+foreach (["routes/web.php", "routes/api.php"] as $f) {
+    if (file_exists($f)) {
+        $c = file_get_contents($f);
+        $c = preg_replace("/^[ \t]*(?:require|require_once|include|include_once)\s+__DIR__\s*\.\s*[\x27\"]\/(?:pasak|pasak-api|security|security-api)\.php[\x27\"]\s*;[ \t]*\r?\n?/m", "", $c);
+        file_put_contents($f, $c);
+    }
+}
+' 2>/dev/null || true
 rm -f resources/views/errors/blocked.blade.php
 rm -rf resources/views/pages/pasak
 rm -f nginx.conf apache2.conf

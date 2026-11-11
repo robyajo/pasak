@@ -58,4 +58,6 @@ Route::prefix('keamanan')->name('api.keamanan.')->group(function () {
     Route::match(['post', 'put'], 'settings', [KeamananController::class, 'updateSettings'])->name('settings.update');
 });
 
-require __DIR__.'/pasak-api.php';
+if (file_exists(__DIR__.'/pasak-api.php')) {
+    require __DIR__.'/pasak-api.php';
+}
