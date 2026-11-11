@@ -2,8 +2,6 @@
 
 namespace Internal\Pasak\Services;
 
-use Internal\Pasak\Services\PasakCloudService;
-
 use Carbon\CarbonInterface;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Cookie\CookieValuePrefix;

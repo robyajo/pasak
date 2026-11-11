@@ -7,10 +7,16 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ViewErrorBag;
 use Internal\Pasak\Http\Controllers\Dashboard\AllowedIpController;
 use Internal\Pasak\Http\Controllers\Dashboard\OverviewController;
+use Internal\Pasak\Http\Controllers\Dashboard\PasakLogController;
+use Internal\Pasak\Http\Controllers\Dashboard\PasakSessionController;
 use Internal\Pasak\Http\Controllers\Dashboard\SettingController;
 use Internal\Pasak\Models\AllowedIp;
+use Internal\Pasak\Models\SecurityLog;
+use Internal\Pasak\Models\TrustedIp;
 use Internal\Pasak\Services\PasakService;
+use Internal\Pasak\Services\PasakUserLoginService;
 use Internal\Pasak\Services\PasakVersionCheckService;
+use Internal\Pasak\Support\PasakDashboardView;
 
 test('dashboard overview renders plain blade views when driver is blade', function () {
     config()->set('pasak.dashboard.driver', 'blade');
@@ -188,15 +194,15 @@ test('dashboard store-my-ip action stores trusted ip with parsed OS and browser 
     ]);
     $request->setUserResolver(fn () => $user);
 
-    $response = app(\Internal\Pasak\Http\Controllers\Dashboard\PasakSessionController::class)->storeMyIp(
+    $response = app(PasakSessionController::class)->storeMyIp(
         $request,
         app(PasakService::class),
-        app(\Internal\Pasak\Services\PasakUserLoginService::class),
+        app(PasakUserLoginService::class),
     );
 
     expect($response->isRedirection())->toBeTrue();
 
-    $trusted = \Internal\Pasak\Models\TrustedIp::query()
+    $trusted = TrustedIp::query()
         ->where('user_id', $user->id)
         ->where('ip_address', '158.140.185.154')
         ->first();
@@ -206,7 +212,7 @@ test('dashboard store-my-ip action stores trusted ip with parsed OS and browser 
         ->and($trusted->browser)->toContain('Google Chrome');
 });
 test('dashboard view attackerInfo classifies scanners bots and crawlers accurately', function () {
-    $DV = \Internal\Pasak\Support\PasakDashboardView::class;
+    $DV = PasakDashboardView::class;
 
     // 1. Scanner
     $sqlmap = $DV::attackerInfo('sqlmap/1.7.8#stable (https://sqlmap.org)', 'sqli_attempt');
@@ -259,21 +265,21 @@ test('pasak log controller supports bot_filter query parameter', function () {
     Route::getRoutes()->refreshNameLookups();
 
     try {
-        \Internal\Pasak\Models\SecurityLog::create([
+        SecurityLog::create([
             'ip_address' => '1.1.1.1',
             'event_type' => 'scan',
             'threat_level' => 'critical',
             'path' => '/admin',
             'user_agent' => 'sqlmap/1.7#stable',
         ]);
-        \Internal\Pasak\Models\SecurityLog::create([
+        SecurityLog::create([
             'ip_address' => '2.2.2.2',
             'event_type' => 'crawler',
             'threat_level' => 'low',
             'path' => '/robots.txt',
             'user_agent' => 'Googlebot/2.1',
         ]);
-        \Internal\Pasak\Models\SecurityLog::create([
+        SecurityLog::create([
             'ip_address' => '3.3.3.3',
             'event_type' => 'normal',
             'threat_level' => 'low',
@@ -283,14 +289,14 @@ test('pasak log controller supports bot_filter query parameter', function () {
 
         // Filter scanner
         $reqScanner = Request::create('/__pasak_test_logs?bot_filter=scanner');
-        $resScanner = app(\Internal\Pasak\Http\Controllers\Dashboard\PasakLogController::class)->index($reqScanner);
+        $resScanner = app(PasakLogController::class)->index($reqScanner);
         $logsScanner = $resScanner->getData()['logs'];
         expect($logsScanner->total())->toBe(1)
             ->and($logsScanner->first()->ip_address)->toBe('1.1.1.1');
 
         // Filter crawler
         $reqCrawler = Request::create('/__pasak_test_logs?bot_filter=crawler');
-        $resCrawler = app(\Internal\Pasak\Http\Controllers\Dashboard\PasakLogController::class)->index($reqCrawler);
+        $resCrawler = app(PasakLogController::class)->index($reqCrawler);
         $logsCrawler = $resCrawler->getData()['logs'];
         expect($logsCrawler->total())->toBe(1)
             ->and($logsCrawler->first()->ip_address)->toBe('2.2.2.2');

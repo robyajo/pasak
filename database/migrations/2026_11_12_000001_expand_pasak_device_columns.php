@@ -36,6 +36,7 @@ return new class extends Migration
                     if (Schema::hasColumn($table, 'browser')) {
                         DB::statement("ALTER TABLE `{$table}` MODIFY `browser` VARCHAR(255) NULL");
                     }
+
                     continue;
                 }
 
@@ -46,6 +47,7 @@ return new class extends Migration
                     if (Schema::hasColumn($table, 'browser')) {
                         DB::statement("ALTER TABLE \"{$table}\" ALTER COLUMN \"browser\" TYPE VARCHAR(255)");
                     }
+
                     continue;
                 }
 
@@ -58,7 +60,7 @@ return new class extends Migration
                             $blueprint->string('browser', 255)->nullable()->change();
                         }
                     });
-                } catch (\Throwable) {
+                } catch (Throwable) {
                     // Abaikan jika database engine tidak mendukung change column tanpa doctrine/dbal
                 }
             }
@@ -83,6 +85,7 @@ return new class extends Migration
                     if (Schema::hasColumn($table, 'browser')) {
                         DB::statement("ALTER TABLE `{$table}` MODIFY `browser` VARCHAR(255) NOT NULL DEFAULT 'Unknown Browser'");
                     }
+
                     continue;
                 }
 
@@ -93,6 +96,7 @@ return new class extends Migration
                     if (Schema::hasColumn($table, 'browser')) {
                         DB::statement("ALTER TABLE \"{$table}\" ALTER COLUMN \"browser\" TYPE VARCHAR(255)");
                     }
+
                     continue;
                 }
 
@@ -105,7 +109,7 @@ return new class extends Migration
                             $blueprint->string('browser', 255)->default('Unknown Browser')->change();
                         }
                     });
-                } catch (\Throwable) {
+                } catch (Throwable) {
                     // Abaikan jika database engine tidak mendukung change column tanpa doctrine/dbal
                 }
             }
@@ -139,6 +143,7 @@ return new class extends Migration
                     if (Schema::hasColumn($table, 'browser')) {
                         DB::statement("ALTER TABLE `{$table}` MODIFY `browser` VARCHAR(100) NULL");
                     }
+
                     continue;
                 }
 
@@ -149,6 +154,7 @@ return new class extends Migration
                     if (Schema::hasColumn($table, 'browser')) {
                         DB::statement("ALTER TABLE \"{$table}\" ALTER COLUMN \"browser\" TYPE VARCHAR(100)");
                     }
+
                     continue;
                 }
 
@@ -161,7 +167,7 @@ return new class extends Migration
                             $blueprint->string('browser', 100)->nullable()->change();
                         }
                     });
-                } catch (\Throwable) {
+                } catch (Throwable) {
                     // Abaikan jika database engine tidak mendukung rollback change column
                 }
             }
@@ -186,6 +192,7 @@ return new class extends Migration
                     if (Schema::hasColumn($table, 'browser')) {
                         DB::statement("ALTER TABLE `{$table}` MODIFY `browser` VARCHAR(100) NOT NULL DEFAULT 'Unknown Browser'");
                     }
+
                     continue;
                 }
 
@@ -196,6 +203,7 @@ return new class extends Migration
                     if (Schema::hasColumn($table, 'browser')) {
                         DB::statement("ALTER TABLE \"{$table}\" ALTER COLUMN \"browser\" TYPE VARCHAR(100)");
                     }
+
                     continue;
                 }
 
@@ -208,7 +216,7 @@ return new class extends Migration
                             $blueprint->string('browser', 100)->default('Unknown Browser')->change();
                         }
                     });
-                } catch (\Throwable) {
+                } catch (Throwable) {
                     // Abaikan jika driver tidak mendukung
                 }
             }

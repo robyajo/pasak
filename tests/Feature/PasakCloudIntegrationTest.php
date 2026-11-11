@@ -27,7 +27,7 @@ test('cloud service validates isConfigured based on key format', function () {
     expect($cloud->getMaskedKey())->toContain('psk_live');
 
     config()->set('pasak.cloud.key', null);
-    $emptyCloud = new PasakCloudService();
+    $emptyCloud = new PasakCloudService;
     expect($emptyCloud->isConfigured())->toBeFalse();
 });
 

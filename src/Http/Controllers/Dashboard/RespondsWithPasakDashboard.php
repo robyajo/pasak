@@ -40,7 +40,7 @@ trait RespondsWithPasakDashboard
             abort(500, 'Dashboard views are not published. Run: php artisan pasak:install --with-dashboard');
         }
 
-        $appLocale = config('app.locale', env('APP_LOCALE', 'en'));
+        $appLocale = (string) config('app.locale', 'en');
         if (! in_array($appLocale, ['en', 'id'], true)) {
             $appLocale = 'en';
         }

@@ -29,7 +29,10 @@ class PasakAuthController
         $secret = $this->resolveExpectedSecret();
         $secretConfigured = $secret !== '';
 
-        return view('pages.pasak.login', [
+        /** @var view-string $viewName */
+        $viewName = 'pages.pasak.login';
+
+        return view($viewName, [
             'secretConfigured' => $secretConfigured,
             'defaultUsername' => $this->resolveExpectedUsername(),
             'defaultPassword' => $this->resolveDefaultPassword(),
@@ -236,11 +239,6 @@ class PasakAuthController
             return $secret;
         }
 
-        $envSecret = env('PASAK_DASHBOARD_SECRET');
-        if ($envSecret !== null && (string) $envSecret !== '') {
-            return (string) $envSecret;
-        }
-
         return (string) (PasakDashboardSecret::readFromEnvFile(base_path('.env')) ?? '');
     }
 
@@ -264,11 +262,6 @@ class PasakAuthController
             return $username;
         }
 
-        $envUser = env('PASAK_DASHBOARD_USERNAME');
-        if ($envUser !== null && (string) $envUser !== '') {
-            return (string) $envUser;
-        }
-
         return (string) (PasakDashboardSecret::readUsernameFromEnvFile(base_path('.env')) ?? PasakDashboardSecret::DEFAULT_USERNAME);
     }
 
@@ -280,11 +273,6 @@ class PasakAuthController
         $password = (string) config('pasak.dashboard.auth.default_password');
         if ($password !== '') {
             return $password;
-        }
-
-        $envPassword = env('PASAK_DASHBOARD_PASSWORD');
-        if ($envPassword !== null && (string) $envPassword !== '') {
-            return (string) $envPassword;
         }
 
         return (string) (PasakDashboardSecret::readPasswordFromEnvFile(base_path('.env')) ?? PasakDashboardSecret::DEFAULT_PASSWORD);
