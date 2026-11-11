@@ -48,6 +48,21 @@
                 <div class="sec-detail-value sec-font-mono" style="font-size: 12px;">{{ number_format((float) $loc['latitude'], 4) }}°, {{ number_format((float) $loc['longitude'], 4) }}°</div>
             </div>
         @endif
+        @php
+            $leadLogsList = $logsLeadingToBlock ?? $relatedLogs ?? collect();
+            $firstLead = $leadLogsList->first();
+            $leadAttacker = $firstLead ? $DV::attackerInfo($firstLead->user_agent, $firstLead->event_type) : null;
+        @endphp
+        @if ($leadAttacker)
+            <div class="sec-detail-item">
+                <div class="sec-detail-label">{{ __('Profil Penyerang') }}</div>
+                <div class="sec-detail-value" style="display: flex; align-items: center; gap: 8px;">
+                    <span style="font-size: 18px; line-height: 1;">{{ $leadAttacker['icon'] }}</span>
+                    <span class="sec-badge {{ $leadAttacker['badge_class'] }}" style="font-size: 12px; font-weight: 600;">{{ $leadAttacker['name'] }}</span>
+                    <span style="font-size: 12px; color: var(--sec-text-muted);">({{ $leadAttacker['category_label'] }})</span>
+                </div>
+            </div>
+        @endif
         <div class="sec-detail-item">
             <div class="sec-detail-label">{{ __('Status') }}</div>
             <div class="sec-detail-value">
@@ -142,9 +157,16 @@
                                 <div style="font-size: 11px; color: var(--sec-text-muted);">{{ $log->created_at ? $DV::diffForHumans($log->created_at) : '' }}</div>
                             </td>
                             <td>
-                                <div style="display: flex; align-items: center; gap: 6px;">
-                                    <span class="sec-badge sec-badge-zinc sec-font-mono" style="font-size: 10.5px; font-weight: 800;">{{ $log->method ?? 'GET' }}</span>
-                                    <span class="sec-font-mono" style="font-size: 12px; word-break: break-all; max-width: 240px;" title="{{ $log->path }}">{{ $log->path ?? '/' }}</span>
+                                <div style="display: flex; flex-direction: column; gap: 4px;">
+                                    <div style="display: flex; align-items: center; gap: 6px;">
+                                        <span class="sec-badge sec-badge-zinc sec-font-mono" style="font-size: 10.5px; font-weight: 800;">{{ $log->method ?? 'GET' }}</span>
+                                        <span class="sec-font-mono" style="font-size: 12px; word-break: break-all; max-width: 240px;" title="{{ $log->path }}">{{ $log->path ?? '/' }}</span>
+                                    </div>
+                                    @php($rowAttacker = $DV::attackerInfo($log->user_agent, $log->event_type))
+                                    <div style="display: inline-flex; align-items: center; gap: 4px; font-size: 11px;" title="{{ $rowAttacker['raw_ua'] ?: __('Tanpa User-Agent') }}">
+                                        <span>{{ $rowAttacker['icon'] }}</span>
+                                        <span class="sec-badge {{ $rowAttacker['badge_class'] }}" style="padding: 1px 5px; font-size: 10px;">{{ $rowAttacker['name'] }}</span>
+                                    </div>
                                 </div>
                             </td>
                             <td>

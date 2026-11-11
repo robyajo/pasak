@@ -205,3 +205,96 @@ test('dashboard store-my-ip action stores trusted ip with parsed OS and browser 
         ->and($trusted->operating_system)->toBe('Linux')
         ->and($trusted->browser)->toContain('Google Chrome');
 });
+test('dashboard view attackerInfo classifies scanners bots and crawlers accurately', function () {
+    $DV = \Internal\Pasak\Support\PasakDashboardView::class;
+
+    // 1. Scanner
+    $sqlmap = $DV::attackerInfo('sqlmap/1.7.8#stable (https://sqlmap.org)', 'sqli_attempt');
+    expect($sqlmap['category'])->toBe('scanner')
+        ->and($sqlmap['is_bot'])->toBeTrue()
+        ->and($sqlmap['icon'])->toBe('🚨')
+        ->and($sqlmap['name'])->toContain('SQLMap');
+
+    // 2. Automated Script
+    $curl = $DV::attackerInfo('curl/7.88.1');
+    expect($curl['category'])->toBe('bot')
+        ->and($curl['is_bot'])->toBeTrue()
+        ->and($curl['icon'])->toBe('🤖')
+        ->and($curl['name'])->toContain('cURL');
+
+    // 3. Web Crawler
+    $google = $DV::attackerInfo('Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)');
+    expect($google['category'])->toBe('crawler')
+        ->and($google['is_bot'])->toBeTrue()
+        ->and($google['icon'])->toBe('🕷️')
+        ->and($google['name'])->toBe('Googlebot');
+
+    // 4. Headless / Empty UA
+    $empty = $DV::attackerInfo('');
+    expect($empty['category'])->toBe('headless')
+        ->and($empty['is_bot'])->toBeTrue()
+        ->and($empty['icon'])->toBe('🕵️');
+
+    // 5. Standard Browser
+    $chrome = $DV::attackerInfo('Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36');
+    expect($chrome['category'])->toBe('browser')
+        ->and($chrome['is_bot'])->toBeFalse()
+        ->and($chrome['name'])->toContain('Google Chrome');
+});
+
+test('pasak log controller supports bot_filter query parameter', function () {
+    config()->set('pasak.dashboard.driver', 'blade');
+    $target = resource_path('views/pages/pasak');
+    if (! File::isDirectory($target)) {
+        File::copyDirectory(
+            dirname(__DIR__, 2).'/stubs/blade/pages/pasak',
+            $target
+        );
+    }
+
+    Route::get('/__pasak_test_logs', fn () => 'ok')->name('pasak.dashboard.logs');
+    Route::get('/__pasak_test_logs/{id}', fn () => 'ok')->name('pasak.dashboard.logs.show');
+    Route::delete('/__pasak_test_logs_clear', fn () => 'ok')->name('pasak.dashboard.logs.clear');
+    Route::delete('/__pasak_test_logs/{id}', fn () => 'ok')->name('pasak.dashboard.logs.destroy');
+    Route::getRoutes()->refreshNameLookups();
+
+    try {
+        \Internal\Pasak\Models\SecurityLog::create([
+            'ip_address' => '1.1.1.1',
+            'event_type' => 'scan',
+            'threat_level' => 'critical',
+            'path' => '/admin',
+            'user_agent' => 'sqlmap/1.7#stable',
+        ]);
+        \Internal\Pasak\Models\SecurityLog::create([
+            'ip_address' => '2.2.2.2',
+            'event_type' => 'crawler',
+            'threat_level' => 'low',
+            'path' => '/robots.txt',
+            'user_agent' => 'Googlebot/2.1',
+        ]);
+        \Internal\Pasak\Models\SecurityLog::create([
+            'ip_address' => '3.3.3.3',
+            'event_type' => 'normal',
+            'threat_level' => 'low',
+            'path' => '/home',
+            'user_agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
+        ]);
+
+        // Filter scanner
+        $reqScanner = Request::create('/__pasak_test_logs?bot_filter=scanner');
+        $resScanner = app(\Internal\Pasak\Http\Controllers\Dashboard\PasakLogController::class)->index($reqScanner);
+        $logsScanner = $resScanner->getData()['logs'];
+        expect($logsScanner->total())->toBe(1)
+            ->and($logsScanner->first()->ip_address)->toBe('1.1.1.1');
+
+        // Filter crawler
+        $reqCrawler = Request::create('/__pasak_test_logs?bot_filter=crawler');
+        $resCrawler = app(\Internal\Pasak\Http\Controllers\Dashboard\PasakLogController::class)->index($reqCrawler);
+        $logsCrawler = $resCrawler->getData()['logs'];
+        expect($logsCrawler->total())->toBe(1)
+            ->and($logsCrawler->first()->ip_address)->toBe('2.2.2.2');
+    } finally {
+        File::deleteDirectory($target);
+    }
+});

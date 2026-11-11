@@ -125,7 +125,7 @@ class PasakDashboardView
         $detected = null;
         if (is_link('/etc/localtime')) {
             $link = @readlink('/etc/localtime');
-            if ($link && preg_match('#(?:zoneinfo|zoneinfo\.default)/(.+)$#', $link, $matches)) {
+            if ($link && preg_match('#(?:zoneinfo|zoneinfo\\.default)/(.+)$#', $link, $matches)) {
                 $detected = $matches[1];
             }
         }
@@ -211,5 +211,271 @@ class PasakDashboardView
         }
 
         return $carbon->diffForHumans(null, $syntax);
+    }
+
+    /**
+     * Analisis profil penyerang / client berdasarkan User-Agent dan karakteristik request.
+     * Mengidentifikasi Scanner Keamanan, Bot/Script Otomatis, Web Crawler, Headless Browser, atau Browser Biasa.
+     *
+     * @return array{
+     *     category: 'scanner'|'bot'|'crawler'|'headless'|'browser',
+     *     category_label: string,
+     *     name: string,
+     *     icon: string,
+     *     badge_class: string,
+     *     is_bot: bool,
+     *     os: string,
+     *     browser: string,
+     *     device_type: string,
+     *     raw_ua: string
+     * }
+     */
+    public static function attackerInfo(?string $userAgent, ?string $eventType = null): array
+    {
+        $rawUa = trim((string) $userAgent);
+
+        if ($rawUa === '' || $rawUa === '-' || $rawUa === '—') {
+            return [
+                'category' => 'headless',
+                'category_label' => 'Tanpa User-Agent (Headless)',
+                'name' => 'Headless / Raw HTTP',
+                'icon' => '🕵️',
+                'badge_class' => 'sec-badge-critical',
+                'is_bot' => true,
+                'os' => 'Tidak Diketahui',
+                'browser' => 'None',
+                'device_type' => 'bot',
+                'raw_ua' => $rawUa,
+            ];
+        }
+
+        // 1. Security Exploit Scanners & Reconnaissance Tools
+        $scanners = [
+            'sqlmap' => 'SQLMap (Automated SQLi)',
+            'nuclei' => 'Nuclei (Vuln Scanner)',
+            'nikto' => 'Nikto (Web Scanner)',
+            'acunetix' => 'Acunetix (Web Scanner)',
+            'wvs' => 'Acunetix WVS',
+            'nessus' => 'Nessus (Vuln Scanner)',
+            'burpcollaborator' => 'Burp Suite Collaborator',
+            'burpsuite' => 'Burp Suite Proxy',
+            'burp' => 'Burp Suite',
+            'zaproxy' => 'OWASP ZAP',
+            'owasp zap' => 'OWASP ZAP',
+            'dirbuster' => 'DirBuster (Path Fuzzer)',
+            'gobuster' => 'Gobuster (URI Bruter)',
+            'ffuf' => 'FFUF (Web Fuzzer)',
+            'wpscan' => 'WPScan (WordPress)',
+            'masscan' => 'Masscan (Port/Web)',
+            'nmap' => 'Nmap (Network Scanner)',
+            'openvas' => 'OpenVAS (Security Scanner)',
+            'qualys' => 'Qualys (Vuln Scanner)',
+            'arachni' => 'Arachni (Web Scanner)',
+            'whatweb' => 'WhatWeb (Tech Scanner)',
+            'w3af' => 'w3af (Attack Framework)',
+            'hydra' => 'THC-Hydra (Logon Cracker)',
+            'metasploit' => 'Metasploit Framework',
+            'zgrab' => 'ZGrab (Banner Prober)',
+            'havij' => 'Havij (SQLi Tool)',
+            'netsparker' => 'Netsparker (Scanner)',
+            'censys' => 'Censys (Recon Prober)',
+            'shodan' => 'Shodan (Network Prober)',
+            'zoomeye' => 'ZoomEye (Cyberspace Scanner)',
+            'binaryedge' => 'BinaryEdge (Threat Prober)',
+            'morfeus' => 'Morfeus Scanner',
+            'commix' => 'Commix (Command Injection)',
+            'sublist3r' => 'Sublist3r (Subdomain Recon)',
+            'jaeles' => 'Jaeles (Web Scanner)',
+            'dsss' => 'Damn Small SQLi Scanner',
+        ];
+
+        foreach ($scanners as $sig => $label) {
+            if (stripos($rawUa, $sig) !== false) {
+                return [
+                    'category' => 'scanner',
+                    'category_label' => 'Alat Scanner Eksploitasi',
+                    'name' => $label,
+                    'icon' => '🚨',
+                    'badge_class' => 'sec-badge-critical',
+                    'is_bot' => true,
+                    'os' => 'Security Tool',
+                    'browser' => $label,
+                    'device_type' => 'scanner',
+                    'raw_ua' => $rawUa,
+                ];
+            }
+        }
+
+        // 2. Headless Browsers & Automation Frameworks
+        $automation = [
+            'headlesschrome' => 'Headless Chrome',
+            'phantomjs' => 'PhantomJS Headless',
+            'selenium' => 'Selenium Automation',
+            'puppeteer' => 'Puppeteer Automation',
+            'playwright' => 'Playwright Automation',
+            'cypress' => 'Cypress Test Automation',
+            'webdriver' => 'WebDriver Automation',
+        ];
+
+        foreach ($automation as $sig => $label) {
+            if (stripos($rawUa, $sig) !== false) {
+                return [
+                    'category' => 'bot',
+                    'category_label' => 'Headless / Browser Otomasi',
+                    'name' => $label,
+                    'icon' => '🤖',
+                    'badge_class' => 'sec-badge-critical',
+                    'is_bot' => true,
+                    'os' => 'Automation Environment',
+                    'browser' => $label,
+                    'device_type' => 'bot',
+                    'raw_ua' => $rawUa,
+                ];
+            }
+        }
+
+        // 3. Automated HTTP Clients & Scripting Engines
+        $scripts = [
+            'python-requests' => 'Python Requests',
+            'python-urllib' => 'Python urllib',
+            'python/' => 'Python HTTP',
+            'aiohttp' => 'Python aiohttp',
+            'httpx' => 'Python HTTPX',
+            'scrapy' => 'Scrapy Crawler',
+            'guzzlehttp' => 'Guzzle PHP Client',
+            'guzzle' => 'Guzzle PHP Client',
+            'go-http-client' => 'Go HTTP Client',
+            'axios' => 'Axios HTTP Client',
+            'postmanruntime' => 'Postman API Client',
+            'postman' => 'Postman Client',
+            'insomnia' => 'Insomnia REST Client',
+            'httpie' => 'HTTPie CLI',
+            'curl' => 'cURL CLI Tool',
+            'wget' => 'GNU Wget',
+            'libwww-perl' => 'Perl LWP Library',
+            'lwp-' => 'Perl LWP',
+            'apache-httpclient' => 'Apache HttpClient',
+            'java/' => 'Java HTTP Client',
+            'okhttp' => 'OkHttp Library',
+            'node-fetch' => 'Node.js Fetch Client',
+            'undici' => 'Node.js Undici Client',
+            'winhttp' => 'Windows WinHTTP API',
+            'powershell' => 'PowerShell WebRequest',
+            'ruby' => 'Ruby Net::HTTP',
+            'restsharp' => 'RestSharp .NET Client',
+            'colly' => 'Colly Golang Scraper',
+            'reqwest' => 'Rust Reqwest Client',
+        ];
+
+        foreach ($scripts as $sig => $label) {
+            if (stripos($rawUa, $sig) !== false) {
+                return [
+                    'category' => 'bot',
+                    'category_label' => 'Script / Bot HTTP Otomatis',
+                    'name' => $label,
+                    'icon' => '🤖',
+                    'badge_class' => 'sec-badge-high',
+                    'is_bot' => true,
+                    'os' => 'Script Engine',
+                    'browser' => $label,
+                    'device_type' => 'script',
+                    'raw_ua' => $rawUa,
+                ];
+            }
+        }
+
+        // 4. Known Web Crawlers & Search Engine Bots
+        $crawlers = [
+            'googlebot' => 'Googlebot',
+            'bingbot' => 'Bingbot',
+            'yandexbot' => 'Yandex Bot',
+            'yandex' => 'Yandex Bot',
+            'baiduspider' => 'Baidu Spider',
+            'duckduckbot' => 'DuckDuckBot',
+            'semrushbot' => 'SEMrush SEO Bot',
+            'ahrefsbot' => 'Ahrefs SEO Bot',
+            'dotbot' => 'DotBot Crawler',
+            'mj12bot' => 'Majestic-12 Bot',
+            'bytespider' => 'ByteSpider (ByteDance)',
+            'petalbot' => 'PetalBot (Huawei)',
+            'applebot' => 'Applebot',
+            'facebookexternalhit' => 'Meta / Facebook Bot',
+            'twitterbot' => 'Twitterbot / X',
+            'linkedinbot' => 'LinkedIn Bot',
+            'discordbot' => 'Discord Bot',
+            'telegrambot' => 'Telegram Bot',
+            'whatsapp' => 'WhatsApp Bot',
+            'slackbot' => 'Slack Bot',
+        ];
+
+        foreach ($crawlers as $sig => $label) {
+            if (stripos($rawUa, $sig) !== false) {
+                return [
+                    'category' => 'crawler',
+                    'category_label' => 'Web Crawler / Indexer',
+                    'name' => $label,
+                    'icon' => '🕷️',
+                    'badge_class' => 'sec-badge-medium',
+                    'is_bot' => true,
+                    'os' => 'Crawler Platform',
+                    'browser' => $label,
+                    'device_type' => 'crawler',
+                    'raw_ua' => $rawUa,
+                ];
+            }
+        }
+
+        // 5. Generic bot/spider regex
+        if (preg_match('/(bot|crawler|spider|scraper|prober|scan)/i', $rawUa, $m)) {
+            $matchedWord = ucfirst(strtolower($m[1]));
+
+            return [
+                'category' => 'bot',
+                'category_label' => 'Bot Otomatis Terdeteksi',
+                'name' => "Generic {$matchedWord}",
+                'icon' => '🤖',
+                'badge_class' => 'sec-badge-high',
+                'is_bot' => true,
+                'os' => 'Automated Bot',
+                'browser' => "Bot/{$matchedWord}",
+                'device_type' => 'bot',
+                'raw_ua' => $rawUa,
+            ];
+        }
+
+        // 6. Standard Browser (Human or Spoofed UA)
+        try {
+            $parsed = app(PasakUserLoginService::class)->parseUserAgent($rawUa);
+            $os = $parsed['os'];
+            $browser = $parsed['browser'];
+            $device = $parsed['device'];
+        } catch (Throwable) {
+            $os = 'Unknown OS';
+            $browser = 'Unknown Browser';
+            $device = 'desktop';
+        }
+
+        $icon = match ($device) {
+            'mobile' => '📱',
+            'tablet' => '📱',
+            default => '💻',
+        };
+
+        $displayName = ($browser !== 'Unknown Browser' && $os !== 'Unknown OS')
+            ? "{$browser} ({$os})"
+            : ($browser !== 'Unknown Browser' ? $browser : ($os !== 'Unknown OS' ? $os : 'Web Browser'));
+
+        return [
+            'category' => 'browser',
+            'category_label' => 'Browser Web (Human / Spoofed UA)',
+            'name' => $displayName,
+            'icon' => $icon,
+            'badge_class' => 'sec-badge-low',
+            'is_bot' => false,
+            'os' => $os,
+            'browser' => $browser,
+            'device_type' => $device,
+            'raw_ua' => $rawUa,
+        ];
     }
 }

@@ -238,6 +238,14 @@
                     <option value="{{ $type }}" @selected(($filters['event_type'] ?? '') === $type)>{{ $type }}</option>
                 @endforeach
             </select>
+            <select name="bot_filter" class="sec-select">
+                <option value="">{{ __('Semua Klien / Bot') }}</option>
+                <option value="scanner" @selected(($filters['bot_filter'] ?? '') === 'scanner')>🚨 {{ __('Scanner / Exploit Tool') }}</option>
+                <option value="bot" @selected(($filters['bot_filter'] ?? '') === 'bot')>🤖 {{ __('Bot Otomatis / Script') }}</option>
+                <option value="crawler" @selected(($filters['bot_filter'] ?? '') === 'crawler')>🕷️ {{ __('Web Crawler / Indexer') }}</option>
+                <option value="headless" @selected(($filters['bot_filter'] ?? '') === 'headless')>🕵️ {{ __('Tanpa UA / Anonymized') }}</option>
+                <option value="browser" @selected(($filters['bot_filter'] ?? '') === 'browser')>💻 {{ __('Browser Standar') }}</option>
+            </select>
             <div style="display: inline-flex; align-items: center; gap: 6px;">
                 <label for="filter_date_from" style="font-size: 12px; color: var(--sec-text-muted); font-weight: 500;">{{ __('From') }}:</label>
                 <input id="filter_date_from" type="date" name="date_from" value="{{ $filters['date_from'] ?? '' }}" class="sec-input" style="font-size: 13px;">
@@ -274,7 +282,7 @@
             <thead>
                 <tr>
                     <th>{{ __('Time') }}</th>
-                    <th>{{ __('IP address') }}</th>
+                    <th>{{ __('IP & Klien') }}</th>
                     <th>{{ __('Asal / Lokasi') }}</th>
                     <th>{{ __('Event') }}</th>
                     <th>{{ __('Level') }}</th>
@@ -298,17 +306,28 @@
                     @endphp
                     <tr>
                         <td class="sec-font-mono" style="font-size: 12px; white-space: nowrap;" title="{{ $DV::diffForHumans($log->created_at) }}">{{ $DV::formatDate($log->created_at, 'Y-m-d H:i:s') }}</td>
-                        <td class="sec-font-mono" style="font-weight: 600;">
-                            <div style="display: inline-flex; align-items: center; gap: 6px;">
-                                <span>{{ $log->ip_address }}</span>
-                                @if (! $isBlocked)
-                                    <button type="button" class="sec-btn sec-btn-ghost sec-btn-sm" style="padding: 2px 4px; font-size: 11px; line-height: 1;" title="{{ __('Blokir IP ini') }}" onclick="openBlockModal({
-                                        ip: '{{ $log->ip_address }}',
-                                        device_id: '{{ $log->device_id ?? "" }}',
-                                        local_ip: '{{ $log->local_ip ?? "" }}',
-                                        reason: '{{ addslashes($log->event_type . ($log->path ? " " . __("pada") . " " . $log->path : "")) }}'
-                                    })">🚫</button>
-                                @endif
+                        @php
+                            $attacker = $DV::attackerInfo($log->user_agent, $log->event_type);
+                        @endphp
+                        <td style="font-size: 12.5px;">
+                            <div style="display: flex; flex-direction: column; gap: 4px;">
+                                <div style="display: inline-flex; align-items: center; gap: 6px;" class="sec-font-mono">
+                                    <span style="font-weight: 600;">{{ $log->ip_address }}</span>
+                                    @if (! $isBlocked)
+                                        <button type="button" class="sec-btn sec-btn-ghost sec-btn-sm" style="padding: 2px 4px; font-size: 11px; line-height: 1;" title="{{ __('Blokir IP ini') }}" onclick="openBlockModal({
+                                            ip: '{{ $log->ip_address }}',
+                                            device_id: '{{ $log->device_id ?? "" }}',
+                                            local_ip: '{{ $log->local_ip ?? "" }}',
+                                            reason: '{{ addslashes($log->event_type . ($log->path ? " " . __("pada") . " " . $log->path : "")) }}'
+                                        })">🚫</button>
+                                    @endif
+                                </div>
+                                <div style="display: inline-flex; align-items: center; gap: 4px; font-size: 11px;" title="{{ $attacker['raw_ua'] ?: __('Tanpa User-Agent') }}">
+                                    <span>{{ $attacker['icon'] }}</span>
+                                    <span class="sec-badge {{ $attacker['badge_class'] }}" style="padding: 1px 6px; font-size: 10px; font-weight: 600; max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                        {{ $attacker['name'] }}
+                                    </span>
+                                </div>
                             </div>
                         </td>
                         <td>

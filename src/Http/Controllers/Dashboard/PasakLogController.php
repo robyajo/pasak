@@ -28,6 +28,7 @@ class PasakLogController extends Controller
         $search = (string) $request->query('search', '');
         $level = (string) $request->query('level', '');
         $eventType = (string) $request->query('event_type', '');
+        $botFilter = (string) $request->query('bot_filter', '');
         $dateFrom = (string) $request->query('date_from', '');
         $dateTo = (string) $request->query('date_to', '');
         $perPage = (int) $request->query('per_page', 25);
@@ -60,6 +61,72 @@ class PasakLogController extends Controller
 
         if ($eventType !== '') {
             $query->where('event_type', $eventType);
+        }
+
+        if ($botFilter === 'scanner') {
+            $query->where(function ($q): void {
+                $q->where('user_agent', 'like', '%sqlmap%')
+                    ->orWhere('user_agent', 'like', '%nuclei%')
+                    ->orWhere('user_agent', 'like', '%nikto%')
+                    ->orWhere('user_agent', 'like', '%acunetix%')
+                    ->orWhere('user_agent', 'like', '%nessus%')
+                    ->orWhere('user_agent', 'like', '%burp%')
+                    ->orWhere('user_agent', 'like', '%zaproxy%')
+                    ->orWhere('user_agent', 'like', '%dirbuster%')
+                    ->orWhere('user_agent', 'like', '%gobuster%')
+                    ->orWhere('user_agent', 'like', '%ffuf%')
+                    ->orWhere('user_agent', 'like', '%wpscan%')
+                    ->orWhere('user_agent', 'like', '%masscan%')
+                    ->orWhere('user_agent', 'like', '%nmap%')
+                    ->orWhere('user_agent', 'like', '%zgrab%')
+                    ->orWhere('user_agent', 'like', '%censys%')
+                    ->orWhere('user_agent', 'like', '%shodan%');
+            });
+        } elseif ($botFilter === 'bot') {
+            $query->where(function ($q): void {
+                $q->where('user_agent', 'like', '%curl%')
+                    ->orWhere('user_agent', 'like', '%python%')
+                    ->orWhere('user_agent', 'like', '%guzzle%')
+                    ->orWhere('user_agent', 'like', '%go-http%')
+                    ->orWhere('user_agent', 'like', '%postman%')
+                    ->orWhere('user_agent', 'like', '%wget%')
+                    ->orWhere('user_agent', 'like', '%bot%')
+                    ->orWhere('user_agent', 'like', '%crawler%')
+                    ->orWhere('user_agent', 'like', '%spider%')
+                    ->orWhere('user_agent', 'like', '%headless%');
+            });
+        } elseif ($botFilter === 'crawler') {
+            $query->where(function ($q): void {
+                $q->where('user_agent', 'like', '%googlebot%')
+                    ->orWhere('user_agent', 'like', '%bingbot%')
+                    ->orWhere('user_agent', 'like', '%yandex%')
+                    ->orWhere('user_agent', 'like', '%baiduspider%')
+                    ->orWhere('user_agent', 'like', '%duckduckbot%')
+                    ->orWhere('user_agent', 'like', '%semrushbot%')
+                    ->orWhere('user_agent', 'like', '%ahrefsbot%')
+                    ->orWhere('user_agent', 'like', '%dotbot%')
+                    ->orWhere('user_agent', 'like', '%mj12bot%')
+                    ->orWhere('user_agent', 'like', '%bytespider%')
+                    ->orWhere('user_agent', 'like', '%petalbot%');
+            });
+        } elseif ($botFilter === 'headless') {
+            $query->where(function ($q): void {
+                $q->whereNull('user_agent')
+                    ->orWhere('user_agent', '')
+                    ->orWhere('user_agent', '-')
+                    ->orWhere('user_agent', '—');
+            });
+        } elseif ($botFilter === 'browser') {
+            $query->whereNotNull('user_agent')
+                ->where('user_agent', '!=', '')
+                ->where('user_agent', '!=', '-')
+                ->where('user_agent', '!=', '—')
+                ->where('user_agent', 'not like', '%bot%')
+                ->where('user_agent', 'not like', '%crawler%')
+                ->where('user_agent', 'not like', '%spider%')
+                ->where('user_agent', 'not like', '%curl%')
+                ->where('user_agent', 'not like', '%python%')
+                ->where('user_agent', 'not like', '%sqlmap%');
         }
 
         if ($dateFrom !== '') {
@@ -134,6 +201,7 @@ class PasakLogController extends Controller
                 'search' => $search,
                 'level' => $level,
                 'event_type' => $eventType,
+                'bot_filter' => $botFilter,
                 'date_from' => $dateFrom,
                 'date_to' => $dateTo,
                 'per_page' => $perPage,

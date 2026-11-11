@@ -17,6 +17,7 @@
         $regionName = $loc['region'] ?? null;
         $cityName = $loc['city'] ?? null;
         $locDetail = implode(', ', array_filter([$cityName, $regionName]));
+        $attacker = $DV::attackerInfo($log->user_agent, $log->event_type);
     @endphp
     <div class="sec-detail-grid">
         <div class="sec-detail-item">
@@ -53,6 +54,26 @@
                 <div class="sec-detail-value sec-font-mono" style="font-size: 12px;">{{ number_format((float) $loc['latitude'], 4) }}°, {{ number_format((float) $loc['longitude'], 4) }}°</div>
             </div>
         @endif
+        <div class="sec-detail-item">
+            <div class="sec-detail-label">{{ __('Profil Penyerang') }}</div>
+            <div class="sec-detail-value" style="display: flex; align-items: center; gap: 8px;">
+                <span style="font-size: 18px; line-height: 1;">{{ $attacker['icon'] }}</span>
+                <span class="sec-badge {{ $attacker['badge_class'] }}" style="font-size: 12px; font-weight: 600;">
+                    {{ $attacker['name'] }}
+                </span>
+            </div>
+        </div>
+        <div class="sec-detail-item">
+            <div class="sec-detail-label">{{ __('Kategori Klien') }}</div>
+            <div class="sec-detail-value" style="display: flex; align-items: center; gap: 6px;">
+                <span>{{ $attacker['category_label'] }}</span>
+                @if ($attacker['is_bot'])
+                    <span class="sec-badge sec-badge-critical" style="font-size: 10.5px;">{{ __('BOT / OTOMASI') }}</span>
+                @else
+                    <span class="sec-badge sec-badge-low" style="font-size: 10.5px;">{{ __('HUMAN / BROWSER') }}</span>
+                @endif
+            </div>
+        </div>
         <div class="sec-detail-item">
             <div class="sec-detail-label">{{ __('Threat level') }}</div>
             <div class="sec-detail-value"><span class="sec-badge {{ $DV::levelClass($log->threat_level) }}">{{ $DV::levelLabel($log->threat_level) }}</span></div>
@@ -105,6 +126,51 @@
         </div>
     </div>
 @endif
+
+<div class="sec-card">
+    <div class="sec-card-header" style="border-bottom: none; padding-bottom: 0;">
+        <h3 class="sec-card-title" style="display: flex; align-items: center; gap: 8px;">
+            <span>{{ $attacker['icon'] }}</span>
+            <span>{{ __('Karakteristik & Profil Klien Penyerang') }}</span>
+        </h3>
+    </div>
+    <div class="sec-card-body" style="padding-top: 12px;">
+        <div class="sec-detail-grid">
+            <div class="sec-detail-item">
+                <div class="sec-detail-label">{{ __('Nama Software / Client') }}</div>
+                <div class="sec-detail-value" style="font-weight: 600;">{{ $attacker['name'] }}</div>
+            </div>
+            <div class="sec-detail-item">
+                <div class="sec-detail-label">{{ __('Klasifikasi Ancaman') }}</div>
+                <div class="sec-detail-value">
+                    <span class="sec-badge {{ $attacker['badge_class'] }}">{{ $attacker['category_label'] }}</span>
+                </div>
+            </div>
+            <div class="sec-detail-item">
+                <div class="sec-detail-label">{{ __('Sistem Operasi Terdeteksi') }}</div>
+                <div class="sec-detail-value">{{ $attacker['os'] ?? '—' }}</div>
+            </div>
+            <div class="sec-detail-item">
+                <div class="sec-detail-label">{{ __('Perangkat / Browser') }}</div>
+                <div class="sec-detail-value">{{ $attacker['browser'] ?? '—' }} ({{ ucfirst($attacker['device_type'] ?? 'desktop') }})</div>
+            </div>
+            <div class="sec-detail-item">
+                <div class="sec-detail-label">{{ __('Status Otomasi') }}</div>
+                <div class="sec-detail-value">
+                    @if ($attacker['is_bot'])
+                        <span class="sec-badge sec-badge-critical">{{ __('Terdeteksi Bot / Otomasi / Script') }}</span>
+                    @else
+                        <span class="sec-badge sec-badge-low">{{ __('Browser Standar') }}</span>
+                    @endif
+                </div>
+            </div>
+        </div>
+        <div style="margin-top: 14px;">
+            <div class="sec-detail-label">{{ __('Raw User-Agent') }}</div>
+            <pre class="sec-code-block" style="white-space: pre-wrap; word-break: break-all;">{{ $log->user_agent ?: '—' }}</pre>
+        </div>
+    </div>
+</div>
 
 <div class="sec-card">
     <div class="sec-card-header" style="border-bottom: none; padding-bottom: 0;">
