@@ -23,8 +23,8 @@ parameters:
         # so its result is environment-dependent (true when the host has published
         # the view, false on a clean checkout such as CI).
         -
-            message: '#Factory::exists\(\) with .*errors\.blocked.* will always evaluate to (true|false)#'
-            path: src/Http/Middleware/PasakBlockIpAddress.php
+            message: '#Factory::exists\(\) with .*(errors\.blocked|errors\.pasak-login-throttle|errors\.login-throttle).* will always evaluate to (true|false)#'
+            path: src/*
         # The configured user model is dynamic; `email` is not part of the contract.
         - '#Access to an undefined property Illuminate\\Contracts\\Auth\\Authenticatable::\$email#'
 

@@ -255,7 +255,7 @@ class PasakDashboardSecret
             return $result;
         }
 
-        if (! $generate && $hasLine) {
+        if (! $generate) {
             // Contoh konfigurasi tidak boleh menyimpan rahasia nyata, termasuk
             // nilai warisan instalasi lama yang mungkin sudah ter-commit.
             $content = (string) preg_replace(
