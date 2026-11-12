@@ -2,6 +2,68 @@
 
 All notable changes to `robyajo/pasak` will be documented in this file.
 
+## [1.7.14] - 2026-11-12
+
+### Fixed & Maintenance
+
+- **Penyempurnaan Kompatibilitas CI & Pemeriksaan Statis PHPStan** (`phpstan.neon.dist`, `src/Support/PasakDashboardSecret.php`, `src/Console/Commands/PasakCloudCommand.php`):
+  - Memperluas ignore pattern pemeriksaan `Factory::exists` untuk semua subdirektori di bawah `src/` guna mencegah kegagalan analisis statis pada lingkungan CI.
+  - Memperbaiki penanganan `env()` di luar berkas konfigurasi dengan memindahkan pembacaan ke helper `config()` serta menerapkan pemformatan Laravel Pint secara menyeluruh.
+  - Menghilangkan kondisi redundan pada pemeriksaan rahasia dasbor di `PasakDashboardSecret`.
+- **Penanganan Dependensi Doctrine DBAL pada Migrasi Alter Table** (`database/migrations/2026_11_12_000001_expand_pasak_device_columns.php`):
+  - Mengimplementasikan fallback otomatis ke kueri SQL native (`ALTER TABLE ... MODIFY/ALTER COLUMN`) apabila paket `doctrine/dbal` belum terpasang di aplikasi host, menjamin migrasi selalu berjalan sukses di semua versi Laravel.
+  - Menambahkan pengaman `file_exists` sebelum memuat berkas rute publikasi.
+
+## [1.7.13] - 2026-11-12
+
+### Added
+
+- **Klasifikasi Intelijen & Profil Penyerang Otomatis (Attacker Profiling: Scanners, Bots, Crawlers)** (`src/Support/PasakDashboardView.php`, `stubs/blade/pages/pasak/logs.blade.php`, `src/Http/Controllers/Dashboard/PasakLogController.php`):
+  - Menambahkan kapabilitas `PasakDashboardView::attackerInfo()` untuk mengidentifikasi dan mengelompokkan pengunjung maupun penyerang secara otomatis berdasarkan User-Agent dan karakteristik request:
+    - 🚨 **Scanner Eksploitasi**: `sqlmap`, `nikto`, `acunetix`, `nmap`, `masscan`, `wpscan`, `dirbuster`, dll.
+    - 🤖 **Automated Script / Bot**: `curl`, `python-requests`, `postman`, `go-http-client`, `wget`, dll.
+    - 🕷️ **Web Crawler / Search Engine**: `Googlebot`, `Bingbot`, `YandexBot`, `DuckDuckBot`, dll.
+    - 🕵️ **Headless / Anonymized Client**: Permintaan tanpa User-Agent atau browser automation (`Puppeteer`, `Playwright`, `Selenium`).
+    - 🌐 **Standard Browser**: Chrome, Firefox, Safari, Edge, Opera.
+  - Menyajikan lencana visual informatif dan tooltip User-Agent mentah pada setiap baris log keamanan.
+- **Penyaringan Cepat Kategori Klien & Bot (`bot_filter`)**:
+  - Menambahkan parameter kueri `?bot_filter=scanner|bot|crawler|headless|browser` pada halaman audit log keamanan untuk memfilter lalu lintas mencurigakan dengan satu klik.
+
+## [1.7.12] - 2026-11-12
+
+### Fixed
+
+- **Pencegahan Pemotongan Data (Data Truncation) pada Perangkat & IP Terpercaya** (`database/migrations/2026_11_12_000001_expand_pasak_device_columns.php`, `src/Models/PasakTrustedIp.php`, `src/Models/PasakUserLogin.php`, `src/Services/PasakUserLoginService.php`):
+  - Memperluas kapasitas kolom `operating_system`, `browser`, `device_id`, dan `user_agent` menjadi 255 karakter / teks panjang.
+  - Mencegah galat SQL data truncation saat memproses signature peramban modern yang panjang ketika mendaftarkan IP atau perangkat terpercaya.
+
+## [1.7.11] - 2026-11-11
+
+### Added
+
+- **Integrasi Pasak Cloud Service & Perintah CLI `pasak:cloud`** (`src/Services/PasakCloudService.php`, `src/Console/Commands/PasakCloudCommand.php`):
+  - Layanan telemetri WAF mandiri yang secara otomatis mengekstrak metadata identitas aplikasi host dari `APP_NAME` dan `APP_URL`.
+  - Menyediakan perintah Artisan interaktif:
+    - `php artisan pasak:cloud --test` : Uji konektivitas dan autentikasi lisensi ke server Pasak Cloud.
+    - `php artisan pasak:cloud --info` : Tampilkan status konfigurasi cloud, token, dan metadata aplikasi.
+    - `php artisan pasak:cloud --register` : Kirim pendaftaran awal dan heartbeat telemetri aplikasi.
+- **Dukungan Lisensi Universal Multi-Aplikasi (`PASAK_CLOUD_KEY`)**:
+  - Satu token lisensi (`psk_live_...`) dapat digunakan secara bersamaan pada berbagai aplikasi Laravel dan server VPS yang menjalankan daemon Sentinel.
+  - Operasi cloud bersifat opsional: jika `PASAK_CLOUD_KEY` tidak diisi, WAF beroperasi 100% lokal tanpa dependensi jaringan eksternal.
+- **Isolasi Namespace Total Antarmuka Cooldown Login (HTTP 429)** (`stubs/pasak-login-throttle.blade.php`, `src/Services/PasakLoginThrottleService.php`):
+  - Membakukan seluruh styling CSS, custom properties, dan ID DOM menggunakan prefix `pasak-` untuk menjamin tampilan hitung mundur responsif tanpa risiko konflik CSS host.
+  - Deteksi otomatis header `Accept: application/json` dan rute `/api/*` untuk merespons status HTTP 429 dengan payload JSON terstruktur dan header `Retry-After`.
+- **Pembersihan Berkas Stub Usang**:
+  - Menghapus stub usang (`login-throttle.blade.php`, `429.blade.php`, `pasak-429.blade.php`) dan membakukan penggunaan stub `pasak-login-throttle.blade.php`.
+
+## [1.7.10] - 2026-11-11
+
+### Added
+
+- **Branding Resmi Dwitema pada Gateway Login Dashboard** (`stubs/blade/pages/pasak/login.blade.php`, `src/Services/PasakService.php`):
+  - Menampilkan logo resmi horizontal PASAK pada formulir autentikasi login dasbor dengan adaptasi otomatis untuk mode terang (Light Mode) dan gelap (Dark Mode).
+  - Penyelarasan pengujian unit pengalihan autentikasi dasbor berputar (`pasak.dashboard.login`).
+
 ## [1.7.9] - 2026-11-11
 
 ### Added
