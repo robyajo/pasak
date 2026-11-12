@@ -5,6 +5,8 @@ namespace Internal\Pasak\Support;
 use DateTimeInterface;
 use DateTimeZone;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Cache;
+use Internal\Pasak\Models\PasakSetting;
 use Internal\Pasak\Services\PasakUserLoginService;
 use Throwable;
 
@@ -111,6 +113,16 @@ class PasakDashboardView
      */
     public static function timezone(): string
     {
+        try {
+            $dbTz = Cache::remember('pasak:server_timezone', 86400, function (): ?string {
+                return PasakSetting::getServerTimezone();
+            });
+            if (! empty($dbTz) && in_array($dbTz, DateTimeZone::listIdentifiers(), true)) {
+                return (string) $dbTz;
+            }
+        } catch (Throwable) {
+        }
+
         $custom = config('pasak.dashboard.timezone') ?: config('app.timezone');
         if (! empty($custom) && in_array($custom, DateTimeZone::listIdentifiers(), true)) {
             return (string) $custom;
@@ -141,6 +153,14 @@ class PasakDashboardView
         }
 
         return ! empty($appTz) ? (string) $appTz : 'UTC';
+    }
+
+    /**
+     * Dapatkan objek Carbon saat ini dalam zona waktu server yang dikonfigurasi.
+     */
+    public static function now(): Carbon
+    {
+        return Carbon::now(static::timezone());
     }
 
     /**

@@ -235,6 +235,7 @@ class PasakUpgradeCommand extends Command
                     File::copy($stubDir.'/pasak-api.php.stub', base_path('routes/pasak-api.php'));
                 }
             }
+            $this->ensureMissingRoutesInHostFiles();
             $this->info(
                 '  ✓ Berkas routes/pasak.php dan routes/pasak-api.php telah disinkronkan ke versi terbaru.',
             );
@@ -283,6 +284,10 @@ class PasakUpgradeCommand extends Command
             $this->warnIfViewsOutdated(
                 resource_path('views/pages/pasak/settings.blade.php'),
                 'auto_block_level_thresholds',
+            );
+            $this->warnIfViewsOutdated(
+                resource_path('views/pages/pasak/server.blade.php'),
+                'serverLocationForm',
             );
         }
 
@@ -373,6 +378,41 @@ class PasakUpgradeCommand extends Command
      * agar instalasi lama otomatis menyesuaikan: isi kustom user dipertahankan,
      * hanya nama berkas/direktori yang dipindahkan bila target baru belum ada.
      */
+    /**
+     * Pastikan rute-rute baru (seperti lokasi & waktu server) disematkan ke
+     * berkas rute lokal host jika pengguna belum menggunakan flag --sync-routes.
+     */
+    protected function ensureMissingRoutesInHostFiles(): void
+    {
+        $webRoutePath = base_path('routes/pasak.php');
+        if (File::exists($webRoutePath)) {
+            $content = File::get($webRoutePath);
+            if (! str_contains($content, "'server.location'")) {
+                $search = "Route::post('server/suspicious-files/unverify', [PasakServerController::class, 'unverifySuspiciousFile'])->name('server.suspicious-files.unverify');";
+                if (str_contains($content, $search)) {
+                    $insert = $search."\n    Route::post('server', [PasakServerController::class, 'updateLocation']);\n    Route::post('server/location', [PasakServerController::class, 'updateLocation'])->name('server.location');";
+                    $content = str_replace($search, $insert, $content);
+                    File::put($webRoutePath, $content);
+                    $this->info('  ✓ Rute server/location berhasil disematkan ke routes/pasak.php.');
+                }
+            }
+        }
+
+        $apiRoutePath = base_path('routes/pasak-api.php');
+        if (File::exists($apiRoutePath)) {
+            $content = File::get($apiRoutePath);
+            if (! str_contains($content, "'server.location'")) {
+                $search = "Route::post('server/suspicious-files/unverify', [PasakServerSecurityApiController::class, 'unverifySuspiciousFile'])->name('server.suspicious-files.unverify');";
+                if (str_contains($content, $search)) {
+                    $insert = $search."\n        Route::get('server/location', [PasakServerSecurityApiController::class, 'getLocation'])->name('server.location.get');\n        Route::post('server/location', [PasakServerSecurityApiController::class, 'updateLocation'])->name('server.location');";
+                    $content = str_replace($search, $insert, $content);
+                    File::put($apiRoutePath, $content);
+                    $this->info('  ✓ Rute server/location berhasil disematkan ke routes/pasak-api.php.');
+                }
+            }
+        }
+    }
+
     protected function migrateLegacyHostFiles(): void
     {
         // Berkas rute era lama -> nama baru (beserta require di web.php/api.php).

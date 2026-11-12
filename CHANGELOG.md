@@ -2,6 +2,23 @@
 
 All notable changes to `robyajo/pasak` will be documented in this file.
 
+## [1.7.15] - 2026-11-12
+
+### Added
+
+- **Konfigurasi Lokasi Fisik GPS & Target Radar Live Threat Map** (`src/Models/PasakSetting.php`, `src/Http/Controllers/Dashboard/PasakServerController.php`, `src/Http/Controllers/Dashboard/PasakThreatMapController.php`, `stubs/blade/pages/pasak/server.blade.php`, `stubs/blade/pages/pasak/threat-map.blade.php`):
+  - Memungkinkan administrator mengonfigurasi label lokasi, latitude, dan longitude fisik server secara langsung dari panel Server Audit.
+  - Target node Live Threat Map secara otomatis mengarahkan radar fokus ke titik koordinat GPS server yang dikonfigurasi.
+  - Menyediakan fitur deteksi otomatis koordinat GPS melalui peramban serta tombol reset kembali ke deteksi otomatis bawaan.
+- **Standardisasi Zona Waktu Server Terpadu (Unified Timezone Engine)** (`src/Models/PasakSetting.php`, `src/Support/PasakDashboardView.php`, `src/Services/PasakServerSecurityService.php`):
+  - Menghadirkan pengaturan zona waktu operasional resmi server (WIB, WITA, WIT, zona waktu global populer, atau deteksi peramban otomatis) yang disimpan secara persisten di tabel `pasak_settings`.
+  - `PasakDashboardView::timezone()` dan `PasakDashboardView::now()` menjadikan zona waktu server yang dikonfigurasi sebagai acuan waktu tunggal untuk seluruh pencatatan log insiden, laporan audit berkas, jam server di header dasbor, dan stempel waktu telemetri.
+- **Ketahanan Pembaruan Sistem & Rute Cadangan Otomatis (Zero-Friction Updates & Auto-Fallback)** (`src/PasakServiceProvider.php`, `src/Console/Commands/PasakUpgradeCommand.php`, `routes/pasak-dashboard-blade.php`, `stubs/routes/pasak.php.stub`, `stubs/routes/pasak-api.php.stub`):
+  - `PasakServiceProvider::ensureEssentialDashboardRoutes()` dan `ensureEssentialApiRoutes()` menjamin rute-rute baru (seperti konfigurasi lokasi server) tetap langsung aktif di memori meskipun aplikasi host menggunakan berkas rute lokal dari versi lama.
+  - Menambahkan dukungan penanganan method `POST /server` sebagai fallback dinamis guna mengeliminasi galat `MethodNotAllowedHttpException` saat menyimpan konfigurasi.
+  - `PasakUpgradeCommand` secara cerdas menyematkan rute baru yang hilang ke berkas rute host dengan pencadangan otomatis bertanggal (`.backup-*`).
+  - Menambahkan deteksi berkas tampilan lama `server.blade.php` yang belum memuat form konfigurasi lokasi dan memberikan panduan `--sync-views`.
+
 ## [1.7.14] - 2026-11-12
 
 ### Fixed & Maintenance

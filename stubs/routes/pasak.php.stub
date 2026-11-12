@@ -99,12 +99,14 @@ $registerPasakDashboard = function () {
     Route::patch('allowed-ips/{id}/toggle', [PasakAllowedIpController::class, 'toggle'])->whereNumber('id')->name('allowed-ips.toggle');
     Route::delete('allowed-ips/{id}', [PasakAllowedIpController::class, 'destroy'])->whereNumber('id')->name('allowed-ips.destroy');
     Route::get('server', [PasakServerController::class, 'index'])->name('server');
+    Route::post('server', [PasakServerController::class, 'updateLocation']);
     Route::post('server/baseline', [PasakServerController::class, 'createBaseline'])->name('server.baseline');
     Route::delete('server/baseline', [PasakServerController::class, 'deleteBaseline'])->name('server.baseline.destroy');
     Route::delete('server/suspicious-files', [PasakServerController::class, 'deleteSuspiciousFile'])->name('server.suspicious-files.destroy');
     Route::get('server/suspicious-files/download', [PasakServerController::class, 'downloadSuspiciousFile'])->name('server.suspicious-files.download');
     Route::post('server/suspicious-files/verify', [PasakServerController::class, 'verifySuspiciousFile'])->name('server.suspicious-files.verify');
     Route::post('server/suspicious-files/unverify', [PasakServerController::class, 'unverifySuspiciousFile'])->name('server.suspicious-files.unverify');
+    Route::post('server/location', [PasakServerController::class, 'updateLocation'])->name('server.location');
     Route::post('optimize-clear', [PasakServerController::class, 'optimizeClear'])->name('optimize-clear');
     Route::delete('lockouts/{id}', [PasakServerController::class, 'releaseLockout'])->whereNumber('id')->name('lockouts.destroy');
     Route::get('sessions', [PasakSessionController::class, 'index'])->name('sessions');

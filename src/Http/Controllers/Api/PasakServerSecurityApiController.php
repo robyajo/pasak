@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Artisan;
 use Internal\Pasak\Models\PasakLoginAttempt;
+use Internal\Pasak\Models\PasakSetting;
 use Internal\Pasak\Services\PasakLoginThrottleService;
 use Internal\Pasak\Services\PasakServerSecurityService;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
@@ -140,6 +141,59 @@ class PasakServerSecurityApiController extends Controller
     }
 
     /**
+     * Dapatkan konfigurasi lokasi fisik server & Live Threat Map.
+     */
+    public function getLocation(): JsonResponse
+    {
+        return response()->json([
+            'success' => true,
+            'data' => PasakSetting::getServerLocation(),
+        ]);
+    }
+
+    /**
+     * Simpan pembaruan lokasi fisik server & koordinat Live Threat Map.
+     */
+    public function updateLocation(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'server_location_name' => ['nullable', 'string', 'max:255'],
+            'server_latitude' => ['nullable', 'numeric', 'between:-90,90'],
+            'server_longitude' => ['nullable', 'numeric', 'between:-180,180'],
+            'server_timezone' => ['nullable', 'string', 'max:64'],
+        ]);
+
+        $tz = $validated['server_timezone'] ?? null;
+        if ($tz !== null && $tz !== '' && ! in_array($tz, \DateTimeZone::listIdentifiers(), true)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Identifier zona waktu tidak valid.',
+            ], 422);
+        }
+
+        PasakSetting::setServerLocation(
+            $validated['server_location_name'] ?? null,
+            isset($validated['server_latitude']) &&
+            $validated['server_latitude'] !== '' &&
+            $validated['server_latitude'] !== null
+                ? (float) $validated['server_latitude']
+                : null,
+            isset($validated['server_longitude']) &&
+            $validated['server_longitude'] !== '' &&
+            $validated['server_longitude'] !== null
+                ? (float) $validated['server_longitude']
+                : null,
+            $tz !== '' ? $tz : null,
+        );
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Lokasi server berhasil diperbarui.',
+            'data' => PasakSetting::getServerLocation(),
+        ]);
+    }
+
+    /**
      * Bersihkan seluruh cache sistem dan optimasi Laravel (optimize:clear).
      */
     public function optimizeClear(Request $request): JsonResponse
@@ -153,7 +207,9 @@ class PasakServerSecurityApiController extends Controller
 
         return response()->json([
             'ok' => true,
-            'message' => __('Cache aplikasi, tampilan (views), routes, dan konfigurasi berhasil dibersihkan.'),
+            'message' => __(
+                'Cache aplikasi, tampilan (views), routes, dan konfigurasi berhasil dibersihkan.',
+            ),
             'output' => $output,
         ]);
     }

@@ -55,7 +55,10 @@ foreach ($configuredMiddleware as $m) {
     }
 }
 
-if ($authEnabled && ! in_array(PasakDashboardAuthenticate::class, $middleware, true)) {
+if (
+    $authEnabled &&
+    ! in_array(PasakDashboardAuthenticate::class, $middleware, true)
+) {
     $middleware[] = PasakDashboardAuthenticate::class;
 }
 
@@ -70,14 +73,20 @@ $rotating = (bool) config('pasak.dashboard.rotating', false);
 Route::middleware(['web'])
     ->prefix($prefix)
     ->group(function () {
-        Route::get('login', [PasakAuthController::class, 'showLoginForm'])
-            ->name('pasak.dashboard.login');
-        Route::post('login', [PasakAuthController::class, 'login'])
-            ->name('pasak.dashboard.login.submit');
-        Route::post('logout', [PasakAuthController::class, 'logout'])
-            ->name('pasak.dashboard.logout');
-        Route::post('password', [PasakAuthController::class, 'updatePassword'])
-            ->name('pasak.dashboard.password.update');
+        Route::get('login', [
+            PasakAuthController::class,
+            'showLoginForm',
+        ])->name('pasak.dashboard.login');
+        Route::post('login', [PasakAuthController::class, 'login'])->name(
+            'pasak.dashboard.login.submit',
+        );
+        Route::post('logout', [PasakAuthController::class, 'logout'])->name(
+            'pasak.dashboard.logout',
+        );
+        Route::post('password', [
+            PasakAuthController::class,
+            'updatePassword',
+        ])->name('pasak.dashboard.password.update');
     });
 
 $registerPasakDashboard = function () {
@@ -124,9 +133,10 @@ $registerPasakDashboard = function () {
     Route::get('allowed-ips', [PasakAllowedIpController::class, 'index'])->name(
         'allowed-ips',
     );
-    Route::post('allowed-ips', [PasakAllowedIpController::class, 'store'])->name(
-        'allowed-ips.store',
-    );
+    Route::post('allowed-ips', [
+        PasakAllowedIpController::class,
+        'store',
+    ])->name('allowed-ips.store');
     Route::patch('allowed-ips/{id}/toggle', [
         PasakAllowedIpController::class,
         'toggle',
@@ -142,6 +152,10 @@ $registerPasakDashboard = function () {
     Route::get('server', [PasakServerController::class, 'index'])->name(
         'server',
     );
+    Route::post('server', [
+        PasakServerController::class,
+        'updateLocation',
+    ]);
     Route::post('server/baseline', [
         PasakServerController::class,
         'createBaseline',
@@ -166,6 +180,10 @@ $registerPasakDashboard = function () {
         PasakServerController::class,
         'unverifySuspiciousFile',
     ])->name('server.suspicious-files.unverify');
+    Route::post('server/location', [
+        PasakServerController::class,
+        'updateLocation',
+    ])->name('server.location');
     Route::post('optimize-clear', [
         PasakServerController::class,
         'optimizeClear',

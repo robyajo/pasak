@@ -19,10 +19,11 @@ abstract class TestCase extends OrchestraTestCase
         // pasak:install publishes config/pasak.php into the Testbench skeleton.
         // Left behind, that copy shadows the package config in every later
         // test (and later runs), so edits to config/pasak.php are ignored.
-        $publishedConfig = dirname(__DIR__).'/vendor/orchestra/testbench-core/laravel/config/pasak.php';
-
-        if (is_file($publishedConfig)) {
-            unlink($publishedConfig);
+        foreach (['config/pasak.php', 'routes/pasak.php', 'routes/pasak-api.php'] as $rel) {
+            $p = dirname(__DIR__).'/vendor/orchestra/testbench-core/laravel/'.$rel;
+            if (is_file($p)) {
+                unlink($p);
+            }
         }
 
         parent::setUp();

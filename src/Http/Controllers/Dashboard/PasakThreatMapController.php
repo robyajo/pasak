@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Internal\Pasak\Models\PasakBlockedIp;
 use Internal\Pasak\Models\PasakLog;
+use Internal\Pasak\Models\PasakSetting;
 use Internal\Pasak\Services\PasakService;
 use Internal\Pasak\Services\PasakUserLoginService;
 
@@ -36,8 +37,8 @@ class PasakThreatMapController extends Controller
         // Ambil IP penyerang terbanyak dalam rentang waktu window_hours
         $topRows = PasakLog::query()
             ->selectRaw(
-                'ip_address, COUNT(*) as hits, MAX(created_at) as last_seen, '
-                ."MAX(case threat_level when 'critical' then 4 when 'high' then 3 when 'medium' then 2 else 1 end) as weight"
+                'ip_address, COUNT(*) as hits, MAX(created_at) as last_seen, '.
+                    "MAX(case threat_level when 'critical' then 4 when 'high' then 3 when 'medium' then 2 else 1 end) as weight",
             )
             ->where('created_at', '>=', $start)
             ->groupBy('ip_address')
@@ -45,31 +46,44 @@ class PasakThreatMapController extends Controller
             ->limit($this->maxOrigins())
             ->get();
 
-        // Jika jumlah origin dalam rentang window kurang dari maxOrigins, lengkapi dengan riwayat log sebelumnya
-        // agar seluruh data serangan riil yang ada di Security Logs (logs.blade.php) tetap tampil di peta
-        if ($topRows->count() < $this->maxOrigins()) {
-            $existingIps = $topRows->pluck('ip_address')->all();
-            $fallbackRows = PasakLog::query()
-                ->selectRaw(
-                    'ip_address, COUNT(*) as hits, MAX(created_at) as last_seen, '
-                    ."MAX(case threat_level when 'critical' then 4 when 'high' then 3 when 'medium' then 2 else 1 end) as weight"
-                )
-                ->when(! empty($existingIps), fn ($q) => $q->whereNotIn('ip_address', $existingIps))
-                ->groupBy('ip_address')
-                ->orderByDesc('hits')
-                ->limit($this->maxOrigins() - $topRows->count())
-                ->get();
+        $origins = [];
+        foreach ($topRows as $row) {
+            $ip = (string) $row->ip_address;
+            $geo = $this->locationFor($ip);
 
-            $topRows = $topRows->concat($fallbackRows);
+            $origins[] = [
+                'ip' => $ip,
+                'hits' => (int) $row->hits,
+                'weight' => (int) $row->weight,
+                'last_seen' => $row->last_seen
+                    ? (string) $row->last_seen
+                    : null,
+                'lat' => $geo['latitude'],
+                'lon' => $geo['longitude'],
+                'place' => $geo['city'],
+                'country' => $geo['country'],
+            ];
         }
 
+        // Ambil 25 log keamanan terbaru untuk feed live radar
+        $recentLogs = PasakLog::query()
+            ->where('created_at', '>=', $start)
+            ->orderByDesc('id')
+            ->limit(25)
+            ->get();
+
+        // Cari tahu apakah IP penyerang pada recent_logs sedang dalam status aktif terblokir
         $activeBlocked = [];
         try {
-            $originIps = $topRows->pluck('ip_address')->unique()->filter()->all();
-            if (! empty($originIps)) {
+            $recentIps = $recentLogs
+                ->pluck('ip_address')
+                ->unique()
+                ->filter()
+                ->all();
+            if (! empty($recentIps)) {
                 $activeBlocked = PasakBlockedIp::query()
                     ->active()
-                    ->whereIn('ip_address', $originIps)
+                    ->whereIn('ip_address', $recentIps)
                     ->pluck('ip_address')
                     ->flip()
                     ->all();
@@ -77,41 +91,13 @@ class PasakThreatMapController extends Controller
         } catch (\Throwable) {
         }
 
-        $origins = $topRows
-            ->map(function ($row) use ($activeBlocked): array {
-                $geo = $this->locationFor((string) $row->ip_address);
-                $sample = PasakLog::query()
-                    ->where('ip_address', $row->ip_address)
-                    ->orderByDesc('id')
-                    ->limit(10)
-                    ->get();
-
-                return [
-                    'ip' => (string) $row->ip_address,
-                    'lat' => $geo['latitude'],
-                    'lon' => $geo['longitude'],
-                    'place' => $geo['city'],
-                    'country' => $geo['country'],
-                    'hits' => (int) $row->hits,
-                    'weight' => (int) $row->weight,
-                    'last_seen' => (string) $row->last_seen,
-                    'samples' => $sample
-                        ->map(fn (PasakLog $log): array => $this->logToArray($log, true, $activeBlocked))
-                        ->values()
-                        ->all(),
-                ];
-            })
-            ->values()
-            ->all();
-
-        // Ambil riwayat log terbaru (persis sama dengan entri pada halaman Security Logs)
-        $recentLogs = PasakLog::query()
-            ->latest('id')
-            ->limit(50)
-            ->get();
-
-        $recentLogIps = $recentLogs->pluck('ip_address')->unique()->filter()->all();
+        // Kumpulkan koordinat geografis untuk setiap IP penyerang di recent_logs
         $recentLocations = [];
+        $recentLogIps = $recentLogs
+            ->pluck('ip_address')
+            ->unique()
+            ->filter()
+            ->all();
         foreach ($recentLogIps as $rIp) {
             $rGeo = $this->locationFor((string) $rIp);
             $recentLocations[$rIp] = [
@@ -130,7 +116,13 @@ class PasakThreatMapController extends Controller
                 'enforcement' => $security->enforcementEnabled(),
                 'origins' => $origins,
                 'recent_logs' => $recentLogs
-                    ->map(fn (PasakLog $log): array => $this->logToArray($log, true, $activeBlocked))
+                    ->map(
+                        fn (PasakLog $log): array => $this->logToArray(
+                            $log,
+                            true,
+                            $activeBlocked,
+                        ),
+                    )
                     ->values()
                     ->all(),
                 'locations' => $recentLocations,
@@ -144,8 +136,7 @@ class PasakThreatMapController extends Controller
     {
         $after = (int) $request->query('after', 0);
 
-        $query = PasakLog::query()
-            ->orderByDesc('id');
+        $query = PasakLog::query()->orderByDesc('id');
 
         if ($after > 0) {
             $query->where('id', '>', $after);
@@ -187,15 +178,25 @@ class PasakThreatMapController extends Controller
             'stats' => $security->stats(),
             'locations' => $locations,
             'logs' => $logs
-                ->map(fn (PasakLog $log): array => $this->logToArray($log, true, $activeBlocked))
+                ->map(
+                    fn (PasakLog $log): array => $this->logToArray(
+                        $log,
+                        true,
+                        $activeBlocked,
+                    ),
+                )
                 ->values()
                 ->all(),
         ]);
     }
 
-    protected function logToArray(PasakLog $log, bool $withTime = false, array $activeBlocked = []): array
-    {
-        $isBlocked = (bool) $log->was_blocked || isset($activeBlocked[$log->ip_address]);
+    protected function logToArray(
+        PasakLog $log,
+        bool $withTime = false,
+        array $activeBlocked = [],
+    ): array {
+        $isBlocked =
+            (bool) $log->was_blocked || isset($activeBlocked[$log->ip_address]);
 
         return [
             'id' => $log->id,
@@ -206,9 +207,7 @@ class PasakThreatMapController extends Controller
             'method' => $log->method ? (string) $log->method : null,
             'path' => mb_substr((string) $log->path, 0, 140),
             'blocked' => $isBlocked,
-            'time' => $withTime
-                ? $log->created_at?->toIso8601String()
-                : null,
+            'time' => $withTime ? $log->created_at?->toIso8601String() : null,
         ];
     }
 
@@ -217,7 +216,25 @@ class PasakThreatMapController extends Controller
      */
     protected function target(): array
     {
-        $manualName = config('pasak.dashboard.threat_map.target_name');
+        $dbLoc = PasakSetting::getServerLocation();
+        $dbName = $dbLoc['name'];
+        $dbLat = $dbLoc['latitude'];
+        $dbLon = $dbLoc['longitude'];
+
+        if ($dbLat !== null && $dbLon !== null) {
+            return [
+                'name' => ! empty($dbName)
+                    ? $dbName
+                    : (config('pasak.dashboard.threat_map.target_name') ?:
+                    'Server Node'),
+                'lat' => $dbLat,
+                'lon' => $dbLon,
+            ];
+        }
+
+        $manualName = ! empty($dbName)
+            ? $dbName
+            : config('pasak.dashboard.threat_map.target_name');
         $manualLat = config('pasak.dashboard.threat_map.target_lat');
         $manualLon = config('pasak.dashboard.threat_map.target_lon');
 
@@ -247,7 +264,9 @@ class PasakThreatMapController extends Controller
         }
 
         return [
-            'name' => ! empty($manualName) ? (string) $manualName : 'Pekanbaru, Riau (ID)',
+            'name' => ! empty($manualName)
+                ? (string) $manualName
+                : 'Pekanbaru, Riau (ID)',
             'lat' => $manualLat !== null ? (float) $manualLat : 0.5071,
             'lon' => $manualLon !== null ? (float) $manualLon : 101.4478,
         ];
@@ -261,39 +280,53 @@ class PasakThreatMapController extends Controller
      */
     protected function autoDetectServerTarget(): ?array
     {
-        return Cache::remember('pasak:threat_map_server_target', now()->addDays(7), function (): ?array {
-            try {
-                $response = Http::timeout(3)->get(
-                    'http://ip-api.com/json?fields=status,message,country,countryCode,regionName,city,lat,lon'
-                );
+        return Cache::remember(
+            'pasak:threat_map_server_target',
+            now()->addDays(7),
+            function (): ?array {
+                try {
+                    $response = Http::timeout(3)->get(
+                        'http://ip-api.com/json?fields=status,message,country,countryCode,regionName,city,lat,lon',
+                    );
 
-                if ($response->successful() && $response->json('status') === 'success') {
-                    $data = $response->json();
-                    $lat = isset($data['lat']) ? (float) $data['lat'] : null;
-                    $lon = isset($data['lon']) ? (float) $data['lon'] : null;
+                    if (
+                        $response->successful() &&
+                        $response->json('status') === 'success'
+                    ) {
+                        $data = $response->json();
+                        $lat = isset($data['lat'])
+                            ? (float) $data['lat']
+                            : null;
+                        $lon = isset($data['lon'])
+                            ? (float) $data['lon']
+                            : null;
 
-                    if ($lat !== null && $lon !== null) {
-                        $city = $data['city'] ?? $data['regionName'] ?? 'Server Node';
-                        $region = $data['regionName'] ?? '';
-                        $countryCode = $data['countryCode'] ?? 'ID';
+                        if ($lat !== null && $lon !== null) {
+                            $city =
+                                $data['city'] ??
+                                ($data['regionName'] ?? 'Server Node');
+                            $region = $data['regionName'] ?? '';
+                            $countryCode = $data['countryCode'] ?? 'ID';
 
-                        $labelParts = array_filter([$city, $region]);
-                        $name = ! empty($labelParts)
-                            ? implode(', ', array_unique($labelParts))." ({$countryCode})"
-                            : "Server Node ({$countryCode})";
+                            $labelParts = array_filter([$city, $region]);
+                            $name = ! empty($labelParts)
+                                ? implode(', ', array_unique($labelParts)).
+                                    " ({$countryCode})"
+                                : "Server Node ({$countryCode})";
 
-                        return [
-                            'name' => $name,
-                            'lat' => $lat,
-                            'lon' => $lon,
-                        ];
+                            return [
+                                'name' => $name,
+                                'lat' => $lat,
+                                'lon' => $lon,
+                            ];
+                        }
                     }
+                } catch (\Throwable) {
                 }
-            } catch (\Throwable) {
-            }
 
-            return null;
-        });
+                return null;
+            },
+        );
     }
 
     /**
@@ -313,16 +346,25 @@ class PasakThreatMapController extends Controller
 
     protected function windowHours(): int
     {
-        return max(1, (int) config('pasak.dashboard.threat_map.window_hours', 24));
+        return max(
+            1,
+            (int) config('pasak.dashboard.threat_map.window_hours', 24),
+        );
     }
 
     protected function maxOrigins(): int
     {
-        return max(1, (int) config('pasak.dashboard.threat_map.max_origins', 10));
+        return max(
+            1,
+            (int) config('pasak.dashboard.threat_map.max_origins', 10),
+        );
     }
 
     protected function refreshSeconds(): int
     {
-        return max(3, (int) config('pasak.dashboard.threat_map.refresh_seconds', 8));
+        return max(
+            3,
+            (int) config('pasak.dashboard.threat_map.refresh_seconds', 8),
+        );
     }
 }

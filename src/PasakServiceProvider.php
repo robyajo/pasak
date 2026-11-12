@@ -27,7 +27,10 @@ use Internal\Pasak\Console\Commands\PasakSentinelCommand;
 use Internal\Pasak\Console\Commands\PasakUnblockIpCommand;
 use Internal\Pasak\Console\Commands\PasakUninstallCommand;
 use Internal\Pasak\Console\Commands\PasakUpgradeCommand;
+use Internal\Pasak\Http\Controllers\Api\PasakServerSecurityApiController;
+use Internal\Pasak\Http\Controllers\Dashboard\PasakServerController;
 use Internal\Pasak\Http\Middleware\PasakBlockIpAddress;
+use Internal\Pasak\Http\Middleware\PasakDashboardAuthenticate;
 use Internal\Pasak\Http\Middleware\PasakDetectSecurityThreats;
 use Internal\Pasak\Http\Middleware\PasakEnsureSecurityAdmin;
 use Internal\Pasak\Http\Middleware\PasakInjectAnnouncementBanner;
@@ -357,6 +360,8 @@ class PasakServiceProvider extends ServiceProvider
 
         // Jika rute sudah didaftarkan (misalnya oleh routes/api.php di host), hindari duplikasi
         if (Route::has('pasak.logs.index')) {
+            $this->ensureEssentialApiRoutes();
+
             return;
         }
 
@@ -364,6 +369,7 @@ class PasakServiceProvider extends ServiceProvider
         $hostRouteFile = base_path('routes/pasak-api.php');
         if (file_exists($hostRouteFile)) {
             $this->loadRoutesFrom($hostRouteFile);
+            $this->ensureEssentialApiRoutes();
 
             return;
         }
@@ -387,6 +393,8 @@ class PasakServiceProvider extends ServiceProvider
 
         // Jika rute dashboard sudah didaftarkan (misalnya oleh routes/web.php di host), hindari duplikasi
         if (Route::has('pasak.dashboard.overview')) {
+            $this->ensureEssentialDashboardRoutes();
+
             return;
         }
 
@@ -394,6 +402,7 @@ class PasakServiceProvider extends ServiceProvider
         $hostDashboardFile = base_path('routes/pasak.php');
         if (file_exists($hostDashboardFile)) {
             $this->loadRoutesFrom($hostDashboardFile);
+            $this->ensureEssentialDashboardRoutes();
 
             return;
         }
@@ -407,6 +416,107 @@ class PasakServiceProvider extends ServiceProvider
     protected function registerBladeDashboardRoutes(): void
     {
         $this->loadRoutesFrom(__DIR__.'/../routes/pasak-dashboard-blade.php');
+    }
+
+    /**
+     * Pastikan rute esensial API baru (seperti lokasi server) tetap terdaftar
+     * meskipun host menggunakan berkas routes/pasak-api.php dari versi lama.
+     */
+    protected function ensureEssentialApiRoutes(): void
+    {
+        if (Route::has('pasak.server.location')) {
+            return;
+        }
+
+        $prefix = config('pasak.routes.prefix', 'api/pasak');
+        $middleware = config('pasak.routes.middleware', ['api']);
+
+        Route::prefix($prefix)
+            ->middleware($middleware)
+            ->name('pasak.')
+            ->group(function () {
+                Route::get('server/location', [
+                    PasakServerSecurityApiController::class,
+                    'getLocation',
+                ])->name('server.location.get');
+                Route::post('server/location', [
+                    PasakServerSecurityApiController::class,
+                    'updateLocation',
+                ])->name('server.location');
+            });
+    }
+
+    /**
+     * Pastikan rute esensial dashboard baru (seperti konfigurasi lokasi & waktu server)
+     * tetap terdaftar meskipun host menggunakan berkas routes/pasak.php dari versi lama.
+     */
+    protected function ensureEssentialDashboardRoutes(): void
+    {
+        if (Route::has('pasak.dashboard.server.location')) {
+            return;
+        }
+
+        $prefix = trim((string) config('pasak.dashboard.prefix', 'pasak'), '/');
+        if ($prefix === '') {
+            $prefix = 'pasak';
+        }
+
+        $configuredMiddleware = array_filter(
+            (array) config('pasak.dashboard.middleware', ['web', 'auth']),
+        );
+        $authEnabled = (bool) config('pasak.dashboard.auth.enabled', true);
+
+        $middleware = [];
+        foreach ($configuredMiddleware as $m) {
+            if ($m === 'auth' && $authEnabled) {
+                $middleware[] = PasakDashboardAuthenticate::class;
+            } else {
+                $middleware[] = $m;
+            }
+        }
+
+        if (
+            $authEnabled &&
+            ! in_array(PasakDashboardAuthenticate::class, $middleware, true)
+        ) {
+            $middleware[] = PasakDashboardAuthenticate::class;
+        }
+
+        $middleware = array_values(array_unique(array_filter($middleware)));
+        $adminMiddleware = array_filter(
+            (array) config('pasak.dashboard.admin_middleware', []),
+        );
+        $rotating = (bool) config('pasak.dashboard.rotating', false);
+
+        $registerRoutes = function () {
+            Route::post('server', [
+                PasakServerController::class,
+                'updateLocation',
+            ]);
+            Route::post('server/location', [
+                PasakServerController::class,
+                'updateLocation',
+            ])->name('server.location');
+        };
+
+        if ($rotating) {
+            Route::middleware(
+                array_merge($middleware, $adminMiddleware, [
+                    PasakRotatingDashboard::class,
+                ]),
+            )
+                ->prefix('{pasakSlug}')
+                ->where([
+                    'pasakSlug' => preg_quote($prefix, '/').'-[A-Za-z0-9]{12,32}',
+                ])
+                ->name('pasak.dashboard.')
+                ->group($registerRoutes);
+        } else {
+            Route::middleware(array_merge($middleware, $adminMiddleware))
+                ->prefix($prefix)
+                ->name('pasak.dashboard.')
+                ->group($registerRoutes);
+        }
     }
 
     /**

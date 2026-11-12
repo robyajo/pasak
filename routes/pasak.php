@@ -131,6 +131,14 @@ Route::prefix($prefix)
                 PasakServerSecurityApiController::class,
                 'verifySuspiciousFile',
             ])->name('server.suspicious-files.verify');
+            Route::get('server/location', [
+                PasakServerSecurityApiController::class,
+                'getLocation',
+            ])->name('server.location.get');
+            Route::post('server/location', [
+                PasakServerSecurityApiController::class,
+                'updateLocation',
+            ])->name('server.location');
             Route::post('server/optimize-clear', [
                 PasakServerSecurityApiController::class,
                 'optimizeClear',

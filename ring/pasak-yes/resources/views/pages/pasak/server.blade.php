@@ -5,8 +5,8 @@
 @section('content')
 @php
     $DV = \Internal\Pasak\Support\DashboardView::class;
+    $summary = $report['summary'] ?? [];
 @endphp
-@php($summary = $report['summary'] ?? [])
 
 <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-bottom: 20px; flex-wrap: wrap;">
     <div class="sec-grid-4" style="flex: 1; margin-bottom: 0;">
@@ -75,11 +75,13 @@
             </div>
         </div>
 
-        @php($integrityIssues = array_slice(array_merge(
-            array_map(fn ($f) => ['type' => 'modified', 'file' => $f], $integrity['modified'] ?? []),
-            array_map(fn ($f) => ['type' => 'missing', 'file' => $f], $integrity['missing'] ?? []),
-            array_map(fn ($f) => ['type' => 'added', 'file' => $f], $integrity['added'] ?? []),
-        ), 0, 8))
+        @php
+            $integrityIssues = array_slice(array_merge(
+                array_map(fn ($f) => ['type' => 'modified', 'file' => $f], $integrity['modified'] ?? []),
+                array_map(fn ($f) => ['type' => 'missing', 'file' => $f], $integrity['missing'] ?? []),
+                array_map(fn ($f) => ['type' => 'added', 'file' => $f], $integrity['added'] ?? []),
+            ), 0, 8);
+        @endphp
 
         @if (! empty($integrityIssues))
             <div style="display: flex; flex-direction: column; gap: 6px;">
@@ -105,6 +107,181 @@
         </div>
     </div>
 </div>
+
+{{-- Pengaturan Lokasi Fisik & Zona Waktu Server (Live Threat Map & System Clock) --}}
+@php
+    $effectiveTz = $serverLocation['effective_timezone'] ?? ($serverLocation['timezone'] ?? \Internal\Pasak\Support\DashboardView::timezone());
+    $customTz = $serverLocation['timezone'] ?? null;
+    $indonesianTzs = [
+        'Asia/Jakarta' => 'Asia/Jakarta (WIB — UTC+07:00: Jakarta, Sumatra, Jawa)',
+        'Asia/Pontianak' => 'Asia/Pontianak (WIB — UTC+07:00: Kalimantan Barat)',
+        'Asia/Makassar' => 'Asia/Makassar (WITA — UTC+08:00: Makassar, Bali, NTB, NTT, Kalsel, Kaltim)',
+        'Asia/Jayapura' => 'Asia/Jayapura (WIT — UTC+09:00: Maluku, Papua)',
+    ];
+    $globalTzs = [
+        'UTC' => 'UTC (Universal Coordinated Time — UTC+00:00)',
+        'Asia/Singapore' => 'Asia/Singapore (SGT — UTC+08:00: Singapura, Malaysia)',
+        'Asia/Bangkok' => 'Asia/Bangkok (ICT — UTC+07:00: Bangkok, Hanoi)',
+        'Asia/Tokyo' => 'Asia/Tokyo (JST — UTC+09:00: Tokyo)',
+        'Asia/Seoul' => 'Asia/Seoul (KST — UTC+09:00: Seoul)',
+        'Asia/Hong_Kong' => 'Asia/Hong_Kong (HKT — UTC+08:00: Hong Kong)',
+        'Asia/Dubai' => 'Asia/Dubai (GST — UTC+04:00: Dubai)',
+        'Europe/London' => 'Europe/London (GMT/BST — UTC+00:00 / +01:00: London)',
+        'Europe/Amsterdam' => 'Europe/Amsterdam (CET/CEST — UTC+01:00 / +02:00: Amsterdam, Berlin, Paris)',
+        'America/New_York' => 'America/New_York (EST/EDT — UTC-05:00 / -04:00: New York)',
+        'America/Chicago' => 'America/Chicago (CST/CDT — UTC-06:00 / -05:00: Chicago)',
+        'America/Los_Angeles' => 'America/Los_Angeles (PST/PDT — UTC-08:00 / -07:00: Los Angeles)',
+        'Australia/Sydney' => 'Australia/Sydney (AEST/AEDT — UTC+10:00 / +11:00: Sydney)',
+    ];
+    $allTzs = \DateTimeZone::listIdentifiers();
+@endphp
+<div class="sec-card" style="margin-bottom: 20px;">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-bottom: 16px; flex-wrap: wrap;">
+        <div>
+            <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                <h3 class="sec-card-title" style="margin: 0; font-size: 16px;">📍 {{ __('Lokasi & Waktu Operasional Server') }}</h3>
+                @if ($serverLocation['is_custom'] ?? false)
+                    <span class="sec-badge sec-badge-success" style="font-size: 11px;">{{ __('Kustom Aktif') }}</span>
+                @else
+                    <span class="sec-badge sec-badge-low" style="font-size: 11px;">{{ __('Deteksi Otomatis / Bawaan') }}</span>
+                @endif
+                <span class="sec-badge sec-badge-low sec-font-mono" style="font-size: 11px;">🕒 {{ $effectiveTz }}</span>
+            </div>
+            <p class="sec-card-subtitle" style="margin-top: 4px;">
+                {{ __('Konfigurasikan label lokasi, titik koordinat GPS (target radar Threat Map), serta zona waktu resmi server yang berlaku untuk seluruh log, audit, dan telemetri.') }}
+            </p>
+        </div>
+        <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+            @if (!empty($urls['threatMap']) && $urls['threatMap'] !== '#')
+                <a href="{{ $urls['threatMap'] }}" class="sec-btn sec-btn-secondary sec-btn-sm" style="display: inline-flex; align-items: center; gap: 5px; text-decoration: none;">
+                    <span>🗺️</span>
+                    <span>{{ __('Lihat Radar Threat Map') }}</span>
+                </a>
+            @endif
+        </div>
+    </div>
+
+    <form method="POST" action="{{ $urls['updateLocation'] ?? (Route::has('pasak.dashboard.server.location') ? route('pasak.dashboard.server.location') : (Route::has('pasak.dashboard.server') ? route('pasak.dashboard.server') : '#')) }}" id="serverLocationForm">
+        @csrf
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin-bottom: 16px;">
+            <div>
+                <label style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 6px; color: var(--sec-text-muted);">
+                    {{ __('Nama Lokasi / Label Node Server') }}
+                </label>
+                <input type="text"
+                    name="server_location_name"
+                    id="locNameInput"
+                    class="sec-input"
+                    style="width: 100%; box-sizing: border-box;"
+                    placeholder="contoh: Data Center Kominfo, Jakarta (ID)"
+                    value="{{ old('server_location_name', $serverLocation['name'] ?? '') }}"
+                    maxlength="255">
+                <span style="display: block; font-size: 11px; color: var(--sec-text-subtle); margin-top: 4px;">
+                    {{ __('Label node server yang muncul pada bar status atas Live Threat Map.') }}
+                </span>
+            </div>
+
+            <div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                    <label style="font-size: 12px; font-weight: 600; color: var(--sec-text-muted); margin: 0;">
+                        🕒 {{ __('Zona Waktu Server (Timezone)') }}
+                    </label>
+                    <span style="font-size: 11px; font-weight: 600; color: var(--sec-primary);" class="sec-font-mono" id="currentClockTicker">--:--:--</span>
+                </div>
+                <select name="server_timezone" id="locTimezoneSelect" class="sec-select sec-font-mono" style="width: 100%; box-sizing: border-box; font-size: 12.5px;">
+                    <option value="" @selected(empty($customTz))>-- {{ __('Bawaan Host / Auto-Detect (:tz)', ['tz' => config('app.timezone', 'UTC')]) }} --</option>
+                    <optgroup label="🇮🇩 Indonesia (WIB / WITA / WIT)">
+                        @foreach ($indonesianTzs as $tzKey => $tzLabel)
+                            <option value="{{ $tzKey }}" @selected(old('server_timezone', $customTz) === $tzKey)>{{ $tzLabel }}</option>
+                        @endforeach
+                    </optgroup>
+                    <optgroup label="🌐 Global Populer & UTC">
+                        @foreach ($globalTzs as $tzKey => $tzLabel)
+                            <option value="{{ $tzKey }}" @selected(old('server_timezone', $customTz) === $tzKey)>{{ $tzLabel }}</option>
+                        @endforeach
+                    </optgroup>
+                    <optgroup label="🌍 Semua Zona Waktu Lainnya">
+                        @foreach ($allTzs as $tzKey)
+                            @if (!isset($indonesianTzs[$tzKey]) && !isset($globalTzs[$tzKey]))
+                                <option value="{{ $tzKey }}" @selected(old('server_timezone', $customTz) === $tzKey)>{{ $tzKey }}</option>
+                            @endif
+                        @endforeach
+                    </optgroup>
+                </select>
+                <span style="display: block; font-size: 11px; color: var(--sec-text-subtle); margin-top: 4px;">
+                    {{ __('Waktu rujukan untuk seluruh tampilan tanggal, jam log, grafik, audit, dan radar.') }}
+                </span>
+            </div>
+
+            <div>
+                <label style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 6px; color: var(--sec-text-muted);">
+                    {{ __('Latitude (Lintang: -90 s/d 90)') }}
+                </label>
+                <input type="number"
+                    step="any"
+                    name="server_latitude"
+                    id="locLatInput"
+                    class="sec-input sec-font-mono"
+                    style="width: 100%; box-sizing: border-box;"
+                    placeholder="-6.2088"
+                    value="{{ old('server_latitude', $serverLocation['latitude'] ?? '') }}">
+                <span style="display: block; font-size: 11px; color: var(--sec-text-subtle); margin-top: 4px;">
+                    {{ __('Titik koordinat lintang untuk Live Threat Map.') }}
+                </span>
+            </div>
+
+            <div>
+                <label style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 6px; color: var(--sec-text-muted);">
+                    {{ __('Longitude (Bujur: -180 s/d 180)') }}
+                </label>
+                <input type="number"
+                    step="any"
+                    name="server_longitude"
+                    id="locLonInput"
+                    class="sec-input sec-font-mono"
+                    style="width: 100%; box-sizing: border-box;"
+                    placeholder="106.8456"
+                    value="{{ old('server_longitude', $serverLocation['longitude'] ?? '') }}">
+                <span style="display: block; font-size: 11px; color: var(--sec-text-subtle); margin-top: 4px;">
+                    {{ __('Titik koordinat bujur untuk Live Threat Map.') }}
+                </span>
+            </div>
+        </div>
+
+        {{-- Action Bar & Interactive Helpers --}}
+        <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 12px; border-top: 1px solid var(--sec-border-light); flex-wrap: wrap; gap: 10px;">
+            <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                <button type="button" class="sec-btn sec-btn-secondary sec-btn-sm" id="btnDetectGps" style="display: inline-flex; align-items: center; gap: 5px;">
+                    <span>🎯</span>
+                    <span>{{ __('Gunakan GPS Peramban') }}</span>
+                </button>
+                <button type="button" class="sec-btn sec-btn-secondary sec-btn-sm" id="btnDetectTimezone" style="display: inline-flex; align-items: center; gap: 5px;">
+                    <span>🕒</span>
+                    <span>{{ __('Deteksi Timezone Peramban') }}</span>
+                </button>
+                <button type="button" class="sec-btn sec-btn-secondary sec-btn-sm" id="btnClearLocation" style="display: inline-flex; align-items: center; gap: 5px;">
+                    <span>🔄</span>
+                    <span>{{ __('Kosongkan / Reset Bawaan') }}</span>
+                </button>
+                @if (!empty($serverLocation['latitude']) && !empty($serverLocation['longitude']))
+                    <a href="https://www.google.com/maps?q={{ $serverLocation['latitude'] }},{{ $serverLocation['longitude'] }}" target="_blank" rel="noopener noreferrer" class="sec-btn sec-btn-secondary sec-btn-sm" style="display: inline-flex; align-items: center; gap: 4px; text-decoration: none;" title="{{ __('Lihat titik koordinat di Google Maps') }}">
+                        <span>🌐</span>
+                        <span>{{ __('Buka di Maps ↗') }}</span>
+                    </a>
+                @endif
+            </div>
+
+            <div style="display: flex; gap: 8px; align-items: center;">
+                <span id="locStatusMsg" style="font-size: 12px; color: var(--sec-text-muted); display: none;"></span>
+                <button type="submit" class="sec-btn sec-btn-primary sec-btn-sm" style="display: inline-flex; align-items: center; gap: 6px;">
+                    <span>💾</span>
+                    <span>{{ __('Simpan Pengaturan Server') }}</span>
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
 
 <div class="sec-card sec-card-flush">
     <div class="sec-card-header">
@@ -626,6 +803,102 @@
                 }
             });
         });
+        // Penangan Interaktif Pengaturan Lokasi Server
+        var btnDetectGps = document.getElementById('btnDetectGps');
+        var btnClearLocation = document.getElementById('btnClearLocation');
+        var locNameInput = document.getElementById('locNameInput');
+        var locLatInput = document.getElementById('locLatInput');
+        var locLonInput = document.getElementById('locLonInput');
+        var locStatusMsg = document.getElementById('locStatusMsg');
+        var locTimezoneSelect = document.getElementById('locTimezoneSelect');
+        var currentClockTicker = document.getElementById('currentClockTicker');
+        var btnDetectTimezone = document.getElementById('btnDetectTimezone');
+
+        function updateServerClockTicker() {
+            if (!currentClockTicker) return;
+            var selectedTz = (locTimezoneSelect && locTimezoneSelect.value) ? locTimezoneSelect.value : '{{ $effectiveTz }}';
+            try {
+                var now = new Date();
+                currentClockTicker.textContent = new Intl.DateTimeFormat('id-ID', {
+                    timeZone: selectedTz,
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    hour12: false
+                }).format(now);
+            } catch (e) {
+            }
+        }
+        setInterval(updateServerClockTicker, 1000);
+        updateServerClockTicker();
+
+        if (locTimezoneSelect) {
+            locTimezoneSelect.addEventListener('change', updateServerClockTicker);
+        }
+
+        if (btnDetectTimezone) {
+            btnDetectTimezone.addEventListener('click', function() {
+                try {
+                    var detectedTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+                    if (detectedTz && locTimezoneSelect) {
+                        locTimezoneSelect.value = detectedTz;
+                        updateServerClockTicker();
+                        showLocStatus('{{ __('Zona waktu terdeteksi: ') }}' + detectedTz + '. {{ __('Klik Simpan untuk menerapkan.') }}', false);
+                    }
+                } catch (e) {
+                    showLocStatus('{{ __('Gagal mendeteksi zona waktu peramban.') }}', true);
+                }
+            });
+        }
+
+        function showLocStatus(text, isError) {
+            if (!locStatusMsg) return;
+            locStatusMsg.textContent = text;
+            locStatusMsg.style.display = 'inline';
+            locStatusMsg.style.color = isError ? 'var(--sec-danger)' : 'var(--sec-success)';
+            setTimeout(function() {
+                locStatusMsg.style.display = 'none';
+            }, 5000);
+        }
+
+        if (btnDetectGps) {
+            btnDetectGps.addEventListener('click', function() {
+                if (!navigator.geolocation) {
+                    showLocStatus('{{ __('Geolokasi tidak didukung oleh peramban ini.') }}', true);
+                    return;
+                }
+                btnDetectGps.disabled = true;
+                btnDetectGps.innerHTML = '<span>⏳</span><span>{{ __('Mencari GPS...') }}</span>';
+                navigator.geolocation.getCurrentPosition(
+                    function(pos) {
+                        btnDetectGps.disabled = false;
+                        btnDetectGps.innerHTML = '<span>🎯</span><span>{{ __('Gunakan GPS Peramban') }}</span>';
+                        if (locLatInput) locLatInput.value = pos.coords.latitude.toFixed(6);
+                        if (locLonInput) locLonInput.value = pos.coords.longitude.toFixed(6);
+                        if (locNameInput && (!locNameInput.value || locNameInput.value.trim() === '')) {
+                            locNameInput.value = 'Node Administrator (GPS)';
+                        }
+                        showLocStatus('{{ __('Koordinat GPS berhasil diperoleh! Jangan lupa klik Simpan.') }}', false);
+                    },
+                    function(err) {
+                        btnDetectGps.disabled = false;
+                        btnDetectGps.innerHTML = '<span>🎯</span><span>{{ __('Gunakan GPS Peramban') }}</span>';
+                        showLocStatus('{{ __('Gagal membaca GPS: ') }}' + (err.message || 'Izin ditolak'), true);
+                    },
+                    { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+                );
+            });
+        }
+
+        if (btnClearLocation) {
+            btnClearLocation.addEventListener('click', function() {
+                if (locNameInput) locNameInput.value = '';
+                if (locLatInput) locLatInput.value = '';
+                if (locLonInput) locLonInput.value = '';
+                showLocStatus('{{ __('Bidang dikosongkan. Klik Simpan untuk kembali ke deteksi otomatis.') }}', false);
+            });
+        }
+
     });
 </script>
 

@@ -12,6 +12,7 @@ use Illuminate\Support\Str;
 use Internal\Pasak\Models\PasakBlockedIp;
 use Internal\Pasak\Models\PasakLog;
 use Internal\Pasak\Models\PasakLoginAttempt;
+use Internal\Pasak\Support\PasakDashboardView;
 use Laravel\Fortify\Features;
 use Throwable;
 
@@ -1485,8 +1486,8 @@ class PasakServerSecurityService
             'cache' => (string) config('cache.default', 'database'),
             'queue' => (string) config('queue.default', 'sync'),
             'session' => (string) config('session.driver', 'database'),
-            'timezone' => (string) config('app.timezone', 'UTC'),
-            'server_time' => now()->toIso8601String(),
+            'timezone' => (string) PasakDashboardView::timezone(),
+            'server_time' => PasakDashboardView::formatDate(now(), 'd M Y, H:i:s T'),
             'os' => PHP_OS_FAMILY.' '.php_uname('r'),
         ];
 

@@ -2,18 +2,33 @@
   "date": "2026-11-12",
   "type": "important",
   "title": {
-    "id": "Profil Otomasi Penyerang, Deteksi Alat Eksploitasi, dan Ketahanan Sesi Perangkat",
-    "en": "Attacker Automation Profiling, Exploit Tool Detection, and Resilient Device Session Guard"
+    "id": "Profil Otomasi Penyerang, Lokasi & Waktu Server Terpadu, dan Ketahanan Pembaruan Sistem",
+    "en": "Attacker Automation Profiling, Unified Server Location & Timezone, and Resilient Update Guard"
   },
   "body": {
-    "id": "Pembaruan v1.7.14 menghadirkan intelijen deteksi otomatis untuk mengidentifikasi profil penyerang (alat scanner eksploitasi, bot otomatis, script, dan perayap web), penyaringan cepat log keamanan, penguatan ketahanan penyimpanan sesi perangkat panjang, serta pengamanan bertingkat percobaan masuk.",
-    "en": "Update v1.7.14 introduces intelligent automatic classification identifying attacker profiles (exploit scanners, automated bots, scripts, and web crawlers), quick security log filtering, resilient device session handling, and stepped cooldown protection for login attempts."
+    "id": "Pembaruan komprehensif menghadirkan intelijen deteksi otomatis untuk mengidentifikasi profil penyerang (alat scanner, bot, script, dan perayap), konfigurasi lokasi fisik server & koordinat radar ancaman Live Threat Map, standardisasi zona waktu operasional server terpadu, penyaringan cepat log keamanan, serta proteksi otomatis rute sistem saat pembaruan paket.",
+    "en": "Comprehensive update introducing automated intelligence to profile attackers (exploit scanners, bots, scripts, and web crawlers), physical server location & Live Threat Map radar target configuration, unified operational server timezone standardization, rapid security log filtering, and automated route resilience during package updates."
   },
   "items": [
     {
       "type": "new",
-      "id": "Klasifikasi Cerdas & Profil Penyerang Otomatis: Dasbor kini secara otomatis mengenali dan menampilkan identitas alat penyerang seperti scanner eksploitasi, bot otomatis, script pengikis, perayap web, atau peramban standar lengkap dengan lencana visual informatif.",
-      "en": "Intelligent Automated Attacker Profiling: The dashboard now automatically recognizes and displays the software identities of attackers—such as exploit scanners, automated bots, scraping scripts, web crawlers, or standard browsers with informative visual badges."
+      "id": "Pengaturan Lokasi Fisik & Titik Radar Ancaman Server: Pengelola kini dapat mengonfigurasi label nama lokasi dan titik koordinat GPS server langsung dari panel Server Audit, yang secara otomatis menjadi sasaran radar pada peta ancaman Live Threat Map.",
+      "en": "Physical Server Location & Threat Radar Target: Administrators can now configure server location labels and GPS coordinates directly from the Server Audit panel, automatically anchoring the focal target on the Live Threat Map."
+    },
+    {
+      "type": "new",
+      "id": "Standardisasi Zona Waktu Server Terpadu: Penentuan zona waktu resmi server (WIB, WITA, WIT, zona waktu global populer, atau deteksi peramban otomatis) sebagai acuan waktu tunggal untuk seluruh pencatatan insiden, audit berkas, dan jam dasbor.",
+      "en": "Unified Operational Server Timezone: Dedicated server timezone configuration (WIB, WITA, WIT, global timezones, or browser auto-detection) acting as the single source of truth across all incident logs, file integrity audits, and dashboard clocks."
+    },
+    {
+      "type": "improvement",
+      "id": "Ketahanan Pembaruan Sistem & Rute Cadangan Otomatis: Menjamin seluruh rute baru tetap langsung berfungsi normal saat paket diperbarui tanpa kendala rute tidak ditemukan atau penolakan metode, disertai penyematan rute aman pada perintah peningkatan.",
+      "en": "Resilient System Updates & Automated Route Fallbacks: Guarantees newly introduced routes immediately function upon package updates without route-not-found or method rejection errors, backed by safe auto-injection during upgrade commands."
+    },
+    {
+      "type": "new",
+      "id": "Klasifikasi Cerdas & Profil Penyerang Otomatis: Dasbor secara otomatis mengenali dan menampilkan identitas alat penyerang seperti scanner eksploitasi, bot otomatis, script pengikis, perayap web, atau peramban standar lengkap dengan lencana visual informatif.",
+      "en": "Intelligent Automated Attacker Profiling: The dashboard automatically recognizes and displays the software identities of attackers—such as exploit scanners, automated bots, scraping scripts, web crawlers, or standard browsers with informative visual badges."
     },
     {
       "type": "new",
