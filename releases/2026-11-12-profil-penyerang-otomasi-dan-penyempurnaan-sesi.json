@@ -6,8 +6,8 @@
     "en": "Attacker Automation Profiling, Exploit Tool Detection, and Resilient Device Session Guard"
   },
   "body": {
-    "id": "Pembaruan v1.7.13 menghadirkan intelijen deteksi otomatis untuk mengidentifikasi profil penyerang (alat scanner eksploitasi, bot otomatis, script, dan perayap web), penyaringan cepat log keamanan, penguatan ketahanan penyimpanan sesi perangkat panjang, serta pengamanan bertingkat percobaan masuk.",
-    "en": "Update v1.7.13 introduces intelligent automatic classification identifying attacker profiles (exploit scanners, automated bots, scripts, and web crawlers), quick security log filtering, resilient device session handling, and stepped cooldown protection for login attempts."
+    "id": "Pembaruan v1.7.14 menghadirkan intelijen deteksi otomatis untuk mengidentifikasi profil penyerang (alat scanner eksploitasi, bot otomatis, script, dan perayap web), penyaringan cepat log keamanan, penguatan ketahanan penyimpanan sesi perangkat panjang, serta pengamanan bertingkat percobaan masuk.",
+    "en": "Update v1.7.14 introduces intelligent automatic classification identifying attacker profiles (exploit scanners, automated bots, scripts, and web crawlers), quick security log filtering, resilient device session handling, and stepped cooldown protection for login attempts."
   },
   "items": [
     {
